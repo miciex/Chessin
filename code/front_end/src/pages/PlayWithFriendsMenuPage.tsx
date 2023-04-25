@@ -4,19 +4,65 @@ import React from "react";
 import { ColorsPallet } from "../utils/Constants";
 import SendInvitation from "../features/playOnline/components/SendInvitation";
 import InputField from "../components/InputField";
-import EndedGame from "../features/home/components/EndedGame";
+import Friend from "../features/playOnline/components/Friend";
+import Footer from "../components/Footer";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../Routing";
+import { RouteProp } from "@react-navigation/native";
+import Submit from "../features/login/components/Submit";
 
 const friends = [
-  { playerNick: "Pusznik", rank: 1500, active: false, avatar: "" },
-  { playerNick: "MaciekNieBij", rank: 1500, active: true, avatar: "" },
-  { playerNick: "Slaweczuk", rank: 1500, active: true, avatar: "" },
-  { playerNick: "Strzała", rank: 1500, active: false, avatar: "" },
-  { playerNick: "Bestia", rank: 1500, active: false, avatar: "" },
-  { playerNick: "Sharku", rank: 1000, active: true, avatar: "" },
-  { playerNick: "Zocho", rank: 1300, active: false, avatar: "" },
+  {
+    playerNick: "Pusznik",
+    rank: 1500,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
+  {
+    playerNick: "MaciekNieBij",
+    rank: 1500,
+    active: true,
+    playing: true,
+    avatar: "",
+  },
+  {
+    playerNick: "Slaweczuk",
+    rank: 1500,
+    active: true,
+    playing: false,
+    avatar: "",
+  },
+  {
+    playerNick: "Strzała",
+    rank: 1500,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
+  {
+    playerNick: "Bestia",
+    rank: 1500,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
+  { playerNick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
+  {
+    playerNick: "Zocho",
+    rank: 1300,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
 ];
 
-export default function PlayWithFriendsMenu() {
+type Props = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
+  route: RouteProp<RootStackParamList, "Login">;
+};
+
+export default function PlayWithFriendsMenu({ route, navigation }: Props) {
   return (
     <ScrollView>
       <View style={styles.appContainer}>
@@ -24,14 +70,16 @@ export default function PlayWithFriendsMenu() {
           <SendInvitation />
           <InputField placeholder="Search" />
           {friends.map((gracz) => (
-            <EndedGame
+            <Friend
               nick={gracz.playerNick}
               rank={gracz.rank}
-              result={gracz.avatar}
+              active={gracz.active}
+              playing={gracz.playing}
             />
           ))}
         </View>
       </View>
+      <Footer navigation={navigation} />
     </ScrollView>
   );
 }

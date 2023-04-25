@@ -29,6 +29,7 @@ export default function Login({ route, navigation }: Props) {
           <LogInWithOtherFirm brand="apple" />
         </View>
       </View>
+      <Footer navigation={navigation} />
     </View>
   );
 }

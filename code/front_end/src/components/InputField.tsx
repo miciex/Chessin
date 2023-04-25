@@ -14,7 +14,12 @@ const InputField = (props: Arguments) => {
       <TextInput
         onChangeText={setInputText}
         placeholder={props.placeholder}
-        style={{ textAlign: "center", color: ColorsPallet.darker }}
+        style={{
+          textAlign: "center",
+          color: ColorsPallet.darker,
+          fontSize: 20,
+          lineHeight: 100,
+        }}
       />
     </View>
   );
@@ -26,10 +31,9 @@ const styles = StyleSheet.create({
   InputField: {
     backgroundColor: ColorsPallet.baseColor,
     width: "100%",
-    height: 45,
-    padding: 10,
+    height: 55,
+    padding: 12,
     borderRadius: 14,
-
     textAlign: "center",
     textDecorationStyle: "none",
     margin: 8,

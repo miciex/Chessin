@@ -1,64 +1,73 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import React from "react";
-
+import { Fontisto } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { ColorsPallet } from "../../../utils/Constants";
-// import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap%27);
-// import { useFonts, Inter_900Black } from "@expo-google-fonts/inter";
-// import { Inter_400Regular, useFonts } from "@expo-google-fonts/inter";
 
 type Props = {
   nick: string;
   rank: Number;
-  result: string;
+  active: boolean;
+  playing: boolean;
 };
 
-const EndedGame = (props: Props) => {
-  let resultColor = "rgb(92, 6, 6)";
-  if (props.result == "win") {
-    resultColor = "rgb(31, 145, 46)";
-  } else if (props.result == "draw") {
-    resultColor = "rgb(54, 56, 55)";
-  }
+const Friend = (props: Props) => {
+  const PlayingEye = () => {
+    if (!props.playing) {
+      return null;
+    }
+    return <FontAwesome5 name="eye" size={18} color="black" />;
+  };
+  const Online = () => {
+    if (!props.active) {
+      return <Fontisto name="radio-btn-active" size={9} color="black" />;
+    }
+    return <Fontisto name="radio-btn-active" size={9} color="green" />;
+  };
   return (
     <View style={styles.record}>
       {/* <Image source={}/> */}
       <Text style={styles.left}>
-        {props.nick} {props.rank.toString()}
+        <Online /> {props.nick} {props.rank.toString()}
       </Text>
+
       <View style={styles.right}>
         <Text style={{ textAlign: "right", width: "100%" }}>
-          <FontAwesome5 name="chess-board" size={18} color="black" />
+          <PlayingEye />
           <Text> </Text>
-          <FontAwesome5 name="crown" size={18} color={resultColor} />
+          <FontAwesome5 name="chess-board" size={18} color="black" />
         </Text>
       </View>
     </View>
   );
 };
-export default EndedGame;
+export default Friend;
 
 const styles = StyleSheet.create({
   record: {
     backgroundColor: ColorsPallet.baseColor,
-    width: "87%",
+
+    width: "90%",
     height: 37,
     paddingBottom: 10,
     paddingTop: 10,
-    paddingLeft: 35,
+    paddingLeft: 25,
     paddingRight: 25,
-    borderRadius: 4,
+    borderRadius: 10,
     flexDirection: "row",
     flexWrap: "wrap",
     textAlign: "center",
     textDecorationStyle: "none",
-    margin: 8,
+    margin: 10,
     display: "flex",
   },
   left: {
-    width: "80%",
+    width: "70%",
+    // backgroundColor: "red",
   },
   right: {
-    width: "20%",
+    width: "30%",
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
 });

@@ -17,12 +17,11 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: ColorsPallet.baseColor,
     width: "100%",
-    height: 60,
-    paddingBottom: 10,
-    paddingTop: 10,
+    height: 55,
+    padding: 12,
     paddingLeft: 35,
     paddingRight: 25,
-    borderRadius: 4,
+    borderRadius: 16,
     flexDirection: "row",
     flexWrap: "wrap",
     margin: 8,
@@ -32,7 +31,7 @@ const styles = StyleSheet.create({
   text: {
     textAlign: "center",
     width: "100%",
-    lineHeight: 40,
+    lineHeight: 28,
     fontSize: 18,
   },
 });
