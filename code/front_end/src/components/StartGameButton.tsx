@@ -18,5 +18,5 @@ export default function StartGameButton({ navigation }: Props) {
     navigation.navigate("PlayOnline");
   };
 
-  return <BaseButton />;
+  return <BaseButton handlePress={handlePress} text="Play" />;
 }

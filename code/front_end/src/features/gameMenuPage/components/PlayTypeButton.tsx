@@ -1,6 +1,6 @@
-import { Text, Pressable } from "react-native";
+import { Text, Pressable, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import type { playType } from "./PlayTypeButtons";
+import type { playType } from "../context/TypeContext";
 import BaseButton from "../../../components/BaseButton";
 
 type Props = {
@@ -19,3 +19,5 @@ export default function PlayTypeButton({ text, active, handlePress }: Props) {
     />
   );
 }
+
+const styles = StyleSheet.create({});
