@@ -3,6 +3,7 @@ import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import { ColorsPallet } from "../../../utils/Constants";
+import BaseButton from "../../../components/BaseButton";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home", undefined>;
@@ -14,11 +15,7 @@ export default function SingButton({ navigation, text }: Props) {
     navigation.navigate(text);
   };
 
-  return (
-    <Pressable onPress={handlePress} style={styles.button}>
-      <Text style={styles.buttonText}>{text}</Text>
-    </Pressable>
-  );
+  return <BaseButton handlePress={handlePress} text={text} />;
 }
 
 const styles = StyleSheet.create({

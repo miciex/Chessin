@@ -5,3 +5,17 @@ export const ColorsPallet = {
   dark: "#634832",
   darker: "#38220f",
 };
+
+export type StackParamList =
+  | "Analyze"
+  | "FreeBoard"
+  | "GameMenu"
+  | "Home"
+  | "LastGame"
+  | "Login"
+  | "PlayBot"
+  | "PlayOnline"
+  | "PlayWithFriendsMenu"
+  | "ProfilePage"
+  | "Register"
+  | "Socials";

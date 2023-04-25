@@ -6,25 +6,27 @@ import { FontAwesome } from "@expo/vector-icons";
 export default function Header() {
   return (
     <View style={styles.header}>
-      <Text style={styles.headerText}>Chessin</Text>
-      <FontAwesome
-        name="user-circle"
-        size={32}
-        color="black"
-        style={styles.headerImage}
-      />
+      <View style={styles.contentContainer}>
+        <Text style={styles.headerText}>Chessin</Text>
+        <FontAwesome
+          name="user-circle"
+          size={32}
+          color="black"
+          style={styles.headerImage}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
-    width: "100%",
-    height: "100%",
+    flex: 1,
+    alignContent: "stretch",
     backgroundColor: ColorsPallet.darker,
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "flex-end",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerText: {
     fontSize: 32,
@@ -33,5 +35,15 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     marginBottom: 4,
+  },
+  contentContainer: {
+    flexDirection: "row",
+    width: "80%",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+  },
+  textContainer: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

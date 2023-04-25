@@ -10,7 +10,11 @@ type Props = {
 export default function BaseButton({ handlePress, text }: Props) {
   return (
     <View style={styles.buttonContainer}>
-      <Pressable onPress={handlePress} style={styles.button}>
+      <Pressable
+        onPress={handlePress}
+        style={styles.button}
+        android_ripple={{ color: ColorsPallet.darker, borderless: false }}
+      >
         <Text style={styles.buttonText}>{text}</Text>
       </Pressable>
     </View>
@@ -30,6 +34,8 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
     color: ColorsPallet.darker,

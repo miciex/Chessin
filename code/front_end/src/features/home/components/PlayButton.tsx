@@ -6,7 +6,11 @@ import { ColorsPallet } from "../../../utils/Constants";
 import BaseButton from "../../../components/BaseButton";
 
 type Props = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Home", undefined>;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "Home" | "GameMenu",
+    undefined
+  >;
 };
 
 export default function PlayButton({ navigation }: Props) {

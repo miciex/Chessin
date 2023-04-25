@@ -9,14 +9,17 @@ import Footer from "../components/Footer";
 import AuthenticateButton from "../features/home/components/AuthenticateButton";
 import EndedGame from "../features/home/components/EndedGame";
 import TopButtons from "../features/home/components/TopButtons";
+import { ColorsPallet } from "../utils/Constants";
 
 //przykladowe stary gry
 const ended_games = [
-  { playerNick: "Pusznik", rank: 1500 },
-  { playerNick: "MaciekNieBij", rank: 1500 },
-  { playerNick: "Slaweczuk", rank: 1500 },
-  { playerNick: "Strzała", rank: 1500 },
-  { playerNick: "Bestia", rank: 1500 },
+  { playerNick: "Pusznik", rank: 1500, lastGameResult: "win" },
+  { playerNick: "MaciekNieBij", rank: 1500, lastGameResult: "win" },
+  { playerNick: "Slaweczuk", rank: 1500, lastGameResult: "win" },
+  { playerNick: "Strzała", rank: 1500, lastGameResult: "lose" },
+  { playerNick: "Bestia", rank: 1500, lastGameResult: "win" },
+  { playerNick: "Sharku", rank: 1000, lastGameResult: "lose" },
+  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
 ];
 
 type Props = {
@@ -33,10 +36,14 @@ const HomePage = ({ route, navigation }: Props) => {
     <View style={styles.appContainer}>
       <ScrollView>
         <View style={styles.contentContainer}>
-          <TopButtons />
+          <TopButtons navigation={navigation} />
           <Text style={{ fontSize: 18 }}>Old Games</Text>
           {ended_games.map((gracz) => (
-            <EndedGame nick={gracz.playerNick} rank={gracz.rank} />
+            <EndedGame
+              nick={gracz.playerNick}
+              rank={gracz.rank}
+              result={gracz.lastGameResult}
+            />
           ))}
           <View style={styles.endedGames}>{}</View>
         </View>
@@ -50,9 +57,10 @@ const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
     alignContent: "stretch",
+    backgroundColor: ColorsPallet.light,
   },
   contentContainer: {
-    marginTop: 100,
+    marginTop: 32,
     flex: 8,
     alignItems: "center",
   },

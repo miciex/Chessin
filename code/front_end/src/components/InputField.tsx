@@ -1,6 +1,6 @@
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import React from "react";
-import { ColorsPallet } from "../../../utils/Constants";
+import { ColorsPallet } from "../utils/Constants";
 
 type Arguments = {
   placeholder: string;
@@ -25,7 +25,7 @@ export default InputField;
 const styles = StyleSheet.create({
   InputField: {
     backgroundColor: ColorsPallet.baseColor,
-    width: "70%",
+    width: "100%",
     height: 45,
     padding: 10,
     borderRadius: 14,
