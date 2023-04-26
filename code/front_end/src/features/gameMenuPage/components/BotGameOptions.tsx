@@ -61,7 +61,7 @@ export default function BotGameOptions({
 
   return (
     <View style={styles.container}>
-      <View style={styles.optionsContainer}>
+      <View style={{ ...styles.optionsContainer, flex: 5 }}>
         <View style={styles.botOptionsContainer}>
           <View style={styles.botOptionsInnerContainer}>
             <BotOption setBotType={setBotType} name="fish" />
@@ -72,7 +72,7 @@ export default function BotGameOptions({
         </View>
       </View>
 
-      <View style={styles.optionsContainer}>
+      <View style={{ ...styles.optionsContainer, flex: 3 }}>
         <View style={styles.botOptionsInnerContainer}>
           <BotOption setBotType={setBotType} name="robot" />
         </View>
@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     alignItems: "center",
+    justifyContent: "space-evenly",
     top: 20,
   },
   botStrengthOptionsBarContainer: {
@@ -102,7 +103,6 @@ const styles = StyleSheet.create({
   },
   botOptionsInnerContainer: {},
   optionsContainer: {
-    flex: 1,
     justifyContent: "space-evenly",
     alignItems: "center",
     rowGap: 20,

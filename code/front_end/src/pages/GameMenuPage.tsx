@@ -19,6 +19,12 @@ import {
   botStrengthLevelContextType,
 } from "../features/gameMenuPage/context/BotStrengthContext";
 import BotGameOptions from "../features/gameMenuPage/components/BotGameOptions";
+import {
+  PlayColorsContextType,
+  PlayColorsContext,
+} from "../features/gameMenuPage/context/PlayColorContext";
+import PickColor from "../features/gameMenuPage/components/PickColor";
+import PlayOnlineOptions from "../features/gameMenuPage/components/PlayOnlineOptions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -33,6 +39,8 @@ export default function GameMenu({ route, navigation }: Props) {
   const [gameType, setGameType] = useState<playType>("Play Online");
   const [gameBotType, setGameBotType] = useState<botType>("ChessinBot");
   const [gameBotStrength, setGameBotStrength] = useState<strengthLevelType>(1);
+  const [chosenColor, setChosenColor] =
+    useState<PlayColorsContextType>("random");
 
   const setGame = (gmType: playType) => {
     setGameType(gmType);
@@ -42,31 +50,50 @@ export default function GameMenu({ route, navigation }: Props) {
     setGameBotType(botType);
   };
 
+  const setColor = (colorType: PlayColorsContextType) => {
+    setChosenColor(colorType);
+  };
+
   return (
-    <botStrengthLevelContextType.Provider value={gameBotStrength}>
-      <BotTypeContext.Provider value={gameBotType}>
-        <TypeContext.Provider value={gameType}>
-          <View style={styles.appContainer}>
-            <View style={styles.contentContainer}>
-              <View style={styles.chooseGameContainer}>
-                <BotGameOptions
-                  setBotType={setBotType}
-                  setGameBotStrength={setGameBotStrength}
-                  handleChooseBotType={setBotType}
-                />
+    <PlayColorsContext.Provider value={chosenColor}>
+      <botStrengthLevelContextType.Provider value={gameBotStrength}>
+        <BotTypeContext.Provider value={gameBotType}>
+          <TypeContext.Provider value={gameType}>
+            <View style={styles.appContainer}>
+              <View style={styles.contentContainer}>
+                <View style={styles.chooseGameContainer}>
+                  {gameType === "Play With Bot" ? (
+                    <>
+                      <View style={styles.gameOptionsContainer}>
+                        <BotGameOptions
+                          setBotType={setBotType}
+                          setGameBotStrength={setGameBotStrength}
+                          handleChooseBotType={setBotType}
+                        />
+                      </View>
+                      <View style={styles.pickColorContainer}>
+                        <View style={styles.pickColorInnerContainer}>
+                          <PickColor handleOnClick={setChosenColor} />
+                        </View>
+                      </View>
+                    </>
+                  ) : (
+                    <PlayOnlineOptions />
+                  )}
+                </View>
+                <View style={styles.bottomButtonsContainer}>
+                  <BottomButtons
+                    navigation={navigation}
+                    handleSetType={setGame}
+                  />
+                </View>
               </View>
-              <View style={styles.bottomButtonsContainer}>
-                <BottomButtons
-                  navigation={navigation}
-                  handleSetType={setGame}
-                />
-              </View>
+              <Footer navigation={navigation} />
             </View>
-            <Footer navigation={navigation} />
-          </View>
-        </TypeContext.Provider>
-      </BotTypeContext.Provider>
-    </botStrengthLevelContextType.Provider>
+          </TypeContext.Provider>
+        </BotTypeContext.Provider>
+      </botStrengthLevelContextType.Provider>
+    </PlayColorsContext.Provider>
   );
 }
 
@@ -82,9 +109,25 @@ const styles = StyleSheet.create({
   },
   chooseGameContainer: {
     flex: 7,
+    alignItems: "center",
+    gap: 16,
   },
   bottomButtonsContainer: {
     flex: 2,
     width: "100%",
+  },
+  gameOptionsContainer: {
+    width: "100%",
+    flex: 7,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pickColorContainer: {
+    width: "100%",
+    flex: 1,
+  },
+  pickColorInnerContainer: {
+    width: "50%",
+    flexDirection: "row",
   },
 });

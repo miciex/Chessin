@@ -1,41 +1,64 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Pressable, StyleSheet, Text } from "react-native";
 import React from "react";
-import { Fontisto } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { ColorsPallet } from "../../../utils/Constants";
+import { Fontisto } from "@expo/vector-icons";
+import { ColorsPallet, StackParamList } from "../../../utils/Constants";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../../Routing";
+import { RouteProp } from "@react-navigation/native";
 
 type Props = {
   nick: string;
   rank: Number;
   active: boolean;
   playing: boolean;
+  navigateToPlayWithFriend?: Function;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    StackParamList,
+    undefined
+  >;
 };
-
-const Friend = (props: Props) => {
+const Friend = ({ navigation, nick, rank, playing, active }: Props) => {
   const PlayingEye = () => {
-    if (!props.playing) {
+    if (!playing) {
       return null;
     }
     return <FontAwesome5 name="eye" size={18} color="green" />;
   };
   const Online = () => {
-    if (!props.active) {
+    if (!active) {
       return <Fontisto name="radio-btn-active" size={9} color="black" />;
     }
     return <Fontisto name="radio-btn-active" size={9} color="green" />;
+  };
+
+  const goToFriendsMenu = () => {
+    navigation.navigate("PlayWithFriendsMenu", {
+      nick,
+      rank,
+      playing,
+      active,
+    });
   };
   return (
     <View style={styles.record}>
       {/* <Image source={}/> */}
       <Text style={styles.left}>
-        <Online /> {props.nick} {props.rank.toString()}
+        <Online /> {nick} {rank.toString()}
       </Text>
 
       <View style={styles.right}>
         <Text style={{ textAlign: "right", width: "100%" }}>
           <PlayingEye />
           {"  "}
-          <FontAwesome5 name="chess-board" size={18} color="black" />
+          <FontAwesome5
+            name="chess-board"
+            size={18}
+            color="black"
+            onPress={goToFriendsMenu}
+          />
         </Text>
       </View>
     </View>
@@ -46,7 +69,6 @@ export default Friend;
 const styles = StyleSheet.create({
   record: {
     backgroundColor: ColorsPallet.baseColor,
-
     width: "100%",
     height: 60,
     padding: 20,

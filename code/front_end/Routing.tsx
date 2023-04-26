@@ -25,7 +25,12 @@ export type RootStackParamList = {
   Login: undefined;
   PlayBot: undefined;
   PlayOnline: undefined;
-  PlayWithFriendsMenu: undefined;
+  PlayWithFriendsMenu: {
+    nick: string;
+    rank: Number;
+    active: boolean;
+    playing: boolean;
+  };
   ProfilePage: undefined;
   Register: undefined;
   Socials: undefined;

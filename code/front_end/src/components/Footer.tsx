@@ -28,7 +28,7 @@ type Props = {
 
 export default function Footer({ navigation }: Props) {
   const handlePressFriends = () => {
-    navigation.navigate("PlayWithFriendsMenu");
+    navigation.navigate("Socials");
   };
 
   const handlePressGame = () => {
