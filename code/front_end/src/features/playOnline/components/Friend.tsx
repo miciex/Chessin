@@ -52,7 +52,7 @@ const Friend = ({ navigation, nick, rank, playing, active }: Props) => {
       <View style={styles.right}>
         <Text style={{ textAlign: "right", width: "100%" }}>
           <PlayingEye />
-          {"  "}
+          {"  sd"}
           <FontAwesome5
             name="chess-board"
             size={18}
