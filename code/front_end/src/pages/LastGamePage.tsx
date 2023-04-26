@@ -20,26 +20,31 @@ const ended_games = [
 ];
 
 type Props = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
-  route: RouteProp<RootStackParamList, "Login">;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "LastGame",
+    undefined
+  >;
+  route: RouteProp<RootStackParamList, "LastGame">;
 };
 
 export default function LastGame({ route, navigation }: Props) {
   return (
-    <ScrollView>
-      <View style={styles.contentContainer}>
-        <Text style={{ fontSize: 18 }}>Old Games</Text>
-        {ended_games.map((gracz) => (
-          <EndedGame
-            nick={gracz.playerNick}
-            rank={gracz.rank}
-            result={gracz.lastGameResult}
-          />
-        ))}
-        <View style={styles.endedGames}>{}</View>
-      </View>
+    <View style={styles.appContainer}>
+      <ScrollView>
+        <View style={styles.contentContainer}>
+          <Text style={{ fontSize: 18 }}>Old Games</Text>
+          {ended_games.map((gracz) => (
+            <EndedGame
+              nick={gracz.playerNick}
+              rank={gracz.rank}
+              result={gracz.lastGameResult}
+            />
+          ))}
+        </View>
+      </ScrollView>
       <Footer navigation={navigation} />
-    </ScrollView>
+    </View>
   );
 }
 

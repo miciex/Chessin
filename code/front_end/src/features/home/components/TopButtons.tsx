@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   },
   authButtonContainer: {
     width: "40%",
-    height: 32,
+    height: 55,
   },
   playButtonsContainer: {
     width: "100%",
@@ -52,6 +52,6 @@ const styles = StyleSheet.create({
   playButtonContainer: {
     width: "80%",
     flexDirection: "row",
-    height: 32,
+    height: 55,
   },
 });

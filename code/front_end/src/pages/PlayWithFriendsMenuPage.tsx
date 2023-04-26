@@ -55,32 +55,83 @@ const friends = [
     playing: false,
     avatar: "",
   },
+  {
+    playerNick: "Strzała",
+    rank: 1500,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
+  {
+    playerNick: "Bestia",
+    rank: 1500,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
+  { playerNick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
+  {
+    playerNick: "Zocho",
+    rank: 1300,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
+  {
+    playerNick: "Strzała",
+    rank: 1500,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
+  {
+    playerNick: "Bestia",
+    rank: 1500,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
+  { playerNick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
+  {
+    playerNick: "Zocho",
+    rank: 1300,
+    active: false,
+    playing: false,
+    avatar: "",
+  },
 ];
 
 type Props = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
-  route: RouteProp<RootStackParamList, "Login">;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "PlayWithFriendsMenu",
+    undefined
+  >;
+  route: RouteProp<RootStackParamList, "PlayWithFriendsMenu">;
 };
 
 export default function PlayWithFriendsMenu({ route, navigation }: Props) {
   return (
-    <ScrollView>
-      <View style={styles.appContainer}>
-        <View style={styles.formContainer}>
-          <SendInvitation />
-          <InputField placeholder="Search" />
-          {friends.map((gracz) => (
-            <Friend
-              nick={gracz.playerNick}
-              rank={gracz.rank}
-              active={gracz.active}
-              playing={gracz.playing}
-            />
-          ))}
-        </View>
+    <View style={styles.appContainer}>
+      <View style={styles.formContainer}>
+        <SendInvitation />
+        <InputField placeholder="Search" />
+        <ScrollView>
+          <View style={styles.scrollView}>
+            {friends.map((gracz) => (
+              <Friend
+                nick={gracz.playerNick}
+                rank={gracz.rank}
+                active={gracz.active}
+                playing={gracz.playing}
+              />
+            ))}
+          </View>
+        </ScrollView>
       </View>
+
       <Footer navigation={navigation} />
-    </ScrollView>
+    </View>
   );
 }
 
@@ -89,12 +140,18 @@ const styles = StyleSheet.create({
     flex: 8,
     alignItems: "center",
     backgroundColor: ColorsPallet.light,
-    width: "80%",
+    width: "90%",
   },
   appContainer: {
     backgroundColor: ColorsPallet.light,
     flex: 1,
     alignContent: "stretch",
     alignItems: "center",
+    justifyContent: "center",
+  },
+  scrollView: {
+    alignItems: "center",
+    marginLeft: "5%",
+    width: "90%",
   },
 });

@@ -1,19 +1,45 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import { View, StyleSheet } from "react-native";
+import React, { useContext } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import BaseButton from "../../../components/BaseButton";
+import {
+  strengthLevelType,
+  botStrengthLevelContextType,
+} from "../context/BotStrengthContext";
+import { BotTypeContext, botType } from "../context/BotTypeContext";
 
 type Props = {
-  strengthLevel: Number;
-  handleChooseStrengthLevel: () => {};
+  strengthLevel: strengthLevelType;
+  handleChooseStrengthLevel: (botStrength: strengthLevelType) => void;
+  handleChooseBotType: (botStrength: botType) => void;
+  botGameType: botType;
 };
 
-export default function BotStrengthOption({ strengthLevel }: Props) {
+export default function BotStrengthOption({
+  strengthLevel,
+  handleChooseStrengthLevel,
+  botGameType,
+  handleChooseBotType,
+}: Props) {
+  const botStrengthLevel = useContext(botStrengthLevelContextType);
+  const botTypeContext = useContext(BotTypeContext);
+
+  const handleOnPress = () => {
+    handleChooseStrengthLevel(strengthLevel);
+    handleChooseBotType(botGameType);
+  };
+
+  const color =
+    botStrengthLevel === strengthLevel && botGameType === botTypeContext
+      ? ColorsPallet.lighter
+      : ColorsPallet.baseColor;
+
   return (
-    <View style={styles.container}>
+    <View style={{ ...styles.container, backgroundColor: color }}>
       <BaseButton
         text={strengthLevel.toString()}
-        handlePress={() => strengthLevel}
+        handlePress={handleOnPress}
+        color={color}
       />
     </View>
   );
@@ -25,7 +51,6 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: ColorsPallet.baseColor,
     borderColor: ColorsPallet.darker,
     borderWidth: 2,
     borderRadius: 8,

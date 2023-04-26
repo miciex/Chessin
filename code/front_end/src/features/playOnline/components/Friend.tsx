@@ -16,7 +16,7 @@ const Friend = (props: Props) => {
     if (!props.playing) {
       return null;
     }
-    return <FontAwesome5 name="eye" size={18} color="black" />;
+    return <FontAwesome5 name="eye" size={18} color="green" />;
   };
   const Online = () => {
     if (!props.active) {
@@ -34,7 +34,7 @@ const Friend = (props: Props) => {
       <View style={styles.right}>
         <Text style={{ textAlign: "right", width: "100%" }}>
           <PlayingEye />
-          <Text> </Text>
+          {"  "}
           <FontAwesome5 name="chess-board" size={18} color="black" />
         </Text>
       </View>
@@ -47,18 +47,18 @@ const styles = StyleSheet.create({
   record: {
     backgroundColor: ColorsPallet.baseColor,
 
-    width: "90%",
-    height: 37,
-    paddingBottom: 10,
-    paddingTop: 10,
-    paddingLeft: 25,
-    paddingRight: 25,
+    width: "100%",
+    height: 60,
+    padding: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
     borderRadius: 10,
     flexDirection: "row",
     flexWrap: "wrap",
     textAlign: "center",
     textDecorationStyle: "none",
-    margin: 10,
+    marginBottom: 10,
+    marginTop: 10,
     display: "flex",
   },
   left: {

@@ -10,6 +10,7 @@ import AuthenticateButton from "../features/home/components/AuthenticateButton";
 import EndedGame from "../features/home/components/EndedGame";
 import TopButtons from "../features/home/components/TopButtons";
 import { ColorsPallet } from "../utils/Constants";
+import BaseButton from "../components/BaseButton";
 
 //przykladowe stary gry
 const ended_games = [
@@ -19,6 +20,9 @@ const ended_games = [
   { playerNick: "Strzała", rank: 1500, lastGameResult: "lose" },
   { playerNick: "Bestia", rank: 1500, lastGameResult: "win" },
   { playerNick: "Sharku", rank: 1000, lastGameResult: "lose" },
+  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
+  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
+  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
   { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
 ];
 
@@ -34,20 +38,30 @@ const HomePage = ({ route, navigation }: Props) => {
 
   return (
     <View style={styles.appContainer}>
-      <ScrollView>
-        <View style={styles.contentContainer}>
-          <TopButtons navigation={navigation} />
-          <Text style={{ fontSize: 18 }}>Old Games</Text>
-          {ended_games.map((gracz) => (
-            <EndedGame
-              nick={gracz.playerNick}
-              rank={gracz.rank}
-              result={gracz.lastGameResult}
-            />
-          ))}
-          <View style={styles.endedGames}>{}</View>
-        </View>
-      </ScrollView>
+      <View style={styles.contentContainer}>
+        <ScrollView>
+          <View style={{ width: "100%", alignItems: "center" }}>
+            <TopButtons navigation={navigation} />
+            <View style={styles.oldGamesButton}>
+              <BaseButton
+                handlePress={() => {
+                  navigation.navigate("LastGame");
+                }}
+                text="Old Games"
+              />
+            </View>
+
+            {ended_games.map((gracz) => (
+              <EndedGame
+                nick={gracz.playerNick}
+                rank={gracz.rank}
+                result={gracz.lastGameResult}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+
       <Footer navigation={navigation} />
     </View>
   );
@@ -64,9 +78,11 @@ const styles = StyleSheet.create({
     flex: 8,
     alignItems: "center",
   },
-
-  endedGames: {},
-  endGame: {},
+  oldGamesButton: {
+    width: "80%",
+    height: 55,
+    margin: 10,
+  },
 });
 
 export default HomePage;
