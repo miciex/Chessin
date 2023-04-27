@@ -16,6 +16,7 @@ import Socials from "./src/pages/SocialsPage";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
+import AnalyzeGamePage from "./src/pages/AnalyzeGamePage";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -94,7 +95,7 @@ const Routing = () => {
           component={Socials}
           options={{ ...headerOptions }}
         />
-        <Stack.Screen name="Analyze" component={Socials} />
+        <Stack.Screen name="Analyze" component={AnalyzeGamePage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

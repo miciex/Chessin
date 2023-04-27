@@ -1,11 +1,18 @@
 import { createContext } from "react";
 
 export type LengthType = {
-  increment: Number;
-  totalTime: Number;
+  increment: number;
+  totalTime: number;
 };
 
-export type GameLengthTypeContextType = "blitz" | "bullet" | "rapid" | "custom";
+export enum GameLengthTypeContextType {
+  BULLET = "bullet",
+  BLITZ = "blitz",
+  RAPID = "rapid",
+  CUSTOM = "custom",
+}
 
-export const GameLengthTypeContext =
-  createContext<GameLengthTypeContextType>("rapid");
+export const GameLengthTypeContext = createContext<LengthType>({
+  increment: 0,
+  totalTime: 600,
+});

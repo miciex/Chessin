@@ -4,7 +4,7 @@ import { ColorsPallet } from "../utils/Constants";
 
 type Props = {
   content: React.ReactNode;
-  handlePress: () => void;
+  handlePress: () => void | Function;
 };
 
 const BaseCustomContentButton: React.FC<Props> = ({ handlePress, content }) => {
