@@ -4,7 +4,7 @@ import BaseCustomContentButton from "../../../components/BaseCustomContentButton
 import {
   LengthType,
   GameLengthTypeContextType,
-} from "../context/GameLengthType";
+} from "../context/GameLengthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ColorsPallet } from "../../../utils/Constants";
 

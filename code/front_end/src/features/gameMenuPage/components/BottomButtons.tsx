@@ -22,11 +22,6 @@ export default function BottomButtons({ navigation, handleSetType }: Props) {
       <View style={styles.typeButtonsContainer}>
         <PlayTypeButtons handleSetType={handleSetType} />
       </View>
-      <View style={styles.startGameButtonOuterContainer}>
-        <View style={styles.startGameButtonInnerContainer}>
-          <StartGameButton navigation={navigation} />
-        </View>
-      </View>
     </View>
   );
 }

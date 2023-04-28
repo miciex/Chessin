@@ -37,7 +37,6 @@ export default function BotOption({ setBotType, name }: Props) {
         />
       </View>
     </View>
-    // <View style={styles.butto
   );
 }
 
@@ -59,7 +58,6 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.dark,
     borderRadius: 8,
     borderColor: ColorsPallet.darker,
-    borderWidth: 4,
   },
   buttonInnerContainerUnactive: {
     width: "100%",

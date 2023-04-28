@@ -78,7 +78,7 @@ export default function GameMenu({ route, navigation }: Props) {
                       </View>
                     </>
                   ) : (
-                    <PlayOnlineOptions />
+                    <PlayOnlineOptions navigation={navigation} />
                   )}
                 </View>
                 <View style={styles.bottomButtonsContainer}>

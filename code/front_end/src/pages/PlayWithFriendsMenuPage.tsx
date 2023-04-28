@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Switch,
+  Modal,
+} from "react-native";
 import React, { useState } from "react";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -14,6 +21,7 @@ import PickColor from "../features/gameMenuPage/components/PickColor";
 import BaseButton from "../components/BaseButton";
 import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColorContext";
 import BaseCustomContentButton from "../components/BaseCustomContentButton";
+import BaseModal from "../components/BaseModal";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -28,6 +36,10 @@ type Props = {
 export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   const [chosenColor, setChosenColor] =
     useState<PlayColorsContextType>("random");
+
+  const setColor = (colorType: PlayColorsContextType) => {
+    setChosenColor(colorType);
+  };
 
   const { nick, active, playing, rank } = route.params;
 
@@ -101,6 +113,9 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
         </View>
         <View style={{ width: "80%", height: 80 }}>
           <BaseButton handlePress={() => {}} text="Graj" fontSizeProps={30} />
+          <Text>
+            <Modal />;
+          </Text>
         </View>
       </View>
       <Footer navigation={navigation} />

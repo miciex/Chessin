@@ -1,10 +1,10 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import React from "react";
 import PlayOnlineElement from "./PlayOnlineElement";
 import {
   LengthType,
   GameLengthTypeContextType,
-} from "../context/GameLengthType";
+} from "../context/GameLengthContext";
 
 type Props = {
   elementsInfo: Array<LengthType>;
@@ -13,27 +13,28 @@ type Props = {
 
 export default function PlayOnlineBar({ elementsInfo, gameLengthType }: Props) {
   const content = elementsInfo.map((elem) => (
-    <View style={styles.contentContainer}>
-      <View style={styles.contentInnerContainer}>
-        <PlayOnlineElement lengthType={elem} gameLengthType={gameLengthType} />
-      </View>
+    <View style={styles.contentInnerContainer}>
+      <PlayOnlineElement lengthType={elem} gameLengthType={gameLengthType} />
     </View>
   ));
 
-  return <View style={styles.container}>{content}</View>;
+  return (
+    <View style={styles.container}>
+      {/* <View>
+        <Text>Blitz</Text>
+      </View> */}
+      <View style={styles.contentContainer}>{content}</View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
-    flexDirection: "row",
     width: "100%",
     gap: 16,
   },
   contentContainer: {
-    flex: 1,
     flexDirection: "row",
-    height: "100%",
     gap: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -42,5 +43,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 8,
     overflow: "hidden",
+    flexBasis: "30%",
+    justifyContent: "space-evenly",
   },
 });
