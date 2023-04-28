@@ -1,7 +1,6 @@
 import { View, StyleSheet, Text } from "react-native";
 import React, { useState } from "react";
 import TimeOptionsModal from "./TimeOptionsModal";
-import BaseCustomContentButton from "../../../components/BaseCustomContentButton";
 import StartGameButton from "../../../components/StartGameButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
@@ -9,6 +8,10 @@ import { ColorsPallet } from "../../../utils/Constants";
 import ChooseTimeButton from "./ChooseTimeButton";
 import ChooseFriendsToPlayWith from "./ChooseFriendsToPlayWith";
 import { User } from "../../../context/UserContext";
+import {
+  LengthType,
+  GameLengthTypeContextType,
+} from "../context/GameLengthContext";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -29,7 +32,11 @@ const friends: Array<User> = [
 
 export default function PlayOnlineOptions({ navigation }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [] = useState();
+  const [gameTempo, setGameTempo] = useState<LengthType>({
+    lengthType: GameLengthTypeContextType.BLITZ,
+    totalTime: 180,
+    increment: 0,
+  });
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -39,13 +46,23 @@ export default function PlayOnlineOptions({ navigation }: Props) {
     setIsModalOpen(true);
   };
 
+  const handleGameTempoChange = (tempo: LengthType) => {
+    setGameTempo(tempo);
+  };
+
   return (
     <View style={styles.container}>
       {isModalOpen ? (
-        <TimeOptionsModal handleCloseModal={handleCloseModal} />
+        <TimeOptionsModal
+          handleCloseModal={handleCloseModal}
+          handleGameTempoChange={handleGameTempoChange}
+        />
       ) : (
         <View>
-          <ChooseTimeButton handleOpenModal={handleOpenModal} />
+          <ChooseTimeButton
+            handleOpenModal={handleOpenModal}
+            tempo={gameTempo}
+          />
           <View style={styles.chooseFriendContainer}>
             <ChooseFriendsToPlayWith friends={friends} />
           </View>

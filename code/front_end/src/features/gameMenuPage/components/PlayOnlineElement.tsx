@@ -7,56 +7,25 @@ import {
 } from "../context/GameLengthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ColorsPallet } from "../../../utils/Constants";
+import { lengthTypeToText } from "../services/HelpFunctions";
 
 type Props = {
   lengthType: LengthType;
-  gameLengthType: GameLengthTypeContextType;
+  handleCloseModal: () => void;
+  handleGameTempoChange: (tempo: LengthType) => void;
 };
 
 export default function PlayOnlineElement({
   lengthType,
-  gameLengthType,
+  handleCloseModal,
+  handleGameTempoChange,
 }: Props) {
-  const gameLengthTypeContextTypeToIconName = () => {
-    switch (gameLengthType) {
-      case GameLengthTypeContextType.BULLET:
-        return <MaterialCommunityIcons name="bullet" size={24} color="black" />;
-      case GameLengthTypeContextType.BLITZ:
-        return (
-          <MaterialCommunityIcons
-            name="lightning-bolt"
-            size={24}
-            color="rgb(235, 203, 47)"
-          />
-        );
-      case GameLengthTypeContextType.RAPID:
-        return (
-          <MaterialCommunityIcons
-            name="clock-time-eight"
-            size={24}
-            color="black"
-          />
-        );
-      default:
-        return (
-          <MaterialCommunityIcons name="clock-edit" size={24} color="black" />
-        );
-    }
+  const handleOnClick = () => {
+    handleGameTempoChange(lengthType);
+    handleCloseModal();
   };
 
-  const createElementText = () => {
-    return (
-      (lengthType.totalTime < 60
-        ? lengthType.totalTime
-        : lengthType.totalTime / 60
-      ).toString() +
-      (lengthType.increment > 0 ? "+" + lengthType.increment.toString() : "")
-    );
-  };
-
-  const icon = gameLengthTypeContextTypeToIconName();
-
-  const elementText = createElementText();
+  const elementText = lengthTypeToText(lengthType);
 
   return (
     <View style={styles.container}>
@@ -64,10 +33,9 @@ export default function PlayOnlineElement({
         content={
           <View style={styles.buttonContentContainer}>
             <Text>{elementText}</Text>
-            {icon}
           </View>
         }
-        handlePress={() => console.log("hello")}
+        handlePress={handleOnClick}
       />
     </View>
   );

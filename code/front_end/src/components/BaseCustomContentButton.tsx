@@ -5,16 +5,11 @@ import { ColorsPallet } from "../utils/Constants";
 type Props = {
   content: React.ReactNode;
   handlePress: () => void | Function;
-  additionalStyles?: Object;
 };
 
-const BaseCustomContentButton: React.FC<Props> = ({
-  handlePress,
-  content,
-  additionalStyles,
-}) => {
+const BaseCustomContentButton: React.FC<Props> = ({ handlePress, content }) => {
   return (
-    <View style={{ ...styles.buttonContainer, ...additionalStyles }}>
+    <View style={{ ...styles.buttonContainer }}>
       <Pressable
         onPress={handlePress}
         style={styles.button}
@@ -38,6 +33,9 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
+  },
+  buttonText: {
+    color: ColorsPallet.darker,
   },
 });
 

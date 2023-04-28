@@ -3,13 +3,19 @@ import React from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import BaseCustomContentButton from "../../../components/BaseCustomContentButton";
 import { FontAwesome5 } from "@expo/vector-icons";
-<FontAwesome5 name="angle-down" size={24} color="black" />;
+import { LengthType } from "../context/GameLengthContext";
+import { lengthTypeToText } from "../services/HelpFunctions";
+import { gameLengthTypeContextTypeToIconName } from "../services/HelpFunctions";
 
 type Props = {
   handleOpenModal: () => void;
+  tempo: LengthType;
 };
 
-export default function ChooseTimeButton({ handleOpenModal }: Props) {
+export default function ChooseTimeButton({ handleOpenModal, tempo }: Props) {
+  const text = lengthTypeToText(tempo);
+  const icon = gameLengthTypeContextTypeToIconName(tempo);
+
   return (
     <View style={styles.container}>
       <View style={styles.chooseTimeButtonOuterContainer}>
@@ -18,8 +24,9 @@ export default function ChooseTimeButton({ handleOpenModal }: Props) {
           android_ripple={{ color: ColorsPallet.lighter }}
         >
           <View style={styles.buttonContentContainer}>
+            <View style={styles.iconContainer}>{icon}</View>
             <View style={styles.mainButtonContentContainer}>
-              <Text style={styles.buttonText}>2|1</Text>
+              <Text style={styles.buttonText}>{text}</Text>
             </View>
             <View style={styles.arrowDownContainer}>
               <FontAwesome5
@@ -69,5 +76,12 @@ const styles = StyleSheet.create({
   arrowDownContainer: {
     flex: 1,
     justifyContent: "center",
+  },
+  iconContainer: {
+    flex: 1,
+    height: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

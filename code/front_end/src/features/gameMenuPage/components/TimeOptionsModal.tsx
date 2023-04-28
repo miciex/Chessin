@@ -1,12 +1,12 @@
-import { View, StyleSheet, Modal, Text } from "react-native";
+import { View, StyleSheet, Modal, Text, Pressable } from "react-native";
 import React from "react";
 import PlayOnlineBar from "./PlayOnlineBar";
 import {
   GameLengthTypeContextType,
   LengthType,
 } from "../context/GameLengthContext";
-import BaseButton from "../../../components/BaseButton";
 import { ColorsPallet } from "../../../utils/Constants";
+import { Entypo } from "@expo/vector-icons";
 
 const bulletGameLengths: Array<LengthType> = [
   {
@@ -68,14 +68,21 @@ const gameLengths: Array<Array<LengthType>> = [
   rapidGameLengths,
 ];
 
-type Props = { handleCloseModal: () => void };
+type Props = {
+  handleCloseModal: () => void;
+  handleGameTempoChange: (tempo: LengthType) => void;
+};
 
-export default function TimeOptionsModal({ handleCloseModal }: Props) {
+export default function TimeOptionsModal({
+  handleCloseModal,
+  handleGameTempoChange,
+}: Props) {
   const convertArraysToElements = (lengthTypesArray: Array<LengthType>) => (
     <View style={styles.playOnlineBarContainer}>
       <PlayOnlineBar
         elementsInfo={lengthTypesArray}
-        gameLengthType={GameLengthTypeContextType.BULLET}
+        handleCloseModal={handleCloseModal}
+        handleGameTempoChange={handleGameTempoChange}
       />
     </View>
   );
@@ -86,6 +93,20 @@ export default function TimeOptionsModal({ handleCloseModal }: Props) {
     <Modal>
       <View style={styles.container}>
         <View style={styles.modalHeader}>
+          <View style={styles.closeModalButtonContainer}>
+            <View style={styles.closeModalButtonInnerContainer}>
+              <Pressable
+                style={styles.closeModalButton}
+                android_ripple={{
+                  color: ColorsPallet.lighter,
+                  borderless: false,
+                }}
+                onPress={handleCloseModal}
+              >
+                <Entypo name="cross" size={36} color="black" />
+              </Pressable>
+            </View>
+          </View>
           <Text style={styles.headerText}>Game tempo</Text>
         </View>
         <View style={styles.contentContainer}>{content}</View>
@@ -98,23 +119,44 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     height: "100%",
+    backgroundColor: ColorsPallet.light,
     gap: 16,
   },
   playOnlineBarContainer: {
     width: "100%",
-    flex: 1,
   },
   contentContainer: {
     flex: 7,
+    gap: 32,
   },
   modalHeader: {
     flex: 1,
     backgroundColor: ColorsPallet.darker,
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "row",
   },
   headerText: {
     color: ColorsPallet.lighter,
     fontSize: 36,
+    position: "absolute",
+  },
+  closeModalButton: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeModalButtonContainer: {
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    paddingLeft: 16,
+  },
+  closeModalButtonInnerContainer: {
+    borderRadius: 8,
+    overflow: "hidden",
+    width: 36,
+    height: 36,
   },
 });
