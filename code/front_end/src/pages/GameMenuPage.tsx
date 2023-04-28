@@ -69,6 +69,7 @@ export default function GameMenu({ route, navigation }: Props) {
                           setBotType={setBotType}
                           setGameBotStrength={setGameBotStrength}
                           handleChooseBotType={setBotType}
+                          navigation={navigation}
                         />
                       </View>
                       <View style={styles.pickColorContainer}>

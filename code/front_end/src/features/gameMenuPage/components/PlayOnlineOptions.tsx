@@ -12,6 +12,7 @@ import {
   LengthType,
   GameLengthTypeContextType,
 } from "../context/GameLengthContext";
+import { chosenFriendContext } from "../context/ChosenFriendContext";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -37,6 +38,7 @@ export default function PlayOnlineOptions({ navigation }: Props) {
     totalTime: 180,
     increment: 0,
   });
+  const [chosenFriend, setChosenFriend] = useState<User | null>(null);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -50,30 +52,41 @@ export default function PlayOnlineOptions({ navigation }: Props) {
     setGameTempo(tempo);
   };
 
+  const handleChooseFriend = (friend: User) => {
+    setChosenFriend((prevFriend) =>
+      prevFriend?.email === friend.email ? null : friend
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      {isModalOpen ? (
-        <TimeOptionsModal
-          handleCloseModal={handleCloseModal}
-          handleGameTempoChange={handleGameTempoChange}
-        />
-      ) : (
-        <View>
-          <ChooseTimeButton
-            handleOpenModal={handleOpenModal}
-            tempo={gameTempo}
+    <chosenFriendContext.Provider value={chosenFriend}>
+      <View style={styles.container}>
+        {isModalOpen ? (
+          <TimeOptionsModal
+            handleCloseModal={handleCloseModal}
+            handleGameTempoChange={handleGameTempoChange}
           />
-          <View style={styles.chooseFriendContainer}>
-            <ChooseFriendsToPlayWith friends={friends} />
-          </View>
-          <View style={styles.startGameButtonOuterContainer}>
-            <View style={styles.startGameButtonInnerContainer}>
-              <StartGameButton navigation={navigation} />
+        ) : (
+          <View>
+            <ChooseTimeButton
+              handleOpenModal={handleOpenModal}
+              tempo={gameTempo}
+            />
+            <View style={styles.chooseFriendContainer}>
+              <ChooseFriendsToPlayWith
+                friends={friends}
+                handleChooseFriend={handleChooseFriend}
+              />
+            </View>
+            <View style={styles.startGameButtonOuterContainer}>
+              <View style={styles.startGameButtonInnerContainer}>
+                <StartGameButton navigation={navigation} />
+              </View>
             </View>
           </View>
-        </View>
-      )}
-    </View>
+        )}
+      </View>
+    </chosenFriendContext.Provider>
   );
 }
 

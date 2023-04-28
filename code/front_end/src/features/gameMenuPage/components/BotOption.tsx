@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.dark,
     borderRadius: 8,
     borderColor: ColorsPallet.darker,
+    borderWidth: 4,
   },
   buttonInnerContainerUnactive: {
     width: "100%",

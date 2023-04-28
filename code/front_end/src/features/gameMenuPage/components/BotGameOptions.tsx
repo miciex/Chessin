@@ -4,6 +4,9 @@ import BotOption from "./BotOption";
 import BotStrengthOptionsBar from "./BotStrengthOptionsBar";
 import { botType, BotTypeContext } from "../context/BotTypeContext";
 import { strengthLevelType } from "../context/BotStrengthContext";
+import StartGameButton from "../../../components/StartGameButton";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../../Routing";
 
 const stockFishLevelsArray = new Array<strengthLevelType>(
   1,
@@ -21,12 +24,18 @@ type Props = {
   setBotType: (botType: botType) => void;
   setGameBotStrength: (botStrength: strengthLevelType) => void;
   handleChooseBotType: (botStrength: botType) => void;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "GameMenu",
+    undefined
+  >;
 };
 
 export default function BotGameOptions({
   setBotType,
   setGameBotStrength,
   handleChooseBotType,
+  navigation,
 }: Props) {
   const currentBotType = useContext(BotTypeContext);
 
@@ -58,16 +67,16 @@ export default function BotGameOptions({
 
   const stockFishBotContent = strengthLevels(stockFishLevelsArray, "Stockfish");
   const chessinBotContent = strengthLevels(chessinBotLevelsArray, "ChessinBot");
-
+  //Todo: work on a styling of this page
   return (
     <View style={styles.container}>
       <View style={{ ...styles.optionsContainer, flex: 5 }}>
         <View style={styles.botOptionsContainer}>
-          <View style={styles.botOptionsInnerContainer}>
+          <View style={{ ...styles.botOptionsInnerContainer, marginTop: 4 }}>
             <BotOption setBotType={setBotType} name="fish" />
           </View>
         </View>
-        <View style={styles.strengthLevelsContainer}>
+        <View style={{ ...styles.strengthLevelsContainer }}>
           {stockFishBotContent}
         </View>
       </View>
@@ -77,6 +86,11 @@ export default function BotGameOptions({
           <BotOption setBotType={setBotType} name="robot" />
         </View>
         <View style={styles.strengthLevelsContainer}>{chessinBotContent}</View>
+      </View>
+      <View style={styles.startGameButtonOuterContainer}>
+        <View style={styles.startGameButtonInnerContainer}>
+          <StartGameButton navigation={navigation} />
+        </View>
       </View>
     </View>
   );
@@ -88,7 +102,7 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     justifyContent: "space-evenly",
-    top: 20,
+    gap: 16,
   },
   botStrengthOptionsBarContainer: {
     width: "100%",
@@ -106,5 +120,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
     rowGap: 20,
+  },
+  startGameButtonInnerContainer: {
+    width: "80%",
+    height: 32,
+  },
+  startGameButtonOuterContainer: {
+    flex: 1,
+    paddingTop: 8,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

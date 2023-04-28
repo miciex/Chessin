@@ -2,9 +2,9 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import React from "react";
 
 import { ColorsPallet } from "../utils/Constants";
-import SendInvitation from "../features/playOnline/components/SendInvitation";
+import SendInvitation from "../features/playWithFriend/components/SendInvitation";
 import InputField from "../components/InputField";
-import Friend from "../features/playOnline/components/Friend";
+import Friend from "../features/playWithFriend/components/Friend";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";

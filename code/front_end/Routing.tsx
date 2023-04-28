@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "./src/pages/HomePage";
@@ -17,6 +17,7 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGamePage from "./src/pages/AnalyzeGamePage";
+import { UserContext, User } from "./src/context/UserContext";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -41,63 +42,70 @@ export type RootStackParamList = {
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
 
+  const [user, setUser] = useState<User>({
+    name: "Wojtek",
+    email: "Burek@gmail.com",
+  });
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={HomePage}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen
-          name="GameMenu"
-          component={GameMenu}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen name="FreeBoard" component={FreeBoard} />
-        <Stack.Screen
-          name="LastGame"
-          component={LastGame}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen
-          name="PlayBot"
-          component={PlayBot}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen
-          name="PlayOnline"
-          component={PlayOnline}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen
-          name="PlayWithFriendsMenu"
-          component={PlayWithFriendsMenu}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen
-          name="ProfilePage"
-          component={ProfilePage}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen
-          name="Register"
-          component={Register}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen
-          name="Socials"
-          component={Socials}
-          options={{ ...headerOptions }}
-        />
-        <Stack.Screen name="Analyze" component={AnalyzeGamePage} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserContext.Provider value={user}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen
+            name="Home"
+            component={HomePage}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen
+            name="GameMenu"
+            component={GameMenu}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen name="FreeBoard" component={FreeBoard} />
+          <Stack.Screen
+            name="LastGame"
+            component={LastGame}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen
+            name="PlayBot"
+            component={PlayBot}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen
+            name="PlayOnline"
+            component={PlayOnline}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen
+            name="PlayWithFriendsMenu"
+            component={PlayWithFriendsMenu}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen
+            name="ProfilePage"
+            component={ProfilePage}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen
+            name="Socials"
+            component={Socials}
+            options={{ ...headerOptions }}
+          />
+          <Stack.Screen name="Analyze" component={AnalyzeGamePage} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserContext.Provider>
   );
 };
 

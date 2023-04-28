@@ -15,7 +15,7 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
-import Profile from "../features/playOnline/components/Profile";
+import Profile from "../features/playWithFriend/components/Profile";
 import { ColorsPallet } from "../utils/Constants";
 import PickColor from "../features/gameMenuPage/components/PickColor";
 import BaseButton from "../components/BaseButton";

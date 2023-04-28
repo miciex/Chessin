@@ -5,10 +5,20 @@ import FriendToPlayWith from "./FriendToPlayWith";
 
 type Props = {
   friends: Array<User>;
+  handleChooseFriend: (friend: User) => void;
 };
 
-export default function ChooseFriendsToPlayWith({ friends }: Props) {
-  const content = friends.map((friend) => <FriendToPlayWith friend={friend} />);
+export default function ChooseFriendsToPlayWith({
+  friends,
+  handleChooseFriend,
+}: Props) {
+  const content = friends.map((friend, index) => (
+    <FriendToPlayWith
+      friend={friend}
+      handleChooseFriend={handleChooseFriend}
+      key={index}
+    />
+  ));
 
   return <View style={styles.container}>{content}</View>;
 }

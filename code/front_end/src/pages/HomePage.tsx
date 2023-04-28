@@ -51,12 +51,13 @@ const HomePage = ({ route, navigation }: Props) => {
               />
             </View>
 
-            {ended_games.map((gracz) => (
+            {ended_games.map((gracz, index) => (
               <EndedGame
                 nick={gracz.playerNick}
                 rank={gracz.rank}
                 result={gracz.lastGameResult}
                 navigation={navigation}
+                key={index}
               />
             ))}
           </View>
