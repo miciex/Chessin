@@ -1,6 +1,7 @@
 package com.chessin.security.authentication;
 
 import com.chessin.security.authentication.refreshToken.RefreshToken;
+import com.chessin.security.authentication.refreshToken.RefreshTokenRepository;
 import com.chessin.security.authentication.refreshToken.RefreshTokenService;
 import com.chessin.security.authentication.requests.AuthenticationRequest;
 import com.chessin.security.authentication.requests.RegisterRequest;
@@ -14,6 +15,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +28,12 @@ import static org.hibernate.cfg.AvailableSettings.USER;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public AuthenticationResponse register(RegisterRequest request){
 
@@ -45,7 +49,7 @@ public class AuthenticationService {
 
         var jwtToken = jwtService.generateToken(user);
 
-        repository.save(user);
+        userRepository.save(user);
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
@@ -62,9 +66,17 @@ public class AuthenticationService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-        var user = repository.findByEmail(request.getEmail()).orElseThrow();
+
+        var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken(user);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        RefreshToken refreshToken;
+
+        if(refreshTokenRepository.existsByUserId(user.getId()) && refreshTokenService.isTokenExpired(refreshTokenRepository.findByUserId(user.getId()).get()))
+            refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        else if(!refreshTokenRepository.existsByUserId(user.getId()))
+            refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        else
+            refreshToken = refreshTokenRepository.findByUserId(user.getId()).get();
 
         return AuthenticationResponse
                 .builder()
