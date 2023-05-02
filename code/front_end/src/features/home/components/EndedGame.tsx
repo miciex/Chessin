@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, ScrollView, Pressable } from "react-native";
 import React from "react";
 
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -10,20 +10,28 @@ import { ColorsPallet } from "../../../utils/Constants";
 // import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap%27);
 // import { useFonts, Inter_900Black } from "@expo-google-fonts/inter";
 // import { Inter_400Regular, useFonts } from "@expo-google-fonts/inter";
+import { RootStackParamList } from "../../../../Routing";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { StackParamList } from "../../../utils/Constants";
 
 type Props = {
   nick: string;
   rank: Number;
   result: string;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    StackParamList,
+    undefined
+  >;
 };
 
-const EndedGame = (props: Props) => {
+const EndedGame = ({nick, rank, result, navigation}: Props) => {
   const Result = () => {
-    if (props.result == "win") {
+    if (result == "win") {
       return <FontAwesome5 name="trophy" size={17} color="rgb(235, 203, 47)" />;
-    } else if (props.result == "draw") {
+    } else if (result == "draw") {
       return <FontAwesome5 name="balance-scale" size={17} color="black" />;
-    } else if (props.result == "lose") {
+    } else if (result == "lose") {
       return (
         <Text>
           <FontAwesome name="close" size={20} color="rgb(194, 10, 10)" />{" "}
@@ -33,12 +41,21 @@ const EndedGame = (props: Props) => {
     return null;
   };
 
+  const goToFriendsProfile = () => {
+    navigation.navigate("ProfilePage", {
+      nick,
+      rank
+    });
+  };
+
   return (
     <View style={styles.record}>
       {/* <Image source={}/> */}
-      <Text style={styles.left}>
-        {props.nick} {props.rank.toString()}
-      </Text>
+      <Pressable style={[styles.left, styles.back]} onPress={goToFriendsProfile}>
+        <Text >
+         {nick} {rank.toString()}
+        </Text>
+        </Pressable>
       <View style={styles.right}>
         <Text style={{ textAlign: "right", width: "100%" }}>
           <FontAwesome5 name="chess-board" size={18} color="black" />
@@ -54,7 +71,7 @@ const EndedGame = (props: Props) => {
           <Result />
         </Text>
       </View>
-    </View>
+    </View> 
   );
 };
 export default EndedGame;
@@ -64,7 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.baseColor,
     width: "87%",
     height: 55,
-    padding: 20,
+    padding: 18,
     paddingLeft: 35,
     paddingRight: 25,
     borderRadius: 10,
@@ -81,4 +98,7 @@ const styles = StyleSheet.create({
   right: {
     width: "30%",
   },
+  back:{
+    backgroundColor: ColorsPallet.baseColor,
+  }
 });

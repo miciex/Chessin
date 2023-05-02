@@ -56,6 +56,7 @@ const HomePage = ({ route, navigation }: Props) => {
                 nick={gracz.playerNick}
                 rank={gracz.rank}
                 result={gracz.lastGameResult}
+                navigation={navigation}
               />
             ))}
           </View>
