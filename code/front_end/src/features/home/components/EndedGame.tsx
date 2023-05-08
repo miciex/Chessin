@@ -15,9 +15,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "../../../utils/Constants";
 
 type Props = {
+  date: String,
   nick: string;
   rank: Number;
-  result: string;
+  result?: string;
   navigation: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
@@ -25,7 +26,7 @@ type Props = {
   >;
 };
 
-const EndedGame = ({nick, rank, result, navigation}: Props) => {
+const EndedGame = ({nick, rank, result,date, navigation}: Props) => {
   const Result = () => {
     if (result == "win") {
       return <FontAwesome5 name="trophy" size={17} color="rgb(235, 203, 47)" />;
@@ -57,7 +58,9 @@ const EndedGame = ({nick, rank, result, navigation}: Props) => {
         </Text>
         </Pressable>
       <View style={styles.right}>
+        
         <Text style={{ textAlign: "right", width: "100%" }}>
+        <Text style={styles.dateText}> {date}</Text>{"  "}
           <FontAwesome5 name="chess-board" size={18} color="black" />
 
           <Text
@@ -68,6 +71,7 @@ const EndedGame = ({nick, rank, result, navigation}: Props) => {
           >
             {"  "}
           </Text>
+          
           <Result />
         </Text>
       </View>
@@ -93,12 +97,17 @@ const styles = StyleSheet.create({
     display: "flex",
   },
   left: {
-    width: "70%",
+    width: "55%",
   },
   right: {
-    width: "30%",
+    width: "45%",
+   
   },
   back:{
     backgroundColor: ColorsPallet.baseColor,
+  },
+  dateText:{
+    fontSize: 11,
+    color: "#b3afaf"
   }
 });
