@@ -1,22 +1,20 @@
-package com.chessin.security.authentication;
+package com.chessin.security.services;
 
 import com.chessin.security.authentication.refreshToken.RefreshToken;
 import com.chessin.security.authentication.refreshToken.RefreshTokenRepository;
-import com.chessin.security.authentication.refreshToken.RefreshTokenService;
+import com.chessin.security.services.RefreshTokenService;
 import com.chessin.security.authentication.requests.AuthenticationRequest;
 import com.chessin.security.authentication.requests.RegisterRequest;
-import com.chessin.security.authentication.requests.TokenRefreshRequest;
 import com.chessin.security.authentication.responses.AuthenticationResponse;
-import com.chessin.security.authentication.responses.TokenRefreshResponse;
 import com.chessin.security.configuration.JwtService;
 import com.chessin.security.user.User;
 import com.chessin.security.user.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -61,11 +59,15 @@ public class AuthenticationService {
 
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request){
+    public ResponseEntity<?> authenticate(AuthenticationRequest request){
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        try
+        {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        }catch(AuthenticationException e){
+            return ResponseEntity.badRequest().body("Password incorrect.");
+        }
 
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken(user);
@@ -78,11 +80,10 @@ public class AuthenticationService {
         else
             refreshToken = refreshTokenRepository.findByUserId(user.getId()).get();
 
-        return AuthenticationResponse
+        return ResponseEntity.ok(AuthenticationResponse
                 .builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken.getToken())
-                .build();
-
+                .build());
     }
 }

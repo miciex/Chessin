@@ -1,12 +1,11 @@
 package com.chessin.api;
 
 import com.chessin.security.authentication.refreshToken.RefreshToken;
-import com.chessin.security.authentication.refreshToken.RefreshTokenService;
+import com.chessin.security.services.RefreshTokenService;
 import com.chessin.security.authentication.refreshToken.TokenRefreshException;
 import com.chessin.security.authentication.requests.AuthenticationRequest;
 import com.chessin.security.authentication.requests.TokenRefreshRequest;
-import com.chessin.security.authentication.responses.AuthenticationResponse;
-import com.chessin.security.authentication.AuthenticationService;
+import com.chessin.security.services.AuthenticationService;
 import com.chessin.security.authentication.requests.RegisterRequest;
 import com.chessin.security.authentication.responses.TokenRefreshResponse;
 import com.chessin.security.configuration.JwtService;
@@ -28,13 +27,23 @@ public class AuthenticationController {
     private final JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request){
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request){
+
+        if(repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email already exists in the database.");
+        }
+
         return ResponseEntity.ok(service.register(request));
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
-        return ResponseEntity.ok(service.authenticate(request));
+    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return service.authenticate(request);
     }
 
     @PostMapping(path = "/users/get/{userEmail}")
