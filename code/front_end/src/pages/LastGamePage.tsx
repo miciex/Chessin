@@ -8,15 +8,19 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
 import Footer from "../components/Footer";
+import Heading from "../components/Heading";
 
 const ended_games = [
-  { playerNick: "Pusznik", rank: 1500, lastGameResult: "win" },
-  { playerNick: "MaciekNieBij", rank: 1500, lastGameResult: "win" },
-  { playerNick: "Slaweczuk", rank: 1500, lastGameResult: "win" },
-  { playerNick: "Strzała", rank: 1500, lastGameResult: "lose" },
-  { playerNick: "Bestia", rank: 1500, lastGameResult: "win" },
-  { playerNick: "Sharku", rank: 1000, lastGameResult: "lose" },
-  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
+  { date: "01.10.2022", playerNick: "Pusznik", rank: 1500, lastGameResult: "win" },
+  { date: "01.10.2022", playerNick: "MaciekNieBij", rank: 1500, lastGameResult: "win" },
+  { date: "01.10.2022", playerNick: "Slaweczuk", rank: 1500, lastGameResult: "win" },
+  { date: "01.10.2022", playerNick: "Strzała", rank: 1500, lastGameResult: "lose" },
+  { date: "01.10.2022", playerNick: "Bestia", rank: 1500, lastGameResult: "win" },
+  { date: "01.10.2022", playerNick: "Sharku", rank: 1000, lastGameResult: "lose" },
+  { date: "01.10.2022", playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
+  { date: "01.10.2022", playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
+  { date: "01.10.2022", playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
+  { date: "01.10.2022", playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
 ];
 
 type Props = {
@@ -33,12 +37,14 @@ export default function LastGame({ route, navigation }: Props) {
     <View style={styles.appContainer}>
       <ScrollView>
         <View style={styles.contentContainer}>
-          <Text style={{ fontSize: 18 }}>Old Games</Text>
+        <Heading text={"Old Games"}/>
           {ended_games.map((gracz) => (
             <EndedGame
               nick={gracz.playerNick}
               rank={gracz.rank}
               result={gracz.lastGameResult}
+              date={gracz.date}
+              navigation={navigation}
             />
           ))}
         </View>

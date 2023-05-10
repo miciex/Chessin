@@ -22,10 +22,10 @@ import { RouteProp } from "@react-navigation/native";
 // import { Inter_400Regular, useFonts } from "@expo-google-fonts/inter";
 
 type Props = {
+  date: String;
   nick: string;
   rank: Number;
-  result: string;
-  navigateToPlayWithFriend?: Function;
+  result?: string;
   navigation: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
@@ -33,7 +33,7 @@ type Props = {
   >;
 };
 
-const EndedGame = ({ nick, rank, result, navigation }: Props) => {
+const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
   const Result = () => {
     if (result == "win") {
       return <FontAwesome5 name="trophy" size={17} color="rgb(235, 203, 47)" />;
@@ -49,32 +49,29 @@ const EndedGame = ({ nick, rank, result, navigation }: Props) => {
     return null;
   };
 
+  const goToFriendsProfile = () => {
+    navigation.navigate("ProfilePage", {
+      nick,
+      rank,
+    });
+  };
+
   return (
     <View style={styles.record}>
       {/* <Image source={}/> */}
-      <Text style={styles.left}>
-        {nick} {rank.toString()}
-      </Text>
+      <Pressable
+        style={[styles.left, styles.back]}
+        onPress={goToFriendsProfile}
+      >
+        <Text>
+          {nick} {rank.toString()}
+        </Text>
+      </Pressable>
       <View style={styles.right}>
-        <View
-          style={{
-            alignItems: "flex-end",
-            width: "100%",
-            flexDirection: "row",
-          }}
-        >
-          <Pressable
-            onPress={() => {
-              navigation.navigate("PlayWithFriendsMenu", {
-                nick,
-                rank,
-                playing: true,
-                active: true,
-              });
-            }}
-          >
-            <FontAwesome5 name="chess-board" size={18} color="black" />
-          </Pressable>
+        <Text style={{ textAlign: "right", width: "100%" }}>
+          <Text style={styles.dateText}> {date}</Text>
+          {"  "}
+          <FontAwesome5 name="chess-board" size={18} color="black" />
 
           <Text
             style={{
@@ -84,8 +81,8 @@ const EndedGame = ({ nick, rank, result, navigation }: Props) => {
           >
             {"  "}
           </Text>
-          <Result />
-        </View>
+        </Text>
+        <Result />
       </View>
     </View>
   );
@@ -97,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.baseColor,
     width: "87%",
     height: 55,
-    padding: 20,
+    padding: 18,
     paddingLeft: 35,
     paddingRight: 25,
     borderRadius: 10,
@@ -109,9 +106,16 @@ const styles = StyleSheet.create({
     display: "flex",
   },
   left: {
-    width: "80%",
+    width: "55%",
   },
   right: {
-    width: "20%",
+    width: "45%",
+  },
+  back: {
+    backgroundColor: ColorsPallet.baseColor,
+  },
+  dateText: {
+    fontSize: 11,
+    color: "#b3afaf",
   },
 });

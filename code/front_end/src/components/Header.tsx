@@ -1,19 +1,50 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
-import { ColorsPallet } from "../utils/Constants";
 import { FontAwesome } from "@expo/vector-icons";
+import { View, Pressable, StyleSheet, Text } from "react-native";
+import React from "react";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { ColorsPallet } from "../utils/Constants";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../Routing";
+import { RouteProp } from "@react-navigation/native";
 
-export default function Header() {
+type Props = {
+  navigation?: NativeStackNavigationProp<
+    RootStackParamList,
+    | "Analyze"
+    | "FreeBoard"
+    | "GameMenu"
+    | "Home"
+    | "LastGame"
+    | "Login"
+    | "PlayBot"
+    | "PlayOnline"
+    | "PlayWithFriendsMenu"
+    | "ProfilePage"
+    | "Register"
+    | "Socials",
+    undefined
+  >;
+  console: Function
+};
+
+export default function Header({navigation, console}: Props) {
+  const goToProfilePage = () =>{
+  console()
+  }
   return (
     <View style={styles.header}>
       <View style={styles.contentContainer}>
         <Text style={styles.headerText}>Chessin</Text>
+        <Pressable onPress={goToProfilePage} >
         <FontAwesome
           name="user-circle"
           size={32}
           color="black"
           style={styles.headerImage}
+   
         />
+        </Pressable>
       </View>
     </View>
   );

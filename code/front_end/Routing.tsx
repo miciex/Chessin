@@ -18,6 +18,7 @@ import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGamePage from "./src/pages/AnalyzeGamePage";
 import { UserContext, User } from "./src/context/UserContext";
+import { enableExpoCliLogging } from "expo/build/logs/Logs";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -33,7 +34,12 @@ export type RootStackParamList = {
     active: boolean;
     playing: boolean;
   };
-  ProfilePage: undefined;
+  ProfilePage: {
+    nick: string;
+    rank: Number;
+    active?: boolean;
+    playing?: boolean;
+  };
   Register: undefined;
   Socials: undefined;
   Analyze: undefined;
@@ -121,7 +127,7 @@ const styles = StyleSheet.create({
 
 const headerOptions: NativeStackNavigationOptions = {
   headerStyle: styles.header,
-  headerTitle: () => <Header />,
+  headerTitle: () => <Header console={() => console.log("profil")} />,
 };
 
 export default Routing;

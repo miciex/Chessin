@@ -42,13 +42,21 @@ const Friend = ({ navigation, nick, rank, playing, active }: Props) => {
       active,
     });
   };
+  const goToFriendsProfile = () => {
+    navigation.navigate("ProfilePage", {
+      nick,
+      rank,
+      playing,
+    });
+  };
   return (
     <View style={styles.record}>
       {/* <Image source={}/> */}
-      <Text style={styles.left}>
+      <Pressable style={styles.left} onPress={goToFriendsProfile}>
+      <Text >
         <Online /> {nick} {rank.toString()}
       </Text>
-
+      </Pressable>
       <View style={styles.right}>
         <Text style={{ textAlign: "right", width: "100%" }}>
           <PlayingEye />

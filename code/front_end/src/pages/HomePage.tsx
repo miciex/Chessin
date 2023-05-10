@@ -14,16 +14,66 @@ import BaseButton from "../components/BaseButton";
 
 //przykladowe stary gry
 const ended_games = [
-  { playerNick: "Pusznik", rank: 1500, lastGameResult: "win" },
-  { playerNick: "MaciekNieBij", rank: 1500, lastGameResult: "win" },
-  { playerNick: "Slaweczuk", rank: 1500, lastGameResult: "win" },
-  { playerNick: "Strzała", rank: 1500, lastGameResult: "lose" },
-  { playerNick: "Bestia", rank: 1500, lastGameResult: "win" },
-  { playerNick: "Sharku", rank: 1000, lastGameResult: "lose" },
-  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
-  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
-  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
-  { playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
+  {
+    date: "01.10.2022",
+    playerNick: "Pusznik",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "MaciekNieBij",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Slaweczuk",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Strzała",
+    rank: 1500,
+    lastGameResult: "lose",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Bestia",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Sharku",
+    rank: 1000,
+    lastGameResult: "lose",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
 ];
 
 type Props = {
@@ -58,6 +108,7 @@ const HomePage = ({ route, navigation }: Props) => {
                 result={gracz.lastGameResult}
                 navigation={navigation}
                 key={index}
+                date={gracz.date}
               />
             ))}
           </View>
