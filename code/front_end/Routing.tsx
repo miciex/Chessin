@@ -17,6 +17,7 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import { enableExpoCliLogging } from "expo/build/logs/Logs";
+import AnalyzeGamePage from "./src/pages/AnalyzeGamePage";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -87,7 +88,7 @@ const Routing = () => {
         />
         <Stack.Screen
           name="ProfilePage"
-         component={ProfilePage}
+          component={ProfilePage}
           options={{ ...headerOptions }}
         />
         <Stack.Screen
@@ -100,7 +101,7 @@ const Routing = () => {
           component={Socials}
           options={{ ...headerOptions }}
         />
-        <Stack.Screen name="Analyze" component={Socials} />
+        <Stack.Screen name="Analyze" component={AnalyzeGamePage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
 
 const headerOptions: NativeStackNavigationOptions = {
   headerStyle: styles.header,
-  headerTitle: () => <Header console={()=>console.log("profil")}/>,
+  headerTitle: () => <Header console={() => console.log("profil")} />,
 };
 
 export default Routing;
