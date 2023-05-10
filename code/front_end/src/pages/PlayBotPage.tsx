@@ -23,15 +23,15 @@ import BotBar from "../features/play-with-bot/components/BotBar";
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,
-    "PlayOnline",
+    "PlayBot",
     undefined
   >;
-  route: RouteProp<RootStackParamList, "PlayOnline">;
+  route: RouteProp<RootStackParamList, "PlayBot">;
 };
 
 const initialChessBoard: FieldInfo[] = getInitialChessBoard();
 
-export default function PlayOnline({ navigation, route }: Props) {
+export default function PlayBot({ navigation, route }: Props) {
   const user = useContext(UserContext);
 
   useEffect(() => {

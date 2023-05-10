@@ -80,11 +80,7 @@ const Routing = () => {
             component={Login}
             options={{ ...headerOptions }}
           />
-          <Stack.Screen
-            name="PlayBot"
-            component={PlayBot}
-            options={{ ...headerOptions }}
-          />
+          <Stack.Screen name="PlayBot" component={PlayBot} />
           <Stack.Screen
             name="PlayOnline"
             component={PlayOnline}
