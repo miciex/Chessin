@@ -45,6 +45,8 @@ const Routing = () => {
   const [user, setUser] = useState<User>({
     name: "Wojtek",
     email: "Burek@gmail.com",
+    country: "pl",
+    ranking: 1500,
   });
 
   return (

@@ -8,6 +8,7 @@ type Props = {
   style?: StyleSheet.AbsoluteFillStyle;
   color?: string;
   fontSizeProps?: number;
+  fontColor?: string;
 };
 //text chce wiekszy
 export default function BaseButton({
@@ -16,13 +17,9 @@ export default function BaseButton({
   style,
   color,
   fontSizeProps,
+  fontColor,
 }: Props) {
-  if (
-    fontSizeProps === null ||
-    fontSizeProps === undefined ||
-    fontSizeProps === 0
-  )
-    fontSizeProps = 16;
+  if (!fontSizeProps) fontSizeProps = 16;
 
   return (
     <View style={style != null ? style : styles.buttonContainer}>
@@ -34,8 +31,15 @@ export default function BaseButton({
         }}
         android_ripple={{ color: ColorsPallet.darker, borderless: false }}
       >
-        <Text style={styles.buttonText}>
-          <Text style={{ fontSize: fontSizeProps }}>{text}</Text>
+        <Text style={{}}>
+          <Text
+            style={{
+              fontSize: fontSizeProps,
+              color: fontColor ? fontColor : ColorsPallet.darker,
+            }}
+          >
+            {text}
+          </Text>
         </Text>
       </Pressable>
     </View>
@@ -56,8 +60,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-  },
-  buttonText: {
-    color: ColorsPallet.darker,
   },
 });

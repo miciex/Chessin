@@ -23,12 +23,12 @@ type Props = {
 };
 
 const friends: Array<User> = [
-  { name: "Maciek", email: "maciej@gmail.com" },
-  { name: "Wojtek", email: "wojtek@gmail.com" },
-  { name: "Sławek", email: "sławek@gmail.com" },
-  { name: "Paweł", email: "paweł@gmail.com" },
-  { name: "Szymon", email: "szymon@gmail.com" },
-  { name: "Strzała", email: "strzała@gmail.com" },
+  { name: "Maciek", email: "maciej@gmail.com", country: "pl", ranking: 1500 },
+  { name: "Wojtek", email: "wojtek@gmail.com", country: "pl", ranking: 1500 },
+  { name: "Sławek", email: "sławek@gmail.com", country: "pl", ranking: 1500 },
+  { name: "Paweł", email: "paweł@gmail.com", country: "pl", ranking: 1500 },
+  { name: "Szymon", email: "szymon@gmail.com", country: "pl", ranking: 1500 },
+  { name: "Strzała", email: "strzała@gmail.com", country: "pl", ranking: 1500 },
 ];
 
 export default function PlayOnlineOptions({ navigation }: Props) {
@@ -80,7 +80,10 @@ export default function PlayOnlineOptions({ navigation }: Props) {
             </View>
             <View style={styles.startGameButtonOuterContainer}>
               <View style={styles.startGameButtonInnerContainer}>
-                <StartGameButton navigation={navigation} />
+                <StartGameButton
+                  navigation={navigation}
+                  navigationRoute="PlayOnline"
+                />
               </View>
             </View>
           </View>

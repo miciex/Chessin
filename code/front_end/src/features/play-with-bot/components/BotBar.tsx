@@ -1,30 +1,27 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import CountryFlag from "react-native-country-flag";
-import { Player } from "..";
 import { ColorsPallet } from "../../../utils/Constants";
-import Timer from "./Timer";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { BotPlayer } from "../../playOnline";
 
 type Props = {
-  player: Player | null;
-  timerInfo?: Date | undefined;
+  player: BotPlayer | null;
 };
 
-export default function PlayerBar({ player, timerInfo }: Props) {
+export default function BotBar({ player }: Props) {
   return (
     <View style={styles.appContainer}>
       <View style={styles.textContainer}>
-        <FontAwesome name="user-circle" size={32} color="black" />
+        <FontAwesome5
+          name={player ? player.user.iconName : "circle"}
+          size={32}
+          color="black"
+        />
         <Text style={styles.text}>{player ? player.user.name : ""}</Text>
         <Text style={styles.text}>{player ? player.user.ranking : ""}</Text>
       </View>
-      <View style={styles.iconsContainer}>
-        <View style={styles.timerContainer}>
-          <Timer info={timerInfo} />
-        </View>
-        <CountryFlag isoCode={player ? player.user.country : "pl"} size={24} />
-      </View>
+      <View style={styles.iconsContainer}></View>
     </View>
   );
 }

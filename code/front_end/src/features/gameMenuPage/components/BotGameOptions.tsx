@@ -89,7 +89,7 @@ export default function BotGameOptions({
       </View>
       <View style={styles.startGameButtonOuterContainer}>
         <View style={styles.startGameButtonInnerContainer}>
-          <StartGameButton navigation={navigation} />
+          <StartGameButton navigation={navigation} navigationRoute="PlayBot" />
         </View>
       </View>
     </View>

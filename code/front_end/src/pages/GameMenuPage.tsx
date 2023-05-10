@@ -25,7 +25,7 @@ import {
 } from "../features/gameMenuPage/context/PlayColorContext";
 import PickColor from "../features/gameMenuPage/components/PickColor";
 import PlayOnlineOptions from "../features/gameMenuPage/components/PlayOnlineOptions";
-//s
+
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,
@@ -53,7 +53,6 @@ export default function GameMenu({ route, navigation }: Props) {
   const setColor = (colorType: PlayColorsContextType) => {
     setChosenColor(colorType);
   };
-  //Todo:  move Play button to bot GameOptions and PlayOnlineOptions
   return (
     <PlayColorsContext.Provider value={chosenColor}>
       <botStrengthLevelContextType.Provider value={gameBotStrength}>

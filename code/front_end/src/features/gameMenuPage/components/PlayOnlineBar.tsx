@@ -21,12 +21,13 @@ export default function PlayOnlineBar({
 }: Props) {
   const icon = gameLengthTypeContextTypeToIconName(elementsInfo[0]);
 
-  const content = elementsInfo.map((elem) => (
+  const content = elementsInfo.map((elem, index) => (
     <View style={styles.contentInnerContainer}>
       <PlayOnlineElement
         lengthType={elem}
         handleCloseModal={handleCloseModal}
         handleGameTempoChange={handleGameTempoChange}
+        key={index}
       />
     </View>
   ));

@@ -11,11 +11,15 @@ type Props = {
     StackParamList,
     undefined
   >;
+  navigationRoute: "PlayOnline" | "PlayBot";
 };
 
-export default function StartGameButton({ navigation }: Props) {
+export default function StartGameButton({
+  navigation,
+  navigationRoute,
+}: Props) {
   const handlePress = () => {
-    navigation.navigate("PlayOnline");
+    navigation.navigate(navigationRoute);
   };
 
   return <BaseButton handlePress={handlePress} text="Play" />;
