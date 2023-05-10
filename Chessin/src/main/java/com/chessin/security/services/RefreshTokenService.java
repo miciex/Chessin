@@ -1,5 +1,8 @@
-package com.chessin.security.authentication.refreshToken;
+package com.chessin.security.services;
 
+import com.chessin.security.authentication.refreshToken.RefreshToken;
+import com.chessin.security.authentication.refreshToken.RefreshTokenRepository;
+import com.chessin.security.authentication.refreshToken.TokenRefreshException;
 import com.chessin.security.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +46,16 @@ public class RefreshTokenService {
         }
 
         return token;
+    }
+
+    public boolean isTokenExpired(RefreshToken token)
+    {
+        if(token.getExpiryDate().compareTo(Instant.now()) < 0) {
+            refreshTokenRepository.delete(token);
+            return true;
+        }
+
+        return false;
     }
 
     @Transactional
