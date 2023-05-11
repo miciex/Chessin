@@ -6,22 +6,12 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
+import { StackParamList } from "../utils/Constants";
 
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,
-    | "Analyze"
-    | "FreeBoard"
-    | "GameMenu"
-    | "Home"
-    | "LastGame"
-    | "Login"
-    | "PlayBot"
-    | "PlayOnline"
-    | "PlayWithFriendsMenu"
-    | "ProfilePage"
-    | "Register"
-    | "Socials",
+    StackParamList,
     undefined
   >;
 };
@@ -36,7 +26,7 @@ export default function Footer({ navigation }: Props) {
   };
 
   const handleAnalyze = () => {
-    navigation.navigate("Analyze");
+    navigation.navigate("AnalyzeGame");
   };
 
   return (

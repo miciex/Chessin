@@ -1,5 +1,5 @@
 import { User } from "../../context/UserContext";
-import { baseBoard } from "../../utils/Constants";
+import { baseBoard } from "../../utils/ChessConstants";
 import { botType } from "../gameMenuPage/context/BotTypeContext";
 import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
 
@@ -7,9 +7,10 @@ export type Move = {
   from: number;
   to: number;
   promotion?: string;
-  takenPiece?: number;
-  takenPieceField?: number;
+  captured?: number;
+  capturedField?: number;
   piece: number;
+  continuations?: Move[];
 };
 
 export type FieldInfo = {
