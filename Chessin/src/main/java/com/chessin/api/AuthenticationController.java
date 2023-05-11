@@ -34,7 +34,7 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body("Email already exists in the database.");
         }
 
-        return ResponseEntity.ok(service.register(request));
+        return service.register(request);
     }
 
     @PostMapping("/authenticate")
@@ -54,7 +54,7 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
         }
 
-        return ResponseEntity.ok("");
+        return service.verifyCode(request);
     }
 
 //    @PostMapping(path = "/users/get/{userEmail}")
@@ -73,7 +73,7 @@ public class AuthenticationController {
                 .map(user -> {
                     String token = jwtService.generateToken(user);
                     return ResponseEntity.ok(new TokenRefreshResponse(token, request.getRefreshToken()));
-                }).orElseThrow(() -> new TokenRefreshException(request.getRefreshToken(), "Refresh token is not in database!"));
+                }).orElseThrow(() -> new TokenRefreshException(request.getRefreshToken(), "Refresh token is not in database."));
     }
 
 }
