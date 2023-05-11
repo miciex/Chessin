@@ -1,6 +1,7 @@
 package com.chessin.api;
 
 import com.chessin.security.authentication.refreshToken.RefreshToken;
+import com.chessin.security.authentication.requests.CodeVerificationRequest;
 import com.chessin.security.services.RefreshTokenService;
 import com.chessin.security.authentication.refreshToken.TokenRefreshException;
 import com.chessin.security.authentication.requests.AuthenticationRequest;
@@ -46,12 +47,22 @@ public class AuthenticationController {
         return service.authenticate(request);
     }
 
-    @PostMapping(path = "/users/get/{userEmail}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable String userEmail){
-        User user = repository.findByEmail(userEmail).orElseThrow();
-        UserResponse userResponse = UserResponse.fromUser(user);
-        return ResponseEntity.ok(userResponse);
+    @PostMapping("/verifyCode")
+    public ResponseEntity<?> verifyCode(@RequestBody CodeVerificationRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return ResponseEntity.ok("");
     }
+
+//    @PostMapping(path = "/users/get/{userEmail}")
+//    public ResponseEntity<UserResponse> getUser(@PathVariable String userEmail){
+//        User user = repository.findByEmail(userEmail).orElseThrow();
+//        UserResponse userResponse = UserResponse.fromUser(user);
+//        return ResponseEntity.ok(userResponse);
+//    }
 
     @PostMapping("/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request)

@@ -29,6 +29,7 @@ public class User implements UserDetails {
     private String nameInGame;
     private String password;
     private String role;
+    private boolean isTwoFactorAuthenticationEnabled;
 
 
     @Override
