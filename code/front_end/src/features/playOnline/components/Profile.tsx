@@ -7,6 +7,7 @@ type Props = {
     rank: Number;
     active?: boolean;
     playing?: boolean;
+    
     avatar?: String
 }
 
@@ -17,7 +18,7 @@ export default function Profile({nick, rank, active, playing, avatar}:Props) {
       <Image
         style={styles.tinyLogo}
         source={{
-          uri: "https://us-tuna-sounds-images.voicemod.net/6f0b01c1-bf29-4157-a1f7-800327ea9323-1658162982836.jpg",
+          uri: "https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Flag_of_Poland.svg/1200px-Flag_of_Poland.svg.png",
         }}
       />
        <Image
