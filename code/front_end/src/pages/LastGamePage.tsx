@@ -37,7 +37,7 @@ export default function LastGame({ route, navigation }: Props) {
     <View style={styles.appContainer}>
       <ScrollView>
         <View style={styles.contentContainer}>
-        <Heading text={"Old Games"}/>
+        <Heading text={"Old Games"} />
           {ended_games.map((gracz) => (
             <EndedGame
               nick={gracz.playerNick}
