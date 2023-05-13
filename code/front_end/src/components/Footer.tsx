@@ -21,8 +21,8 @@ export default function Footer({ navigation }: Props) {
     navigation.navigate("Socials");
   };
 
-  const handlePressGame = () => {
-    navigation.navigate("GameMenu");
+  const handlePressHome = () => {
+    navigation.navigate("Home");
   };
 
   const handleAnalyze = () => {
@@ -34,8 +34,8 @@ export default function Footer({ navigation }: Props) {
       <Pressable onPress={handlePressFriends}>
         <FontAwesome5 name="user-friends" size={32} color="black" />
       </Pressable>
-      <Pressable onPress={handlePressGame}>
-        <MaterialCommunityIcons name="sword-cross" size={32} color="black" />
+      <Pressable onPress={handlePressHome}>
+        <FontAwesome5 name="home" size={32} color="black" />
       </Pressable>
       <Pressable onPress={handleAnalyze}>
         <FontAwesome5 name="chess-board" size={32} color="black" />

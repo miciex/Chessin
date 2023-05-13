@@ -8,12 +8,16 @@ export type PiecesNumberToIconTypeProps = {
   pieceType: number | string;
   styles?: StyleProp<any>;
   size?: number;
+  color?: string;
+  key?: string | number;
 };
 
 export const PiecesNumberToIcon = ({
   pieceType,
   styles,
   size,
+  color,
+  key,
 }: PiecesNumberToIconTypeProps) => {
   switch (typeof pieceType === "string" ? pieceType : pieceType % 8) {
     case 1:
@@ -22,8 +26,9 @@ export const PiecesNumberToIcon = ({
         <FontAwesome5
           name="chess-king"
           size={size ? size : 24}
-          color={ColorsPallet.lighter}
+          color={color ? color : ColorsPallet.lighter}
           style={styles ? styles : null}
+          key={key}
         />
       );
     case 2:
@@ -32,8 +37,9 @@ export const PiecesNumberToIcon = ({
         <FontAwesome5
           name="chess-queen"
           size={size ? size : 24}
-          color={ColorsPallet.lighter}
+          color={color ? color : ColorsPallet.lighter}
           style={styles ? styles : null}
+          key={key}
         />
       );
     case 3:
@@ -42,8 +48,9 @@ export const PiecesNumberToIcon = ({
         <FontAwesome5
           name="chess-rook"
           size={size ? size : 24}
-          color={ColorsPallet.lighter}
+          color={color ? color : ColorsPallet.lighter}
           style={styles ? styles : null}
+          key={key}
         />
       );
     case 4:
@@ -52,8 +59,9 @@ export const PiecesNumberToIcon = ({
         <FontAwesome5
           name="chess-bishop"
           size={size ? size : 24}
-          color={ColorsPallet.lighter}
+          color={color ? color : ColorsPallet.lighter}
           style={styles ? styles : null}
+          key={key}
         />
       );
     case 5:
@@ -62,8 +70,9 @@ export const PiecesNumberToIcon = ({
         <FontAwesome5
           name="chess-knight"
           size={size ? size : 24}
-          color={ColorsPallet.lighter}
+          color={color ? color : ColorsPallet.lighter}
           style={styles ? styles : null}
+          key={key}
         />
       );
     case 6:
@@ -72,8 +81,9 @@ export const PiecesNumberToIcon = ({
         <FontAwesome5
           name="chess-pawn"
           size={size ? size : 24}
-          color={ColorsPallet.lighter}
+          color={color ? color : ColorsPallet.lighter}
           style={styles ? styles : null}
+          key={key}
         />
       );
     default:

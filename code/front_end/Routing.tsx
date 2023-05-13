@@ -68,7 +68,11 @@ const Routing = () => {
             component={GameMenu}
             options={{ ...headerOptions }}
           />
-          <Stack.Screen name="FreeBoard" component={FreeBoard} />
+          <Stack.Screen
+            name="FreeBoard"
+            component={FreeBoard}
+            options={{ ...headerOptions }}
+          />
           <Stack.Screen
             name="LastGame"
             component={LastGame}

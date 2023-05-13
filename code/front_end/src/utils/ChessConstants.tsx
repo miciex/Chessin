@@ -8,6 +8,8 @@ export const baseBoard: Array<number> = [
   14, 14, 14, 14, 14, 11, 13, 14, 10, 9, 12, 13, 11,
 ];
 
+export const piecesNumbers = [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14];
+
 export const sampleMoves: Array<string> = [
   "e4",
   "e5",
