@@ -8,6 +8,8 @@ import { RouteProp } from "@react-navigation/native";
 import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playOnline/components/FriendsIconList";
+import SendInvitation from "../features/playOnline/components/SendInvitation";
+import BaseButton from "../components/BaseButton";
 
 const ended_games = [
   { date: "01.10.2022", playerNick: "Pusznik", rank: 1500, lastGameResult: "win" },
@@ -34,25 +36,50 @@ type Props = {
 }
 
 export default function ProfilePage({navigation, route}: Props) {
-  const {nick, rank, active, playing} = route.params;
+
+  const {nick, rank} = route.params;
+
+
+  
   let component = ended_games.slice(0,5).map((game)=>{
     return <EndedGame nick={game.playerNick} date={game.date} rank={game.rank} navigation={navigation}/>
   });
+
+  let playing = false;
+  let active = false;
   
+  const goToFriendsMenu = () => {
+    console.log(nick)
+    navigation.navigate("PlayWithFriendsMenu", {
+      nick,
+      rank,
+      playing,
+      active,
+    });
+  };
  
-  return (  <ScrollView>
+  return ( 
+     <ScrollView >
     <View style={styles.container}>
     
     <View style={styles.profile}>
       <Profile nick={nick} rank={rank} active={active} playing={playing} />
     </View>
-    <Heading text={"Old Games"}/>
+
+    <View style={styles.invite}>
+      <BaseButton handlePress={()=>{console.log("inv")}} text="Send Invitation"/>
+    </View> 
+    <View style={styles.invite}>
+      <BaseButton handlePress={()=>{goToFriendsMenu()}} text="Play Game"/>
+    </View> 
+    <Heading text={"Friends"} navigation={navigation} stringNavigation={"Socials"}/>
+    <FriendsIconList navigation={navigation}/>
+    <Heading text={"Old Games"} navigation={navigation} stringNavigation={"LastGame"} />
     {
       component
     }
-    <Heading text={"Friends"}/>
-    <FriendsIconList />
-    </View></ScrollView>
+    </View>
+    </ScrollView>
   );
 }
 
@@ -64,5 +91,10 @@ const styles = StyleSheet.create({
   },
   container:{
     alignItems: "center"
+  },
+  invite:{
+    width:"90%",
+    height: 55,
+    margin: 3
   }
 })

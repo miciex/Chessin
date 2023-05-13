@@ -47,6 +47,7 @@ const Friend = ({ navigation, nick, rank, playing, active }: Props) => {
       nick,
       rank,
       playing,
+      active
     });
   };
   return (

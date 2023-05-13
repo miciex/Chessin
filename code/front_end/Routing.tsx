@@ -38,6 +38,7 @@ export type RootStackParamList = {
     rank: Number;
     active?: boolean;
     playing?: boolean;
+    avatar?: String;
   };
   Register: undefined;
   Socials: undefined;

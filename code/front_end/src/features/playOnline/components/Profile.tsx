@@ -7,16 +7,17 @@ type Props = {
     rank: Number;
     active?: boolean;
     playing?: boolean;
+    avatar?: String
 }
 
-export default function Profile({nick, rank, active, playing}:Props) {
+export default function Profile({nick, rank, active, playing, avatar}:Props) {
   return (
     <View style={styles.profile}>
       <View style={styles.left}>
       <Image
         style={styles.tinyLogo}
         source={{
-          uri: 'https://us-tuna-sounds-images.voicemod.net/6f0b01c1-bf29-4157-a1f7-800327ea9323-1658162982836.jpg',
+          uri: avatar,
         }}
       />
        <Image
