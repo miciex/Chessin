@@ -26,6 +26,7 @@ import { PlayColorsContext } from "../features/gameMenuPage/context/PlayColorCon
 import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButton";
 import { GameLengthTypeContextType } from "../features/gameMenuPage/context/GameLengthContext";
 import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
+import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -37,7 +38,15 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayWithFriendsMenu">;
 };
 
+
 export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
+
+
+ 
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   
   const [chosenColor, setChosenColor] =
     useState<PlayColorsContextType>("random");
@@ -54,7 +63,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
       setGameTempo(tempo);
     };
   
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [timerModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const { nick, active, playing, rank } = route.params;
 
@@ -71,7 +80,11 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
     <View>
     <PlayColorsContext.Provider value={chosenColor}>
       <View style={styles.appContainer}>
-        <View style={styles.contentContainer}>
+        {timerModalOpen? (<TimeOptionsModal
+            handleCloseModal={handleCloseModal}
+            handleGameTempoChange={handleGameTempoChange}
+          />): (
+      <View style={styles.contentContainer}>
           <View
             style={{
               width: "90%",
@@ -81,17 +94,15 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
             }}
           >
             <Profile nick={nick} rank={rank} />
-          </View>
-
-          <ChooseTimeButton
+            <View style={{ width: 400, height: 130 }}>
+              <ChooseTimeButton 
               handleOpenModal={handleOpenModal}
               tempo={gameTempo}
-            />
-
-          {/* <View style={styles.buttonsContainer}> */}
-          
-          
-            <View style={{ width: 200, height: 60 }}>
+             />
+            </View>
+            
+           
+            <View style={{ width: 200, height: 60,  transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }], }}>
               <PickColor handleOnClick={setChosenColor} />
             </View>
             <View style={styles.rightButtons}>
@@ -102,6 +113,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                   backgroundColor: ColorsPallet.baseColor,
                   padding: 5,
                   borderRadius: 8,
+                  transform: [{ scaleX: 1.15 }, { scaleY: 1.15 }],
                 }}
               >
                 <BaseCustomContentButton
@@ -126,12 +138,17 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                 ios_backgroundColor={"grey"}
                 onValueChange={toggleSwitch}
                 value={isEnabled}
+                onTouchMove={toggleSwitch}
               />
             </View>
             <View style={{ width: "80%", height: 80 }}>
             <BaseButton handlePress={() => {}} text="Graj" fontSizeProps={30} />
             </View>
           </View>
+            
+          </View>
+          )}
+        
           
         <Footer navigation={navigation} />
       </View>
@@ -147,17 +164,9 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.light,
   },
   contentContainer: {
-    marginTop: 32,
+    marginTop: 22,
     flex: 8,
     alignItems: "center",
-  },
-  timer: {
-    width: "70%",
-    height: 60,
-    backgroundColor: "grey",
-    padding: 10,
-    borderRadius: 6,
-    marginBottom: 30,
   },
   text: {
     textAlign: "center",
@@ -175,7 +184,7 @@ const styles = StyleSheet.create({
   },
   rightButtons: {
     marginTop: 30,
-    marginBottom: 90,
+    marginBottom: 30,
     flexDirection: "row",
     flexWrap: "wrap",
   },

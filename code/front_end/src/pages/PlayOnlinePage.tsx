@@ -16,6 +16,9 @@ import {
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../utils/ChessConstants";
+import BaseCustomContentButton from "../components/BaseCustomContentButton";
+import { FontAwesome } from "@expo/vector-icons";
+import BaseButton from "../components/BaseButton";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -74,7 +77,9 @@ export default function PlayOnline({ navigation, route }: Props) {
           </View>
           <View style={styles.boardContainer}>
             <ChessBoard board={chessBoard} />
+            
           </View>
+              
           <View style={styles.playerBarContainer}>
             <PlayerBar
               player={opponent?.color !== "black" ? opponent : myPlayer}

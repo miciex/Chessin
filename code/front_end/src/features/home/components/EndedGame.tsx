@@ -81,8 +81,9 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
           >
             {"  "}
           </Text>
+          <Result />
         </Text>
-        <Result />
+       
       </View>
     </View>
   );

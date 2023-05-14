@@ -2,6 +2,8 @@ import { View, StyleSheet } from "react-native";
 import React from "react";
 import { FieldInfo } from "../features/playOnline";
 import ChessBoardField from "./ChessBoardField";
+import BaseCustomContentButton from "./BaseCustomContentButton";
+import { FontAwesome } from "@expo/vector-icons";
 
 type Props = {
   board: Array<FieldInfo>;
