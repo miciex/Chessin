@@ -4,16 +4,17 @@ import { ColorsPallet } from "../utils/Constants";
 
 type Arguments = {
   placeholder: string;
+  onChange?: (text: string) => void;
+  value?: string;
 };
 
-const InputField = (props: Arguments) => {
-  const [inputText, setInputText] = React.useState("NIGER");
-
+const InputField = ({ placeholder, onChange, value }: Arguments) => {
   return (
     <View style={styles.InputField}>
       <TextInput
-        onChangeText={setInputText}
-        placeholder={props.placeholder}
+        value={value}
+        onChangeText={onChange}
+        placeholder={placeholder}
         style={{
           textAlign: "center",
           color: ColorsPallet.darker,
