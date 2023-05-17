@@ -13,35 +13,48 @@ import { loginRequestType } from "../utils/ServicesTypes";
 import { authLink } from "../utils/ServicesConstants";
 import * as SecureStore from "expo-secure-store";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
+import { AuthenticationResponse } from "../utils/ServicesTypes";
+import { fetchUser } from "../features/authentication/services/loginServices";
+import { storeUser } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
   route: RouteProp<RootStackParamList, "Login">;
+  setUser: (user: any) => void;
 };
 
-export default function Login({ route, navigation }: Props) {
+export default function Login({ route, navigation, setUser }: Props) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
 
+  const setUserDataFromResponse = async (
+    responseData: AuthenticationResponse
+  ) => {
+    if (responseData.refreshToken) {
+      SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
+      SecureStore.setItemAsync("accesToken", responseData.accesToken);
+      const user = await fetchUser(email);
+      storeUser(user);
+      setUser(user);
+    } else {
+      setShowAuthCode(true);
+    }
+  };
+
   const onSubmit = () => {
     setShowAuthCode(true);
-    // fetch(authLink, {
-    //   body: JSON.stringify({ email, password }),
-    //   method: "POST",
-    // })
-    //   .then((response) => response.json())
-    //   .then((responseData) => {
-    //     if (responseData.refreshToken) {
-    //       SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
-    //       SecureStore.setItemAsync("accesToken", responseData.accesToken);
-    //     } else {
-    //       setShowAuthCode(true);
-    //     }
-    //   })
-    //   .then((responseData) => {
-    //     navigation.navigate("Home");
-    //   });
+    fetch(authLink, {
+      body: JSON.stringify({ email, password }),
+      method: "POST",
+    })
+      .then((response) => response.json())
+      .then((responseData) => {
+        setUserDataFromResponse(responseData);
+      })
+      .then(() => {
+        navigation.navigate("Home");
+      });
   };
 
   const hideModal = () => {
@@ -50,7 +63,13 @@ export default function Login({ route, navigation }: Props) {
 
   return (
     <View style={styles.appContainer}>
-      {showAuthCode ? <AuthCodeModal hideModal={hideModal} /> : null}
+      {showAuthCode ? (
+        <AuthCodeModal
+          hideModal={hideModal}
+          navigation={navigation}
+          setUserDataFromResponse={setUserDataFromResponse}
+        />
+      ) : null}
       <View style={styles.formContainer}>
         <InputField placeholder="Email" value={email} onChange={setEmail} />
         <InputField

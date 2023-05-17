@@ -10,3 +10,8 @@ export type loginRequestType = {
   email: string;
   password: string;
 };
+
+export type AuthenticationResponse = {
+  refreshToken: string;
+  accesToken: string;
+};

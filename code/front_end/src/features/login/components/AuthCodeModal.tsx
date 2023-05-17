@@ -1,18 +1,46 @@
 import { Modal, View, Text, StyleSheet, TextInput } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import { Char, isChar } from "../../../utils/Types";
-import { ElementType } from "react";
+import { verifyCode } from "../../../utils/ServicesConstants";
+import { UserContext } from "../../../context/UserContext";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../../Routing";
+import BaseButton from "../../../components/BaseButton";
+import { AuthenticationResponse } from "../../../utils/ServicesTypes";
 
 type Props = {
   hideModal: () => void;
+  navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
+  setUserDataFromResponse: (responseData: AuthenticationResponse) => void;
 };
 
 const InputLength = 8;
-export default function AuthCodeModal({ hideModal }: Props) {
-  const [authCode, setAuthCode] = useState<Char[]>(new Array(InputLength));
+export default function AuthCodeModal({
+  hideModal,
+  navigation,
+  setUserDataFromResponse,
+}: Props) {
   const [currentInput, setCurrentInput] = useState<number>(0);
   const [inputs, setInputs] = useState<Char[]>(new Array(InputLength));
+
+  const user = useContext(UserContext);
+
+  const submitCode = () => {
+    fetch(verifyCode, {
+      body: JSON.stringify({ authCode: inputs.join(), email: user.email }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setUserDataFromResponse(data);
+      })
+      .then(() => {
+        navigation.navigate("Home");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const getInputsView = () => {
     const inputsArray = [];
@@ -37,10 +65,11 @@ export default function AuthCodeModal({ hideModal }: Props) {
   const InputsView = getInputsView();
 
   return (
-    <Modal transparent={true}>
+    <Modal transparent={true} onTouchEnd={hideModal}>
       <View style={styles.mainContainer}>
         <View style={styles.modalContainer}>
           <View style={styles.inputsContainer}>{InputsView}</View>
+          <BaseButton handlePress={submitCode} text="Submit" />
         </View>
       </View>
     </Modal>
