@@ -8,7 +8,6 @@ import { RouteProp } from "@react-navigation/native";
 import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
-import SendInvitation from "../features/playWithFriend/components/SendInvitation";
 import BaseButton from "../components/BaseButton";
 
 const ended_games = [

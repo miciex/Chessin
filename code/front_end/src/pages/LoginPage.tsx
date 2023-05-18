@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import InputField from "../components/InputField";
 import Footer from "../components/Footer";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
@@ -8,8 +8,6 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
 import { ColorsPallet } from "../utils/Constants";
-import useFetch from "../hooks/useFetch";
-import { loginRequestType } from "../utils/ServicesTypes";
 import { authLink } from "../utils/ServicesConstants";
 import * as SecureStore from "expo-secure-store";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
@@ -26,7 +24,7 @@ type Props = {
 export default function Login({ route, navigation, setUser }: Props) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
+  const [showAuthCode, setShowAuthCode] = useState<boolean>(true);
 
   const setUserDataFromResponse = async (
     responseData: AuthenticationResponse

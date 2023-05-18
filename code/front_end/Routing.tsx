@@ -18,8 +18,6 @@ import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { UserContext, User } from "./src/context/UserContext";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RouteProp } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { getUser } from "./src/services/userServices";
 
@@ -71,7 +69,7 @@ const Routing = () => {
   const [user, setUser] = useState<User>(basicUser);
 
   return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={basicUser}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home">
           <Stack.Screen

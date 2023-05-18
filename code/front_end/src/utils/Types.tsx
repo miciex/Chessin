@@ -1,3 +1,4 @@
+export type HashMap<T> = { [key: string]: T };
 export type Char =
   | "a"
   | "b"

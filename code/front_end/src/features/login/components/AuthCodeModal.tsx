@@ -1,5 +1,5 @@
 import { Modal, View, Text, StyleSheet, TextInput } from "react-native";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import { Char, isChar } from "../../../utils/Types";
 import { verifyCode } from "../../../utils/ServicesConstants";
@@ -21,8 +21,9 @@ export default function AuthCodeModal({
   navigation,
   setUserDataFromResponse,
 }: Props) {
-  const [currentInput, setCurrentInput] = useState<number>(0);
   const [inputs, setInputs] = useState<Char[]>(new Array(InputLength));
+
+  const itemElems = useRef<any>(new Array(InputLength));
 
   const user = useContext(UserContext);
 
@@ -55,7 +56,11 @@ export default function AuthCodeModal({
             let newInputs = [...inputs];
             newInputs[i] = text;
             setInputs(newInputs);
+            itemElems.current[i + 1]?.focus();
+            itemElems.current[0].blur();
+            if (i + 1 === InputLength) itemElems.current[i]?.blur();
           }}
+          ref={(ref) => (itemElems.current[i] = ref)}
         />
       );
     }
@@ -69,7 +74,9 @@ export default function AuthCodeModal({
       <View style={styles.mainContainer}>
         <View style={styles.modalContainer}>
           <View style={styles.inputsContainer}>{InputsView}</View>
-          <BaseButton handlePress={submitCode} text="Submit" />
+          <View style={styles.submitButtonContainer}>
+            <BaseButton handlePress={submitCode} text="Submit" />
+          </View>
         </View>
       </View>
     </Modal>
@@ -90,6 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.lighter,
     alignItems: "center",
     justifyContent: "center",
+    gap: 16,
   },
   input: {
     height: 40,
@@ -104,5 +112,9 @@ const styles = StyleSheet.create({
     width: "90%",
     justifyContent: "space-around",
     gap: 8,
+  },
+  submitButtonContainer: {
+    width: "50%",
+    height: 32,
   },
 });
