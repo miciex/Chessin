@@ -86,7 +86,7 @@ const Routing = () => {
           />
           <Stack.Screen
             name="FreeBoard"
-            component={(
+            children={(
               props: NativeStackScreenProps<RootStackParamList, "FreeBoard">
             ) => <FreeBoard {...props} />}
             options={{ ...headerOptions }}
@@ -98,7 +98,7 @@ const Routing = () => {
           />
           <Stack.Screen
             name="Login"
-            component={(
+            children={(
               props: NativeStackScreenProps<RootStackParamList, "Login">
             ) => <Login {...props} setUser={setUser} />}
             options={{ ...headerOptions }}
