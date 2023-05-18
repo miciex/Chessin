@@ -1,13 +1,10 @@
 package com.chessin.api;
 
 import com.chessin.security.authentication.refreshToken.RefreshToken;
-import com.chessin.security.authentication.requests.CodeVerificationRequest;
+import com.chessin.security.authentication.requests.*;
 import com.chessin.security.services.RefreshTokenService;
 import com.chessin.security.authentication.refreshToken.TokenRefreshException;
-import com.chessin.security.authentication.requests.AuthenticationRequest;
-import com.chessin.security.authentication.requests.TokenRefreshRequest;
 import com.chessin.security.services.AuthenticationService;
-import com.chessin.security.authentication.requests.RegisterRequest;
 import com.chessin.security.authentication.responses.TokenRefreshResponse;
 import com.chessin.security.configuration.JwtService;
 import com.chessin.security.user.User;
@@ -55,6 +52,16 @@ public class AuthenticationController {
         }
 
         return service.verifyCode(request);
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return service.changePassword(request);
     }
 
 //    @PostMapping(path = "/users/get/{userEmail}")

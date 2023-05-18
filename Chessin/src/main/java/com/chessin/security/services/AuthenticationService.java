@@ -3,6 +3,7 @@ package com.chessin.security.services;
 import com.chessin.security.authentication.refreshToken.RefreshToken;
 import com.chessin.security.authentication.refreshToken.RefreshTokenRepository;
 import com.chessin.security.authentication.requests.CodeVerificationRequest;
+import com.chessin.security.authentication.requests.PasswordChangeRequest;
 import com.chessin.security.authentication.verificationCode.VerificationCode;
 import com.chessin.security.authentication.verificationCode.VerificationCodeRepository;
 import com.chessin.security.services.RefreshTokenService;
@@ -160,5 +161,26 @@ public class AuthenticationService {
             }
 
         emailService.sendEmail(user.getEmail(), code.getCode());
+    }
+
+    public ResponseEntity<?> changePassword(PasswordChangeRequest request)
+    {
+        try
+        {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getOldPassword()));
+        } catch(AuthenticationException e){
+            return ResponseEntity.badRequest().body("Password incorrect.");
+        }
+
+        var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+
+        if(passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
+            return ResponseEntity.badRequest().body("New password cannot be the same as the old one.");
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password changed successfully.");
     }
 }
