@@ -1,4 +1,5 @@
 import { Move } from "../features/playOnline";
+import { HashMap } from "./Types";
 
 export type ChessPiecesLetterType = "K" | "Q" | "R" | "B" | "N" | "";
 
@@ -7,6 +8,37 @@ export const baseBoard: Array<number> = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 14, 14,
   14, 14, 14, 14, 14, 11, 13, 14, 10, 9, 12, 13, 11,
 ];
+
+export class Pieces {
+  public static readonly KING = 1;
+  public static readonly PAWN = 2;
+  public static readonly ROOK = 3;
+  public static readonly KNIGHT = 4;
+  public static readonly BISHOP = 5;
+  public static readonly QUEEN = 6;
+
+  public static readonly WHITE = 8;
+  public static readonly BLACK = 16;
+
+  public static readonly PiecesArray: Array<number> = [
+    this.KING,
+    this.PAWN,
+    this.ROOK,
+    this.KNIGHT,
+    this.BISHOP,
+    this.QUEEN,
+  ];
+}
+
+const QUEEN = 3;
+export const Directions: { [key: number]: Array<number> } = {
+  1: [1, -1, 8, -8, 7, -7, 9, -9],
+  2: [8, 16, 7, 9],
+  3: [1, -1, 8, -8],
+  4: [6, 10, 15, 17, -6, -10, -15, -17],
+  5: [7, 9, -7, -9],
+  6: [8, -8, 1, -1, 9, -9, 7, -7],
+};
 
 export const piecesNumbers = [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14];
 
