@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet,Pressable} from "react-native";
 import React from "react";
 import { FieldInfo } from "../features/playOnline";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -6,9 +6,13 @@ import { ColorsPallet } from "../utils/Constants";
 
 type Props = {
   info: FieldInfo;
+  handleFieldPress: Function;
+  backgroundColor: string;
 };
 
-export default function ChessBoardField({ info }: Props) {
+
+
+export default function ChessBoardField({backgroundColor, info , handleFieldPress}: Props) {
   const convertToIcon = (piece: Number) => {
     switch (piece) {
       case 1:
@@ -42,17 +46,26 @@ export default function ChessBoardField({ info }: Props) {
 
   const piece = convertToIcon(info.piece);
 
-  const backgroundColor =
-    (info.fieldNumber % 2 === 0 &&
-      Math.floor(info.fieldNumber / 8) % 2 === 0) ||
-    (info.fieldNumber % 2 === 1 && Math.floor(info.fieldNumber / 8) % 2 === 1)
-      ? ColorsPallet.light
-      : ColorsPallet.dark;
+ 
 
+    
+   
   return (
-    <View style={{ ...styles.container, backgroundColor: backgroundColor }}>
+    <Pressable  onPress={()=>{
+      
+        handleFieldPress(info);
+
+    }}
+    
+    style={{ ...styles.container, backgroundColor: backgroundColor }}
+     android_ripple={{
+      color: "null",
+      borderless: false,
+    }}>
+    <View >
       {piece}
     </View>
+    </Pressable>
   );
 }
 

@@ -10,6 +10,6 @@ export type User = {
 export const UserContext = createContext<User>({
   name: "Wojtek",
   email: "Burek@gmail.com",
-  ranking: 1500,
+  ranking: 3600,
   country: "pl",
 });

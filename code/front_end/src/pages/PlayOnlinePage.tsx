@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View,Text, StyleSheet, Modal, Pressable } from "react-native";
 import React, { useState, useContext, useEffect } from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -17,8 +17,10 @@ import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../utils/ChessConstants";
 import BaseCustomContentButton from "../components/BaseCustomContentButton";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import BaseButton from "../components/BaseButton";
+import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
+
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -60,9 +62,21 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [myClockInfo, setMyClockInfo] = useState<Date>();
   const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
 
+  const [gearModal, setGearModal] = useState(false);
+
+  const toggleGear = () =>{
+    setGearModal(!gearModal);
+  }
+  const [opacityGear, setOpacityGear] = useState(1)
+
+  
   return (
     <View style={styles.appContainer}>
-      <View style={styles.contentContainer}>
+      {gearModal? (<>
+        <SettingsGameModal toggleGear={toggleGear} gearModalOn={gearModal}/>
+        {}
+      </>): null}
+<View style={[styles.contentContainer, {opacity: opacityGear}]}>
         <View style={styles.gameRecordContainer}>
           <GameRecord moves={sampleMoves} />
         </View>
@@ -76,10 +90,11 @@ export default function PlayOnline({ navigation, route }: Props) {
             />
           </View>
           <View style={styles.boardContainer}>
-            <ChessBoard board={chessBoard} />
-            
+              <ChessBoard board={chessBoard} /> 
+             
+         
           </View>
-              
+          <Text><FontAwesome name="gear" size={34} color="black" onPress={toggleGear}/></Text>
           <View style={styles.playerBarContainer}>
             <PlayerBar
               player={opponent?.color !== "black" ? opponent : myPlayer}
@@ -91,6 +106,9 @@ export default function PlayOnline({ navigation, route }: Props) {
         </View>
       </View>
       <Footer navigation={navigation} />
+         
+      
+      
     </View>
   );
 }
@@ -100,6 +118,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignContent: "stretch",
     backgroundColor: ColorsPallet.lighter,
+    alignItems: "center"
   },
   contentContainer: {
     flex: 8,
@@ -125,4 +144,5 @@ const styles = StyleSheet.create({
     gap: 16,
     justifyContent: "space-evenly",
   },
+  
 });

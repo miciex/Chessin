@@ -57,22 +57,27 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
   };
 
   return (
-    <View style={styles.record}>
+    <View style={styles.record} >
       {/* <Image source={}/> */}
       <Pressable
-        style={[styles.left, styles.back]}
+        style={[styles.left, styles.back, styles.both]}
         onPress={goToFriendsProfile}
+        android_ripple={{
+          color: ColorsPallet.lighter,
+          borderless: false,
+        }}
       >
         <Text>
           {nick} {rank.toString()}
         </Text>
       </Pressable>
-      <View style={styles.right}>
+      <View style={[styles.right, styles.both]}>
         <Text style={{ textAlign: "right", width: "100%" }}>
+         
           <Text style={styles.dateText}> {date}</Text>
           {"  "}
           <FontAwesome5 name="chess-board" size={18} color="black" />
-
+         
           <Text
             style={{
               color: ColorsPallet.baseColor,
@@ -95,7 +100,7 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.baseColor,
     width: "87%",
     height: 55,
-    padding: 18,
+    padding: 8,
     paddingLeft: 35,
     paddingRight: 25,
     borderRadius: 10,
@@ -114,6 +119,13 @@ const styles = StyleSheet.create({
   },
   back: {
     backgroundColor: ColorsPallet.baseColor,
+   
+  },
+  both:{
+    paddingTop: 10,  
+    paddingBottom: 10,  
+    paddingLeft: 10,  
+    borderRadius: 10,
   },
   dateText: {
     fontSize: 11,
