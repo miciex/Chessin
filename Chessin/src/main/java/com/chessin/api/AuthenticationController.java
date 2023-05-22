@@ -51,7 +51,11 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
         }
 
-        return service.verifyCode(request);
+        return switch (request.getVerificationType()) {
+            case AUTHENTICATE -> service.finishAuthentication(request);
+            case CHANGE_PASSWORD, REMIND_PASSWORD -> service.finishChangingPassword(request);
+            default -> ResponseEntity.badRequest().body("Invalid verification type.");
+        };
     }
 
     @PostMapping("/changePassword")
@@ -64,12 +68,15 @@ public class AuthenticationController {
         return service.changePassword(request);
     }
 
-//    @PostMapping(path = "/users/get/{userEmail}")
-//    public ResponseEntity<UserResponse> getUser(@PathVariable String userEmail){
-//        User user = repository.findByEmail(userEmail).orElseThrow();
-//        UserResponse userResponse = UserResponse.fromUser(user);
-//        return ResponseEntity.ok(userResponse);
-//    }
+    @PostMapping("/remindPassword")
+    public ResponseEntity<?> remindPassword(@RequestBody PasswordRemindRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return service.remindPassword(request);
+    }
 
     @PostMapping("/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request)
