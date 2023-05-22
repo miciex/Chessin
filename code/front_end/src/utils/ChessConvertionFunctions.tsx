@@ -2,7 +2,7 @@ import React, { ReactElement } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { ColorsPallet } from "./Constants";
 import { View, Text, StyleProp, ViewStyle, StyleSheet } from "react-native";
-import { ChessPiecesLetterType } from "./ChessConstants";
+import { ChessPiecesLetterType } from "./chess-calculations/ChessConstants";
 
 export type PiecesNumberToIconTypeProps = {
   pieceType: number | string;

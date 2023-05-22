@@ -24,7 +24,7 @@ type Props = {
 export default function Login({ route, navigation, setUser }: Props) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [showAuthCode, setShowAuthCode] = useState<boolean>(true);
+  const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
 
   const setUserDataFromResponse = async (
     responseData: AuthenticationResponse
@@ -41,7 +41,6 @@ export default function Login({ route, navigation, setUser }: Props) {
   };
 
   const onSubmit = () => {
-    setShowAuthCode(true);
     fetch(authLink, {
       body: JSON.stringify({ email, password }),
       method: "POST",
@@ -74,6 +73,7 @@ export default function Login({ route, navigation, setUser }: Props) {
           placeholder="Password"
           value={password}
           onChange={setPassword}
+          securityTextEntry={true}
         />
         <Submit onSubmit={onSubmit} />
 

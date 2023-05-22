@@ -15,7 +15,7 @@ import {
 } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/ChessConstants";
+import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 
 type Props = {
   navigation: NativeStackNavigationProp<

@@ -123,7 +123,9 @@ const Routing = () => {
           />
           <Stack.Screen
             name="Register"
-            component={Register}
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "Register">
+            ) => <Register {...props} />}
             options={{ ...headerOptions }}
           />
           <Stack.Screen

@@ -1,5 +1,5 @@
-import { Move } from "../features/playOnline";
-import { HashMap } from "./Types";
+import { Move } from "../../features/playOnline";
+import { HashMap } from "../Types";
 
 export type ChessPiecesLetterType = "K" | "Q" | "R" | "B" | "N" | "";
 
@@ -10,6 +10,7 @@ export const baseBoard: Array<number> = [
 ];
 
 export class Pieces {
+  public static readonly NONE = 0;
   public static readonly KING = 1;
   public static readonly PAWN = 2;
   public static readonly ROOK = 3;
@@ -28,6 +29,13 @@ export class Pieces {
     this.BISHOP,
     this.QUEEN,
   ];
+
+  public static readonly PawnValue = 100;
+  public static readonly KnightValue = 300;
+  public static readonly BishopValue = 300;
+  public static readonly RookValue = 500;
+  public static readonly QueenValue = 900;
+  public static readonly KingValue = Number.MAX_VALUE;
 }
 
 const QUEEN = 3;

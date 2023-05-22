@@ -1,4 +1,4 @@
-import { Pieces } from "../ChessConstants";
+import { Pieces } from "./ChessConstants";
 
 type constructorArgs = {
     pieces?:{[key:number]:number},

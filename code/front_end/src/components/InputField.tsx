@@ -6,9 +6,15 @@ type Arguments = {
   placeholder: string;
   onChange?: (text: string) => void;
   value?: string;
+  securityTextEntry?: boolean;
 };
 
-const InputField = ({ placeholder, onChange, value }: Arguments) => {
+const InputField = ({
+  placeholder,
+  onChange,
+  value,
+  securityTextEntry,
+}: Arguments) => {
   return (
     <View style={styles.InputField}>
       <TextInput
@@ -22,6 +28,7 @@ const InputField = ({ placeholder, onChange, value }: Arguments) => {
           width: "100%",
           flex: 1,
         }}
+        secureTextEntry={securityTextEntry}
       />
     </View>
   );

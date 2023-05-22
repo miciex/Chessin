@@ -8,8 +8,19 @@ import { ColorsPallet } from "../utils/Constants";
 import { registerLink } from "../utils/ServicesConstants";
 import type { registerRequestType } from "../utils/ServicesTypes";
 import useFetch from "../hooks/useFetch";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../Routing";
+import { AuthenticationResponse } from "../utils/ServicesTypes";
 
-export default function Register() {
+type Props = {
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "Register",
+    undefined
+  >;
+};
+
+export default function Register({ navigation }: Props) {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [nick, setNick] = useState<string>("");
@@ -17,14 +28,46 @@ export default function Register() {
   const [password, setPassword] = useState<string>("");
   const [repeatPassword, setRepeatPassword] = useState<string>("");
 
-  const [data] = useFetch<registerRequestType>(
-    registerLink,
-    { firstName, lastName, nick, email, password },
-    {
-      body: JSON.stringify({ firstName, lastName, nick, email, password }),
+  // const [data] = useFetch<registerRequestType>(
+  //   registerLink,
+  //   { firstName, lastName, nick, email, password },
+  //   {
+  //     body: JSON.stringify({ firstName, lastName, nick, email, password }),
+  //     method: "POST",
+  //   }
+  // );
+
+  // const setUserDataFromResponse = async (
+  //   responseData: AuthenticationResponse
+  // ) => {
+  //   if (responseData.refreshToken) {
+  //     SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
+  //     SecureStore.setItemAsync("accesToken", responseData.accesToken);
+  //     const user = await fetchUser(email);
+  //     storeUser(user);
+  //     setUser(user);
+  //   } else {
+  //     setShowAuthCode(true);
+  //   }
+  // };
+
+  const onSubmit = () => {
+    console.log();
+    fetch(registerLink, {
+      body: JSON.stringify({
+        email,
+        password,
+        lastName,
+        firstName,
+        nameInGame: nick,
+      }),
       method: "POST",
-    }
-  );
+    })
+      .then((response) => console.log(response))
+      .then((responseData) => {
+        navigation.navigate("Home");
+      });
+  };
 
   return (
     <View style={styles.appContainer}>
@@ -45,13 +88,15 @@ export default function Register() {
           placeholder="Password"
           value={password}
           onChange={setPassword}
+          securityTextEntry={true}
         />
         <InputField
           placeholder="Repeat Password"
           value={repeatPassword}
           onChange={setRepeatPassword}
+          securityTextEntry={true}
         />
-        <Submit />
+        <Submit onSubmit={onSubmit} />
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
           <LogInWithOtherFirm brand="google" />
           <LogInWithOtherFirm brand="facebook" />
