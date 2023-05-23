@@ -22,6 +22,11 @@ import BaseButton from "../components/BaseButton";
 import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColorContext";
 import BaseCustomContentButton from "../components/BaseCustomContentButton";
 import BaseModal from "../components/BaseModal";
+import { PlayColorsContext } from "../features/gameMenuPage/context/PlayColorContext";
+import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButton";
+import { GameLengthTypeContextType } from "../features/gameMenuPage/context/GameLengthContext";
+import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
+import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -33,13 +38,32 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayWithFriendsMenu">;
 };
 
+
 export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
+
+
+ 
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+  
   const [chosenColor, setChosenColor] =
     useState<PlayColorsContextType>("random");
-
-  const setColor = (colorType: PlayColorsContextType) => {
-    setChosenColor(colorType);
-  };
+    const handleOpenModal = () => {
+      setIsModalOpen(true);
+    };
+  
+    const [gameTempo, setGameTempo] = useState<LengthType>({
+      lengthType: GameLengthTypeContextType.BLITZ,
+      totalTime: 180,
+      increment: 0,
+    });
+    const handleGameTempoChange = (tempo: LengthType) => {
+      setGameTempo(tempo);
+    };
+  
+  const [timerModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const { nick, active, playing, rank } = route.params;
 
@@ -53,72 +77,82 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   };
 
   return (
-    <View style={styles.appContainer}>
+    <View>
+    <PlayColorsContext.Provider value={chosenColor}>
+      <View style={styles.appContainer}>
+        {timerModalOpen? (<TimeOptionsModal
+            handleCloseModal={handleCloseModal}
+            handleGameTempoChange={handleGameTempoChange}
+          />): (
       <View style={styles.contentContainer}>
-        <View
-          style={{
-            width: "90%",
-            height: 200,
-            alignItems: "center",
-            marginBottom: 20,
-          }}
-        >
-          <Profile nick={nick} rank={rank} />
-        </View>
-
-        <View style={styles.timer}>
-          <TouchableOpacity>
-            <Text style={styles.text}>10:00</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.buttonsContainer}>
-          <View style={{ width: 200, height: 60 }}>
-            <PickColor handleOnClick={setChosenColor} />
-          </View>
-          <View style={styles.rightButtons}>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                backgroundColor: ColorsPallet.baseColor,
-                padding: 5,
-                borderRadius: 8,
-              }}
-            >
-              <BaseCustomContentButton
-                handlePress={() => {}}
-                content={
-                  <FontAwesome5
-                    name="medal"
-                    size={44}
-                    color={() => {
-                      console.log("cos");
-                      if (isEnabled) return "white";
-                      else if (!isEnabled) return "black";
-                    }}
-                  />
-                }
+          <View
+            style={{
+              width: "90%",
+              height: 200,
+              alignItems: "center",
+              marginBottom: 20,
+            }}
+          >
+            <Profile nick={nick} rank={rank} />
+            <View style={{ width: 400, height: 130 }}>
+              <ChooseTimeButton 
+              handleOpenModal={handleOpenModal}
+              tempo={gameTempo}
+             />
+            </View>
+            
+           
+            <View style={{ width: 200, height: 60,  transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }], }}>
+              <PickColor handleOnClick={setChosenColor} />
+            </View>
+            <View style={styles.rightButtons}>
+              <View
+                style={{
+                  width: 60,
+                  height: 60,
+                  backgroundColor: ColorsPallet.baseColor,
+                  padding: 5,
+                  borderRadius: 8,
+                  transform: [{ scaleX: 1.15 }, { scaleY: 1.15 }],
+                }}
+              >
+                <BaseCustomContentButton
+                  handlePress={() => {toggleSwitch()}}
+                  content={
+                    <FontAwesome5
+                      name="medal"
+                      size={44}
+                      color={() => {
+                        console.log("cos");
+                        if (isEnabled) return "white";
+                        else if (!isEnabled) return "black";
+                      }}
+                    />
+                  }
+                />
+              </View>
+              <Switch
+                style={styles.switch}
+                trackColor={{ false: "grey", true: "orange" }}
+                thumbColor={"#f4f3f4"}
+                ios_backgroundColor={"grey"}
+                onValueChange={toggleSwitch}
+                value={isEnabled}
+                onTouchMove={toggleSwitch}
               />
             </View>
-            <Switch
-              style={styles.switch}
-              trackColor={{ false: "grey", true: "orange" }}
-              thumbColor={"#f4f3f4"}
-              ios_backgroundColor={"grey"}
-              onValueChange={toggleSwitch}
-              value={isEnabled}
-            />
+            <View style={{ width: "80%", height: 80 }}>
+            <BaseButton handlePress={() => {}} text="Graj" fontSizeProps={30} />
+            </View>
           </View>
-        </View>
-        <View style={{ width: "80%", height: 80 }}>
-          <BaseButton handlePress={() => {}} text="Graj" fontSizeProps={30} />
-          <Text>
-            <Modal />;
-          </Text>
-        </View>
+            
+          </View>
+          )}
+        
+          
+        <Footer navigation={navigation} />
       </View>
-      <Footer navigation={navigation} />
+    </PlayColorsContext.Provider>
     </View>
   );
 }
@@ -130,17 +164,9 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.light,
   },
   contentContainer: {
-    marginTop: 32,
+    marginTop: 22,
     flex: 8,
     alignItems: "center",
-  },
-  timer: {
-    width: "70%",
-    height: 60,
-    backgroundColor: "grey",
-    padding: 10,
-    borderRadius: 6,
-    marginBottom: 30,
   },
   text: {
     textAlign: "center",
@@ -149,6 +175,8 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     alignItems: "center",
+    display: "flex",
+    flexDirection: "row",
   },
   switch: {
     marginLeft: 30,

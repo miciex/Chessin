@@ -1,12 +1,19 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable} from "react-native";
 import React from "react";
 
 import { ColorsPallet } from "../../../utils/Constants";
 
 const SendInvitation = () => {
   return (
-    <View style={styles.button}>
+    <View style={{borderRadius: 10}}>
+    <Pressable style={styles.button} android_ripple={{
+      color: ColorsPallet.lighter,
+      borderless: false,
+    }}>
+   
       <Text style={styles.text}>Send Invitation</Text>
+   
+    </Pressable>
     </View>
   );
 };

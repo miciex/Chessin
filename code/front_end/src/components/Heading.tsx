@@ -31,11 +31,15 @@ export default function Heading({ text, navigation, stringNavigation }: Props) {
   return (
     <View style={styles.headingContainer}>
       <Text style={styles.text}>{text}</Text>
-      <Text style={styles.iconArrow}>{icon}</Text>
-
-      {/* <Pressable style={styles.iconArrow}> */}
-
-      {/* </Pressable> */}
+      <Pressable
+        style={styles.iconArrow}
+        android_ripple={{
+          color: ColorsPallet.light,
+          borderless: false,
+        }}
+      >
+        {icon}
+      </Pressable>
     </View>
   );
 }
@@ -62,6 +66,7 @@ const styles = StyleSheet.create({
   },
   iconArrow: {
     // backgroundColor: "green",
-    width: "5%",
+    width: "20%",
+    height: 50,
   },
 });

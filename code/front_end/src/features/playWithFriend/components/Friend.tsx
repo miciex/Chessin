@@ -53,7 +53,10 @@ const Friend = ({ navigation, nick, rank, playing, active }: Props) => {
   return (
     <View style={styles.record}>
       {/* <Image source={}/> */}
-      <Pressable style={styles.left} onPress={goToFriendsProfile}>
+      <Pressable style={styles.left} onPress={goToFriendsProfile}  android_ripple={{
+                  color: ColorsPallet.lighter,
+                  borderless: false,
+                }}>
       <Text >
         <Online /> {nick} {rank.toString()}
       </Text>
@@ -79,8 +82,8 @@ const styles = StyleSheet.create({
   record: {
     backgroundColor: ColorsPallet.baseColor,
     width: "100%",
-    height: 60,
-    padding: 20,
+    height: 58,
+    paddingTop: 5,
     paddingLeft: 20,
     paddingRight: 20,
     borderRadius: 10,
@@ -94,11 +97,14 @@ const styles = StyleSheet.create({
   },
   left: {
     width: "70%",
-    // backgroundColor: "red",
+    paddingTop: 15,
+    paddingBottom:10,
   },
   right: {
     width: "30%",
     flexDirection: "row",
     flexWrap: "wrap",
+    paddingTop: 15,
+    paddingBottom:10,
   },
 });
