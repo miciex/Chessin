@@ -6,11 +6,8 @@ import Submit from "../features/login/components/Submit";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
 import { ColorsPallet } from "../utils/Constants";
 import { registerLink } from "../utils/ServicesConstants";
-import type { registerRequestType } from "../utils/ServicesTypes";
-import useFetch from "../hooks/useFetch";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
-import { AuthenticationResponse } from "../utils/ServicesTypes";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -28,31 +25,8 @@ export default function Register({ navigation }: Props) {
   const [password, setPassword] = useState<string>("");
   const [repeatPassword, setRepeatPassword] = useState<string>("");
 
-  // const [data] = useFetch<registerRequestType>(
-  //   registerLink,
-  //   { firstName, lastName, nick, email, password },
-  //   {
-  //     body: JSON.stringify({ firstName, lastName, nick, email, password }),
-  //     method: "POST",
-  //   }
-  // );
-
-  // const setUserDataFromResponse = async (
-  //   responseData: AuthenticationResponse
-  // ) => {
-  //   if (responseData.refreshToken) {
-  //     SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
-  //     SecureStore.setItemAsync("accesToken", responseData.accesToken);
-  //     const user = await fetchUser(email);
-  //     storeUser(user);
-  //     setUser(user);
-  //   } else {
-  //     setShowAuthCode(true);
-  //   }
-  // };
-
   const onSubmit = () => {
-    console.log();
+    console.log("submit");
     fetch(registerLink, {
       body: JSON.stringify({
         email,
@@ -62,11 +36,12 @@ export default function Register({ navigation }: Props) {
         nameInGame: nick,
       }),
       method: "POST",
-    })
-      .then((response) => console.log(response))
-      .then((responseData) => {
+      headers: new Headers({ "content-type": "application/json" }),
+    }).then((response) => {
+      if (response.status === 200) {
         navigation.navigate("Home");
-      });
+      }
+    });
   };
 
   return (
