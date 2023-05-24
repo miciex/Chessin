@@ -14,11 +14,16 @@ import {
 } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
+import {
+  sampleMoves,
+  StartingPositions,
+} from "../utils/chess-calculations/ChessConstants";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
 import Board from "../utils/chess-calculations/board";
 import { Move } from "../utils/chess-calculations/move";
+import { getUser } from "../services/userServices";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -28,8 +33,6 @@ type Props = {
   >;
   route: RouteProp<RootStackParamList, "PlayOnline">;
 };
-
-const initialChessBoard: FieldInfo[] = getInitialChessBoard();
 
 export default function PlayOnline({ navigation, route }: Props) {
   const user = useContext(UserContext);
@@ -43,12 +46,7 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const [gearModal, setGearModal] = useState(false);
   //TODO: write reducer for boardState
-  const [boardState, setBoardState] = useState<Board>(
-    new Board({
-      fenString: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-      whiteToMove: true,
-    })
-  );
+  const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
   const [opacityGear, setOpacityGear] = useState(1);
 
   //TODO: get opponent from server and user from react-native-storage
@@ -63,7 +61,11 @@ export default function PlayOnline({ navigation, route }: Props) {
       },
       color: isOpponentWhite ? "white" : "black",
     });
-    setMyPlayer({ user: user, color: isOpponentWhite ? "black" : "white" });
+
+    getUser().then((user) => {
+      if (user === null) return;
+      setMyPlayer({ user: user, color: isOpponentWhite ? "black" : "white" });
+    });
   }, []);
 
   const toggleGear = () => {

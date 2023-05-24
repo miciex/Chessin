@@ -8,7 +8,7 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
 import { ColorsPallet } from "../utils/Constants";
-import { authLink } from "../utils/ServicesConstants";
+import { authenticateLink } from "../utils/ServicesConstants";
 import * as SecureStore from "expo-secure-store";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import { AuthenticationResponse } from "../utils/ServicesTypes";
@@ -34,18 +34,22 @@ export default function Login({ route, navigation, setUser }: Props) {
       SecureStore.setItemAsync("accesToken", responseData.accesToken);
       const user = await fetchUser(email);
       storeUser(user);
-      setUser(user);
+      // setUser(user);
     } else {
       setShowAuthCode(true);
     }
   };
 
   const onSubmit = () => {
-    fetch(authLink, {
+    fetch(authenticateLink, {
       body: JSON.stringify({ email, password }),
       method: "POST",
+      headers: new Headers({ "content-type": "application/json" }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        console.log("got response");
+        return response.json();
+      })
       .then((responseData) => {
         setUserDataFromResponse(responseData);
       })

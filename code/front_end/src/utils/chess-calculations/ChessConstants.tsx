@@ -1,4 +1,4 @@
-import { Move } from "../../features/playOnline";
+import { Move } from "./move";
 import { HashMap } from "../Types";
 
 export type ChessPiecesLetterType = "K" | "Q" | "R" | "B" | "N" | "";
@@ -36,6 +36,11 @@ export class Pieces {
   public static readonly RookValue = 500;
   public static readonly QueenValue = 900;
   public static readonly KingValue = Number.MAX_VALUE;
+}
+
+export class StartingPositions {
+  public static readonly BASE_POSITION =
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 }
 
 const QUEEN = 3;
@@ -115,7 +120,7 @@ export const sampleMoves: Array<string> = [
 ];
 
 //Convert sample moves array from  string array to a Move aray
-export const sampleGame: Move[] = [
-  { from: 12, to: 28, piece: 6, captured: 0, promotion: "" },
-  { from: 56, to: 48, piece: 14 },
-];
+// export const sampleGame: Move[] = [
+//   { from: 12, to: 28, piece: 6, captured: 0, promotion: "" },
+//   { from: 56, to: 48, piece: 14 },
+// ];

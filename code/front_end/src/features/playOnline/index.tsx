@@ -2,6 +2,8 @@ import { User } from "../../context/UserContext";
 import { baseBoard } from "../../utils/chess-calculations/ChessConstants";
 import { botType } from "../gameMenuPage/context/BotTypeContext";
 import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import Board from "../../utils/chess-calculations/board";
+import { StartingPositions } from "../../utils/chess-calculations/ChessConstants";
 
 export type FieldInfo = {
   piece: number;
@@ -24,12 +26,11 @@ export type BotPlayer = {
   color: string;
 };
 
-export const getInitialChessBoard = (): FieldInfo[] => {
-  const initialChessBoard: FieldInfo[] = [];
-  for (let i = 0; i < 64; i++) {
-    initialChessBoard.push({ fieldNumber: i, piece: baseBoard[i] });
-  }
-  return initialChessBoard;
+export const getInitialChessBoard = (): Board => {
+  return new Board({
+    fenString: StartingPositions.BASE_POSITION,
+    whiteToMove: true,
+  });
 };
 export const countryIsoCodes = [
   {

@@ -25,8 +25,10 @@ export default function ChessBoard({ board, setBoard }: Props) {
       board.isWhite(data.fieldNumber) !== board.whiteToMove
     ) {
       setActiveField(data.fieldNumber);
+      return;
     } else if (possibleMoves.includes(data.fieldNumber)) {
       const brd = board;
+
       brd.movePiece(
         new Move({
           pieces: brd.position,
@@ -34,14 +36,11 @@ export default function ChessBoard({ board, setBoard }: Props) {
           endField: data.fieldNumber,
         })
       );
-      setBoard(brd);
 
-      setActiveField(-1);
-      setPossibleMoves([]);
-    } else {
-      setPossibleMoves([]);
-      setActiveField(-1);
+      setBoard(brd);
     }
+    setActiveField(-1);
+    setPossibleMoves([]);
   };
 
   let copyPossibleMoves: Number[] = [0];
@@ -88,8 +87,6 @@ export default function ChessBoard({ board, setBoard }: Props) {
   possibleMoves.sort((a, b) => a - b);
   copyPossibleMoves = possibleMoves.filter((value) => value >= 0);
 
-  console.log(possibleMoves);
-  console.log(copyPossibleMoves);
   const renderedBoard = renderBoard();
 
   return <View style={styles.container}>{renderedBoard}</View>;
