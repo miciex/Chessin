@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "./src/pages/HomePage";
@@ -18,6 +18,8 @@ import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { UserContext, User } from "./src/context/UserContext";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { getUser } from "./src/services/userServices";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -45,18 +47,29 @@ export type RootStackParamList = {
   AnalyzeGame: undefined;
 };
 
+const basicUser: User = {
+  name: "Wojtek",
+  email: "Burek@gmail.com",
+  country: "pl",
+  ranking: 1500,
+};
+
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
 
-  const [user, setUser] = useState<User>({
-    name: "Wojtek",
-    email: "Burek@gmail.com",
-    country: "pl",
-    ranking: 1500,
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getUser();
+      setUser(data || basicUser);
+    };
+
+    fetchData();
+  }, []);
+
+  const [user, setUser] = useState<User>(basicUser);
 
   return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={basicUser}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home">
           <Stack.Screen
@@ -71,7 +84,9 @@ const Routing = () => {
           />
           <Stack.Screen
             name="FreeBoard"
-            component={FreeBoard}
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "FreeBoard">
+            ) => <FreeBoard {...props} />}
             options={{ ...headerOptions }}
           />
           <Stack.Screen
@@ -81,7 +96,9 @@ const Routing = () => {
           />
           <Stack.Screen
             name="Login"
-            component={Login}
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "Login">
+            ) => <Login {...props} setUser={setUser} />}
             options={{ ...headerOptions }}
           />
           <Stack.Screen
@@ -106,7 +123,9 @@ const Routing = () => {
           />
           <Stack.Screen
             name="Register"
-            component={Register}
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "Register">
+            ) => <Register {...props} />}
             options={{ ...headerOptions }}
           />
           <Stack.Screen

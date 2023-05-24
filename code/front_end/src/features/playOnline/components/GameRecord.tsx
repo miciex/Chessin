@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
-import BaseButton from "../../../components/BaseButton";
 import GameRecordMove from "./GameRecordMove";
 
 //TODO: change moves to array of Move type

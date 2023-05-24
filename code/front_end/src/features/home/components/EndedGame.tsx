@@ -57,7 +57,7 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
   };
 
   return (
-    <View style={styles.record} >
+    <View style={styles.record}>
       {/* <Image source={}/> */}
       <Pressable
         style={[styles.left, styles.back, styles.both]}
@@ -73,11 +73,10 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
       </Pressable>
       <View style={[styles.right, styles.both]}>
         <Text style={{ textAlign: "right", width: "100%" }}>
-         
           <Text style={styles.dateText}> {date}</Text>
           {"  "}
           <FontAwesome5 name="chess-board" size={18} color="black" />
-         
+
           <Text
             style={{
               color: ColorsPallet.baseColor,
@@ -88,7 +87,6 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
           </Text>
           <Result />
         </Text>
-       
       </View>
     </View>
   );
@@ -105,8 +103,8 @@ const styles = StyleSheet.create({
     paddingRight: 25,
     borderRadius: 10,
     flexDirection: "row",
-    flexWrap: "wrap",
-    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
     textDecorationStyle: "none",
     margin: 8,
     display: "flex",
@@ -119,12 +117,11 @@ const styles = StyleSheet.create({
   },
   back: {
     backgroundColor: ColorsPallet.baseColor,
-   
   },
-  both:{
-    paddingTop: 10,  
-    paddingBottom: 10,  
-    paddingLeft: 10,  
+  both: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 10,
     borderRadius: 10,
   },
   dateText: {

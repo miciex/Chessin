@@ -1,22 +1,18 @@
-import { View, StyleSheet, ScrollView, StatusBar } from "react-native";
-import React, { useState, useContext, useEffect } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
 import ChessBoard from "../components/ChessBoard";
-import { User, UserContext } from "../context/UserContext";
-import {
-  Move,
-  FieldInfo,
-  Player,
-  getInitialChessBoard,
-} from "../features/playOnline";
+import { User } from "../context/UserContext";
+import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/ChessConstants";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
+import Board from "../utils/chess-calculations/board";
+import { getUser } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -27,21 +23,17 @@ type Props = {
   route: RouteProp<RootStackParamList, "AnalyzeGame">;
 };
 
-const initialChessBoard: FieldInfo[] = getInitialChessBoard();
-
 export default function AnalyzeGame({ navigation, route }: Props) {
-  const user = useContext(UserContext);
+  const [user, setUser] = useState<User | null>();
 
   useEffect(() => {
-    if (user) {
-      setWhoseTurn("white");
-    }
+    getUser().then((user) => {
+      if (user === null) return;
+      setUser(user);
+    });
   }, []);
 
-  const [gameRecord, setGameRecord] = useState<Move[]>([]);
-  const [chessBoard, setChessBoard] =
-    useState<Array<FieldInfo>>(initialChessBoard);
-  const [whoseTurn, setWhoseTurn] = useState<"white" | "black" | null>(null);
+  const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
 
   const analyzisContent = sampleMoves.map((move, index) => (
     <StringMoveToText move={move} key={index} />
@@ -55,7 +47,7 @@ export default function AnalyzeGame({ navigation, route }: Props) {
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.boardContainer}>
-            <ChessBoard board={chessBoard} />
+            <ChessBoard board={boardState} setBoard={setBoardState} />
           </View>
         </View>
         <ScrollView

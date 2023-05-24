@@ -1,6 +1,7 @@
 package com.chessin.api;
 
 import com.chessin.security.authentication.refreshToken.RefreshToken;
+import com.chessin.security.authentication.requests.CodeVerificationRequest;
 import com.chessin.security.services.RefreshTokenService;
 import com.chessin.security.authentication.refreshToken.TokenRefreshException;
 import com.chessin.security.authentication.requests.AuthenticationRequest;
@@ -33,7 +34,7 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body("Email already exists in the database.");
         }
 
-        return ResponseEntity.ok(service.register(request));
+        return service.register(request);
     }
 
     @PostMapping("/authenticate")
@@ -46,12 +47,28 @@ public class AuthenticationController {
         return service.authenticate(request);
     }
 
-    @PostMapping(path = "/users/get/{userEmail}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable String userEmail){
-        User user = repository.findByEmail(userEmail).orElseThrow();
-        UserResponse userResponse = UserResponse.fromUser(user);
-        return ResponseEntity.ok(userResponse);
+    @GetMapping("/email")
+    public ResponseEntity<?> email(){
+        return ResponseEntity.ok("Email sent");
+
     }
+
+    @PostMapping("/verifyCode")
+    public ResponseEntity<?> verifyCode(@RequestBody CodeVerificationRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return service.verifyCode(request);
+    }
+
+//    @PostMapping(path = "/users/get/{userEmail}")
+//    public ResponseEntity<UserResponse> getUser(@PathVariable String userEmail){
+//        User user = repository.findByEmail(userEmail).orElseThrow();
+//        UserResponse userResponse = UserResponse.fromUser(user);
+//        return ResponseEntity.ok(userResponse);
+//    }
 
     @PostMapping("/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request)
@@ -62,7 +79,7 @@ public class AuthenticationController {
                 .map(user -> {
                     String token = jwtService.generateToken(user);
                     return ResponseEntity.ok(new TokenRefreshResponse(token, request.getRefreshToken()));
-                }).orElseThrow(() -> new TokenRefreshException(request.getRefreshToken(), "Refresh token is not in database!"));
+                }).orElseThrow(() -> new TokenRefreshException(request.getRefreshToken(), "Refresh token is not in database."));
     }
 
 }

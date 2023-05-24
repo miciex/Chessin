@@ -3,14 +3,14 @@ import React from "react";
 
 import { ColorsPallet } from "../../../utils/Constants";
 
-const Submit = () => {
+type Props = {
+  onSubmit?: () => void;
+};
+
+const Submit = ({ onSubmit }: Props) => {
   return (
     <View style={styles.SubmitDiv}>
-      <TouchableOpacity
-        onPress={() => {
-          console.log("submit");
-        }}
-      >
+      <TouchableOpacity onPress={onSubmit}>
         <Text style={styles.Text}>Submit</Text>
       </TouchableOpacity>
     </View>

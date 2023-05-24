@@ -23,7 +23,10 @@ export default function PlayerBar({ player, timerInfo }: Props) {
         <View style={styles.timerContainer}>
           <Timer info={timerInfo} />
         </View>
-        <CountryFlag isoCode={player ? player.user.country : "pl"} size={24} />
+        <CountryFlag
+          isoCode={player?.user?.country ? player.user.country : "pl"}
+          size={24}
+        />
       </View>
     </View>
   );

@@ -15,7 +15,7 @@ import {
 } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/ChessConstants";
+import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { BotPlayer } from "../features/playOnline";
 import BotBar from "../features/play-with-bot/components/BotBar";

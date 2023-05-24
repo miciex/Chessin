@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 import React from "react";
 import { PiecesNumberToIcon } from "../../../utils/ChessConvertionFunctions";
-import { piecesNumbers } from "../../../utils/ChessConstants";
+import { piecesNumbers } from "../../../utils/chess-calculations/ChessConstants";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 type Props = {

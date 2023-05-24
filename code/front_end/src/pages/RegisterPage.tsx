@@ -1,20 +1,77 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import InputField from "../components/InputField";
 import Submit from "../features/login/components/Submit";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
 import { ColorsPallet } from "../utils/Constants";
+import { registerLink } from "../utils/ServicesConstants";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../Routing";
 
-export default function Register() {
+type Props = {
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "Register",
+    undefined
+  >;
+};
+
+export default function Register({ navigation }: Props) {
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [nick, setNick] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [repeatPassword, setRepeatPassword] = useState<string>("");
+
+  const onSubmit = () => {
+    console.log("submit");
+    fetch(registerLink, {
+      body: JSON.stringify({
+        email,
+        password,
+        lastName,
+        firstName,
+        nameInGame: nick,
+      }),
+      method: "POST",
+      headers: new Headers({ "content-type": "application/json" }),
+    }).then((response) => {
+      if (response.status === 200) {
+        navigation.navigate("Home");
+      }
+    });
+  };
+
   return (
     <View style={styles.appContainer}>
       <View style={styles.formContainer}>
-        <InputField placeholder="Your Nick" />
-        <InputField placeholder="Email" />
-        <InputField placeholder="Password" />
-        <InputField placeholder="Repeat Password" />
-        <Submit />
+        <InputField
+          placeholder="Your Firstname"
+          value={firstName}
+          onChange={setFirstName}
+        />
+        <InputField
+          placeholder="Your LastName"
+          value={lastName}
+          onChange={setLastName}
+        />
+        <InputField placeholder="Your Nick" value={nick} onChange={setNick} />
+        <InputField placeholder="Email" value={email} onChange={setEmail} />
+        <InputField
+          placeholder="Password"
+          value={password}
+          onChange={setPassword}
+          securityTextEntry={true}
+        />
+        <InputField
+          placeholder="Repeat Password"
+          value={repeatPassword}
+          onChange={setRepeatPassword}
+          securityTextEntry={true}
+        />
+        <Submit onSubmit={onSubmit} />
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
           <LogInWithOtherFirm brand="google" />
           <LogInWithOtherFirm brand="facebook" />

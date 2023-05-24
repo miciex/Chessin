@@ -1,4 +1,4 @@
-import { View,Text, StyleSheet, Modal, Pressable } from "react-native";
+import { View, Text, StyleSheet, Modal, Pressable } from "react-native";
 import React, { useState, useContext, useEffect } from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -8,19 +8,22 @@ import ChessBoard from "../components/ChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
 import { User, UserContext } from "../context/UserContext";
 import {
-  Move,
   FieldInfo,
   Player,
   getInitialChessBoard,
 } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/ChessConstants";
-import BaseCustomContentButton from "../components/BaseCustomContentButton";
+import {
+  sampleMoves,
+  StartingPositions,
+} from "../utils/chess-calculations/ChessConstants";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
-import BaseButton from "../components/BaseButton";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
-
+import Board from "../utils/chess-calculations/board";
+import { Move } from "../utils/chess-calculations/move";
+import { getUser } from "../services/userServices";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -31,11 +34,22 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayOnline">;
 };
 
-const initialChessBoard: FieldInfo[] = getInitialChessBoard();
-
 export default function PlayOnline({ navigation, route }: Props) {
   const user = useContext(UserContext);
+  const [opponent, setOpponent] = useState<Player | null>(null);
+  const [myPlayer, setMyPlayer] = useState<Player | null>(null);
+  const [opponentClockInfo, setOpponentClockInfo] = useState<
+    Date | undefined
+  >();
+  const [myClockInfo, setMyClockInfo] = useState<Date>();
+  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
 
+  const [gearModal, setGearModal] = useState(false);
+  //TODO: write reducer for boardState
+  const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
+  const [opacityGear, setOpacityGear] = useState(1);
+
+  //TODO: get opponent from server and user from react-native-storage
   useEffect(() => {
     const isOpponentWhite = Math.random() > 0.5;
     setOpponent({
@@ -47,36 +61,26 @@ export default function PlayOnline({ navigation, route }: Props) {
       },
       color: isOpponentWhite ? "white" : "black",
     });
-    setMyPlayer({ user: user, color: isOpponentWhite ? "black" : "white" });
+
+    getUser().then((user) => {
+      if (user === null) return;
+      setMyPlayer({ user: user, color: isOpponentWhite ? "black" : "white" });
+    });
   }, []);
 
-  const [gameRecord, setGameRecord] = useState<Move[]>([]);
-  const [chessBoard, setChessBoard] =
-    useState<Array<FieldInfo>>(initialChessBoard);
-  const [opponent, setOpponent] = useState<Player | null>(null);
-  const [myPlayer, setMyPlayer] = useState<Player | null>(null);
-  const [isMyTurn, setIsMyTurn] = useState<boolean>(false);
-  const [opponentClockInfo, setOpponentClockInfo] = useState<
-    Date | undefined
-  >();
-  const [myClockInfo, setMyClockInfo] = useState<Date>();
-  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
-
-  const [gearModal, setGearModal] = useState(false);
-
-  const toggleGear = () =>{
+  const toggleGear = () => {
     setGearModal(!gearModal);
-  }
-  const [opacityGear, setOpacityGear] = useState(1)
+  };
 
-  
   return (
     <View style={styles.appContainer}>
-      {gearModal? (<>
-        <SettingsGameModal toggleGear={toggleGear} gearModalOn={gearModal}/>
-        {}
-      </>): null}
-<View style={[styles.contentContainer, {opacity: opacityGear}]}>
+      {gearModal ? (
+        <>
+          <SettingsGameModal toggleGear={toggleGear} gearModalOn={gearModal} />
+          {}
+        </>
+      ) : null}
+      <View style={[styles.contentContainer, { opacity: opacityGear }]}>
         <View style={styles.gameRecordContainer}>
           <GameRecord moves={sampleMoves} />
         </View>
@@ -90,11 +94,16 @@ export default function PlayOnline({ navigation, route }: Props) {
             />
           </View>
           <View style={styles.boardContainer}>
-              <ChessBoard board={chessBoard} /> 
-             
-         
+            <ChessBoard board={boardState} setBoard={setBoardState} />
           </View>
-          <Text><FontAwesome name="gear" size={34} color="black" onPress={toggleGear}/></Text>
+          <Text>
+            <FontAwesome
+              name="gear"
+              size={34}
+              color="black"
+              onPress={toggleGear}
+            />
+          </Text>
           <View style={styles.playerBarContainer}>
             <PlayerBar
               player={opponent?.color !== "black" ? opponent : myPlayer}
@@ -106,9 +115,6 @@ export default function PlayOnline({ navigation, route }: Props) {
         </View>
       </View>
       <Footer navigation={navigation} />
-         
-      
-      
     </View>
   );
 }
@@ -118,7 +124,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignContent: "stretch",
     backgroundColor: ColorsPallet.lighter,
-    alignItems: "center"
+    alignItems: "center",
   },
   contentContainer: {
     flex: 8,
@@ -144,5 +150,4 @@ const styles = StyleSheet.create({
     gap: 16,
     justifyContent: "space-evenly",
   },
-  
 });

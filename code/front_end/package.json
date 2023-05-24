@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
+    "@react-native-async-storage/async-storage": "^1.18.1",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
     "expo": "~48.0.11",
+    "expo-secure-store": "^12.1.1",
     "expo-status-bar": "~1.4.4",
     "kill-port": "^2.0.1",
     "react": "18.2.0",
@@ -28,6 +30,7 @@
     "@types/jest": "^29.5.1",
     "@types/react": "^18.0.38",
     "@types/react-test-renderer": "^18.0.0",
+    "typedoc": "^0.24.7",
     "typescript": "^5.0.4"
   },
   "private": true

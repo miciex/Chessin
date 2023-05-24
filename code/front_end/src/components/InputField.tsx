@@ -1,25 +1,34 @@
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
 import React from "react";
 import { ColorsPallet } from "../utils/Constants";
 
 type Arguments = {
   placeholder: string;
+  onChange?: (text: string) => void;
+  value?: string;
+  securityTextEntry?: boolean;
 };
 
-const InputField = (props: Arguments) => {
-  const [inputText, setInputText] = React.useState("NIGER");
-
+const InputField = ({
+  placeholder,
+  onChange,
+  value,
+  securityTextEntry,
+}: Arguments) => {
   return (
     <View style={styles.InputField}>
       <TextInput
-        onChangeText={setInputText}
-        placeholder={props.placeholder}
+        value={value}
+        onChangeText={onChange}
+        placeholder={placeholder}
         style={{
           textAlign: "center",
-          color: ColorsPallet.darker,
+          color: "black",
           fontSize: 20,
-          lineHeight: 100,
+          width: "100%",
+          flex: 1,
         }}
+        secureTextEntry={securityTextEntry}
       />
     </View>
   );
@@ -31,11 +40,11 @@ const styles = StyleSheet.create({
   InputField: {
     backgroundColor: ColorsPallet.baseColor,
     width: "100%",
-    height: 55,
+    height: 60,
     padding: 12,
     borderRadius: 14,
-    textAlign: "center",
-    textDecorationStyle: "none",
     margin: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
