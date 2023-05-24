@@ -5,6 +5,7 @@ type constructorArgs = {
     startField?:number,
     endField?:number,
     promotePiece?:number,
+    continuations?:Move[],
     move?:Move
 }
 
@@ -16,14 +17,16 @@ export class Move {
     public promotePiece:number = 0;
     public gaveCheck:boolean = false;
     public takenPieceField:number = 0;
+    public continuations: Move[] = [];
     
-    constructor({pieces, startField, endField, promotePiece, move}:constructorArgs){
+    constructor({pieces, startField, endField, promotePiece, move, continuations}:constructorArgs){
         this.startField = startField?startField:(move?move.startField:0);
         this.endField = endField?endField:(move?move.endField:0);
         this.movedPiece = pieces&&startField?pieces[startField]:(move?move.movedPiece:0);
         this.takenPiece = move?move.movedPiece:(pieces?this.calcTakenPiece(pieces):0);
         this.takenPieceField = move?move.takenPieceField:(pieces?this.calcTakenPieceField(pieces):0);
         this.promotePiece = promotePiece?promotePiece:(move?move.promotePiece:0);
+        this.continuations = continuations?continuations:[];
     }
     
     private calcTakenPiece(pieces:{[key:number]:number}):number{

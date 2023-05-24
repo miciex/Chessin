@@ -4,7 +4,7 @@ import { GameResults } from "./ChessTypes";
 import { Pieces, Directions } from "./ChessConstants";
 import { FenToIntArray, boardToMap } from "./helpMethods";
 
-type constructorArgs = {
+export type constructorArgs = {
     fenString?:string;
     whiteToMove?:boolean; 
     availableCastles?:Array<number>;
@@ -12,7 +12,7 @@ type constructorArgs = {
     board?:Board;
 }
 
-class Board {
+export default class Board {
 
     position: {[key:number]:number} = {};
     whiteToMove: boolean = true;
@@ -23,8 +23,9 @@ class Board {
     positions: Array<HashMap<number>> = [];
     movesTo50MoveRule: number = 0;
     movedPieces: number[] = new Array(64).fill(0);
+    result: GameResults = GameResults.NONE;
 
-    Board({fenString, whiteToMove, availableCastles, moves, board}:constructorArgs){
+    constructor({fenString, whiteToMove, availableCastles, moves, board}:constructorArgs){
         this.fen = fenString?fenString:(board?board.fen:"");
         this.visualBoard = FenToIntArray(this.fen, 64);
         this.position = boardToMap(this.visualBoard);

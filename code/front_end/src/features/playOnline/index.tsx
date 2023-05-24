@@ -3,16 +3,6 @@ import { baseBoard } from "../../utils/chess-calculations/ChessConstants";
 import { botType } from "../gameMenuPage/context/BotTypeContext";
 import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
 
-export type Move = {
-  from: number;
-  to: number;
-  promotion?: string;
-  captured?: number;
-  capturedField?: number;
-  piece: number;
-  continuations?: Move[];
-};
-
 export type FieldInfo = {
   piece: number;
   fieldNumber: number;

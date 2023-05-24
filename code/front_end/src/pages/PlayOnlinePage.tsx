@@ -8,7 +8,6 @@ import ChessBoard from "../components/ChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
 import { User, UserContext } from "../context/UserContext";
 import {
-  Move,
   FieldInfo,
   Player,
   getInitialChessBoard,
@@ -18,6 +17,8 @@ import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
+import Board from "../utils/chess-calculations/board";
+import { Move } from "../utils/chess-calculations/move";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -32,7 +33,25 @@ const initialChessBoard: FieldInfo[] = getInitialChessBoard();
 
 export default function PlayOnline({ navigation, route }: Props) {
   const user = useContext(UserContext);
+  const [opponent, setOpponent] = useState<Player | null>(null);
+  const [myPlayer, setMyPlayer] = useState<Player | null>(null);
+  const [opponentClockInfo, setOpponentClockInfo] = useState<
+    Date | undefined
+  >();
+  const [myClockInfo, setMyClockInfo] = useState<Date>();
+  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
 
+  const [gearModal, setGearModal] = useState(false);
+  //TODO: write reducer for boardState
+  const [boardState, setBoardState] = useState<Board>(
+    new Board({
+      fenString: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+      whiteToMove: true,
+    })
+  );
+  const [opacityGear, setOpacityGear] = useState(1);
+
+  //TODO: get opponent from server and user from react-native-storage
   useEffect(() => {
     const isOpponentWhite = Math.random() > 0.5;
     setOpponent({
@@ -47,24 +66,9 @@ export default function PlayOnline({ navigation, route }: Props) {
     setMyPlayer({ user: user, color: isOpponentWhite ? "black" : "white" });
   }, []);
 
-  const [gameRecord, setGameRecord] = useState<Move[]>([]);
-  const [chessBoard, setChessBoard] =
-    useState<Array<FieldInfo>>(initialChessBoard);
-  const [opponent, setOpponent] = useState<Player | null>(null);
-  const [myPlayer, setMyPlayer] = useState<Player | null>(null);
-  const [isMyTurn, setIsMyTurn] = useState<boolean>(false);
-  const [opponentClockInfo, setOpponentClockInfo] = useState<
-    Date | undefined
-  >();
-  const [myClockInfo, setMyClockInfo] = useState<Date>();
-  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
-
-  const [gearModal, setGearModal] = useState(false);
-
   const toggleGear = () => {
     setGearModal(!gearModal);
   };
-  const [opacityGear, setOpacityGear] = useState(1);
 
   return (
     <View style={styles.appContainer}>
@@ -88,7 +92,7 @@ export default function PlayOnline({ navigation, route }: Props) {
             />
           </View>
           <View style={styles.boardContainer}>
-            <ChessBoard board={chessBoard} />
+            <ChessBoard board={boardState} setBoard={setBoardState} />
           </View>
           <Text>
             <FontAwesome
