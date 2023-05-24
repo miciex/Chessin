@@ -8,6 +8,7 @@ import com.chessin.security.authentication.verificationCode.VerificationCodeRepo
 import com.chessin.security.services.RefreshTokenService;
 import com.chessin.security.authentication.responses.AuthenticationResponse;
 import com.chessin.security.configuration.JwtService;
+import com.chessin.security.user.Provider;
 import com.chessin.security.user.User;
 import com.chessin.security.user.UserRepository;
 import lombok.Data;
@@ -50,6 +51,7 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(USER)
                 .isTwoFactorAuthenticationEnabled(true)
+                .provider(Provider.LOCAL)
                 .build();
 
         var jwtToken = jwtService.generateToken(user);
@@ -200,28 +202,35 @@ public class AuthenticationService {
     @Transactional
     public ResponseEntity<?> changePassword(PasswordChangeRequest request)
     {
-        try
-        {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getOldPassword()));
-        } catch(AuthenticationException e){
-            return ResponseEntity.badRequest().body("Password incorrect.");
-        }
-
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
-        if(passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
-            return ResponseEntity.badRequest().body("New password cannot be the same as the old one.");
+        if(!user.isTwoFactorAuthenticationEnabled()) {
+            try {
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getOldPassword()));
+            } catch (AuthenticationException e) {
+                return ResponseEntity.badRequest().body("Password incorrect.");
+            }
 
-        if(user.isTwoFactorAuthenticationEnabled()) {
+            if (passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
+                return ResponseEntity.badRequest().body("New password cannot be the same as the old one.");
+
+            if (user.isTwoFactorAuthenticationEnabled()) {
+                sendVerificationCode(user);
+                return ResponseEntity.accepted().body("Verification code sent to your email address.");
+            }
+
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+
+            return ResponseEntity.ok("Password changed successfully.");
+        }
+        else
+        {
             sendVerificationCode(user);
+
             return ResponseEntity.accepted().body("Verification code sent to your email address.");
         }
-
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
-
-        return ResponseEntity.ok("Password changed successfully.");
     }
 
     @Transactional

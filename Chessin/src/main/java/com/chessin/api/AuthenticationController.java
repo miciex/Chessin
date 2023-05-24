@@ -78,6 +78,17 @@ public class AuthenticationController {
         return service.remindPassword(request);
     }
 
+    @PostMapping("/2faEnabled")
+    public ResponseEntity<?> twoFactorAuthenticationEnabled(@RequestBody TwoFactorAuthenticationEnabledRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return repository.findByEmail(request.getEmail()).get().isTwoFactorAuthenticationEnabled()
+                ? ResponseEntity.ok().body("True") : ResponseEntity.ok().body("False");
+    }
+
     @PostMapping("/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request)
     {
@@ -89,5 +100,4 @@ public class AuthenticationController {
                     return ResponseEntity.ok(new TokenRefreshResponse(token, request.getRefreshToken()));
                 }).orElseThrow(() -> new TokenRefreshException(request.getRefreshToken(), "Refresh token is not in database."));
     }
-
 }
