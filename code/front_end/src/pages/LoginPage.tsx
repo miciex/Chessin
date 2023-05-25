@@ -29,15 +29,10 @@ export default function Login({ route, navigation, setUser }: Props) {
   const setUserDataFromResponse = async (
     responseData: AuthenticationResponse
   ) => {
-    if (responseData.refreshToken) {
-      SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
-      SecureStore.setItemAsync("accesToken", responseData.accesToken);
-      const user = await fetchUser(email);
-      storeUser(user);
-      // setUser(user);
-    } else {
-      setShowAuthCode(true);
-    }
+    SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
+    SecureStore.setItemAsync("accesToken", responseData.accesToken);
+    const user = await fetchUser(email);
+    storeUser(user);
   };
 
   const onSubmit = () => {
@@ -47,14 +42,25 @@ export default function Login({ route, navigation, setUser }: Props) {
       headers: new Headers({ "content-type": "application/json" }),
     })
       .then((response) => {
-        console.log("got response");
-        return response.json();
+        if (response.status === 200) {
+          console.log(response);
+          return response.json();
+        } else if (response.status === 202) {
+          setShowAuthCode(true);
+          return null;
+        } else if (response.status === 400) {
+          throw new Error("Bad request");
+        } else {
+          throw new Error("Something went wrong");
+        }
       })
-      .then((responseData) => {
+      .then((responseData?: AuthenticationResponse) => {
+        if (!responseData) return false;
         setUserDataFromResponse(responseData);
+        return true;
       })
-      .then(() => {
-        navigation.navigate("Home");
+      .then((userSet: boolean) => {
+        if (userSet) navigation.navigate("Home");
       });
   };
 
@@ -98,7 +104,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: ColorsPallet.light,
     justifyContent: "center",
-
     width: "80%",
   },
   appContainer: {
