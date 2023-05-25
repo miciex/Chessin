@@ -38,6 +38,7 @@ export default function AuthCodeModal({
           return response.json();
         } else if (response.status === 400) {
           response.json().then((data) => {
+            hideModal();
             throw new Error(data);
           });
         }
