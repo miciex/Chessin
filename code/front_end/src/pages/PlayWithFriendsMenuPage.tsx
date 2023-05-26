@@ -1,14 +1,10 @@
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
   Switch,
-  Modal,
 } from "react-native";
 import React, { useState } from "react";
 
-import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 <FontAwesome5 name="medal" size={24} color="black" />;
 import Footer from "../components/Footer";
@@ -21,7 +17,6 @@ import PickColor from "../features/gameMenuPage/components/PickColor";
 import BaseButton from "../components/BaseButton";
 import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColorContext";
 import BaseCustomContentButton from "../components/BaseCustomContentButton";
-import BaseModal from "../components/BaseModal";
 import { PlayColorsContext } from "../features/gameMenuPage/context/PlayColorContext";
 import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButton";
 import { GameLengthTypeContextType } from "../features/gameMenuPage/context/GameLengthContext";
@@ -40,10 +35,6 @@ type Props = {
 
 
 export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
-
-
- 
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
@@ -65,16 +56,9 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   
   const [timerModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { nick, active, playing, rank } = route.params;
+  const { nick, rank } = route.params;
 
   const [isEnabled, setIsEnabled] = useState(true);
-  const [text, setText] = useState("Nothing here");
-
-  const toggleSwitch = () => {
-    if (isEnabled) setText("Rankingowa gra");
-    else if (!isEnabled) setText("Nierankingowa gra");
-    setIsEnabled(!isEnabled);
-  };
 
   return (
     <View>
@@ -86,12 +70,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
           />): (
       <View style={styles.contentContainer}>
           <View
-            style={{
-              width: "90%",
-              height: 200,
-              alignItems: "center",
-              marginBottom: 20,
-            }}
+            style={styles.profileBox}
           >
             <Profile nick={nick} rank={rank} />
             <View style={{ width: 400, height: 130 }}>
@@ -102,22 +81,15 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
             </View>
             
            
-            <View style={{ width: 200, height: 60,  transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }], }}>
+            <View style={styles.pickColor}>
               <PickColor handleOnClick={setChosenColor} />
             </View>
             <View style={styles.rightButtons}>
               <View
-                style={{
-                  width: 60,
-                  height: 60,
-                  backgroundColor: ColorsPallet.baseColor,
-                  padding: 5,
-                  borderRadius: 8,
-                  transform: [{ scaleX: 1.15 }, { scaleY: 1.15 }],
-                }}
+                style={styles.medalButton}
               >
                 <BaseCustomContentButton
-                  handlePress={() => {toggleSwitch()}}
+                  handlePress={() => {()=>setIsEnabled(!isEnabled)}}
                   content={
                     <FontAwesome5
                       name="medal"
@@ -136,9 +108,8 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                 trackColor={{ false: "grey", true: "orange" }}
                 thumbColor={"#f4f3f4"}
                 ios_backgroundColor={"grey"}
-                onValueChange={toggleSwitch}
                 value={isEnabled}
-                onTouchMove={toggleSwitch}
+                onTouchMove={()=>setIsEnabled(!isEnabled)}
               />
             </View>
             <View style={{ width: "80%", height: 80 }}>
@@ -188,4 +159,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
+  profileBox:{
+    width: "90%",
+    height: 200,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  medalButton :{
+    width: 60,
+    height: 60,
+    backgroundColor: ColorsPallet.baseColor,
+    padding: 5,
+    borderRadius: 8,
+    transform: [{ scaleX: 1.15 }, { scaleY: 1.15 }],
+  },
+  pickColor:{ width: 200, height: 60,  transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }], }
 });
