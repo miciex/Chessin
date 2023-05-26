@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React, { useState, useRef } from "react";
 import InputField from "../components/InputField";
 import Footer from "../components/Footer";
@@ -14,6 +14,12 @@ import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import { AuthenticationResponse } from "../utils/ServicesTypes";
 import { fetchUser } from "../features/authentication/services/loginServices";
 import { storeUser } from "../services/userServices";
+import { emailRegex, passwordRegex } from "../utils/Constants";
+import AuthInput from "../features/authentication/components/AuthInput";
+import {
+  notValidEmailMessage,
+  notValidPasswordMessage,
+} from "../utils/Constants";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
@@ -23,38 +29,59 @@ type Props = {
 
 export default function Login({ route, navigation, setUser }: Props) {
   const [email, setEmail] = useState<string>("");
+  const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
   const [password, setPassword] = useState<string>("");
+  const [isPasswordValid, setIsPasswordValid] = useState<boolean | null>(null);
   const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
 
   const setUserDataFromResponse = async (
     responseData: AuthenticationResponse
   ) => {
-    if (responseData.refreshToken) {
-      SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
-      SecureStore.setItemAsync("accesToken", responseData.accesToken);
-      const user = await fetchUser(email);
-      storeUser(user);
-      // setUser(user);
-    } else {
-      setShowAuthCode(true);
-    }
+    SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
+    SecureStore.setItemAsync("accesToken", responseData.accesToken);
+    const user = await fetchUser(email);
+    storeUser(user);
+  };
+
+  const validataEmail = (): boolean => {
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (): boolean => {
+    return passwordRegex.test(password);
+  };
+
+  const isDataValid = (): boolean => {
+    return validataEmail() && validatePassword();
   };
 
   const onSubmit = () => {
+    if (!isDataValid()) return;
     fetch(authenticateLink, {
       body: JSON.stringify({ email, password }),
       method: "POST",
       headers: new Headers({ "content-type": "application/json" }),
     })
       .then((response) => {
-        console.log("got response");
-        return response.json();
+        if (response.status === 200) {
+          console.log(response);
+          return response.json();
+        } else if (response.status === 202) {
+          setShowAuthCode(true);
+          return null;
+        } else if (response.status === 400) {
+          throw new Error("Bad request");
+        } else {
+          throw new Error("Something went wrong");
+        }
       })
-      .then((responseData) => {
+      .then((responseData?: AuthenticationResponse) => {
+        if (!responseData) return false;
         setUserDataFromResponse(responseData);
+        return true;
       })
-      .then(() => {
-        navigation.navigate("Home");
+      .then((userSet: boolean) => {
+        if (userSet) navigation.navigate("Home");
       });
   };
 
@@ -72,12 +99,22 @@ export default function Login({ route, navigation, setUser }: Props) {
         />
       ) : null}
       <View style={styles.formContainer}>
-        <InputField placeholder="Email" value={email} onChange={setEmail} />
-        <InputField
+        <AuthInput
+          placeholder="Email"
+          value={email}
+          onChange={setEmail}
+          isValid={isEmailValid}
+          notValidText={notValidEmailMessage}
+          onSubmitEditing={validataEmail}
+        />
+        <AuthInput
           placeholder="Password"
           value={password}
           onChange={setPassword}
           securityTextEntry={true}
+          isValid={isPasswordValid}
+          notValidText={notValidPasswordMessage}
+          onSubmitEditing={validatePassword}
         />
         <Submit onSubmit={onSubmit} />
 
@@ -98,8 +135,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: ColorsPallet.light,
     justifyContent: "center",
-
     width: "80%",
+    rowGap: 8,
   },
   appContainer: {
     backgroundColor: ColorsPallet.light,

@@ -30,9 +30,21 @@ export default function AuthCodeModal({
   const submitCode = () => {
     fetch(verifyCode, {
       body: JSON.stringify({ authCode: inputs.join(), email: user.email }),
+      method: "POST",
+      headers: new Headers({ "content-type": "application/json" }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else if (response.status === 400) {
+          response.json().then((data) => {
+            hideModal();
+            throw new Error(data);
+          });
+        }
+      })
       .then((data) => {
+        console.log(data);
         setUserDataFromResponse(data);
       })
       .then(() => {
@@ -43,6 +55,17 @@ export default function AuthCodeModal({
       });
   };
 
+  const handleOnChange = (text: string, index: number) => {
+    if (!isChar(text)) return;
+
+    let newInputs = [...inputs];
+    newInputs[index] = text;
+    setInputs(newInputs);
+    itemElems.current[index + 1]?.focus();
+    itemElems.current[0].blur();
+    if (index + 1 === InputLength) itemElems.current[index]?.blur();
+  };
+
   const getInputsView = () => {
     const inputsArray = [];
     for (let i = 0; i < InputLength; i++) {
@@ -51,15 +74,7 @@ export default function AuthCodeModal({
           style={styles.input}
           maxLength={1}
           value={inputs[i]?.toString()}
-          onChangeText={(text) => {
-            if (!isChar(text)) return;
-            let newInputs = [...inputs];
-            newInputs[i] = text;
-            setInputs(newInputs);
-            itemElems.current[i + 1]?.focus();
-            itemElems.current[0].blur();
-            if (i + 1 === InputLength) itemElems.current[i]?.blur();
-          }}
+          onChangeText={(text) => handleOnChange(text, i)}
           ref={(ref) => (itemElems.current[i] = ref)}
         />
       );

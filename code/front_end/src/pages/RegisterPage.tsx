@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 
 import InputField from "../components/InputField";
@@ -46,7 +46,13 @@ export default function Register({ navigation }: Props) {
 
   return (
     <View style={styles.appContainer}>
-      <View style={styles.formContainer}>
+      <ScrollView
+        style={styles.formContainer}
+        contentContainerStyle={{
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <InputField
           placeholder="Your Firstname"
           value={firstName}
@@ -77,7 +83,7 @@ export default function Register({ navigation }: Props) {
           <LogInWithOtherFirm brand="facebook" />
           <LogInWithOtherFirm brand="apple" />
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -85,10 +91,7 @@ export default function Register({ navigation }: Props) {
 const styles = StyleSheet.create({
   formContainer: {
     flex: 8,
-    alignItems: "center",
     backgroundColor: ColorsPallet.light,
-    justifyContent: "center",
-
     width: "80%",
   },
   appContainer: {
