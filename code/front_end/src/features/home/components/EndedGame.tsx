@@ -60,7 +60,7 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
     <View style={styles.record}>
       {/* <Image source={}/> */}
       <Pressable
-        style={[styles.left, styles.back, styles.both]}
+        style={styles.playerInfo}
         onPress={goToFriendsProfile}
         android_ripple={{
           color: ColorsPallet.lighter,
@@ -71,23 +71,17 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
           {nick} {rank.toString()}
         </Text>
       </Pressable>
-      <View style={[styles.right, styles.both]}>
-        <Text style={{ textAlign: "right", width: "100%" }}>
+        <View style={styles.gameInfoContainer}>
           <Text style={styles.dateText}> {date}</Text>
-          {"  "}
           <FontAwesome5 name="chess-board" size={18} color="black" />
-
           <Text
             style={{
               color: ColorsPallet.baseColor,
-              paddingRight: 8,
             }}
           >
-            {"  "}
           </Text>
           <Result />
-        </Text>
-      </View>
+        </View>
     </View>
   );
 };
@@ -96,11 +90,8 @@ export default EndedGame;
 const styles = StyleSheet.create({
   record: {
     backgroundColor: ColorsPallet.baseColor,
-    width: "87%",
+    width: "100%",
     height: 55,
-    padding: 8,
-    paddingLeft: 35,
-    paddingRight: 25,
     borderRadius: 10,
     flexDirection: "row",
     justifyContent: "center",
@@ -109,23 +100,23 @@ const styles = StyleSheet.create({
     margin: 8,
     display: "flex",
   },
-  left: {
-    width: "55%",
-  },
-  right: {
-    width: "45%",
+  playerInfo: {
+    flex: 1,
+    marginLeft: 40
   },
   back: {
     backgroundColor: ColorsPallet.baseColor,
-  },
-  both: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 10,
-    borderRadius: 10,
   },
   dateText: {
     fontSize: 11,
     color: "#b3afaf",
   },
+  gameInfoContainer:{
+    flex:1,
+    flexDirection: 'row',
+    gap: 8,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'space-evenly'
+  }
 });
