@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CodeVerificationRequest {
+public class PasswordChangeRequest {
 
     private String email;
-    private String verificationCode;
     private String oldPassword;
     private String newPassword;
-    private VerificationType verificationType;
 }

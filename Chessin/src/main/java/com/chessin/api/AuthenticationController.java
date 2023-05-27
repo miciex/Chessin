@@ -1,13 +1,10 @@
 package com.chessin.api;
 
 import com.chessin.security.authentication.refreshToken.RefreshToken;
-import com.chessin.security.authentication.requests.CodeVerificationRequest;
+import com.chessin.security.authentication.requests.*;
 import com.chessin.security.services.RefreshTokenService;
 import com.chessin.security.authentication.refreshToken.TokenRefreshException;
-import com.chessin.security.authentication.requests.AuthenticationRequest;
-import com.chessin.security.authentication.requests.TokenRefreshRequest;
 import com.chessin.security.services.AuthenticationService;
-import com.chessin.security.authentication.requests.RegisterRequest;
 import com.chessin.security.authentication.responses.TokenRefreshResponse;
 import com.chessin.security.configuration.JwtService;
 import com.chessin.security.user.User;
@@ -60,15 +57,43 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
         }
 
-        return service.verifyCode(request);
+        return switch (request.getVerificationType()) {
+            case AUTHENTICATE -> service.finishAuthentication(request);
+            case CHANGE_PASSWORD, REMIND_PASSWORD -> service.finishChangingPassword(request);
+            default -> ResponseEntity.badRequest().body("Invalid verification type.");
+        };
     }
 
-//    @PostMapping(path = "/users/get/{userEmail}")
-//    public ResponseEntity<UserResponse> getUser(@PathVariable String userEmail){
-//        User user = repository.findByEmail(userEmail).orElseThrow();
-//        UserResponse userResponse = UserResponse.fromUser(user);
-//        return ResponseEntity.ok(userResponse);
-//    }
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return service.changePassword(request);
+    }
+
+    @PostMapping("/remindPassword")
+    public ResponseEntity<?> remindPassword(@RequestBody PasswordRemindRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return service.remindPassword(request);
+    }
+
+    @PostMapping("/2faEnabled")
+    public ResponseEntity<?> twoFactorAuthenticationEnabled(@RequestBody TwoFactorAuthenticationEnabledRequest request){
+
+        if(!repository.existsByEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body("Email does not exist in the database.");
+        }
+
+        return repository.findByEmail(request.getEmail()).get().isTwoFactorAuthenticationEnabled()
+                ? ResponseEntity.ok().body("True") : ResponseEntity.ok().body("False");
+    }
 
     @PostMapping("/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request)
@@ -81,5 +106,4 @@ public class AuthenticationController {
                     return ResponseEntity.ok(new TokenRefreshResponse(token, request.getRefreshToken()));
                 }).orElseThrow(() -> new TokenRefreshException(request.getRefreshToken(), "Refresh token is not in database."));
     }
-
 }
