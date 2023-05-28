@@ -72,13 +72,13 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
         </Text>
       </Pressable>
         <View style={styles.gameInfoContainer}>
-          <Text style={styles.dateText}> {date}</Text>
+          <Text style={styles.dateText}> {date}{"   "}</Text>
           <FontAwesome5 name="chess-board" size={18} color="black" />
           <Text
             style={{
               color: ColorsPallet.baseColor,
             }}
-          >
+          >{"  "}
           </Text>
           <Result />
         </View>
@@ -97,15 +97,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     textDecorationStyle: "none",
-    margin: 8,
+    marginTop: 16,
     display: "flex",
   },
   playerInfo: {
     flex: 1,
     marginLeft: 40
-  },
-  back: {
-    backgroundColor: ColorsPallet.baseColor,
   },
   dateText: {
     fontSize: 11,
@@ -114,9 +111,8 @@ const styles = StyleSheet.create({
   gameInfoContainer:{
     flex:1,
     flexDirection: 'row',
-    gap: 8,
     height: '100%',
     alignItems: 'center',
-    justifyContent: 'space-evenly'
+    justifyContent: 'center',
   }
 });

@@ -17,13 +17,13 @@ type Props = {
 
 export default function Header({ navigation, console }: Props) {
   const goToProfilePage = () => {
-    console();
+    navigation?.navigate("ProfilePage", {nick:"wojtek", rank:3000, active:false, playing:false, avatar:"zdjeic"})
   };
   return (
     <View style={styles.header}>
       <View style={styles.contentContainer}>
         <Text style={styles.headerText}>Chessin</Text>
-        <Pressable onPress={goToProfilePage}>
+        <Pressable onPress={()=>goToProfilePage}>
           <FontAwesome
             name="user-circle"
             size={32}

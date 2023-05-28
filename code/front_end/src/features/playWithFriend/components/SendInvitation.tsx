@@ -2,10 +2,11 @@ import { View, Text, StyleSheet, Image, Pressable} from "react-native";
 import React from "react";
 
 import { ColorsPallet } from "../../../utils/Constants";
+import { PushNotification } from "react-native/Libraries/PushNotificationIOS/PushNotificationIOS";
 
 const SendInvitation = () => {
   return (
-    <View style={{borderRadius: 10}}>
+    <View style={{borderRadius: 10, marginBottom: 12, marginTop: 12}}>
     <Pressable style={styles.button} android_ripple={{
       color: ColorsPallet.lighter,
       borderless: false,

@@ -3,10 +3,8 @@ import React from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 import { ColorsPallet, StackParamList } from "../../../utils/Constants";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
-import { RouteProp } from "@react-navigation/native";
 
 type Props = {
   nick: string;

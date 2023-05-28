@@ -56,6 +56,7 @@ const basicUser: User = {
 
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -155,6 +156,7 @@ const styles = StyleSheet.create({
 const headerOptions: NativeStackNavigationOptions = {
   headerStyle: styles.header,
   headerTitle: () => <Header console={() => console.log("profil")} />,
+  
 };
 
 export default Routing;

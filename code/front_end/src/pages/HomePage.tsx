@@ -82,9 +82,6 @@ type Props = {
 };
 
 const HomePage = ({ route, navigation }: Props) => {
-  const handleMove = () => {
-    navigation.navigate("Login");
-  };
 
   return (
     <View style={styles.appContainer}>
@@ -102,6 +99,7 @@ const HomePage = ({ route, navigation }: Props) => {
             </View>
 
             {ended_games.map((gracz, index) => (
+              <View style={{width: "80%"}}>
               <EndedGame
                 nick={gracz.playerNick}
                 rank={gracz.rank}
@@ -110,6 +108,7 @@ const HomePage = ({ route, navigation }: Props) => {
                 key={index}
                 date={gracz.date}
               />
+              </View>
             ))}
           </View>
         </ScrollView>
