@@ -380,6 +380,7 @@ public class Board {
                 : checkingDir % 8;
         int checkingColumn = position % 8 + help;
 
+
         return checkingRow < 8 && checkingRow >= 0 && checkingColumn < 8 && checkingColumn >= 0;
     }
 

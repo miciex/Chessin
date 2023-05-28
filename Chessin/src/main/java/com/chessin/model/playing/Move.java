@@ -1,12 +1,12 @@
 package com.chessin.model.playing;
 
 import com.chessin.model.utils.Constants;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.context.annotation.Primary;
 
 import java.util.HashMap;
 
@@ -17,7 +17,9 @@ import java.util.HashMap;
 @Entity
 public class Move {
     @Id
-    private long chessGameId;
+    private long Id;
+    @ManyToOne
+    ChessGame chessGame;
     private int movedPiece;
     private int startField;
     private int endField;
