@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useState, useRef } from "react";
-import InputField from "../components/InputField";
 import Footer from "../components/Footer";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -24,10 +23,9 @@ import {
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
   route: RouteProp<RootStackParamList, "Login">;
-  setUser: (user: any) => void;
 };
 
-export default function Login({ route, navigation, setUser }: Props) {
+export default function Login({ route, navigation }: Props) {
   const [email, setEmail] = useState<string>("");
   const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
   const [password, setPassword] = useState<string>("");
@@ -37,8 +35,9 @@ export default function Login({ route, navigation, setUser }: Props) {
   const setUserDataFromResponse = async (
     responseData: AuthenticationResponse
   ) => {
+    console.log(responseData);
     SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
-    SecureStore.setItemAsync("accesToken", responseData.accesToken);
+    SecureStore.setItemAsync("accesToken", responseData.accessToken);
     const user = await fetchUser(email);
     storeUser(user);
   };
@@ -49,6 +48,14 @@ export default function Login({ route, navigation, setUser }: Props) {
 
   const validatePassword = (): boolean => {
     return passwordRegex.test(password);
+  };
+
+  const setPasswordValid = (): void => {
+    setIsPasswordValid(validatePassword());
+  };
+
+  const setEmailValid = (): void => {
+    setIsEmailValid(validataEmail());
   };
 
   const isDataValid = (): boolean => {
@@ -64,7 +71,7 @@ export default function Login({ route, navigation, setUser }: Props) {
     })
       .then((response) => {
         if (response.status === 200) {
-          console.log(response);
+          console.log(JSON.stringify(response));
           return response.json();
         } else if (response.status === 202) {
           setShowAuthCode(true);
@@ -76,12 +83,17 @@ export default function Login({ route, navigation, setUser }: Props) {
         }
       })
       .then((responseData?: AuthenticationResponse) => {
-        if (!responseData) return false;
+        if (!responseData) {
+          return false;
+        }
         setUserDataFromResponse(responseData);
         return true;
       })
       .then((userSet: boolean) => {
         if (userSet) navigation.navigate("Home");
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
@@ -89,15 +101,15 @@ export default function Login({ route, navigation, setUser }: Props) {
     setShowAuthCode(false);
   };
 
-  return (
+  return showAuthCode ? (
+    <AuthCodeModal
+      hideModal={hideModal}
+      navigation={navigation}
+      setUserDataFromResponse={setUserDataFromResponse}
+      email={email}
+    />
+  ) : (
     <View style={styles.appContainer}>
-      {showAuthCode ? (
-        <AuthCodeModal
-          hideModal={hideModal}
-          navigation={navigation}
-          setUserDataFromResponse={setUserDataFromResponse}
-        />
-      ) : null}
       <View style={styles.formContainer}>
         <AuthInput
           placeholder="Email"
@@ -105,7 +117,7 @@ export default function Login({ route, navigation, setUser }: Props) {
           onChange={setEmail}
           isValid={isEmailValid}
           notValidText={notValidEmailMessage}
-          onSubmitEditing={validataEmail}
+          onSubmitEditing={setEmailValid}
         />
         <AuthInput
           placeholder="Password"
@@ -114,7 +126,7 @@ export default function Login({ route, navigation, setUser }: Props) {
           securityTextEntry={true}
           isValid={isPasswordValid}
           notValidText={notValidPasswordMessage}
-          onSubmitEditing={validatePassword}
+          onSubmitEditing={setPasswordValid}
         />
         <Submit onSubmit={onSubmit} />
 

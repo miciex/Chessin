@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import Profile from "../features/playWithFriend/components/Profile";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -9,6 +9,9 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
+import { getUser } from "../services/userServices";
+import useFetch from "../hooks/useFetch";
+import { User } from "../utils/PlayerUtilities";
 
 const ended_games = [
   {
@@ -84,7 +87,14 @@ type Props = {
 };
 
 export default function ProfilePage({ navigation, route }: Props) {
-  const { nick, rank } = route.params;
+  const [user, setUser] = useState<User>();
+  // const [data, loading, error] = useFetch("http://localhost:3000/user", {});
+
+  useEffect(() => {
+    getUser().then((player) => {
+      setUser(player);
+    });
+  }, []);
 
   let component = ended_games.slice(0, 5).map((game) => {
     return (
@@ -101,20 +111,19 @@ export default function ProfilePage({ navigation, route }: Props) {
   let active = false;
 
   const goToFriendsMenu = () => {
-    console.log(nick);
-    navigation.navigate("PlayWithFriendsMenu", {
-      nick,
-      rank,
-      playing,
-      active,
-    });
+    navigation.navigate("PlayWithFriendsMenu", {});
   };
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.profile}>
-          <Profile nick={nick} rank={rank} active={active} playing={playing} />
+          <Profile
+            nick={user ? user.nameInGame : ""}
+            rank={user ? user.highestRanking : 0}
+            active={active}
+            playing={playing}
+          />
         </View>
 
         <View style={styles.invite}>

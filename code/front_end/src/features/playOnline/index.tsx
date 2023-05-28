@@ -1,4 +1,3 @@
-import { User } from "../../context/UserContext";
 import { baseBoard } from "../../utils/chess-calculations/ChessConstants";
 import { botType } from "../gameMenuPage/context/BotTypeContext";
 import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
@@ -14,11 +13,6 @@ export type Bot = {
   name: string;
   ranking: number;
   iconName: any; //keyof typeof FontAwesome5.glyphMap;
-};
-
-export type Player = {
-  user: User;
-  color: string;
 };
 
 export type BotPlayer = {

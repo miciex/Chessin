@@ -1,29 +1,20 @@
 import { View, Text, StyleSheet, Modal, Pressable } from "react-native";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
 import ChessBoard from "../components/ChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
-import { User, UserContext } from "../context/UserContext";
-import {
-  FieldInfo,
-  Player,
-  getInitialChessBoard,
-} from "../features/playOnline";
+import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import {
-  sampleMoves,
-  StartingPositions,
-} from "../utils/chess-calculations/ChessConstants";
-import { FontAwesome, AntDesign } from "@expo/vector-icons";
+import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
+import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
 import Board from "../utils/chess-calculations/board";
-import { Move } from "../utils/chess-calculations/move";
 import { getUser } from "../services/userServices";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { Player } from "../utils/PlayerUtilities";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -35,12 +26,9 @@ type Props = {
 };
 
 export default function PlayOnline({ navigation, route }: Props) {
-  const user = useContext(UserContext);
   const [opponent, setOpponent] = useState<Player | null>(null);
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
-  const [opponentClockInfo, setOpponentClockInfo] = useState<
-    Date | undefined
-  >();
+  const [opponentClockInfo, setOpponentClockInfo] = useState<Date>();
   const [myClockInfo, setMyClockInfo] = useState<Date>();
   const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
 
@@ -56,14 +44,20 @@ export default function PlayOnline({ navigation, route }: Props) {
       user: {
         name: "Maciej",
         email: "maciej@gmail.com",
+        nameInGame: "miciex",
         country: "pl",
-        ranking: 1500,
+        highestRanking: 1500,
+        ranking: {
+          blitz: 1500,
+          rapid: 1500,
+          bullet: 1500,
+          classical: 1500,
+        },
       },
       color: isOpponentWhite ? "white" : "black",
     });
 
     getUser().then((user) => {
-      if (user === null) return;
       setMyPlayer({ user: user, color: isOpponentWhite ? "black" : "white" });
     });
   }, []);

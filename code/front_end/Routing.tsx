@@ -17,7 +17,6 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGame from "./src/pages/AnalyzeGamePage";
-import { UserContext, User } from "./src/context/UserContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { getUser } from "./src/services/userServices";
 
@@ -29,118 +28,94 @@ export type RootStackParamList = {
   Login: undefined;
   PlayBot: undefined;
   PlayOnline: undefined;
-  PlayWithFriendsMenu: {
-    nick: string;
-    rank: Number;
-    active: boolean;
-    playing: boolean;
-  };
-  ProfilePage: {
-    nick: string;
-    rank: Number;
-    active?: boolean;
-    playing?: boolean;
-    avatar?: String;
-  };
+  PlayWithFriendsMenu: {};
+  ProfilePage: undefined;
   Register: undefined;
   Socials: undefined;
   AnalyzeGame: undefined;
 };
 
-const basicUser: User = {
-  name: "Wojtek",
-  email: "Burek@gmail.com",
-  country: "pl",
-  ranking: 1500,
-};
+// const basicUser: User = {
+//   name: "Wojtek",
+//   email: "Burek@gmail.com",
+//   country: "pl",
+//   ranking: 1500,
+// };
 
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getUser();
-      setUser(data || basicUser);
-    };
-
-    fetchData();
-  }, []);
-
-  const [user, setUser] = useState<User>(basicUser);
-
   return (
-    <UserContext.Provider value={basicUser}>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen
-            name="Home"
-            component={HomePage}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="GameMenu"
-            component={GameMenu}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="FreeBoard"
-            children={(
-              props: NativeStackScreenProps<RootStackParamList, "FreeBoard">
-            ) => <FreeBoard {...props} />}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="LastGame"
-            component={LastGame}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="Login"
-            children={(
-              props: NativeStackScreenProps<RootStackParamList, "Login">
-            ) => <Login {...props} setUser={setUser} />}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="PlayBot"
-            component={PlayBot}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="PlayOnline"
-            component={PlayOnline}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="PlayWithFriendsMenu"
-            component={PlayWithFriendsMenu}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="ProfilePage"
-            component={ProfilePage}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="Register"
-            children={(
-              props: NativeStackScreenProps<RootStackParamList, "Register">
-            ) => <Register {...props} />}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="Socials"
-            component={Socials}
-            options={{ ...headerOptions }}
-          />
-          <Stack.Screen
-            name="AnalyzeGame"
-            component={AnalyzeGame}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </UserContext.Provider>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={HomePage}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="GameMenu"
+          component={GameMenu}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="FreeBoard"
+          children={(
+            props: NativeStackScreenProps<RootStackParamList, "FreeBoard">
+          ) => <FreeBoard {...props} />}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="LastGame"
+          component={LastGame}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="Login"
+          children={(
+            props: NativeStackScreenProps<RootStackParamList, "Login">
+          ) => <Login {...props} />}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="PlayBot"
+          component={PlayBot}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="PlayOnline"
+          component={PlayOnline}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="PlayWithFriendsMenu"
+          component={PlayWithFriendsMenu}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="ProfilePage"
+          component={ProfilePage}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="Register"
+          children={(
+            props: NativeStackScreenProps<RootStackParamList, "Register">
+          ) => <Register {...props} />}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="Socials"
+          component={Socials}
+          options={{ ...headerOptions }}
+        />
+        <Stack.Screen
+          name="AnalyzeGame"
+          component={AnalyzeGame}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

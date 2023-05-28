@@ -4,4 +4,4 @@ export const registerLink = `${authLink}register`;
 export const authenticateLink = `${authLink}authenticate`;
 export const refreshTokenLink = `${authLink}refreshToken`;
 export const verifyCode = `${authLink}verifyCode`;
-export const getUser = `${baseLink}users/get/`;
+export const getUser = `${baseLink}user/findByEmail/`;

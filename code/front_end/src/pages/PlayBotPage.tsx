@@ -6,19 +6,16 @@ import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
 import ChessBoard from "../components/ChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
-import { User, UserContext } from "../context/UserContext";
-import {
-  Move,
-  FieldInfo,
-  Player,
-  getInitialChessBoard,
-} from "../features/playOnline";
+import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { BotPlayer } from "../features/playOnline";
 import BotBar from "../features/play-with-bot/components/BotBar";
+import Board from "../utils/chess-calculations/board";
+import { Player } from "../utils/PlayerUtilities";
+import { getUser } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -29,11 +26,19 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayBot">;
 };
 
-const initialChessBoard: FieldInfo[] = getInitialChessBoard();
+const initialChessBoard: Board = getInitialChessBoard();
 
 export default function PlayBot({ navigation, route }: Props) {
-  const user = useContext(UserContext);
-
+  // const [gameRecord, setGameRecord] = useState<Move[]>([]);
+  const [chessBoard, setChessBoard] = useState<Board>(initialChessBoard);
+  const [opponent, setOpponent] = useState<BotPlayer | null>(null);
+  const [myPlayer, setMyPlayer] = useState<Player | null>(null);
+  const [isMyTurn, setIsMyTurn] = useState<boolean>(false);
+  const [opponentClockInfo, setOpponentClockInfo] = useState<
+    Date | undefined
+  >();
+  const [myClockInfo, setMyClockInfo] = useState<Date>();
+  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
   useEffect(() => {
     const isOpponentWhite = Math.random() > 0.5;
     setOpponent({
@@ -44,20 +49,10 @@ export default function PlayBot({ navigation, route }: Props) {
       },
       color: isOpponentWhite ? "white" : "black",
     });
-    setMyPlayer({ user: user, color: isOpponentWhite ? "black" : "white" });
+    getUser().then((user) => {
+      setMyPlayer({ user, color: isOpponentWhite ? "black" : "white" });
+    });
   }, []);
-
-  const [gameRecord, setGameRecord] = useState<Move[]>([]);
-  const [chessBoard, setChessBoard] =
-    useState<Array<FieldInfo>>(initialChessBoard);
-  const [opponent, setOpponent] = useState<BotPlayer | null>(null);
-  const [myPlayer, setMyPlayer] = useState<Player | null>(null);
-  const [isMyTurn, setIsMyTurn] = useState<boolean>(false);
-  const [opponentClockInfo, setOpponentClockInfo] = useState<
-    Date | undefined
-  >();
-  const [myClockInfo, setMyClockInfo] = useState<Date>();
-  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
 
   return (
     <View style={styles.appContainer}>
@@ -74,7 +69,7 @@ export default function PlayBot({ navigation, route }: Props) {
             )}
           </View>
           <View style={styles.boardContainer}>
-            <ChessBoard board={chessBoard} />
+            <ChessBoard board={chessBoard} setBoard={setChessBoard} />
           </View>
           <View style={styles.playerBarContainer}>
             {opponent?.color !== "black" ? (

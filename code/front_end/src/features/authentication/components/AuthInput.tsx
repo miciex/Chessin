@@ -1,4 +1,4 @@
-import { View, TextInput, StyleSheet, Text } from "react-native";
+import { View, TextInput, StyleSheet, Text, ScrollView } from "react-native";
 import React from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 
@@ -22,7 +22,11 @@ export default function AuthInput({
   onSubmitEditing,
 }: Props) {
   return (
-    <View style={styles.container}>
+    <View
+      style={
+        isValid === false ? styles.inValidContainer : styles.validContainer
+      }
+    >
       <View style={styles.textInputContainer}>
         <TextInput
           value={value}
@@ -33,21 +37,29 @@ export default function AuthInput({
           onSubmitEditing={onSubmitEditing}
         />
       </View>
-      {isValid === false || isValid === null ? null : (
-        <Text style={styles.authText}>{notValidText}</Text>
-      )}
+      {isValid === false ? (
+        <ScrollView horizontal={true}>
+          <Text style={styles.authText}>{notValidText}</Text>
+        </ScrollView>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  validContainer: {
+    width: "100%",
+    gap: 4,
+    height: 60,
+  },
+  inValidContainer: {
+    height: 90,
     width: "100%",
     gap: 4,
   },
   authText: {
     fontSize: 16,
-    height: 20,
+    height: 25,
     width: "100%",
     color: "red",
   },

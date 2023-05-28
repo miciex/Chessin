@@ -5,20 +5,15 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
 import ChessBoard from "../components/ChessBoard";
-import { User, UserContext } from "../context/UserContext";
-import {
-  Move,
-  FieldInfo,
-  Player,
-  getInitialChessBoard,
-} from "../features/playOnline";
-import GameRecord from "../features/playOnline/components/GameRecord";
+import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import PiecesBar from "../features/free-board/components/PiecesBar";
 import FunctionsBar from "../features/free-board/components/FunctionsBar";
+import Board from "../utils/chess-calculations/board";
+import { User } from "../utils/PlayerUtilities";
+import { getUser } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -29,20 +24,16 @@ type Props = {
   route: RouteProp<RootStackParamList, "FreeBoard">;
 };
 
-const initialChessBoard: FieldInfo[] = getInitialChessBoard();
+const initialChessBoard: Board = getInitialChessBoard();
 
 export default function FreeBoard({ navigation, route }: Props) {
-  const user = useContext(UserContext);
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
-    if (user) {
-      setWhoseTurn("white");
-    }
+    getUser().then((user) => setUser(user));
   }, []);
 
-  const [gameRecord, setGameRecord] = useState<Move[]>([]);
-  const [chessBoard, setChessBoard] =
-    useState<Array<FieldInfo>>(initialChessBoard);
+  const [chessBoard, setChessBoard] = useState<Board>(initialChessBoard);
   const [whoseTurn, setWhoseTurn] = useState<"white" | "black" | null>(null);
 
   const analyzisContent = sampleMoves.map((move, index) => (
@@ -55,7 +46,7 @@ export default function FreeBoard({ navigation, route }: Props) {
         <View style={styles.mainContentContainer}>
           <PiecesBar barColor="white" />
           <View style={styles.boardContainer}>
-            <ChessBoard board={chessBoard} />
+            <ChessBoard board={chessBoard} setBoard={setChessBoard} />
           </View>
           <PiecesBar barColor="black" />
           <FunctionsBar />

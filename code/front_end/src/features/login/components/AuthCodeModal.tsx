@@ -1,18 +1,20 @@
-import { Modal, View, Text, StyleSheet, TextInput } from "react-native";
+import { Modal, View, Pressable, StyleSheet, TextInput } from "react-native";
 import React, { useState, useContext, useRef } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import { Char, isChar } from "../../../utils/Types";
 import { verifyCode } from "../../../utils/ServicesConstants";
-import { UserContext } from "../../../context/UserContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
 import { AuthenticationResponse } from "../../../utils/ServicesTypes";
+import { VerificationType } from "../../../utils/ServicesTypes";
+import { Entypo } from "@expo/vector-icons";
 
 type Props = {
   hideModal: () => void;
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
   setUserDataFromResponse: (responseData: AuthenticationResponse) => void;
+  email: string;
 };
 
 const InputLength = 8;
@@ -20,32 +22,45 @@ export default function AuthCodeModal({
   hideModal,
   navigation,
   setUserDataFromResponse,
+  email,
 }: Props) {
   const [inputs, setInputs] = useState<Char[]>(new Array(InputLength));
 
   const itemElems = useRef<any>(new Array(InputLength));
 
-  const user = useContext(UserContext);
-
   const submitCode = () => {
     fetch(verifyCode, {
-      body: JSON.stringify({ authCode: inputs.join(), email: user.email }),
+      body: JSON.stringify({
+        verificationCode: inputs.join(""),
+        email: email,
+        verificationType: VerificationType.AUTHENTICATE,
+        oldPassword: "",
+        newPassword: "",
+      }),
       method: "POST",
       headers: new Headers({ "content-type": "application/json" }),
     })
       .then((response) => {
         if (response.status === 200) {
+          console.log("200");
           return response.json();
         } else if (response.status === 400) {
-          response.json().then((data) => {
-            hideModal();
-            throw new Error(data);
-          });
+          console.log("400");
+          return response
+            .json()
+            .then((data) => {
+              console.log(data);
+              throw new Error(data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         }
       })
       .then((data) => {
         console.log(data);
         setUserDataFromResponse(data);
+        return;
       })
       .then(() => {
         navigation.navigate("Home");
@@ -88,9 +103,14 @@ export default function AuthCodeModal({
     <Modal transparent={true} onTouchEnd={hideModal}>
       <View style={styles.mainContainer}>
         <View style={styles.modalContainer}>
-          <View style={styles.inputsContainer}>{InputsView}</View>
-          <View style={styles.submitButtonContainer}>
-            <BaseButton handlePress={submitCode} text="Submit" />
+          <Pressable onPress={hideModal}>
+            <Entypo name="circle-with-cross" size={24} color="black" />
+          </Pressable>
+          <View style={styles.contentContainer}>
+            <View style={styles.inputsContainer}>{InputsView}</View>
+            <View style={styles.submitButtonContainer}>
+              <BaseButton handlePress={submitCode} text="Submit" />
+            </View>
           </View>
         </View>
       </View>
@@ -99,19 +119,25 @@ export default function AuthCodeModal({
 }
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    width: "100%",
+    flex: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 16,
+  },
   mainContainer: {
     width: "100%",
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: ColorsPallet.light,
   },
   modalContainer: {
     width: "80%",
     height: "60%",
     borderRadius: 16,
     backgroundColor: ColorsPallet.lighter,
-    alignItems: "center",
-    justifyContent: "center",
     gap: 16,
   },
   input: {

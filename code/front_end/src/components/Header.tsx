@@ -17,7 +17,7 @@ type Props = {
 
 export default function Header({ navigation, console }: Props) {
   const goToProfilePage = () => {
-    console();
+    if (navigation) navigation.navigate("ProfilePage");
   };
   return (
     <View style={styles.header}>

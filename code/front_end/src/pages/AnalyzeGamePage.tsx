@@ -5,7 +5,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
 import ChessBoard from "../components/ChessBoard";
-import { User } from "../context/UserContext";
 import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
@@ -13,6 +12,7 @@ import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import Board from "../utils/chess-calculations/board";
 import { getUser } from "../services/userServices";
+import { User } from "../utils/PlayerUtilities";
 
 type Props = {
   navigation: NativeStackNavigationProp<

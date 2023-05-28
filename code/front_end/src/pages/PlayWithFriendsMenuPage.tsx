@@ -1,10 +1,5 @@
-import {
-  View,
-  StyleSheet,
-  Switch,
-} from "react-native";
-import React, { useState } from "react";
-
+import { View, StyleSheet, Switch } from "react-native";
+import React, { useState, useEffect } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 <FontAwesome5 name="medal" size={24} color="black" />;
 import Footer from "../components/Footer";
@@ -22,6 +17,8 @@ import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButt
 import { GameLengthTypeContextType } from "../features/gameMenuPage/context/GameLengthContext";
 import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
 import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
+import { User } from "../utils/PlayerUtilities";
+import { getUser } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -33,97 +30,105 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayWithFriendsMenu">;
 };
 
-
 export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
+  const [user, setUser] = useState<User>();
+
+  useEffect(() => {
+    getUser().then((player) => {
+      setUser(player);
+    });
+  }, []);
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-  
+
   const [chosenColor, setChosenColor] =
     useState<PlayColorsContextType>("random");
-    const handleOpenModal = () => {
-      setIsModalOpen(true);
-    };
-  
-    const [gameTempo, setGameTempo] = useState<LengthType>({
-      lengthType: GameLengthTypeContextType.BLITZ,
-      totalTime: 180,
-      increment: 0,
-    });
-    const handleGameTempoChange = (tempo: LengthType) => {
-      setGameTempo(tempo);
-    };
-  
-  const [timerModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
 
-  const { nick, rank } = route.params;
+  const [gameTempo, setGameTempo] = useState<LengthType>({
+    lengthType: GameLengthTypeContextType.BLITZ,
+    totalTime: 180,
+    increment: 0,
+  });
+  const handleGameTempoChange = (tempo: LengthType) => {
+    setGameTempo(tempo);
+  };
+
+  const [timerModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const [isEnabled, setIsEnabled] = useState(true);
 
   return (
     <View>
-    <PlayColorsContext.Provider value={chosenColor}>
-      <View style={styles.appContainer}>
-        {timerModalOpen? (<TimeOptionsModal
-            handleCloseModal={handleCloseModal}
-            handleGameTempoChange={handleGameTempoChange}
-          />): (
-      <View style={styles.contentContainer}>
-          <View
-            style={styles.profileBox}
-          >
-            <Profile nick={nick} rank={rank} />
-            <View style={{ width: 400, height: 130 }}>
-              <ChooseTimeButton 
-              handleOpenModal={handleOpenModal}
-              tempo={gameTempo}
-             />
-            </View>
-            
-           
-            <View style={styles.pickColor}>
-              <PickColor handleOnClick={setChosenColor} />
-            </View>
-            <View style={styles.rightButtons}>
-              <View
-                style={styles.medalButton}
-              >
-                <BaseCustomContentButton
-                  handlePress={() => {()=>setIsEnabled(!isEnabled)}}
-                  content={
-                    <FontAwesome5
-                      name="medal"
-                      size={44}
-                      color={() => {
-                        console.log("cos");
-                        if (isEnabled) return "white";
-                        else if (!isEnabled) return "black";
-                      }}
-                    />
-                  }
+      <PlayColorsContext.Provider value={chosenColor}>
+        <View style={styles.appContainer}>
+          {timerModalOpen ? (
+            <TimeOptionsModal
+              handleCloseModal={handleCloseModal}
+              handleGameTempoChange={handleGameTempoChange}
+            />
+          ) : (
+            <View style={styles.contentContainer}>
+              <View style={styles.profileBox}>
+                <Profile
+                  nick={user ? user.nameInGame : ""}
+                  rank={user ? user.highestRanking : 0}
                 />
+                <View style={{ width: 400, height: 130 }}>
+                  <ChooseTimeButton
+                    handleOpenModal={handleOpenModal}
+                    tempo={gameTempo}
+                  />
+                </View>
+
+                <View style={styles.pickColor}>
+                  <PickColor handleOnClick={setChosenColor} />
+                </View>
+                <View style={styles.rightButtons}>
+                  <View style={styles.medalButton}>
+                    <BaseCustomContentButton
+                      handlePress={() => {
+                        () => setIsEnabled(!isEnabled);
+                      }}
+                      content={
+                        <FontAwesome5
+                          name="medal"
+                          size={44}
+                          color={() => {
+                            if (isEnabled) return "white";
+                            else if (!isEnabled) return "black";
+                          }}
+                        />
+                      }
+                    />
+                  </View>
+                  <Switch
+                    style={styles.switch}
+                    trackColor={{ false: "grey", true: "orange" }}
+                    thumbColor={"#f4f3f4"}
+                    ios_backgroundColor={"grey"}
+                    value={isEnabled}
+                    onTouchMove={() => setIsEnabled(!isEnabled)}
+                  />
+                </View>
+                <View style={{ width: "80%", height: 80 }}>
+                  <BaseButton
+                    handlePress={() => {}}
+                    text="Graj"
+                    fontSizeProps={30}
+                  />
+                </View>
               </View>
-              <Switch
-                style={styles.switch}
-                trackColor={{ false: "grey", true: "orange" }}
-                thumbColor={"#f4f3f4"}
-                ios_backgroundColor={"grey"}
-                value={isEnabled}
-                onTouchMove={()=>setIsEnabled(!isEnabled)}
-              />
             </View>
-            <View style={{ width: "80%", height: 80 }}>
-            <BaseButton handlePress={() => {}} text="Graj" fontSizeProps={30} />
-            </View>
-          </View>
-            
-          </View>
           )}
-        
-          
-        <Footer navigation={navigation} />
-      </View>
-    </PlayColorsContext.Provider>
+
+          <Footer navigation={navigation} />
+        </View>
+      </PlayColorsContext.Provider>
     </View>
   );
 }
@@ -159,13 +164,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
-  profileBox:{
+  profileBox: {
     width: "90%",
     height: 200,
     alignItems: "center",
     marginBottom: 20,
   },
-  medalButton :{
+  medalButton: {
     width: 60,
     height: 60,
     backgroundColor: ColorsPallet.baseColor,
@@ -173,5 +178,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     transform: [{ scaleX: 1.15 }, { scaleY: 1.15 }],
   },
-  pickColor:{ width: 200, height: 60,  transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }], }
+  pickColor: {
+    width: 200,
+    height: 60,
+    transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
+  },
 });

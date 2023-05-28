@@ -4,7 +4,6 @@ import { FieldInfo } from "../features/playOnline";
 import ChessBoardField from "./ChessBoardField";
 import Board, { constructorArgs } from "../utils/chess-calculations/board";
 import { Move } from "../utils/chess-calculations/move";
-
 import { ColorsPallet } from "../utils/Constants";
 
 type Props = {
@@ -27,7 +26,7 @@ export default function ChessBoard({ board, setBoard }: Props) {
       setActiveField(data.fieldNumber);
       return;
     } else if (possibleMoves.includes(data.fieldNumber)) {
-      const brd = board;
+      const brd = new Board({ board });
 
       brd.movePiece(
         new Move({

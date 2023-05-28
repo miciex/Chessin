@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import CountryFlag from "react-native-country-flag";
-import { Player } from "..";
+import { Player } from "../../../utils/PlayerUtilities";
 import { ColorsPallet } from "../../../utils/Constants";
 import Timer from "./Timer";
 import { FontAwesome } from "@expo/vector-icons";
@@ -17,7 +17,9 @@ export default function PlayerBar({ player, timerInfo }: Props) {
       <View style={styles.textContainer}>
         <FontAwesome name="user-circle" size={32} color="black" />
         <Text style={styles.text}>{player ? player.user.name : ""}</Text>
-        <Text style={styles.text}>{player ? player.user.ranking : ""}</Text>
+        <Text style={styles.text}>
+          {player ? player.user.highestRanking : ""}
+        </Text>
       </View>
       <View style={styles.iconsContainer}>
         <View style={styles.timerContainer}>

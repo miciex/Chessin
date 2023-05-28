@@ -44,12 +44,6 @@ public class AuthenticationController {
         return service.authenticate(request);
     }
 
-    @GetMapping("/email")
-    public ResponseEntity<?> email(){
-        return ResponseEntity.ok("Email sent");
-
-    }
-
     @PostMapping("/verifyCode")
     public ResponseEntity<?> verifyCode(@RequestBody CodeVerificationRequest request){
 
