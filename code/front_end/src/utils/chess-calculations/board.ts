@@ -98,7 +98,7 @@ export const boardFactory = ({fenString, whiteToMove, availableCastles, moves, b
     }
 
 export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =>{
-    const piece = board.position[piecePosition] % 8;
+    const piece = board.visualBoard[piecePosition] % 8;
     if(piece === Pieces.NONE)
     return new Array();
         switch (piece) {
