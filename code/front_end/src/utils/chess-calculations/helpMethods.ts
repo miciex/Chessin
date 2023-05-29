@@ -56,6 +56,7 @@ export const FenToIntArray = (fen:string, arrayLength:number):Array<number> =>{
         num++;
 
     }
+    console.log(arr);
     return arr;
 }
 

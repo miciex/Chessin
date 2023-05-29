@@ -9,37 +9,45 @@ type constructorArgs = {
     move?:Move
 }
 
-export class Move {
-    public movedPiece:number = 0;
-    public startField:number = 0;
-    public endField:number = 0;
-    public takenPiece = 0;
-    public promotePiece:number = 0;
-    public gaveCheck:boolean = false;
-    public takenPieceField:number = 0;
-    public continuations: Move[] = [];
+export type Move = {
+     movedPiece:number;
+     startField:number;
+     endField:number;
+     takenPiece:number;
+     promotePiece:number;
+     gaveCheck:boolean;
+     takenPieceField:number;
+     continuations: Move[];
+}
     
-    constructor({pieces, startField, endField, promotePiece, move, continuations}:constructorArgs){
-        this.startField = startField?startField:(move?move.startField:0);
-        this.endField = endField?endField:(move?move.endField:0);
-        this.movedPiece = pieces&&startField?pieces[startField]:(move?move.movedPiece:0);
-        this.takenPiece = move?move.movedPiece:(pieces?this.calcTakenPiece(pieces):0);
-        this.takenPieceField = move?move.takenPieceField:(pieces?this.calcTakenPieceField(pieces):0);
-        this.promotePiece = promotePiece?promotePiece:(move?move.promotePiece:0);
-        this.continuations = continuations?continuations:[];
+    export const moveFactory = ({pieces, startField, endField, promotePiece, move, continuations}:constructorArgs):Move =>{
+        const startF = startField?startField:(move?move.startField:0);
+        const endF = endField?endField:(move?move.endField:0);
+        const movedP = pieces&&startField?pieces[startField]:(move?move.movedPiece:0);
+        const takenP = move?move.movedPiece:(pieces?calcTakenPiece(pieces, startF, endF, movedP):0);
+
+        return {
+        startField: startF,
+        endField: endF,
+        movedPiece: movedP,
+        takenPiece: takenP,
+        takenPieceField: move?move.takenPieceField:(pieces?calcTakenPieceField(pieces, startF, endF, movedP, takenP):0),
+        promotePiece: promotePiece?promotePiece:(move?move.promotePiece:0),
+        continuations: continuations?continuations:[],
+        gaveCheck: move?move.gaveCheck:false
+        }
     }
     
-    private calcTakenPiece(pieces:{[key:number]:number}):number{
-        if(this.endField in pieces) return pieces[this.endField];
-        if((this.movedPiece%8) === Pieces.PAWN && (this.startField - this.endField) % 8 != 0)
-            return Pieces.PAWN + (this.movedPiece > 16 ? Pieces.WHITE : Pieces.BLACK);
+    const calcTakenPiece = (pieces:{[key:number]:number}, startField:number,endField:number, movedPiece:number):number =>{
+        if(endField in pieces) return pieces[endField];
+        if((movedPiece%8) === Pieces.PAWN && (startField - endField) % 8 != 0)
+            return Pieces.PAWN + (movedPiece > 16 ? Pieces.WHITE : Pieces.BLACK);
         return 0;
     }
 
-    private calcTakenPieceField(pieces:{[key:number]:number}):number{
-        if(this.takenPiece == 0)  return -1;
-        if(this.movedPiece%8 == Pieces.PAWN && !(this.endField in pieces))
-                return this.startField + this.endField % 8 - this.startField % 8;
-        return this.endField;
+    const calcTakenPieceField = (pieces:{[key:number]:number}, startField:number, endField:number, movedPiece:number, takenPiece:number):number =>{
+        if(takenPiece == 0)  return -1;
+        if(movedPiece%8 == Pieces.PAWN && !(endField in pieces))
+                return startField + endField % 8 - startField % 8;
+        return endField;
     }
-}

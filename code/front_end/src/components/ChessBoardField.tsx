@@ -18,29 +18,29 @@ export default function ChessBoardField({
 }: Props) {
   const convertToIcon = (piece: Number) => {
     switch (piece) {
-      case 1:
+      case 17:
         return <FontAwesome5 name="chess-king" size={24} color="black" />;
-      case 2:
+      case 22:
         return <FontAwesome5 name="chess-queen" size={24} color="black" />;
-      case 3:
+      case 19:
         return <FontAwesome5 name="chess-rook" size={24} color="black" />;
-      case 4:
+      case 21:
         return <FontAwesome5 name="chess-bishop" size={24} color="black" />;
-      case 5:
+      case 20:
         return <FontAwesome5 name="chess-knight" size={24} color="black" />;
-      case 6:
+      case 18:
         return <FontAwesome5 name="chess-pawn" size={24} color="black" />;
       case 9:
         return <FontAwesome5 name="chess-king" size={24} color="white" />;
-      case 10:
+      case 14:
         return <FontAwesome5 name="chess-queen" size={24} color="white" />;
       case 11:
         return <FontAwesome5 name="chess-rook" size={24} color="white" />;
-      case 12:
-        return <FontAwesome5 name="chess-bishop" size={24} color="white" />;
       case 13:
+        return <FontAwesome5 name="chess-bishop" size={24} color="white" />;
+      case 12:
         return <FontAwesome5 name="chess-knight" size={24} color="white" />;
-      case 14:
+      case 10:
         return <FontAwesome5 name="chess-pawn" size={24} color="white" />;
       default:
         return null;
