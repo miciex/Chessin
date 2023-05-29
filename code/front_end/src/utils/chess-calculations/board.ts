@@ -98,8 +98,10 @@ export const boardFactory = ({fenString, whiteToMove, availableCastles, moves, b
     }
 
 export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =>{
-    console.log("PossibleMoves");
-        switch (board.position[piecePosition] % 8) {
+    const piece = board.position[piecePosition] % 8;
+    if(piece === Pieces.NONE)
+    return new Array();
+        switch (piece) {
             case Pieces.PAWN: 
                 console.log("Pawn moves")
                 const possibleMoves = PossiblePawnMoves(piecePosition, board.position, board.moves);
@@ -110,10 +112,9 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
             case Pieces.KNIGHT:
                 return specialPossibleMoves(piecePosition, Pieces.KNIGHT, board.position);
         }
-
         let possibleMoves:Array<number> = new Array();
-        if(Directions[piecePosition % 8].length > 0)
-        Directions[piecePosition % 8].forEach((i:number) => {
+        if(Directions[piece].length > 0)
+        Directions[piece].forEach((i:number) => {
             let pos:number = piecePosition;
             while (IsCorrect(pos, i)) {
                 pos += i;
