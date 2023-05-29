@@ -15,10 +15,16 @@ export default function ChessBoard({ board, setBoard }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
   const [possibleMoves, setPossibleMoves] = useState([-1]);
+
   const handleFieldPress = (data: FieldInfo) => {
+    console.log("cos");
+    console.log(data);
+
+    //copy is needed for selection of fields
+    setPossibleMoves(board.PossibleMoves(data.fieldNumber));
     copyPossibleMoves = [...possibleMoves];
 
-    setPossibleMoves(board.PossibleMoves(data.fieldNumber));
+    //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
       (board.isWhite(data.fieldNumber) && board.whiteToMove) ||
       board.isWhite(data.fieldNumber) !== board.whiteToMove
@@ -38,6 +44,7 @@ export default function ChessBoard({ board, setBoard }: Props) {
 
       setBoard(brd);
     }
+
     setActiveField(-1);
     setPossibleMoves([]);
   };
@@ -46,7 +53,10 @@ export default function ChessBoard({ board, setBoard }: Props) {
 
   let backgroundColor: string;
 
+  //defining the color of background
+  //different for : white, black, active, possible move, possible move with piece
   const setBackgroundColor = (info: FieldInfo) => {
+    //setting the background to white and black (normal chess board)
     backgroundColor =
       (info.fieldNumber % 2 === 0 &&
         Math.floor(info.fieldNumber / 8) % 2 === 0) ||
@@ -60,7 +70,10 @@ export default function ChessBoard({ board, setBoard }: Props) {
           ? ColorsPallet.baseColor
           : ColorsPallet.darker;
     } else if (info.fieldNumber == copyPossibleMoves[0]) {
-      backgroundColor = "rgb(163, 125, 82)";
+      backgroundColor =
+        backgroundColor == ColorsPallet.light
+          ? ColorsPallet.baseColor
+          : ColorsPallet.darker;
       copyPossibleMoves.shift();
     }
   };

@@ -3,23 +3,15 @@ import {
   Text,
   StyleSheet,
   Image,
-  ScrollView,
   Pressable,
 } from "react-native";
 import React from "react";
 
 import { FontAwesome5 } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { Fontisto } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
 import { ColorsPallet, StackParamList } from "../../../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
-import { RouteProp } from "@react-navigation/native";
-// import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap%27);
-// import { useFonts, Inter_900Black } from "@expo-google-fonts/inter";
-// import { Inter_400Regular, useFonts } from "@expo-google-fonts/inter";
 
 type Props = {
   date: String;
@@ -58,36 +50,40 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
 
   return (
     <View style={styles.record}>
-      {/* <Image source={}/> */}
+      <View style={styles.buttonContainer}>
       <Pressable
-        style={[styles.left, styles.back, styles.both]}
+        style={styles.playerInfo}
         onPress={goToFriendsProfile}
         android_ripple={{
-          color: ColorsPallet.lighter,
+          color: ColorsPallet.darker,
           borderless: false,
         }}
       >
+        <Image
+        style={styles.tinyLogo}
+        source={{
+          uri: "https://play-lh.googleusercontent.com/aTTVA77bs4tVS1UvnsmD_T0w-rdZef7UmjpIsg-8RVDOVl_EVEHjmkn6qN7C0teRS3o",
+        }}
+      />   
         <Text>
           {nick} {rank.toString()}
         </Text>
       </Pressable>
-      <View style={[styles.right, styles.both]}>
-        <Text style={{ textAlign: "right", width: "100%" }}>
-          <Text style={styles.dateText}> {date}</Text>
-          {"  "}
-          <FontAwesome5 name="chess-board" size={18} color="black" />
-
+      </View>
+        <View style={styles.gameInfoContainer}>
+          <Text style={styles.dateText}> {date}{"   "}</Text>
+          <Pressable onPress={()=>{
+            navigation.navigate("AnalyzeGame")
+          }}><FontAwesome5 name="chess-board" size={22} color="black" /></Pressable>
+          
           <Text
             style={{
               color: ColorsPallet.baseColor,
-              paddingRight: 8,
             }}
-          >
-            {"  "}
+          >{"  "}
           </Text>
           <Result />
-        </Text>
-      </View>
+        </View>
     </View>
   );
 };
@@ -96,36 +92,47 @@ export default EndedGame;
 const styles = StyleSheet.create({
   record: {
     backgroundColor: ColorsPallet.baseColor,
-    width: "87%",
+    width: "100%",
     height: 55,
-    padding: 8,
-    paddingLeft: 35,
-    paddingRight: 25,
     borderRadius: 10,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     textDecorationStyle: "none",
-    margin: 8,
+    marginTop: 16,
     display: "flex",
   },
-  left: {
-    width: "55%",
-  },
-  right: {
-    width: "45%",
-  },
-  back: {
-    backgroundColor: ColorsPallet.baseColor,
-  },
-  both: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 10,
-    borderRadius: 10,
+  playerInfo: {
+    flex: 1,
+    flexDirection: "row",
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 15,
+    borderRadius: 15,
   },
   dateText: {
     fontSize: 11,
     color: "#b3afaf",
+  },
+  gameInfoContainer:{
+    flex:1,
+    flexDirection: 'row',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  tinyLogo: {
+    width: 25,
+    height: 25,
+    borderRadius: 50,
+    marginRight: 10
+  },
+  buttonContainer: {
+    width: "50%",
+    height: "100%",
+    overflow: "hidden",
+    borderRadius: 10,
+    flexDirection: "row",
   },
 });

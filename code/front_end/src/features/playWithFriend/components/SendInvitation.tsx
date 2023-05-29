@@ -5,9 +5,9 @@ import { ColorsPallet } from "../../../utils/Constants";
 
 const SendInvitation = () => {
   return (
-    <View style={{borderRadius: 10}}>
+    <View style={styles.buttonContainer}>
     <Pressable style={styles.button} android_ripple={{
-      color: ColorsPallet.lighter,
+      color: ColorsPallet.darker,
       borderless: false,
     }}>
    
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 55,
     paddingTop:13,
-    borderRadius: 16,
+    borderRadius: 11,
     flexDirection: "row",
     flexWrap: "wrap",
     display: "flex",
@@ -38,4 +38,10 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontSize: 18,
   },
+  buttonContainer:{
+    borderRadius: 10, marginBottom: 12, marginTop: 12,
+    width: "100%",
+    overflow: "hidden",
+    flexDirection: "row",
+  }
 });

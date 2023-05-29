@@ -3,6 +3,7 @@ import React from 'react'
 import { RootStackParamList } from '../../../../Routing'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../../utils/Constants'
+import { ColorsPallet } from '../../../utils/Constants'
 //powinien byc jakis dostep do baxy danych ktory mi da id i avatar najlepszych friends jako objecty
 
 const bestFriends = [
@@ -43,12 +44,19 @@ export default function FriendsIconList({navigation}: Props) {
      
       <View style={styles.imageContainer}>
         {bestFriends.map((player)=>{
-            return <Pressable onPress={()=>{goToFriendsProfile(player)}}><View style={styles.profile} ><Image
-            style={styles.imageIcon}
-            source={{
-              uri: player.avatar,
-            }}
-          />
+            return <Pressable onPress={()=>{
+                goToFriendsProfile(player)}} 
+                android_ripple={{
+                    color: ColorsPallet.darker,
+                    borderless: false,
+              }} >
+            <View style={styles.profile} >
+              <Image
+                 style={styles.imageIcon}
+                 source={{
+                   uri: player.avatar,
+                 }}
+            />
           <Text style={styles.text}>{player.playerNick}</Text>
           </View></Pressable>
         })}

@@ -115,6 +115,7 @@ export default function Socials({ route, navigation }: Props) {
     <View style={styles.appContainer}>
       <View style={styles.formContainer}>
         <SendInvitation />
+       
         <InputField placeholder="Search" />
         <ScrollView>
           <View style={styles.scrollView}>

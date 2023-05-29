@@ -22,7 +22,7 @@ export default function Header({ navigation }: Props) {
     <View style={styles.header}>
       <View style={styles.contentContainer}>
         <Text style={styles.headerText}>Chessin</Text>
-        <Pressable onPress={goToProfilePage}>
+        <Pressable onPress={() => goToProfilePage}>
           <FontAwesome
             name="user-circle"
             size={32}

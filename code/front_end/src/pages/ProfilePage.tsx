@@ -10,7 +10,7 @@ import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
 import { getUser } from "../services/userServices";
-import useFetch from "../hooks/useFetch";
+import { ColorsPallet } from "../utils/Constants";
 import { User } from "../utils/PlayerUtilities";
 
 const ended_games = [
@@ -153,7 +153,7 @@ export default function ProfilePage({ navigation, route }: Props) {
           navigation={navigation}
           stringNavigation={"LastGame"}
         />
-        {component}
+        <View style={{ width: "85%" }}>{component}</View>
       </View>
     </ScrollView>
   );
@@ -165,6 +165,9 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
+    width: "100%",
+    height: "100%",
+    backgroundColor: ColorsPallet.light,
   },
   invite: {
     width: "90%",

@@ -38,14 +38,17 @@ export default function LastGame({ route, navigation }: Props) {
       <ScrollView>
         <View style={styles.contentContainer}>
         <Heading text={"Old Games"} />
-          {ended_games.map((gracz) => (
+          {ended_games.map((gracz, index) => (
+            <View style={{width: "90%"}}>
             <EndedGame
               nick={gracz.playerNick}
               rank={gracz.rank}
               result={gracz.lastGameResult}
-              date={gracz.date}
               navigation={navigation}
+              key={index}
+              date={gracz.date}
             />
+            </View>
           ))}
         </View>
       </ScrollView>
