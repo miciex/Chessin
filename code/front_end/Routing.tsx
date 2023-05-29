@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "./src/pages/HomePage";
@@ -13,12 +13,10 @@ import PlayWithFriendsMenu from "./src/pages/PlayWithFriendsMenuPage";
 import ProfilePage from "./src/pages/ProfilePage";
 import Register from "./src/pages/RegisterPage";
 import Socials from "./src/pages/SocialsPage";
-import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { getUser } from "./src/services/userServices";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -35,13 +33,6 @@ export type RootStackParamList = {
   AnalyzeGame: undefined;
 };
 
-// const basicUser: User = {
-//   name: "Wojtek",
-//   email: "Burek@gmail.com",
-//   country: "pl",
-//   ranking: 1500,
-// };
-
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -51,63 +42,85 @@ const Routing = () => {
         <Stack.Screen
           name="Home"
           component={HomePage}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="GameMenu"
           component={GameMenu}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="FreeBoard"
           children={(
             props: NativeStackScreenProps<RootStackParamList, "FreeBoard">
           ) => <FreeBoard {...props} />}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="LastGame"
           component={LastGame}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="Login"
           children={(
             props: NativeStackScreenProps<RootStackParamList, "Login">
           ) => <Login {...props} />}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="PlayBot"
           component={PlayBot}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="PlayOnline"
           component={PlayOnline}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="PlayWithFriendsMenu"
           component={PlayWithFriendsMenu}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="ProfilePage"
           component={ProfilePage}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="Register"
           children={(
             props: NativeStackScreenProps<RootStackParamList, "Register">
           ) => <Register {...props} />}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="Socials"
           component={Socials}
-          options={{ ...headerOptions }}
+          options={({ navigation }) => ({
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="AnalyzeGame"
@@ -126,10 +139,5 @@ const styles = StyleSheet.create({
     backgroundColor: ColorsPallet.darker,
   },
 });
-
-const headerOptions: NativeStackNavigationOptions = {
-  headerStyle: styles.header,
-  headerTitle: () => <Header console={() => console.log("profil")} />,
-};
 
 export default Routing;

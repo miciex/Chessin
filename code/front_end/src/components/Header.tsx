@@ -7,17 +7,16 @@ import { RootStackParamList } from "../../Routing";
 import { StackParamList } from "../utils/Constants";
 
 type Props = {
-  navigation?: NativeStackNavigationProp<
+  navigation: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
     undefined
   >;
-  console: Function;
 };
 
-export default function Header({ navigation, console }: Props) {
+export default function Header({ navigation }: Props) {
   const goToProfilePage = () => {
-    if (navigation) navigation.navigate("ProfilePage");
+    navigation.navigate("ProfilePage");
   };
   return (
     <View style={styles.header}>

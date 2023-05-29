@@ -4,6 +4,7 @@ import { getUser } from "../../../utils/ServicesConstants";
 export const fetchUser = async (email: string) => {
   console.log("fetching user");
   const accessToken = await SecureStore.getItemAsync("accessToken");
+
   const response = await fetch(`${getUser}${email}`, {
     method: "POST",
     headers: new Headers({
