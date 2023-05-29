@@ -61,14 +61,14 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   const [isEnabled, setIsEnabled] = useState(true);
 
   return (
-    <View>
+    <View style={{width: "100%", height: "100%"}}>
     <PlayColorsContext.Provider value={chosenColor}>
       <View style={styles.appContainer}>
         {timerModalOpen? (<TimeOptionsModal
             handleCloseModal={handleCloseModal}
             handleGameTempoChange={handleGameTempoChange}
           />): (
-      <View style={styles.contentContainer}>
+        <View style={styles.contentContainer}>
           <View
             style={styles.profileBox}
           >

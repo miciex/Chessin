@@ -9,6 +9,7 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
+import { ColorsPallet } from "../utils/Constants";
 
 const ended_games = [
   {
@@ -88,12 +89,13 @@ export default function ProfilePage({ navigation, route }: Props) {
 
   let component = ended_games.slice(0, 5).map((game) => {
     return (
-      <EndedGame
-        nick={game.playerNick}
-        date={game.date}
-        rank={game.rank}
-        navigation={navigation}
-      />
+   <EndedGame
+      nick={game.playerNick}
+      date={game.date}
+      rank={game.rank}
+      navigation={navigation}
+    />
+     
     );
   });
 
@@ -111,7 +113,7 @@ export default function ProfilePage({ navigation, route }: Props) {
   };
 
   return (
-    <ScrollView>
+    <ScrollView >
       <View style={styles.container}>
         <View style={styles.profile}>
           <Profile nick={nick} rank={rank} active={active} playing={playing} />
@@ -144,7 +146,7 @@ export default function ProfilePage({ navigation, route }: Props) {
           navigation={navigation}
           stringNavigation={"LastGame"}
         />
-        {component}
+        <View style={{width: "85%"}}>{component}</View>
       </View>
     </ScrollView>
   );
@@ -156,6 +158,9 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
+    width: "100%",
+    height: "100%",
+    backgroundColor: ColorsPallet.light
   },
   invite: {
     width: "90%",

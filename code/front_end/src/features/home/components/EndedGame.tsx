@@ -3,23 +3,15 @@ import {
   Text,
   StyleSheet,
   Image,
-  ScrollView,
   Pressable,
 } from "react-native";
 import React from "react";
 
 import { FontAwesome5 } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { Fontisto } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
 import { ColorsPallet, StackParamList } from "../../../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
-import { RouteProp } from "@react-navigation/native";
-// import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap%27);
-// import { useFonts, Inter_900Black } from "@expo-google-fonts/inter";
-// import { Inter_400Regular, useFonts } from "@expo-google-fonts/inter";
 
 type Props = {
   date: String;
@@ -58,22 +50,32 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
 
   return (
     <View style={styles.record}>
-      {/* <Image source={}/> */}
+      <View style={styles.buttonContainer}>
       <Pressable
         style={styles.playerInfo}
         onPress={goToFriendsProfile}
         android_ripple={{
-          color: ColorsPallet.lighter,
+          color: ColorsPallet.darker,
           borderless: false,
         }}
       >
+        <Image
+        style={styles.tinyLogo}
+        source={{
+          uri: "https://play-lh.googleusercontent.com/aTTVA77bs4tVS1UvnsmD_T0w-rdZef7UmjpIsg-8RVDOVl_EVEHjmkn6qN7C0teRS3o",
+        }}
+      />   
         <Text>
           {nick} {rank.toString()}
         </Text>
       </Pressable>
+      </View>
         <View style={styles.gameInfoContainer}>
           <Text style={styles.dateText}> {date}{"   "}</Text>
-          <FontAwesome5 name="chess-board" size={18} color="black" />
+          <Pressable onPress={()=>{
+            navigation.navigate("AnalyzeGame")
+          }}><FontAwesome5 name="chess-board" size={22} color="black" /></Pressable>
+          
           <Text
             style={{
               color: ColorsPallet.baseColor,
@@ -102,7 +104,11 @@ const styles = StyleSheet.create({
   },
   playerInfo: {
     flex: 1,
-    marginLeft: 40
+    flexDirection: "row",
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 15,
+    borderRadius: 15,
   },
   dateText: {
     fontSize: 11,
@@ -114,5 +120,19 @@ const styles = StyleSheet.create({
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-  }
+  },
+  
+  tinyLogo: {
+    width: 25,
+    height: 25,
+    borderRadius: 50,
+    marginRight: 10
+  },
+  buttonContainer: {
+    width: "50%",
+    height: "100%",
+    overflow: "hidden",
+    borderRadius: 10,
+    flexDirection: "row",
+  },
 });

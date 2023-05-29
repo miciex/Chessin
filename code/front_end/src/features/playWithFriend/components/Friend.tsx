@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet, Text } from "react-native";
+import { View, Pressable, StyleSheet, Text, Image } from "react-native";
 import React from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
@@ -50,15 +50,23 @@ const Friend = ({ navigation, nick, rank, playing, active }: Props) => {
   };
   return (
     <View style={styles.record}>
-      {/* <Image source={}/> */}
+   
+   <View style={styles.cornerPressable}>
       <Pressable style={styles.left} onPress={goToFriendsProfile}  android_ripple={{
-                  color: ColorsPallet.lighter,
+                  color: ColorsPallet.darker,
                   borderless: false,
                 }}>
+      <Image
+        style={styles.tinyLogo}
+        source={{
+          uri: "https://play-lh.googleusercontent.com/aTTVA77bs4tVS1UvnsmD_T0w-rdZef7UmjpIsg-8RVDOVl_EVEHjmkn6qN7C0teRS3o",
+        }}
+      />             
       <Text >
         <Online /> {nick} {rank.toString()}
       </Text>
       </Pressable>
+      </View>
       <View style={styles.right}>
         <Text style={{ textAlign: "right", width: "100%" }}>
           <PlayingEye />
@@ -80,29 +88,41 @@ const styles = StyleSheet.create({
   record: {
     backgroundColor: ColorsPallet.baseColor,
     width: "100%",
-    height: 58,
-    paddingTop: 5,
-    paddingLeft: 20,
-    paddingRight: 20,
-    borderRadius: 10,
+    paddingRight: 15,
+    borderRadius: 12,
     flexDirection: "row",
     flexWrap: "wrap",
     textAlign: "center",
     textDecorationStyle: "none",
-    marginBottom: 10,
-    marginTop: 10,
+    marginBottom: 7,
+    marginTop: 7,
     display: "flex",
+    alignItems: "center",
+
   },
   left: {
-    width: "70%",
+    width: "100%",
+    paddingLeft: 10,
+    flexDirection: "row",
     paddingTop: 15,
-    paddingBottom:10,
+    paddingBottom: 15,
   },
   right: {
     width: "30%",
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingTop: 15,
-    paddingBottom:10,
   },
+  tinyLogo: {
+    width: 25,
+    height: 25,
+    borderRadius: 50,
+    marginRight: 10
+  },
+  cornerPressable:{
+    width: "70%",
+    height: "100%",
+    overflow: "hidden",
+    borderRadius: 12,
+    flexDirection: "row",
+  }
 });
