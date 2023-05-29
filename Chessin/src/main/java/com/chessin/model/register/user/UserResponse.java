@@ -18,6 +18,11 @@ public class UserResponse {
     private String nameInGame;
     private String password;
     private String role;
+    private int ratingBlitz;
+    private int ratingBullet;
+    private int ratingRapid;
+    private int ratingClassical;
+    private String country;
 
     public static UserResponse fromUser(User user){
         return UserResponse
@@ -29,6 +34,11 @@ public class UserResponse {
                 .nameInGame(user.getNameInGame())
                 .password(user.getPassword())
                 .role(user.getRole())
+                .ratingBlitz(user.getRatingBlitz())
+                .ratingBullet(user.getRatingBullet())
+                .ratingRapid(user.getRatingRapid())
+                .ratingClassical(user.getRatingClassical())
+                .country(user.getCountry())
                 .build();
     }
 
@@ -42,6 +52,11 @@ public class UserResponse {
                 .nameInGame(userResponse.getNameInGame())
                 .password(userResponse.getPassword())
                 .role(userResponse.getRole())
+                .ratingBlitz(userResponse.getRatingBlitz())
+                .ratingBullet(userResponse.getRatingBullet())
+                .ratingRapid(userResponse.getRatingRapid())
+                .ratingClassical(userResponse.getRatingClassical())
+                .country(userResponse.getCountry())
                 .build();
     }
 

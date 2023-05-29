@@ -13,7 +13,7 @@ import PiecesBar from "../features/free-board/components/PiecesBar";
 import FunctionsBar from "../features/free-board/components/FunctionsBar";
 import Board from "../utils/chess-calculations/board";
 import { User } from "../utils/PlayerUtilities";
-import { getUser } from "../services/userServices";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -30,7 +30,10 @@ export default function FreeBoard({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
 
   useEffect(() => {
-    getUser().then((user) => setUser(user));
+    getValueFor("user").then((user) => {
+      if (user === null) return;
+      setUser(JSON.parse(user));
+    });
   }, []);
 
   const [chessBoard, setChessBoard] = useState<Board>(initialChessBoard);

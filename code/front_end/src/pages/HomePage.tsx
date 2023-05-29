@@ -1,6 +1,6 @@
 import { View, StyleSheet, ScrollView } from "react-native";
-import React from "react";
-
+import React, { useState, useEffect } from "react";
+import { User } from "../utils/PlayerUtilities";
 import { RootStackParamList } from "../../Routing";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
@@ -9,6 +9,7 @@ import EndedGame from "../features/home/components/EndedGame";
 import TopButtons from "../features/home/components/TopButtons";
 import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 //przykladowe stary gry
 const ended_games = [
@@ -80,6 +81,13 @@ type Props = {
 };
 
 const HomePage = ({ route, navigation }: Props) => {
+  const [user, setUser] = useState<User>();
+
+  useEffect(() => {
+    getValueFor("user").then((user) => {
+      if (user) setUser(JSON.parse(user));
+    });
+  }, []);
 
   return (
     <View style={styles.appContainer}>
@@ -97,15 +105,15 @@ const HomePage = ({ route, navigation }: Props) => {
             </View>
 
             {ended_games.map((gracz, index) => (
-              <View style={{width: "90%"}}>
-              <EndedGame
-                nick={gracz.playerNick}
-                rank={gracz.rank}
-                result={gracz.lastGameResult}
-                navigation={navigation}
-                key={index}
-                date={gracz.date}
-              />
+              <View style={{ width: "90%" }}>
+                <EndedGame
+                  nick={gracz.playerNick}
+                  rank={gracz.rank}
+                  result={gracz.lastGameResult}
+                  navigation={navigation}
+                  key={index}
+                  date={gracz.date}
+                />
               </View>
             ))}
           </View>

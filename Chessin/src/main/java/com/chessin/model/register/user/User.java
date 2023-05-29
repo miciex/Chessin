@@ -38,6 +38,7 @@ public class User implements UserDetails {
     private int ratingBullet;
     private int ratingRapid;
     private int ratingClassical;
+    private String country;
     @ManyToMany
     private List<User> friends;
     @OneToMany

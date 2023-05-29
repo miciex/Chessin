@@ -47,6 +47,7 @@ public class AuthenticationService {
                 .lastName(request.getLastname())
                 .nameInGame(request.getNameInGame())
                 .email(request.getEmail())
+                .country(request.getCountry())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(USER)
                 .isTwoFactorAuthenticationEnabled(true)

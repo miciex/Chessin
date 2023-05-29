@@ -12,6 +12,7 @@ import BaseButton from "../components/BaseButton";
 import { getUser } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User } from "../utils/PlayerUtilities";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 const ended_games = [
   {
@@ -91,8 +92,9 @@ export default function ProfilePage({ navigation, route }: Props) {
   // const [data, loading, error] = useFetch("http://localhost:3000/user", {});
 
   useEffect(() => {
-    getUser().then((player) => {
-      setUser(player);
+    getValueFor("user").then((user) => {
+      if (user === null) return;
+      setUser(JSON.parse(user));
     });
   }, []);
 

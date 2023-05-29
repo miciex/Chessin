@@ -16,6 +16,7 @@ import BotBar from "../features/play-with-bot/components/BotBar";
 import Board from "../utils/chess-calculations/board";
 import { Player } from "../utils/PlayerUtilities";
 import { getUser } from "../services/userServices";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -49,8 +50,12 @@ export default function PlayBot({ navigation, route }: Props) {
       },
       color: isOpponentWhite ? "white" : "black",
     });
-    getUser().then((user) => {
-      setMyPlayer({ user, color: isOpponentWhite ? "black" : "white" });
+    getValueFor("user").then((user) => {
+      if (user === null) return;
+      setMyPlayer({
+        user: JSON.parse(user),
+        color: isOpponentWhite ? "black" : "white",
+      });
     });
   }, []);
 

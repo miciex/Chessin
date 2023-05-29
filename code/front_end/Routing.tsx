@@ -43,6 +43,7 @@ const Routing = () => {
           name="Home"
           component={HomePage}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -50,6 +51,7 @@ const Routing = () => {
           name="GameMenu"
           component={GameMenu}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -59,6 +61,7 @@ const Routing = () => {
             props: NativeStackScreenProps<RootStackParamList, "FreeBoard">
           ) => <FreeBoard {...props} />}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -66,6 +69,7 @@ const Routing = () => {
           name="LastGame"
           component={LastGame}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -75,6 +79,7 @@ const Routing = () => {
             props: NativeStackScreenProps<RootStackParamList, "Login">
           ) => <Login {...props} />}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -82,6 +87,7 @@ const Routing = () => {
           name="PlayBot"
           component={PlayBot}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -89,6 +95,7 @@ const Routing = () => {
           name="PlayOnline"
           component={PlayOnline}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -96,6 +103,7 @@ const Routing = () => {
           name="PlayWithFriendsMenu"
           component={PlayWithFriendsMenu}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -103,6 +111,7 @@ const Routing = () => {
           name="ProfilePage"
           component={ProfilePage}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -112,6 +121,7 @@ const Routing = () => {
             props: NativeStackScreenProps<RootStackParamList, "Register">
           ) => <Register {...props} />}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />
@@ -119,6 +129,7 @@ const Routing = () => {
           name="Socials"
           component={Socials}
           options={({ navigation }) => ({
+            headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,
           })}
         />

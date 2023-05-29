@@ -13,6 +13,7 @@ import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import Board from "../utils/chess-calculations/board";
 import { getUser } from "../services/userServices";
 import { User } from "../utils/PlayerUtilities";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -27,9 +28,9 @@ export default function AnalyzeGame({ navigation, route }: Props) {
   const [user, setUser] = useState<User | null>();
 
   useEffect(() => {
-    getUser().then((user) => {
+    getValueFor("user").then((user) => {
       if (user === null) return;
-      setUser(user);
+      setUser(JSON.parse(user));
     });
   }, []);
 

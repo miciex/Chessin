@@ -1,5 +1,4 @@
-import { Move } from "./move";
-import { HashMap } from "../Types";
+import { countryIsoCodes } from "../../features/playOnline";
 
 export type ChessPiecesLetterType = "K" | "Q" | "R" | "B" | "N" | "";
 

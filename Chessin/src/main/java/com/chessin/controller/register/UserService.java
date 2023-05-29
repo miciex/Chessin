@@ -1,8 +1,9 @@
 package com.chessin.controller.register;
 
-import com.chessin.security.user.Provider;
-import com.chessin.security.user.User;
-import com.chessin.security.user.UserRepository;
+
+import com.chessin.model.register.user.Provider;
+import com.chessin.model.register.user.User;
+import com.chessin.model.register.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

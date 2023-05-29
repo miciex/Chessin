@@ -20,12 +20,20 @@ export type BotPlayer = {
   color: string;
 };
 
+export type countryIsoCodesType = (typeof countryIsoCodes)[number];
+
 export const getInitialChessBoard = (): Board => {
   return new Board({
     fenString: StartingPositions.BASE_POSITION,
     whiteToMove: true,
   });
 };
+
+export const countryToIsoCode = (country: string): string => {
+  const countryIsoCode = countryIsoCodes.find((elem) => elem.Name === country);
+  return countryIsoCode?.Code ? countryIsoCode.Code : "pl";
+};
+
 export const countryIsoCodes = [
   {
     Code: "AF",
@@ -1023,4 +1031,4 @@ export const countryIsoCodes = [
     Code: "ZW",
     Name: "Zimbabwe",
   },
-];
+] as const;

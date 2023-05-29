@@ -17,6 +17,8 @@ import {
   notValidPasswordRepeatMessage,
   notValidSurnameMessage,
 } from "../utils/Constants";
+import ChooseCountry from "../features/register/ChooseCountry";
+import { countryIsoCodesType } from "../features/playOnline";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -43,6 +45,10 @@ export default function Register({ navigation }: Props) {
   const [isRepeatPasswordValid, setIsRepeatPasswordValid] = useState<
     boolean | null
   >(null);
+  const [country, setCountry] = useState<countryIsoCodesType>();
+  const [isCountryScollViewVisible, setIsCountryScollViewVisible] =
+    useState<boolean>(false);
+  const [isCountryValid, setIsCountryValid] = useState<boolean | null>(null);
 
   const validateFirstName = (): boolean => {
     return nameRegex.test(firstName);
@@ -92,15 +98,38 @@ export default function Register({ navigation }: Props) {
     setIsRepeatPasswordValid(validateRepeatPassword());
   };
 
+  const validateCountry = (newCountry?: countryIsoCodesType): boolean => {
+    if (newCountry) return Boolean(newCountry);
+    return country !== undefined;
+  };
+
+  const setCountryValid = (newCountry?: countryIsoCodesType): void => {
+    const valid = newCountry ? validateCountry(newCountry) : validateCountry();
+    setIsCountryValid(valid);
+  };
+
+  const areInputsValid = (): boolean => {
+    return (
+      (isFirstNameValid &&
+        isLastNameValid &&
+        isNickValid &&
+        isEmailValid &&
+        isPasswordValid &&
+        isRepeatPasswordValid &&
+        isCountryValid) === true
+    );
+  };
+
   const onSubmit = () => {
-    console.log("submit");
+    if (!areInputsValid()) return;
     fetch(registerLink, {
       body: JSON.stringify({
         email,
         password,
-        lastName,
-        firstName,
+        lastname: lastName,
+        firstname: firstName,
         nameInGame: nick,
+        country: country?.Name,
       }),
       method: "POST",
       headers: new Headers({ "content-type": "application/json" }),
@@ -177,6 +206,15 @@ export default function Register({ navigation }: Props) {
               notValidText={notValidPasswordRepeatMessage}
             />
           </View>
+          <View style={styles.chooseCountryContainer}>
+            <ChooseCountry
+              isVisible={isCountryScollViewVisible}
+              setIsVisible={setIsCountryScollViewVisible}
+              setCountry={setCountry}
+              country={country}
+              setCountryValid={setCountryValid}
+            />
+          </View>
         </ScrollView>
         <Submit onSubmit={onSubmit} />
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -212,6 +250,11 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 8,
     width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  chooseCountryContainer: {
+    width: "80%",
     alignItems: "center",
     justifyContent: "center",
   },

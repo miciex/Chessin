@@ -15,6 +15,7 @@ import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameM
 import Board from "../utils/chess-calculations/board";
 import { getUser } from "../services/userServices";
 import { Player } from "../utils/PlayerUtilities";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -42,7 +43,8 @@ export default function PlayOnline({ navigation, route }: Props) {
     const isOpponentWhite = Math.random() > 0.5;
     setOpponent({
       user: {
-        name: "Maciej",
+        firstName: "Maciej",
+        lastName: "Kowalski",
         email: "maciej@gmail.com",
         nameInGame: "miciex",
         country: "pl",
@@ -57,8 +59,12 @@ export default function PlayOnline({ navigation, route }: Props) {
       color: isOpponentWhite ? "white" : "black",
     });
 
-    getUser().then((user) => {
-      setMyPlayer({ user: user, color: isOpponentWhite ? "black" : "white" });
+    getValueFor("user").then((user) => {
+      if (user === null) return;
+      setMyPlayer({
+        user: JSON.parse(user),
+        color: isOpponentWhite ? "black" : "white",
+      });
     });
   }, []);
 
@@ -66,7 +72,7 @@ export default function PlayOnline({ navigation, route }: Props) {
     setGearModal(!gearModal);
   };
 
-  return (
+  return myPlayer !== null ? (
     <View style={styles.appContainer}>
       {gearModal ? (
         <>
@@ -110,7 +116,7 @@ export default function PlayOnline({ navigation, route }: Props) {
       </View>
       <Footer navigation={navigation} />
     </View>
-  );
+  ) : null;
 }
 
 const styles = StyleSheet.create({

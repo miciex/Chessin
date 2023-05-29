@@ -16,5 +16,6 @@ public class RegisterRequest {
     private String email;
     private String nameInGame;
     private String password;
+    private String country;
 
 }

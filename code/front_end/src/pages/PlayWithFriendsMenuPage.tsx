@@ -19,6 +19,7 @@ import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
 import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
 import { User } from "../utils/PlayerUtilities";
 import { getUser } from "../services/userServices";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -26,7 +27,6 @@ type Props = {
     "PlayWithFriendsMenu",
     undefined
   >;
-
   route: RouteProp<RootStackParamList, "PlayWithFriendsMenu">;
 };
 
@@ -34,8 +34,9 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
 
   useEffect(() => {
-    getUser().then((player) => {
-      setUser(player);
+    getValueFor("user").then((user) => {
+      if (user === null) return;
+      setUser(JSON.parse(user));
     });
   }, []);
 
