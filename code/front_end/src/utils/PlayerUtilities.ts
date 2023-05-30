@@ -6,6 +6,7 @@ export type User = {
     country: string;
     ranking: Rankings;
     highestRanking: number;
+    online?: boolean;
 };
 
 export type responseUser = {
@@ -36,8 +37,6 @@ export type Rankings = {
 };
 
 export const responseUserToUser = (responseUser: any): User => {
-    console.log("converting")
-    console.log(responseUser);
     
     const rankings:Rankings = {
         bullet: responseUser.ratingBullet,

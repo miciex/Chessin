@@ -11,7 +11,7 @@ import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import PiecesBar from "../features/free-board/components/PiecesBar";
 import FunctionsBar from "../features/free-board/components/FunctionsBar";
-import { Board } from "../utils/chess-calculations/board";
+import { Board } from "../chess-logic/board";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 

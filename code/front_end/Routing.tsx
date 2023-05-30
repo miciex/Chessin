@@ -17,6 +17,7 @@ import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 export type RootStackParamList = {
   Home: undefined;

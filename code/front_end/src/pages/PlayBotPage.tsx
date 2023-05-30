@@ -13,7 +13,7 @@ import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { BotPlayer } from "../features/playOnline";
 import BotBar from "../features/play-with-bot/components/BotBar";
-import { Board } from "../utils/chess-calculations/board";
+import { Board } from "../chess-logic/board";
 import { Player } from "../utils/PlayerUtilities";
 import { getUser } from "../services/userServices";
 import { getValueFor } from "../utils/AsyncStoreFunctions";

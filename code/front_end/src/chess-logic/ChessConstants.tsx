@@ -1,4 +1,4 @@
-import { countryIsoCodes } from "../../features/playOnline";
+import { countryIsoCodes } from "../features/playOnline";
 
 export type ChessPiecesLetterType = "K" | "Q" | "R" | "B" | "N" | "";
 

@@ -12,7 +12,7 @@ import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
-import { Board } from "../utils/chess-calculations/board";
+import { Board } from "../chess-logic/board";
 import { getUser } from "../services/userServices";
 import { Player } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";

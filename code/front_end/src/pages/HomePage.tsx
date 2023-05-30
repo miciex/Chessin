@@ -10,6 +10,7 @@ import TopButtons from "../features/home/components/TopButtons";
 import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 //przykladowe stary gry
 const ended_games = [
@@ -81,7 +82,10 @@ type Props = {
 };
 
 const HomePage = ({ route, navigation }: Props) => {
+  const netInfo = useNetInfo();
   const [user, setUser] = useState<User>();
+
+  console.log(netInfo.isConnected);
 
   useEffect(() => {
     getValueFor("user").then((user) => {

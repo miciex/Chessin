@@ -24,4 +24,10 @@ public class UserController {
         System.out.println(userResponse.toString());
         return ResponseEntity.ok().body(userResponse);
     }
+
+    @PostMapping("/setActive/{email}")
+    public ResponseEntity<?> setActive(@PathVariable String email, @RequestBody boolean active){
+        User user = service.setActive(email, active);
+        return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body("User not found.");
+    }
 }

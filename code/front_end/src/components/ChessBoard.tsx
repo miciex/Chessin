@@ -8,8 +8,8 @@ import {
   boardFactory,
   isWhite,
   playMove,
-} from "../utils/chess-calculations/board";
-import { Move, moveFactory } from "../utils/chess-calculations/move";
+} from "../chess-logic/board";
+import { moveFactory } from "../chess-logic/move";
 import { ColorsPallet } from "../utils/Constants";
 import { Player } from "../utils/PlayerUtilities";
 
