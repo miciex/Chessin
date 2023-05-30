@@ -1,13 +1,15 @@
-import { Move } from "./move";
-import { HashMap } from "../Types";
+import { countryIsoCodes } from "../../features/playOnline";
 
 export type ChessPiecesLetterType = "K" | "Q" | "R" | "B" | "N" | "";
 
-export const baseBoard: Array<number> = [
-  3, 5, 4, 2, 1, 4, 5, 3, 6, 6, 6, 6, 6, 6, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 14, 14,
-  14, 14, 14, 14, 14, 11, 13, 14, 10, 9, 12, 13, 11,
-];
+export const Directions: { [key: number]: Array<number> } = {
+  1: [1, -1, 8, -8, 7, -7, 9, -9],
+  2: [8, 16, 7, 9],
+  3: [1, -1, 8, -8],
+  4: [6, 10, 15, 17, -6, -10, -15, -17],
+  5: [7, 9, -7, -9],
+  6: [8, -8, 1, -1, 9, -9, 7, -7],
+};
 
 export class Pieces {
   public static readonly NONE = 0;
@@ -42,16 +44,6 @@ export class StartingPositions {
   public static readonly BASE_POSITION =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 }
-
-const QUEEN = 3;
-export const Directions: { [key: number]: Array<number> } = {
-  1: [1, -1, 8, -8, 7, -7, 9, -9],
-  2: [8, 16, 7, 9],
-  3: [1, -1, 8, -8],
-  4: [6, 10, 15, 17, -6, -10, -15, -17],
-  5: [7, 9, -7, -9],
-  6: [8, -8, 1, -1, 9, -9, 7, -7],
-};
 
 export const piecesNumbers = [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14];
 

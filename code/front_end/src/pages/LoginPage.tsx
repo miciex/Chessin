@@ -8,17 +8,17 @@ import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
 import { ColorsPallet } from "../utils/Constants";
 import { authenticateLink } from "../utils/ServicesConstants";
-import * as SecureStore from "expo-secure-store";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import { AuthenticationResponse } from "../utils/ServicesTypes";
-import { fetchUser } from "../features/authentication/services/loginServices";
-import { storeUser } from "../services/userServices";
+import { fetchandStoreUser } from "../features/authentication/services/loginServices";
 import { emailRegex, passwordRegex } from "../utils/Constants";
 import AuthInput from "../features/authentication/components/AuthInput";
 import {
   notValidEmailMessage,
   notValidPasswordMessage,
 } from "../utils/Constants";
+import { save, getValueFor } from "../utils/AsyncStoreFunctions";
+import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
@@ -36,10 +36,9 @@ export default function Login({ route, navigation }: Props) {
     responseData: AuthenticationResponse
   ) => {
     console.log(responseData);
-    SecureStore.setItemAsync("refreshToken", responseData.refreshToken);
-    SecureStore.setItemAsync("accesToken", responseData.accessToken);
-    const user = await fetchUser(email);
-    storeUser(user);
+    await save("refreshToken", responseData.refreshToken);
+    await save("accessToken", responseData.accessToken);
+    fetchandStoreUser(email);
   };
 
   const validataEmail = (): boolean => {

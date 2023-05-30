@@ -13,9 +13,10 @@ import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { BotPlayer } from "../features/playOnline";
 import BotBar from "../features/play-with-bot/components/BotBar";
-import Board from "../utils/chess-calculations/board";
+import { Board } from "../utils/chess-calculations/board";
 import { Player } from "../utils/PlayerUtilities";
 import { getUser } from "../services/userServices";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -33,7 +34,7 @@ export default function PlayBot({ navigation, route }: Props) {
   const [chessBoard, setChessBoard] = useState<Board>(initialChessBoard);
   const [opponent, setOpponent] = useState<BotPlayer | null>(null);
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
-  const [isMyTurn, setIsMyTurn] = useState<boolean>(false);
+  const [isMyTurn, setIsMyTurn] = useState<boolean>(true);
   const [opponentClockInfo, setOpponentClockInfo] = useState<
     Date | undefined
   >();
@@ -49,8 +50,12 @@ export default function PlayBot({ navigation, route }: Props) {
       },
       color: isOpponentWhite ? "white" : "black",
     });
-    getUser().then((user) => {
-      setMyPlayer({ user, color: isOpponentWhite ? "black" : "white" });
+    getValueFor("user").then((user) => {
+      if (user === null) return;
+      setMyPlayer({
+        user: JSON.parse(user),
+        color: isOpponentWhite ? "black" : "white",
+      });
     });
   }, []);
 

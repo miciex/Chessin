@@ -5,6 +5,7 @@ import { Player } from "../../../utils/PlayerUtilities";
 import { ColorsPallet } from "../../../utils/Constants";
 import Timer from "./Timer";
 import { FontAwesome } from "@expo/vector-icons";
+import { countryToIsoCode } from "..";
 
 type Props = {
   player: Player | null;
@@ -16,7 +17,7 @@ export default function PlayerBar({ player, timerInfo }: Props) {
     <View style={styles.appContainer}>
       <View style={styles.textContainer}>
         <FontAwesome name="user-circle" size={32} color="black" />
-        <Text style={styles.text}>{player ? player.user.name : ""}</Text>
+        <Text style={styles.text}>{player ? player.user.firstName : ""}</Text>
         <Text style={styles.text}>
           {player ? player.user.highestRanking : ""}
         </Text>
@@ -26,7 +27,7 @@ export default function PlayerBar({ player, timerInfo }: Props) {
           <Timer info={timerInfo} />
         </View>
         <CountryFlag
-          isoCode={player?.user?.country ? player.user.country : "pl"}
+          isoCode={countryToIsoCode(player?.user.country || "")}
           size={24}
         />
       </View>

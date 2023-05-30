@@ -1,7 +1,7 @@
 import { baseBoard } from "../../utils/chess-calculations/ChessConstants";
 import { botType } from "../gameMenuPage/context/BotTypeContext";
 import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
-import Board from "../../utils/chess-calculations/board";
+import { Board, boardFactory } from "../../utils/chess-calculations/board";
 import { StartingPositions } from "../../utils/chess-calculations/ChessConstants";
 
 export type FieldInfo = {
@@ -20,12 +20,20 @@ export type BotPlayer = {
   color: string;
 };
 
+export type countryIsoCodesType = (typeof countryIsoCodes)[number];
+
 export const getInitialChessBoard = (): Board => {
-  return new Board({
+  return boardFactory({
     fenString: StartingPositions.BASE_POSITION,
     whiteToMove: true,
   });
 };
+
+export const countryToIsoCode = (country: string): string => {
+  const countryIsoCode = countryIsoCodes.find((elem) => elem.Name === country);
+  return countryIsoCode?.Code ? countryIsoCode.Code : "pl";
+};
+
 export const countryIsoCodes = [
   {
     Code: "AF",
@@ -1023,4 +1031,4 @@ export const countryIsoCodes = [
     Code: "ZW",
     Name: "Zimbabwe",
   },
-];
+] as const;

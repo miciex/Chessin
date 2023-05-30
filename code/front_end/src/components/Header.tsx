@@ -15,14 +15,15 @@ type Props = {
 };
 
 export default function Header({ navigation }: Props) {
-  const goToProfilePage = () => {
-    navigation.navigate("ProfilePage");
-  };
   return (
     <View style={styles.header}>
       <View style={styles.contentContainer}>
         <Text style={styles.headerText}>Chessin</Text>
-        <Pressable onPress={() =>   goToProfilePage()}>
+        <Pressable
+          onPress={() => {
+            navigation.navigate("ProfilePage");
+          }}
+        >
           <FontAwesome
             name="user-circle"
             size={32}

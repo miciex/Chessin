@@ -2,8 +2,14 @@ import { View, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import { FieldInfo } from "../features/playOnline";
 import ChessBoardField from "./ChessBoardField";
-import Board, { constructorArgs } from "../utils/chess-calculations/board";
-import { Move } from "../utils/chess-calculations/move";
+import {
+  Board,
+  PossibleMoves,
+  boardFactory,
+  isWhite,
+  movePiece,
+} from "../utils/chess-calculations/board";
+import { Move, moveFactory } from "../utils/chess-calculations/move";
 import { ColorsPallet } from "../utils/Constants";
 
 type Props = {
@@ -17,29 +23,27 @@ export default function ChessBoard({ board, setBoard }: Props) {
   const [possibleMoves, setPossibleMoves] = useState([-1]);
 
   const handleFieldPress = (data: FieldInfo) => {
-    console.log("cos");
-    console.log(data);
-
     //copy is needed for selection of fields
-    setPossibleMoves(board.PossibleMoves(data.fieldNumber));
+    setPossibleMoves(PossibleMoves(data.fieldNumber, board));
     copyPossibleMoves = [...possibleMoves];
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
-      (board.isWhite(data.fieldNumber) && board.whiteToMove) ||
-      board.isWhite(data.fieldNumber) !== board.whiteToMove
+      (isWhite(data.fieldNumber, board.position) && board.whiteToMove) ||
+      isWhite(data.fieldNumber, board.position) !== board.whiteToMove
     ) {
       setActiveField(data.fieldNumber);
       return;
     } else if (possibleMoves.includes(data.fieldNumber)) {
-      const brd = new Board({ board });
+      const brd: Board = boardFactory({ board });
 
-      brd.movePiece(
-        new Move({
+      brd.position = movePiece(
+        moveFactory({
           pieces: brd.position,
           startField: activeField,
           endField: data.fieldNumber,
-        })
+        }),
+        brd.position
       );
 
       setBoard(brd);
