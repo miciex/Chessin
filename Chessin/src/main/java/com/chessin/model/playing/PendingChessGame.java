@@ -9,17 +9,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PendingChessGame {
-    @Id
     private long id;
-    @OneToOne
     private User user;
-    @OneToOne
     private User opponent;
     private int timeControl;
     private int increment;
