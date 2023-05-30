@@ -31,7 +31,6 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
   const [opponentClockInfo, setOpponentClockInfo] = useState<Date>();
   const [myClockInfo, setMyClockInfo] = useState<Date>();
-  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
 
   const [gearModal, setGearModal] = useState(false);
   //TODO: write reducer for boardState
@@ -40,7 +39,7 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   //TODO: get opponent from server and user from react-native-storage
   useEffect(() => {
-    const isOpponentWhite = Math.random() > 0.5;
+    const isOpponentWhite = false; //Math.random() > 0.5;
     setOpponent({
       user: {
         firstName: "Maciej",
@@ -94,7 +93,11 @@ export default function PlayOnline({ navigation, route }: Props) {
             />
           </View>
           <View style={styles.boardContainer}>
-            <ChessBoard board={boardState} setBoard={setBoardState} />
+            <ChessBoard
+              board={boardState}
+              setBoard={setBoardState}
+              myPlayer={myPlayer}
+            />
           </View>
           <Text>
             <FontAwesome

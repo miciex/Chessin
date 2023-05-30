@@ -25,7 +25,7 @@ export type responseUser = {
 
 export type Player = {
     user: User;
-    color: string;
+    color: "white" | "black" | "spectator" | null;
 };
 
 export type Rankings = {

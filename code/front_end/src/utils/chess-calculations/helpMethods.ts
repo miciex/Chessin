@@ -68,3 +68,11 @@ export const boardToMap = (board:Array<number>):{[key:number]:number}=>{
     }
     return map;
 }
+
+export const mapToBoard = (map:{[key:number]:number}):Array<number>=>{
+    let board:Array<number> = new Array(64).fill(0);
+    Object.entries(map).forEach(([key, value])=>{
+        board[parseInt(key)] = value;
+    })
+    return board;
+}

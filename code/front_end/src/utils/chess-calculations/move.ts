@@ -37,6 +37,19 @@ export type Move = {
         gaveCheck: move?move.gaveCheck:false
         }
     }
+
+    export const getEmptyMove = ():Move =>{
+        return {
+            movedPiece:0,
+            startField:0,
+            endField:0,
+            takenPiece:0,
+            promotePiece:0,
+            continuations:[],
+            gaveCheck:false,
+            takenPieceField:0
+        }
+    }
     
     const calcTakenPiece = (pieces:{[key:number]:number}, startField:number,endField:number, movedPiece:number):number =>{
         if(endField in pieces) return pieces[endField];

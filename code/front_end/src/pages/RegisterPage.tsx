@@ -120,7 +120,18 @@ export default function Register({ navigation }: Props) {
     );
   };
 
+  const setInputsValid = (): void => {
+    setIsFirstNameValid(validateFirstName());
+    setIsLastNameValid(validateLastName());
+    setIsNickValid(validateNick());
+    setIsEmailValid(validataEmail());
+    setIsPasswordValid(validatePassword());
+    setIsRepeatPasswordValid(validateRepeatPassword());
+    setIsCountryValid(validateCountry());
+  };
+
   const onSubmit = () => {
+    setInputsValid();
     if (!areInputsValid()) return;
     fetch(registerLink, {
       body: JSON.stringify({
