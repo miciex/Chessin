@@ -167,7 +167,7 @@ public class AuthenticationService {
             try
             {
                 authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getOldPassword()));
+                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             } catch(AuthenticationException e){
                 return ResponseEntity.badRequest().body("Password incorrect.");
             }

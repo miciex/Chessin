@@ -13,7 +13,6 @@ public class CodeVerificationRequest {
 
     private String email;
     private String verificationCode;
-    private String oldPassword;
     private String newPassword;
     private VerificationType verificationType;
     private String firstname;
