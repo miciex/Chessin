@@ -17,6 +17,7 @@ import java.util.HashMap;
 @Entity
 public class Move {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long Id;
     @ManyToOne
     ChessGame chessGame;

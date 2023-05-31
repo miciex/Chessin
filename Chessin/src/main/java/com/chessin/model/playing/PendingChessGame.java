@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PendingChessGame {
-    private long id;
+    private Long id;
     private User user;
     private User opponent;
     private int timeControl;

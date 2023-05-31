@@ -14,6 +14,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class ChessGame {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @ManyToOne(fetch = FetchType.EAGER)
     private User whiteUser;

@@ -78,6 +78,8 @@ public class AuthenticationService {
 
         var jwtToken = jwtService.generateToken(user);
 
+        verificationCodeRepository.delete(code);
+
         user.setActivated(true);
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
