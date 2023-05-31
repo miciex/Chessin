@@ -19,6 +19,7 @@ import {
 } from "../utils/Constants";
 import ChooseCountry from "../features/register/ChooseCountry";
 import { countryIsoCodesType } from "../features/playOnline";
+import AuthCodeModal from "../features/login/components/AuthCodeModal";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -49,6 +50,11 @@ export default function Register({ navigation }: Props) {
   const [isCountryScollViewVisible, setIsCountryScollViewVisible] =
     useState<boolean>(false);
   const [isCountryValid, setIsCountryValid] = useState<boolean | null>(null);
+  const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
+
+  const hideAuthCodeModal = (): void => {
+    setShowAuthCode(false);
+  };
 
   const validateFirstName = (): boolean => {
     return nameRegex.test(firstName);
@@ -150,17 +156,25 @@ export default function Register({ navigation }: Props) {
         console.log(response);
         if (response.status === 200) {
           navigation.navigate("Home");
+        } else if (response.status === 202) {
+          setShowAuthCode(true);
+        } else if (response.status === 400) {
+          throw new Error("Bad request");
         }
       })
       .catch((error) => {
         console.log(error);
-      })
-      .finally(() => {
-        console.log("finally");
       });
   };
 
-  return (
+  return showAuthCode ? (
+    <AuthCodeModal
+      hideModal={hideAuthCodeModal}
+      navigation={navigation}
+      email={email}
+      loginUser={false}
+    />
+  ) : (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
         <ScrollView

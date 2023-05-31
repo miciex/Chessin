@@ -19,6 +19,7 @@ import {
 } from "../utils/Constants";
 import { save, getValueFor } from "../utils/AsyncStoreFunctions";
 import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
+import { setUserDataFromResponse } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
@@ -31,15 +32,6 @@ export default function Login({ route, navigation }: Props) {
   const [password, setPassword] = useState<string>("");
   const [isPasswordValid, setIsPasswordValid] = useState<boolean | null>(null);
   const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
-
-  const setUserDataFromResponse = async (
-    responseData: AuthenticationResponse
-  ) => {
-    console.log(responseData);
-    await save("refreshToken", responseData.refreshToken);
-    await save("accessToken", responseData.accessToken);
-    fetchandStoreUser(email);
-  };
 
   const validataEmail = (): boolean => {
     return emailRegex.test(email);
@@ -86,7 +78,7 @@ export default function Login({ route, navigation }: Props) {
         if (!responseData) {
           return false;
         }
-        setUserDataFromResponse(responseData);
+        setUserDataFromResponse(responseData, email);
         return true;
       })
       .then((userSet: boolean) => {
@@ -105,8 +97,8 @@ export default function Login({ route, navigation }: Props) {
     <AuthCodeModal
       hideModal={hideModal}
       navigation={navigation}
-      setUserDataFromResponse={setUserDataFromResponse}
       email={email}
+      loginUser={true}
     />
   ) : (
     <View style={styles.appContainer}>

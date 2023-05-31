@@ -16,7 +16,6 @@ public class UserResponse {
     private String lastName;
     private String email;
     private String nameInGame;
-    private String password;
     private String role;
     private int ratingBlitz;
     private int ratingBullet;
@@ -32,7 +31,6 @@ public class UserResponse {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .nameInGame(user.getNameInGame())
-                .password(user.getPassword())
                 .role(user.getRole())
                 .ratingBlitz(user.getRatingBlitz())
                 .ratingBullet(user.getRatingBullet())
@@ -50,7 +48,6 @@ public class UserResponse {
                 .lastName(userResponse.getLastName())
                 .email(userResponse.getEmail())
                 .nameInGame(userResponse.getNameInGame())
-                .password(userResponse.getPassword())
                 .role(userResponse.getRole())
                 .ratingBlitz(userResponse.getRatingBlitz())
                 .ratingBullet(userResponse.getRatingBullet())

@@ -9,20 +9,26 @@ import BaseButton from "../../../components/BaseButton";
 import { AuthenticationResponse } from "../../../utils/ServicesTypes";
 import { VerificationType } from "../../../utils/ServicesTypes";
 import { Entypo } from "@expo/vector-icons";
+import { StackParamList } from "../../../utils/Constants";
+import { setUserDataFromResponse } from "../../../services/userServices";
 
 type Props = {
   hideModal: () => void;
-  navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
-  setUserDataFromResponse: (responseData: AuthenticationResponse) => void;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    StackParamList,
+    undefined
+  >;
   email: string;
+  loginUser: boolean;
 };
 
 const InputLength = 8;
 export default function AuthCodeModal({
   hideModal,
   navigation,
-  setUserDataFromResponse,
   email,
+  loginUser,
 }: Props) {
   const [inputs, setInputs] = useState<Char[]>(new Array(InputLength));
 
@@ -58,8 +64,7 @@ export default function AuthCodeModal({
         }
       })
       .then((data) => {
-        console.log(data);
-        setUserDataFromResponse(data);
+        if (loginUser) setUserDataFromResponse(data, email);
         return;
       })
       .then(() => {

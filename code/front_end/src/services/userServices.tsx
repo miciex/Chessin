@@ -4,6 +4,9 @@ import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { setActive } from "../utils/ServicesConstants";
 import { responseUserToUser } from "../utils/PlayerUtilities";
 import { refreshTokenLink } from "../utils/ServicesConstants";
+import { save } from "../utils/AsyncStoreFunctions";
+import { fetchandStoreUser } from "../features/authentication/services/loginServices";
+import { AuthenticationResponse } from "../utils/ServicesTypes";
 
 export const storeUser = async (value: User) => {
   try {
@@ -25,10 +28,11 @@ export const getUser = async () => {
 export const setUserActive = async (active: boolean) => {
   const accessToken = await getValueFor("accessToken");
   let correct: boolean = false;
+
   await getValueFor("user")
     .then((userInfo) => {
       if (userInfo === null) return null;
-      return responseUserToUser(JSON.parse(userInfo));
+      return JSON.parse(userInfo);
     })
     .then(async (user) => {
       if (user === null) return null;
@@ -39,18 +43,20 @@ export const setUserActive = async (active: boolean) => {
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          active: active,
+          isOnline: active,
         }),
-      }).catch((error) => console.log(error));
+      })
+        .then((response) => {
+          return response;
+        })
+        .catch((error) => console.log(error));
     })
     .then((response) => {
       console.log(response);
       if (response === undefined || response === null) return null;
       if (response.status === 200) {
-        console.log("user active status changed");
         correct = true;
       } else {
-        console.log("user active status not changed");
         correct = false;
       }
     })
@@ -60,9 +66,11 @@ export const setUserActive = async (active: boolean) => {
 
 export const resetAccessToken = async () => {
   await AsynStorage.removeItem("accessToken");
+  const refreshToken = await getValueFor("refreshToken");
+
   fetch(refreshTokenLink, {
     body: JSON.stringify({
-      token: await getValueFor("refreshToken"),
+      refreshToken: refreshToken,
     }),
     headers: {
       "Content-Type": "application/json",
@@ -82,4 +90,13 @@ export const resetAccessToken = async () => {
     .catch((error) => {
       console.error(error);
     });
+};
+
+export const setUserDataFromResponse = async (
+  responseData: AuthenticationResponse,
+  email: string
+) => {
+  await save("refreshToken", responseData.refreshToken);
+  await save("accessToken", responseData.accessToken);
+  fetchandStoreUser(email);
 };

@@ -44,9 +44,10 @@ export const responseUserToUser = (responseUser: any): User => {
         rapid: responseUser.ratingRapid,
         classical: responseUser.ratingClassical,
     }
+    console.log("responseUserToUser", responseUser)
     return {
         firstName: responseUser.firstname,
-        lastName: responseUser.lastName,
+        lastName: responseUser.lastname,
         email: responseUser.email,
         nameInGame: responseUser.nameInGame,
         country: responseUser.country,

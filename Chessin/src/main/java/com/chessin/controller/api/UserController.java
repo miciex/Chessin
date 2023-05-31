@@ -1,6 +1,7 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.register.UserService;
+import com.chessin.model.register.user.Requests.SetOnlineRequest;
 import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class UserController {
     }
 
     @PostMapping("/setActive/{email}")
-    public ResponseEntity<?> setActive(@PathVariable String email, @RequestBody boolean active){
-        User user = service.setActive(email, active);
+    public ResponseEntity<?> setActive(@PathVariable String email, @RequestBody SetOnlineRequest active){
+        User user = service.setActive(email, active.isOnline()); 
         return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body("User not found.");
     }
 }

@@ -35,6 +35,9 @@ export type RootStackParamList = {
   AnalyzeGame: undefined;
 };
 
+const refreshTokenInterval = 1000 * 60 * 14;
+const checkNetInfoInterval = 1000 * 60;
+
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
   const netInfo = useNetInfo();
@@ -43,11 +46,12 @@ const Routing = () => {
     const setNetInfo = setInterval(() => {
       console.log("isConnected: ", netInfo.isConnected);
       setUserActive(netInfo.isConnected ? true : false);
-    }, 60000);
+    }, checkNetInfoInterval);
     const resetToken = setInterval(() => {
       resetAccessToken();
-    }, 840000);
+    }, refreshTokenInterval);
     return () => {
+      console.log("clearing intervals");
       clearInterval(setNetInfo);
       clearInterval(resetToken);
     };
