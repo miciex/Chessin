@@ -38,7 +38,6 @@ public class ChessGameController {
                     pendingGames.get(foundGame.getUser()).setOpponent(userRepository.findByEmail(request.getEmail()).get());
                     pendingGames.get(foundGame.getUser()).notifyAll();
 
-                    pendingGames.get(foundGame.getUser()).wait(100);
 
                     ChessGame game = ChessGame.builder()
                             .whiteUser(foundGame.getUser())
@@ -47,6 +46,8 @@ public class ChessGameController {
                             .timeControl(foundGame.getTimeControl())
                             .increment(foundGame.getIncrement())
                             .build();
+
+                    pendingGames.get(foundGame.getUser()).wait(100);
                     return ResponseEntity.ok().body(game);
                 }
             }
@@ -63,7 +64,7 @@ public class ChessGameController {
             pendingGames.put(userRepository.findByEmail(request.getEmail()).get(), pendingChessGame);
 
             synchronized (pendingGames.get(pendingChessGame.getUser())) {
-                pendingGames.get(pendingChessGame.getUser()).wait(10000);
+                pendingGames.get(pendingChessGame.getUser()).wait(60000);
             }
 
             synchronized (pendingGames.get(pendingChessGame.getUser())) {

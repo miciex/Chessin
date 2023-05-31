@@ -39,8 +39,9 @@ public class AuthenticationService {
     private final VerificationCodeRepository verificationCodeRepository;
     private final EmailService emailService;
 
-    public ResponseEntity<?> register(RegisterRequest request){
-
+    @Transactional
+    public ResponseEntity<?> register(RegisterRequest request)
+    {
         var user = User
                 .builder()
                 .firstname(request.getFirstname())
@@ -52,11 +53,32 @@ public class AuthenticationService {
                 .role(USER)
                 .isTwoFactorAuthenticationEnabled(true)
                 .provider(Provider.LOCAL)
+                .isActivated(false)
                 .build();
+
+        userRepository.save(user);
+
+        sendVerificationCode(userRepository.findByEmail(request.getEmail()).get());
+        return ResponseEntity.accepted().body("Verification code sent to your email address.");
+    }
+
+    public ResponseEntity<?> activateAccount(CodeVerificationRequest request){
+        if(!verificationCodeRepository.existsByCode(request.getVerificationCode()))
+            return ResponseEntity.badRequest().body("Code is incorrect.");
+
+        var code = verificationCodeRepository.findByCode(request.getVerificationCode()).get();
+
+        if(!code.getUser().getEmail().equals(request.getEmail()))
+            return ResponseEntity.badRequest().body("Code is incorrect.");
+
+        if(code.getExpiryDate().compareTo(Instant.now()) < 0)
+            return ResponseEntity.badRequest().body("Code is expired.");
+
+        var user = code.getUser();
 
         var jwtToken = jwtService.generateToken(user);
 
-        userRepository.save(user);
+        user.setActivated(true);
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
