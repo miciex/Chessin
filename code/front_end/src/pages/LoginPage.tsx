@@ -69,6 +69,7 @@ export default function Login({ route, navigation }: Props) {
       headers: new Headers({ "content-type": "application/json" }),
     })
       .then((response) => {
+        console.log(response.status);
         if (response.status === 200) {
           console.log(JSON.stringify(response));
           return response.json();

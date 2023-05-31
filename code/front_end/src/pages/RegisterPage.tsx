@@ -133,6 +133,7 @@ export default function Register({ navigation }: Props) {
   const onSubmit = () => {
     setInputsValid();
     if (!areInputsValid()) return;
+    console.log("register");
     fetch(registerLink, {
       body: JSON.stringify({
         email,
@@ -146,12 +147,16 @@ export default function Register({ navigation }: Props) {
       headers: new Headers({ "content-type": "application/json" }),
     })
       .then((response) => {
+        console.log(response);
         if (response.status === 200) {
           navigation.navigate("Home");
         }
       })
       .catch((error) => {
         console.log(error);
+      })
+      .finally(() => {
+        console.log("finally");
       });
   };
 

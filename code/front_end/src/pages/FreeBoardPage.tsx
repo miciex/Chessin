@@ -7,7 +7,7 @@ import { RootStackParamList } from "../../Routing";
 import ChessBoard from "../components/ChessBoard";
 import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
+import { sampleMoves } from "../chess-logic/ChessConstants";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import PiecesBar from "../features/free-board/components/PiecesBar";
 import FunctionsBar from "../features/free-board/components/FunctionsBar";
@@ -49,7 +49,11 @@ export default function FreeBoard({ navigation, route }: Props) {
         <View style={styles.mainContentContainer}>
           <PiecesBar barColor="white" />
           <View style={styles.boardContainer}>
-            <ChessBoard board={chessBoard} setBoard={setChessBoard} />
+            <ChessBoard
+              board={chessBoard}
+              setBoard={setChessBoard}
+              playersColor={"spectator"}
+            />
           </View>
           <PiecesBar barColor="black" />
           <FunctionsBar />

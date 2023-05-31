@@ -9,7 +9,7 @@ import PlayerBar from "../features/playOnline/components/PlayerBar";
 import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
+import { sampleMoves } from "../chess-logic/ChessConstants";
 import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
 import { Board } from "../chess-logic/board";
@@ -96,7 +96,7 @@ export default function PlayOnline({ navigation, route }: Props) {
             <ChessBoard
               board={boardState}
               setBoard={setBoardState}
-              myPlayer={myPlayer}
+              playersColor={myPlayer.color}
             />
           </View>
           <Text>

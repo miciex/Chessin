@@ -16,10 +16,10 @@ import { Player } from "../utils/PlayerUtilities";
 type Props = {
   board: Board;
   setBoard: (board: Board) => void;
-  myPlayer: Player;
+  playersColor: "white" | "black" | "spectator" | null;
 };
 
-export default function ChessBoard({ board, setBoard, myPlayer }: Props) {
+export default function ChessBoard({ board, setBoard, playersColor }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
   const [possibleMoves, setPossibleMoves] = useState([-1]);
@@ -34,13 +34,13 @@ export default function ChessBoard({ board, setBoard, myPlayer }: Props) {
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
       data.fieldNumber in board.position &&
-      isWhite(data.fieldNumber, board.position) === (myPlayer.color === "white")
+      isWhite(data.fieldNumber, board.position) === (playersColor === "white")
     ) {
       setActiveField(data.fieldNumber);
       return;
     } else if (
       possibleMoves.includes(data.fieldNumber) &&
-      (myPlayer.color === "white") === board.whiteToMove
+      (playersColor === "white") === board.whiteToMove
     ) {
       board = playMove(
         moveFactory({

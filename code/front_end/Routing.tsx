@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "./src/pages/HomePage";
@@ -18,6 +18,7 @@ import Header from "./src/components/Header";
 import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNetInfo } from "@react-native-community/netinfo";
+import { setUserActive, resetAccessToken } from "./src/services/userServices";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -36,6 +37,21 @@ export type RootStackParamList = {
 
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
+  const netInfo = useNetInfo();
+
+  useEffect(() => {
+    const setNetInfo = setInterval(() => {
+      console.log("isConnected: ", netInfo.isConnected);
+      setUserActive(netInfo.isConnected ? true : false);
+    }, 60000);
+    const resetToken = setInterval(() => {
+      resetAccessToken();
+    }, 840000);
+    return () => {
+      clearInterval(setNetInfo);
+      clearInterval(resetToken);
+    };
+  }, []);
 
   return (
     <NavigationContainer>
