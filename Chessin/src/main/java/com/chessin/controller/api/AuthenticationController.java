@@ -52,6 +52,7 @@ public class AuthenticationController {
         return switch (request.getVerificationType()) {
             case AUTHENTICATE -> service.finishAuthentication(request);
             case CHANGE_PASSWORD, REMIND_PASSWORD -> service.finishChangingPassword(request);
+            case REGISTER -> service.activateAccount(request);
             default -> ResponseEntity.badRequest().body("Invalid verification type.");
         };
     }

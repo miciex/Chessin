@@ -44,6 +44,7 @@ public class User implements UserDetails {
     @OneToMany
     private List<ChessGame> chessGames;
     private boolean isOnline;
+    private boolean isActivated;
     //pfp
     //osobna tabela z oczekującymi grami
 

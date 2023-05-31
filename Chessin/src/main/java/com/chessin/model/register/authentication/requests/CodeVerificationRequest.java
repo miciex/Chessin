@@ -13,7 +13,11 @@ public class CodeVerificationRequest {
 
     private String email;
     private String verificationCode;
-    private String oldPassword;
     private String newPassword;
     private VerificationType verificationType;
+    private String firstname;
+    private String lastname;
+    private String nameInGame;
+    private String password;
+    private String country;
 }
