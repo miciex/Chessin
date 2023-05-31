@@ -2,7 +2,7 @@ package com.chessin.controller.api;
 
 import com.chessin.controller.register.UserService;
 import com.chessin.model.register.user.User;
-import com.chessin.model.register.user.UserResponse;
+import com.chessin.controller.responses.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -3,10 +3,10 @@ package com.chessin.controller.api;
 import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.requests.CancelPendingChessGameRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
+import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.ChessGameRepository;
 import com.chessin.model.playing.PendingChessGame;
-import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +33,10 @@ public class ChessGameController {
     @PostMapping("/searchNewGame")
     public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request) throws InterruptedException {
 
-        if(pendingGames.containsKey(request.getEmail()))
-        {
-            return ResponseEntity.badRequest().body("User is already searching for a game.");
-        }
+//        if(pendingGames.containsKey(request.getEmail()))
+//        {
+//            return ResponseEntity.badRequest().body("User is already searching for a game.");
+//        }
 
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
 
@@ -57,7 +57,8 @@ public class ChessGameController {
                         .build();
 
                 pendingGames.get(foundGame.getUser().getEmail()).wait(100);
-                return ResponseEntity.ok().body(game);
+
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
             }
         }
 
@@ -94,7 +95,7 @@ public class ChessGameController {
 
                 chessGameRepository.save(game);
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
-                return ResponseEntity.ok().body(game);
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
             }
         }
     }

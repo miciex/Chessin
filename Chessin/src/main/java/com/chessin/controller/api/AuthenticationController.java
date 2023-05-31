@@ -1,11 +1,11 @@
 package com.chessin.controller.api;
 
+import com.chessin.controller.requests.*;
 import com.chessin.model.register.authentication.refreshToken.RefreshToken;
-import com.chessin.model.register.authentication.requests.*;
 import com.chessin.controller.register.RefreshTokenService;
 import com.chessin.model.register.authentication.refreshToken.TokenRefreshException;
 import com.chessin.controller.register.AuthenticationService;
-import com.chessin.model.register.authentication.responses.TokenRefreshResponse;
+import com.chessin.controller.responses.TokenRefreshResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.UserRepository;
 import lombok.RequiredArgsConstructor;

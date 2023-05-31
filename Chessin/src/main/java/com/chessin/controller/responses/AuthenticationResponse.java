@@ -1,4 +1,4 @@
-package com.chessin.model.register.authentication.requests;
+package com.chessin.controller.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenRefreshRequest {
+public class AuthenticationResponse {
+
+    private String accessToken;
     private String refreshToken;
+
 }
