@@ -46,4 +46,16 @@ export type ChessGameResponse = {
   availableCastles: Array<number>;
   timeControl: number;
   increment: number;
+  startBoard: string;
+  whiteStarts: boolean;
+};
+
+export type SubmitMoveRequest = {
+  gameId: number;
+  email: string;
+  movedPiece: number;
+  startField: number;
+  endField: number;
+  promotePiece: number;
+  isDrawOffered: boolean;
 };

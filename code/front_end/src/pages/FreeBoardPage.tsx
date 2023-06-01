@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import ChessBoard from "../components/ChessBoard";
+import ChessBoard from "../features/playOnline/components/ChessBoard";
 import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../chess-logic/ChessConstants";

@@ -1,61 +1,79 @@
 import { View, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import { FieldInfo } from "../features/playOnline";
-import ChessBoardField from "./ChessBoardField";
+import { FieldInfo } from "..";
+import ChessBoardField from "../../../components/ChessBoardField";
 import {
   Board,
   PossibleMoves,
   boardFactory,
   isWhite,
   playMove,
-} from "../chess-logic/board";
-import { moveFactory } from "../chess-logic/move";
-import { ColorsPallet } from "../utils/Constants";
-import { Player } from "../utils/PlayerUtilities";
+} from "../../../chess-logic/board";
+import { moveFactory } from "../../../chess-logic/move";
+import { ColorsPallet } from "../../../utils/Constants";
+import { Player } from "../../../utils/PlayerUtilities";
+import { submitMove } from "../services/playOnlineService";
+import { Move } from "../../../chess-logic/move";
+import { SubmitMoveRequest } from "../../../utils/ServicesTypes";
 
 type Props = {
   board: Board;
   setBoard: (board: Board) => void;
-  playersColor: "white" | "black" | "spectator" | null;
+  player: Player;
+  gameId: number;
 };
 
-export default function ChessBoard({ board, setBoard, playersColor }: Props) {
+export default function ChessBoard({ board, setBoard, player, gameId }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
   const [possibleMoves, setPossibleMoves] = useState([-1]);
 
   const handleFieldPress = (data: FieldInfo) => {
     //copy is needed for selection of fields
-    console.log(board);
     setPossibleMoves(PossibleMoves(data.fieldNumber, board));
     copyPossibleMoves = [...possibleMoves];
-    console.log(board);
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
       data.fieldNumber in board.position &&
-      isWhite(data.fieldNumber, board.position) === (playersColor === "white")
+      isWhite(data.fieldNumber, board.position) === (player.color === "white")
     ) {
       setActiveField(data.fieldNumber);
       return;
     } else if (
       possibleMoves.includes(data.fieldNumber) &&
-      (playersColor === "white") === board.whiteToMove
+      (player.color === "white") === board.whiteToMove
     ) {
-      board = playMove(
-        moveFactory({
-          pieces: board.position,
-          startField: activeField,
-          endField: data.fieldNumber,
-        }),
-        board
-      );
-
-      setBoard(board);
+      move(data);
     }
 
     setActiveField(-1);
     setPossibleMoves([]);
+  };
+
+  const move = (data: FieldInfo) => {
+    const move: Move = moveFactory({
+      pieces: board.position,
+      startField: activeField,
+      endField: data.fieldNumber,
+    });
+
+    const submitMoveRequest: SubmitMoveRequest = {
+      gameId: gameId,
+      email: player.email,
+      movedPiece: move.movedPiece,
+      startField: move.startField,
+      endField: move.endField,
+      promotePiece: move.promotePiece,
+      isDrawOffered: false,
+    };
+
+    submitMove();
+
+    board = playMove(move, board);
+
+    setBoard(board);
+    setActiveField(-1);
   };
 
   let copyPossibleMoves: Number[] = [0];

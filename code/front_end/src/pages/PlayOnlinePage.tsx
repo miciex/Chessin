@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import ChessBoard from "../components/ChessBoard";
+import ChessBoard from "../features/playOnline/components/ChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
 import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
@@ -12,14 +12,14 @@ import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../chess-logic/ChessConstants";
 import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
-import { Board } from "../chess-logic/board";
+import { Board, boardFactory } from "../chess-logic/board";
 import { getUser, setUserDataFromResponse } from "../services/userServices";
 import { Player, responseUserToPlayer } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import {
   searchForGame,
   setPendingGameRequest,
-} from "../features/playOnline/services/searchGameService";
+} from "../features/playOnline/services/playOnlineService";
 import {
   PendingChessGameRequest,
   ChessGameResponse,
@@ -56,7 +56,6 @@ const getBaseOpponent = (isOpponentWhite: boolean): Player => ({
 export default function PlayOnline({ navigation, route }: Props) {
   const { request } = route.params;
 
-  const [user, setUser] = useState<User | null>(null);
   const [opponent, setOpponent] = useState<Player | null>(null);
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
   const [opponentClockInfo, setOpponentClockInfo] = useState<Date>();
@@ -67,7 +66,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
   const [opacityGear, setOpacityGear] = useState(1);
   const [foundGame, setFoundGame] = useState(false);
-  const [gameId, setGameId] = useState<Number>(-1);
+  const [gameId, setGameId] = useState<number>(-1);
 
   useEffect(() => {
     getValueFor("user")
@@ -76,11 +75,9 @@ export default function PlayOnline({ navigation, route }: Props) {
         return JSON.parse(user);
       })
       .then((user: User) => {
-        setUser(user);
-        console.log(user);
+        setMyPlayer(userToPlayer(user, null));
         searchForGame(request)
           .then((data: ChessGameResponse) => {
-            console.log(data);
             setUpGame(data, user);
           })
           .catch((err) => {
@@ -90,10 +87,6 @@ export default function PlayOnline({ navigation, route }: Props) {
       .catch((err) => {
         console.log(err);
       });
-
-    // const isOpponentWhite = false; //Math.random() > 0.5;
-
-    // setOpponent(getBaseOpponent(isOpponentWhite));
   }, []);
 
   const toggleGear = () => {
@@ -110,10 +103,17 @@ export default function PlayOnline({ navigation, route }: Props) {
     } else if (data.blackUser.nameInGame === user.nameInGame) {
       setOpponent(responseUserToPlayer(data.whiteUser, "white"));
       setMyPlayer(responseUserToPlayer(data.blackUser, "black"));
-
-      setMyClockInfo(new Date(data.timeControl));
-      setOpponentClockInfo(new Date(data.timeControl));
     }
+
+    setMyClockInfo(new Date(data.timeControl * 1000));
+    setOpponentClockInfo(new Date(data.timeControl * 1000));
+
+    setBoardState(
+      boardFactory({
+        fenString: data.startBoard,
+        whiteToMove: data.whiteStarts,
+      })
+    );
   };
 
   console.log("myPlayer", myPlayer);
@@ -142,7 +142,8 @@ export default function PlayOnline({ navigation, route }: Props) {
             <ChessBoard
               board={boardState}
               setBoard={setBoardState}
-              playersColor={myPlayer.color}
+              player={myPlayer}
+              gameId={gameId}
             />
           </View>
           <Text>

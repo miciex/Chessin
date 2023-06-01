@@ -10,3 +10,4 @@ export const setActive = `${userLink}setActive/`;
 export const chessGameLink = `${baseLink}game/`;
 export const searchNewGameLink = `${chessGameLink}searchNewGame`;
 export const cancelSearchLink = `${chessGameLink}cancelSearch`;
+export const submitMoveLink = `${chessGameLink}submitMove`;

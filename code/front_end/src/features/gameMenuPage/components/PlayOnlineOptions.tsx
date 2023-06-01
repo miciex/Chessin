@@ -13,7 +13,7 @@ import {
 } from "../context/GameLengthContext";
 import { chosenFriendContext } from "../context/ChosenFriendContext";
 import BaseButton from "../../../components/BaseButton";
-import { setPendingGameRequest } from "../../playOnline/services/searchGameService";
+import { setPendingGameRequest } from "../../playOnline/services/playOnlineService";
 import { getRanking } from "../../../utils/PlayerUtilities";
 
 type Props = {

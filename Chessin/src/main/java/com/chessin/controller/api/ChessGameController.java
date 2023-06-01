@@ -70,8 +70,6 @@ public class ChessGameController {
             }
         }
 
-        System.out.println(request);
-
         PendingChessGame pendingChessGame = PendingChessGame.builder()
                 .user(userRepository.findByEmail(request.getEmail()).get())
                 .timeControl(request.getTimeControl())
