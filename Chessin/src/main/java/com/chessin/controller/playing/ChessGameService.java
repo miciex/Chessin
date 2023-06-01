@@ -3,6 +3,8 @@ package com.chessin.controller.playing;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.model.playing.*;
+import com.chessin.model.utils.Convert;
+import com.chessin.model.utils.HelpMethods;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ public class ChessGameService {
         board.setMovesTo50MoveRule(CheckGameResults.draw50MoveRuleCheck(move, board.getMovesTo50MoveRule()));
         board.setWhiteTurn(!board.isWhiteTurn());
         board.setGameResult(board.checkGameResult());
+        board.setVisualBoard(Convert.mapToBoard(board.getPosition()));
 
         moveRepository.save(move);
 
