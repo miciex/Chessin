@@ -1,6 +1,7 @@
 package com.chessin.model.playing;
 
 import com.chessin.model.utils.Constants;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,8 @@ import static com.chessin.model.utils.Convert.boardToMap;
 public class Board {
     ArrayList<Move> moves;
     boolean whiteTurn;
+    String whiteEmail;
+    String blackEmail;
     HashMap<Integer, Integer> position;
     ArrayList<HashMap<Integer, Integer>> positions;
     int movesTo50MoveRule;
@@ -27,11 +30,29 @@ public class Board {
     int[] availableCastles;
     GameResults gameResult;
     int[] visualBoard;
-    String fen;
+    String startBoard;
+
+    public static Board fromGame(ChessGame game)
+    {
+        return Board.builder()
+                .whiteEmail(game.getWhiteUser().getEmail())
+                .blackEmail(game.getBlackUser().getEmail())
+                .moves(new ArrayList<>())
+                .whiteTurn(game.isWhiteStarts())
+                .position(boardToMap(FenToIntArray(game.getStartBoard(), 64)))
+                .positions(new ArrayList<>())
+                .movesTo50MoveRule(0)
+                .movedPieces(new int[64])
+                .availableCastles(game.getAvailableCastles())
+                .gameResult(GameResults.NONE)
+                .visualBoard(FenToIntArray(game.getStartBoard(), 64))
+                .startBoard(game.getStartBoard())
+                .build();
+    }
 
     public Board(String fenString){
-        this.fen = fenString;
-        this.visualBoard = FenToIntArray(this.fen, 64);
+        this.startBoard = fenString;
+        this.visualBoard = FenToIntArray(this.startBoard, 64);
         this.position = boardToMap(this.visualBoard);
         this.whiteTurn = true;
         this.availableCastles = new int[]{0,0,0,0};
@@ -42,7 +63,7 @@ public class Board {
     }
 
     public Board(Board board){
-        this.fen = board.fen;
+        this.startBoard = board.startBoard;
         this.visualBoard = board.visualBoard;
         this.position = (HashMap<Integer, Integer>) board.position.clone();
         this.whiteTurn = board.whiteTurn;
@@ -54,7 +75,7 @@ public class Board {
     }
 
     public void resetBoard(){
-        this.visualBoard = FenToIntArray(this.fen, 64);
+        this.visualBoard = FenToIntArray(this.startBoard, 64);
         this.position = boardToMap(this.visualBoard);
         this.whiteTurn = true;
         this.availableCastles = new int[]{0,0,0,0};
@@ -92,7 +113,7 @@ public class Board {
         return false;
     }
 
-    public  ArrayList<Integer> PossibleMoves(int position) {
+    public ArrayList<Integer> possibleMoves(int position) {
         switch (this.position.get(position) % 8) {
             case Pawn:
                 return PossiblePawnMoves(position);

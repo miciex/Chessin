@@ -1,9 +1,10 @@
 package com.chessin.controller.playing;
 
 import com.chessin.controller.requests.PendingChessGameRequest;
-import com.chessin.model.playing.ChessGameRepository;
-import com.chessin.model.playing.PendingChessGame;
+import com.chessin.controller.requests.SubmitMoveRequest;
+import com.chessin.model.playing.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChessGameService {
     private final ChessGameRepository chessGameRepository;
+    private final MoveRepository moveRepository;
 
     public PendingChessGame searchNewGame(PendingChessGameRequest request, ArrayList<PendingChessGame> pendingGames){
         List<PendingChessGame> matchingGames = pendingGames.stream()
@@ -26,5 +28,18 @@ public class ChessGameService {
         }
 
         return null;
+    }
+
+    public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game){
+
+        Move move = new Move(game, board.getPosition(), request.getStartField(), request.getEndField(), request.getPromotePiece());
+        board.makeMove(move);
+        board.setMovesTo50MoveRule(CheckGameResults.draw50MoveRuleCheck(move, board.getMovesTo50MoveRule()));
+        board.setWhiteTurn(!board.isWhiteTurn());
+        board.setGameResult(board.checkGameResult());
+
+        moveRepository.save(move);
+
+        return board;
     }
 }

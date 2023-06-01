@@ -12,7 +12,7 @@ public class CheckGameResults {
 
         for(Map.Entry<Integer, Integer> entry : board.getPositionCopy().entrySet()){
             if(entry.getValue() < 16 == board.isWhiteTurn()) {
-                ArrayList<Integer> squares = board.PossibleMoves(entry.getKey());
+                ArrayList<Integer> squares = board.possibleMoves(entry.getKey());
                 squares = board.deleteImpossibleMoves(squares, entry.getKey());
                 if (squares.size() > 0)
                     return false;
@@ -26,7 +26,7 @@ public class CheckGameResults {
     public static boolean isStalemate(Board board){
         for(Map.Entry<Integer, Integer> entry : board.getPositionCopy().entrySet()){
             if(entry.getValue() > 16 && !board.isWhiteTurn() || entry.getValue() < 16 && board.isWhiteTurn())
-                if(board.deleteImpossibleMoves(board.PossibleMoves(entry.getKey()), entry.getKey()).size() > 0) return false;
+                if(board.deleteImpossibleMoves(board.possibleMoves(entry.getKey()), entry.getKey()).size() > 0) return false;
         }
         if(board.isChecked() != -1) return false;
         return true;

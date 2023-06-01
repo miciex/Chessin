@@ -23,6 +23,8 @@ public class ChessGameResponse {
     private int[] availableCastles;
     private int timeControl;
     private int increment;
+    private String startBoard;
+    private boolean whiteStarts;
 
     public static ChessGameResponse fromChessGame(ChessGame game){
         return ChessGameResponse
@@ -34,6 +36,8 @@ public class ChessGameResponse {
                 .availableCastles(game.getAvailableCastles())
                 .timeControl(game.getTimeControl())
                 .increment(game.getIncrement())
+                .startBoard(game.getStartBoard())
+                .whiteStarts(game.isWhiteStarts())
                 .build();
     }
 

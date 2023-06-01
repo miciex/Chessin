@@ -3,18 +3,18 @@ package com.chessin.controller.api;
 import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.requests.CancelPendingChessGameRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
+import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.controller.responses.ChessGameResponse;
-import com.chessin.model.playing.ChessGame;
-import com.chessin.model.playing.ChessGameRepository;
-import com.chessin.model.playing.PendingChessGame;
+import com.chessin.model.playing.*;
 import com.chessin.model.register.user.UserRepository;
+import com.chessin.model.utils.Constants;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +28,7 @@ public class ChessGameController {
     private final UserRepository userRepository;
 
     private final ConcurrentHashMap<String, PendingChessGame> pendingGames = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, Board> activeBoards = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, ChessGame> activeGames = new ConcurrentHashMap<>();
 
     @Transactional
@@ -46,20 +47,25 @@ public class ChessGameController {
             synchronized(pendingGames.get(foundGame.getUser().getEmail()))
             {
                 pendingGames.get(foundGame.getUser().getEmail()).setOpponent(userRepository.findByEmail(request.getEmail()).get());
-                pendingGames.get(foundGame.getUser().getEmail()).notifyAll();
-
 
                 ChessGame game = ChessGame.builder()
+                        .startBoard(Constants.Boards.classicBoard)
+                        .whiteStarts(true)
                         .whiteUser(foundGame.getUser())
                         .blackUser(userRepository.findByEmail(request.getEmail()).get())
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
+                        //.moves(new ArrayList<>())
                         .build();
 
                 chessGameRepository.save(game);
-
                 pendingGames.get(foundGame.getUser().getEmail()).setId(game.getId());
+
+                activeBoards.put(game.getId(), Board.fromGame(game));
+                activeGames.put(game.getId(), game);
+
+                pendingGames.get(foundGame.getUser().getEmail()).notifyAll();
 
                 return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
             }
@@ -91,14 +97,18 @@ public class ChessGameController {
 
                 ChessGame game = ChessGame.builder()
                         .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
+                        .startBoard(Constants.Boards.classicBoard)
+                        .whiteStarts(true)
                         .whiteUser(pendingChessGame.getUser())
                         .blackUser(pendingChessGame.getOpponent())
                         .availableCastles(new int[]{0,0,0,0})
                         .timeControl(pendingChessGame.getTimeControl())
                         .increment(pendingChessGame.getIncrement())
+                        //.moves(new ArrayList<>())
                         .build();
 
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
+
                 return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
             }
         }
@@ -119,8 +129,34 @@ public class ChessGameController {
     }
 
     @PostMapping("/submitMove")
-    public ResponseEntity<?> submitMove()
+    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request)
     {
-        return null;
+        if(!activeBoards.containsKey(request.getGameId()))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        Board board = activeBoards.get(request.getGameId());
+
+        if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
+            return ResponseEntity.badRequest().body("It's not your turn.");
+        }
+        else if(!board.isWhiteTurn() && !board.getBlackEmail().equals(request.getEmail())){
+            return ResponseEntity.badRequest().body("It's not your turn.");
+        }
+
+        if(!board.getPosition().containsValue(request.getMovedPiece()))
+            return ResponseEntity.badRequest().body("This piece does not exist.");
+
+        ArrayList<Integer> moves = board.possibleMoves(request.getStartField());
+        moves = board.deleteImpossibleMoves(moves, request.getStartField());
+
+        if(!moves.contains(request.getEndField())){
+            return ResponseEntity.badRequest().body("Illegal move.");
+        }
+
+        board = chessGameService.submitMove(request, board, activeGames.get(request.getGameId()));
+
+        activeBoards.replace(request.getGameId(), board);
+
+        return ResponseEntity.ok().body(board);
     }
 }
