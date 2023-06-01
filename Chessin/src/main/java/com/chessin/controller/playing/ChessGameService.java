@@ -20,7 +20,7 @@ public class ChessGameService {
                 .toList();
 
         for(PendingChessGame game : matchingGames){
-            if(game.getUser().getEmail().equals(request.getEmail()) && game.getBottomRating() <= request.getUserRating() && game.getTopRating() >= request.getUserRating()){
+            if(game.getBottomRating() <= request.getUserRating() && game.getTopRating() >= request.getUserRating()){
                 return game;
             }
         }

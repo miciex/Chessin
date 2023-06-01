@@ -1,11 +1,11 @@
 package com.chessin.controller.register;
 
+import com.chessin.controller.requests.*;
 import com.chessin.model.register.authentication.refreshToken.RefreshTokenRepository;
 import com.chessin.model.register.authentication.refreshToken.RefreshToken;
-import com.chessin.model.register.authentication.requests.*;
 import com.chessin.model.register.authentication.verificationCode.VerificationCode;
 import com.chessin.model.register.authentication.verificationCode.VerificationCodeRepository;
-import com.chessin.model.register.authentication.responses.AuthenticationResponse;
+import com.chessin.controller.responses.AuthenticationResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.Provider;
 import com.chessin.model.register.user.User;
@@ -77,6 +77,8 @@ public class AuthenticationService {
         var user = code.getUser();
 
         var jwtToken = jwtService.generateToken(user);
+
+        verificationCodeRepository.delete(code);
 
         user.setActivated(true);
 

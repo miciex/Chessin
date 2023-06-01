@@ -3,10 +3,10 @@ package com.chessin.controller.api;
 import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.requests.CancelPendingChessGameRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
+import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.ChessGameRepository;
 import com.chessin.model.playing.PendingChessGame;
-import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,15 +28,16 @@ public class ChessGameController {
     private final UserRepository userRepository;
 
     private final ConcurrentHashMap<String, PendingChessGame> pendingGames = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, ChessGame> activeGames = new ConcurrentHashMap<>();
 
     @Transactional
     @PostMapping("/searchNewGame")
     public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request) throws InterruptedException {
 
-        if(pendingGames.containsKey(request.getEmail()))
-        {
-            return ResponseEntity.badRequest().body("User is already searching for a game.");
-        }
+//        if(pendingGames.containsKey(request.getEmail()))
+//        {
+//            return ResponseEntity.badRequest().body("User is already searching for a game.");
+//        }
 
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
 
@@ -56,8 +57,11 @@ public class ChessGameController {
                         .increment(foundGame.getIncrement())
                         .build();
 
-                pendingGames.get(foundGame.getUser().getEmail()).wait(100);
-                return ResponseEntity.ok().body(game);
+                chessGameRepository.save(game);
+
+                pendingGames.get(foundGame.getUser().getEmail()).setId(game.getId());
+
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
             }
         }
 
@@ -78,13 +82,15 @@ public class ChessGameController {
 
         synchronized (pendingGames.get(pendingChessGame.getUser().getEmail())) {
             if (pendingGames.get(pendingChessGame.getUser().getEmail()).getOpponent() == null) {
-                //pendingChessGameRepository.delete(pendingChessGame);
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
                 return ResponseEntity.badRequest().body("No opponent found");
             }
             else
             {
+                pendingGames.get(pendingChessGame.getUser().getEmail()).wait(100);
+
                 ChessGame game = ChessGame.builder()
+                        .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
                         .whiteUser(pendingChessGame.getUser())
                         .blackUser(pendingChessGame.getOpponent())
                         .availableCastles(new int[]{0,0,0,0})
@@ -92,9 +98,8 @@ public class ChessGameController {
                         .increment(pendingChessGame.getIncrement())
                         .build();
 
-                chessGameRepository.save(game);
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
-                return ResponseEntity.ok().body(game);
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
             }
         }
     }
@@ -111,5 +116,11 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("No search found");
 
         return ResponseEntity.ok().body("Search cancelled");
+    }
+
+    @PostMapping("/submitMove")
+    public ResponseEntity<?> submitMove()
+    {
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-package com.chessin.model.register.authentication.requests;
+package com.chessin.controller.requests;
 
 public enum VerificationType {
     REGISTER,
