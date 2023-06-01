@@ -26,6 +26,9 @@ public class ChessGame {
     private int[] availableCastles;
     private int timeControl;
     private int increment;
+    private String startBoard;
+    private boolean whiteStarts;
+    private GameResults gameResult;
 
     public ChessGame(){
         this.moves = new ArrayList<>();

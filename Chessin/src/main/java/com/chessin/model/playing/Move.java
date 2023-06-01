@@ -19,17 +19,18 @@ public class Move {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long Id;
-    @ManyToOne
-    ChessGame chessGame;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private ChessGame chessGame;
     private int movedPiece;
     private int startField;
     private int endField;
     private int takenPiece;
     private int promotePiece;
-    private boolean gaveCheck;
     private int takenPieceField;
+    int movesTo50MoveRule;
 
-    public Move(HashMap<Integer, Integer> pieces, int startField, int endField, int promotePiece){
+    public Move(ChessGame game, HashMap<Integer, Integer> pieces, int startField, int endField, int promotePiece){
+        this.chessGame = game;
         this.startField = startField;
         this.endField = endField;
         this.movedPiece = pieces.get(startField);

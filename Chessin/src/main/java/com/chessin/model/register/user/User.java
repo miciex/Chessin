@@ -40,9 +40,9 @@ public class User implements UserDetails {
     private int ratingRapid;
     private int ratingClassical;
     private String country;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<User> friends;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<ChessGame> chessGames;
     private boolean isOnline;
     private boolean isActivated;
