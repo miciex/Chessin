@@ -59,7 +59,6 @@ public class ChessGameController {
                         //.moves(new ArrayList<>())
                         .build();
 
-                chessGameRepository.save(game);
                 pendingGames.get(foundGame.getUser().getEmail()).setId(game.getId());
 
                 activeBoards.put(game.getId(), Board.fromGame(game));
@@ -129,34 +128,64 @@ public class ChessGameController {
     }
 
     @PostMapping("/submitMove")
-    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request)
-    {
-        if(!activeBoards.containsKey(request.getGameId()))
-            return ResponseEntity.badRequest().body("Game not found.");
+    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request) throws InterruptedException {
+        synchronized(activeGames.get(request.getGameId()))
+        {
+            if(!activeBoards.containsKey(request.getGameId()))
+                return ResponseEntity.badRequest().body("Game not found.");
 
-        Board board = activeBoards.get(request.getGameId());
+            Board board = activeBoards.get(request.getGameId());
 
-        if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
-            return ResponseEntity.badRequest().body("It's not your turn.");
+            if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
+                return ResponseEntity.badRequest().body("It's not your turn.");
+            }
+            else if(!board.isWhiteTurn() && !board.getBlackEmail().equals(request.getEmail())){
+                return ResponseEntity.badRequest().body("It's not your turn.");
+            }
+
+            if(request.getMovedPiece() < 16 != board.isWhiteTurn())
+                return ResponseEntity.badRequest().body("It's not your turn.");
+
+            if(!board.getPosition().containsValue(request.getMovedPiece()))
+                return ResponseEntity.badRequest().body("This piece does not exist.");
+
+            if(!board.getPosition().containsKey(request.getStartField()))
+                return ResponseEntity.badRequest().body("There is no piece on this field.");
+
+            ArrayList<Integer> moves = board.possibleMoves(request.getStartField());
+            moves = board.deleteImpossibleMoves(moves, request.getStartField());
+
+            if(!moves.contains(request.getEndField())){
+                return ResponseEntity.badRequest().body("Illegal move.");
+            }
+
+            board = chessGameService.submitMove(request, board, activeGames.get(request.getGameId()));
+
+            if(board.getGameResult() != GameResults.NONE)
+            {
+                activeBoards.replace(request.getGameId(), board);
+                activeGames.get(request.getGameId()).setGameResult(board.getGameResult());
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body(board);
+            }
+
+            activeBoards.replace(request.getGameId(), board);
+
+            activeBoards.get(request.getGameId()).notifyAll();
+
+            activeGames.get(request.getGameId()).wait(60000);
+
+            if(activeGames.get(request.getGameId()).getGameResult() != GameResults.NONE)
+            {
+                Board endBoard = activeBoards.get(request.getGameId());
+                activeBoards.remove(request.getGameId());
+                activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
+                chessGameRepository.save(activeGames.get(request.getGameId()));
+                activeGames.remove(request.getGameId());
+                return ResponseEntity.ok().body(endBoard);
+            }
+
+            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
         }
-        else if(!board.isWhiteTurn() && !board.getBlackEmail().equals(request.getEmail())){
-            return ResponseEntity.badRequest().body("It's not your turn.");
-        }
-
-        if(!board.getPosition().containsValue(request.getMovedPiece()))
-            return ResponseEntity.badRequest().body("This piece does not exist.");
-
-        ArrayList<Integer> moves = board.possibleMoves(request.getStartField());
-        moves = board.deleteImpossibleMoves(moves, request.getStartField());
-
-        if(!moves.contains(request.getEndField())){
-            return ResponseEntity.badRequest().body("Illegal move.");
-        }
-
-        board = chessGameService.submitMove(request, board, activeGames.get(request.getGameId()));
-
-        activeBoards.replace(request.getGameId(), board);
-
-        return ResponseEntity.ok().body(board);
     }
 }
