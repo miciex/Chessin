@@ -60,6 +60,8 @@ public class ChessGameController {
                         //.moves(new ArrayList<>())
                         .build();
 
+                chessGameRepository.save(game);
+
                 pendingGames.get(foundGame.getUser().getEmail()).setId(game.getId());
 
                 activeBoards.put(game.getId(), Board.fromGame(game));
@@ -172,16 +174,16 @@ public class ChessGameController {
 
             activeBoards.replace(request.getGameId(), board);
 
-            activeBoards.get(request.getGameId()).notifyAll();
+            activeGames.get(request.getGameId()).notifyAll();
 
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
-            if(activeGames.get(request.getGameId()).getGameResult() != GameResults.NONE)
+            if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
             {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
-                chessGameRepository.save(activeGames.get(request.getGameId()));
+                //chessGameRepository.save(activeGames.get(request.getGameId()));
                 activeGames.remove(request.getGameId());
                 return ResponseEntity.ok().body(endBoard);
             }
