@@ -132,11 +132,11 @@ public class ChessGameController {
 
     @PostMapping("/submitMove")
     public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request) throws InterruptedException {
+        if(!activeBoards.containsKey(request.getGameId()))
+            return ResponseEntity.badRequest().body("Game not found.");
+
         synchronized(activeGames.get(request.getGameId()))
         {
-            if(!activeBoards.containsKey(request.getGameId()))
-                return ResponseEntity.badRequest().body("Game not found.");
-
             Board board = activeBoards.get(request.getGameId());
 
             if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
