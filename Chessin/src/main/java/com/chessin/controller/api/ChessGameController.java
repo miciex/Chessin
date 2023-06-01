@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -82,7 +83,7 @@ public class ChessGameController {
         pendingGames.put(request.getEmail(), pendingChessGame);
 
         synchronized (pendingGames.get(pendingChessGame.getUser().getEmail())) {
-            pendingGames.get(pendingChessGame.getUser().getEmail()).wait(60000);
+            pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.gameSearchTime);
         }
 
         synchronized (pendingGames.get(pendingChessGame.getUser().getEmail())) {
@@ -92,7 +93,7 @@ public class ChessGameController {
             }
             else
             {
-                pendingGames.get(pendingChessGame.getUser().getEmail()).wait(100);
+                pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.timeout);
 
                 ChessGame game = ChessGame.builder()
                         .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
@@ -173,7 +174,7 @@ public class ChessGameController {
 
             activeBoards.get(request.getGameId()).notifyAll();
 
-            activeGames.get(request.getGameId()).wait(60000);
+            activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
             if(activeGames.get(request.getGameId()).getGameResult() != GameResults.NONE)
             {
