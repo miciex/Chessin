@@ -44,6 +44,7 @@ export const setPendingGameRequest = (email: string, timeControl: number, increm
 
 export const submitMove = async ( request: SubmitMoveRequest ) => {
     const accessToken = await getValueFor("accessToken");
+    console.log("submit move request: ",request);
     return await fetch(submitMoveLink, {
         method: "Post",
         headers: {
@@ -56,8 +57,9 @@ export const submitMove = async ( request: SubmitMoveRequest ) => {
         if (response.status === 200) {
             return response.json();
         } else if(response.status === 400){
+            console.log("submit move error: ",response);
             response.json().then((data) => {
-                throw new Error(data);
+                console.log("submit move error: ",data);
         })}else{
             throw new Error("Something went wrong");
         }

@@ -142,7 +142,7 @@ public class ChessGameController {
             if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
                 return ResponseEntity.badRequest().body("It's not your turn.");
             }
-            else if(!board.isWhiteTurn() && !board.getBlackEmail().equals(request.getEmail())){
+            else if(!board.isWhiteTurn() && board.getBlackEmail().equals(request.getEmail())){
                 return ResponseEntity.badRequest().body("It's not your turn.");
             }
 

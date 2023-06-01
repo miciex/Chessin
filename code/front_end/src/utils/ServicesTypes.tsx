@@ -1,5 +1,6 @@
 import { responseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
+import { GameResults } from "../chess-logic/board";
 
 export type registerRequestType = {
   firstName: string;
@@ -58,4 +59,19 @@ export type SubmitMoveRequest = {
   endField: number;
   promotePiece: number;
   isDrawOffered: boolean;
+};
+
+export type BoardResponse = {
+  moves: Array<MoveResponse>;
+  whiteTurn: boolean;
+  whiteEmail: string;
+  blackEmail: string;
+  position: { [key: number]: number };
+  positions: Array<{ [key: number]: number }>;
+  movesTo50MoveRule: number;
+  movedPieces: Array<number>;
+  availableCastles: Array<number>;
+  gameResult: GameResults;
+  visualBoard: Array<number>;
+  startBoard: string;
 };

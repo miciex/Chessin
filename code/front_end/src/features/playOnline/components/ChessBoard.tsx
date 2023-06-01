@@ -8,6 +8,7 @@ import {
   boardFactory,
   isWhite,
   playMove,
+  BoardResponseToBoard,
 } from "../../../chess-logic/board";
 import { moveFactory } from "../../../chess-logic/move";
 import { ColorsPallet } from "../../../utils/Constants";
@@ -15,6 +16,7 @@ import { Player } from "../../../utils/PlayerUtilities";
 import { submitMove } from "../services/playOnlineService";
 import { Move } from "../../../chess-logic/move";
 import { SubmitMoveRequest } from "../../../utils/ServicesTypes";
+import { BoardResponse } from "../../../utils/ServicesTypes";
 
 type Props = {
   board: Board;
@@ -68,12 +70,15 @@ export default function ChessBoard({ board, setBoard, player, gameId }: Props) {
       isDrawOffered: false,
     };
 
-    submitMove();
+    submitMove(submitMoveRequest).then((data: BoardResponse) => {
+      if (!data) return;
+      setBoard(BoardResponseToBoard(data));
+    });
 
-    board = playMove(move, board);
+    // board = playMove(move, board);
 
-    setBoard(board);
-    setActiveField(-1);
+    // setBoard(board);
+    // setActiveField(-1);
   };
 
   let copyPossibleMoves: Number[] = [0];

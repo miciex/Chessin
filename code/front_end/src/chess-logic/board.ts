@@ -3,6 +3,7 @@ import { Move, getEmptyMove, moveFactory } from "./move";
 import { Pieces, Directions } from "./ChessConstants";
 import { FenToIntArray, boardToMap, mapToBoard } from "./helpMethods";
 import { ChessGameResponse } from "../utils/ServicesTypes";
+import { BoardResponse } from "../utils/ServicesTypes";
 
 export type constructorArgs = {
     fenString?:string;
@@ -27,6 +28,23 @@ export type Board = {
     movesTo50MoveRule: number;
     movedPieces: number[];
     result: GameResults;
+}
+
+export const BoardResponseToBoard = (boardResponse: BoardResponse):Board => {
+    const moves = boardResponse.moves.map((move) => moveFactory(move));
+
+    return {
+        fen: boardResponse.startBoard,
+        visualBoard: boardResponse.visualBoard,
+        position: boardResponse.position,
+        whiteToMove: boardResponse.whiteTurn,
+        availableCastles: boardResponse.availableCastles,
+        moves: moves,
+        positions: boardResponse.positions,
+        movesTo50MoveRule: boardResponse.movesTo50MoveRule,
+        movedPieces: boardResponse.movedPieces,
+        result: boardResponse.gameResult
+    }
 }
 
 export const boardFactory = ({fenString, whiteToMove, availableCastles, moves, board}:constructorArgs):Board =>{

@@ -38,8 +38,8 @@ type Props = {
 };
 
 const getBaseOpponent = (isOpponentWhite: boolean): Player => ({
-  firstName: "Maciej",
-  lastName: "Kowalski",
+  firstname: "Maciej",
+  lastname: "Kowalski",
   email: "maciej@gmail.com",
   nameInGame: "miciex",
   country: "Poland",
@@ -99,10 +99,10 @@ export default function PlayOnline({ navigation, route }: Props) {
     setGameId(data.id);
     if (data.whiteUser.nameInGame === user.nameInGame) {
       setOpponent(responseUserToPlayer(data.blackUser, "black"));
-      setMyPlayer(responseUserToPlayer(data.whiteUser, "white"));
+      setMyPlayer({ ...user, color: "white" });
     } else if (data.blackUser.nameInGame === user.nameInGame) {
       setOpponent(responseUserToPlayer(data.whiteUser, "white"));
-      setMyPlayer(responseUserToPlayer(data.blackUser, "black"));
+      setMyPlayer({ ...user, color: "black" });
     }
 
     setMyClockInfo(new Date(data.timeControl * 1000));

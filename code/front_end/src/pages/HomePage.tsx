@@ -93,6 +93,8 @@ const HomePage = ({ route, navigation }: Props) => {
     });
   }, []);
 
+  console.log(user);
+
   return (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>

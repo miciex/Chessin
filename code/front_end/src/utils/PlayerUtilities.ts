@@ -1,8 +1,8 @@
 import { GameLengthTypeContextType } from "../features/gameMenuPage/context/GameLengthContext";
 
 export type User = {
-    firstName: string;
-    lastName: string;
+    firstname: string;
+    lastname: string;
     email: string;
     nameInGame: string;
     country: string;
@@ -26,8 +26,8 @@ export type responseUser = {
 }
 
 export type Player = {
-    firstName: string;
-    lastName: string;
+    firstname: string;
+    lastname: string;
     email: string;
     nameInGame: string;
     country: string;
@@ -56,8 +56,8 @@ export const responseUserToUser = (responseUser: responseUser, email:string): Us
     }
     
     return {
-        firstName: responseUser.firstname,
-        lastName: responseUser.lastname,
+        firstname: responseUser.firstname,
+        lastname: responseUser.lastname,
         email: email,
         nameInGame: responseUser.nameInGame,
         country: responseUser.country,
@@ -74,8 +74,8 @@ export const responseUserToPlayer = (responseUser: responseUser, color: playColo
         classical: responseUser.ratingClassical,
     }
     return {
-        firstName: responseUser.firstname,
-        lastName: responseUser.lastname,
+        firstname: responseUser.firstname,
+        lastname: responseUser.lastname,
         email: email ? email : "",
         nameInGame: responseUser.nameInGame,
         country: responseUser.country,
@@ -87,8 +87,8 @@ export const responseUserToPlayer = (responseUser: responseUser, color: playColo
 
 export const userToPlayer = (user: User, color: playColor): Player => {
     return {
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstname: user.firstname,
+        lastname: user.lastname,
         email: user.email,
         nameInGame: user.nameInGame,
         country: user.country,
