@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Submit from "../features/login/components/Submit";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
 import { ColorsPallet } from "../utils/Constants";
-import { registerLink } from "../utils/ServicesConstants";
+import { registerLink } from "../utils/ApiEndpoints";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import AuthInput from "../features/authentication/components/AuthInput";

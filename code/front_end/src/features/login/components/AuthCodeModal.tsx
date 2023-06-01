@@ -2,7 +2,7 @@ import { Modal, View, Pressable, StyleSheet, TextInput } from "react-native";
 import React, { useState, useContext, useRef } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import { Char, isChar } from "../../../utils/Types";
-import { verifyCode } from "../../../utils/ServicesConstants";
+import { verifyCode } from "../../../utils/ApiEndpoints";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
@@ -11,6 +11,7 @@ import { VerificationType } from "../../../utils/ServicesTypes";
 import { Entypo } from "@expo/vector-icons";
 import { StackParamList } from "../../../utils/Constants";
 import { setUserDataFromResponse } from "../../../services/userServices";
+import { save } from "../../../utils/AsyncStoreFunctions";
 
 type Props = {
   hideModal: () => void;

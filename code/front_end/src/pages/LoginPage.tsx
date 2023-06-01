@@ -7,7 +7,7 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
 import { ColorsPallet } from "../utils/Constants";
-import { authenticateLink } from "../utils/ServicesConstants";
+import { authenticateLink } from "../utils/ApiEndpoints";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import { AuthenticationResponse } from "../utils/ServicesTypes";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";

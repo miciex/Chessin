@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
@@ -25,6 +25,8 @@ import {
 } from "../features/gameMenuPage/context/PlayColorContext";
 import PickColor from "../features/gameMenuPage/components/PickColor";
 import PlayOnlineOptions from "../features/gameMenuPage/components/PlayOnlineOptions";
+import { User } from "../utils/PlayerUtilities";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -36,11 +38,20 @@ type Props = {
 };
 
 export default function GameMenu({ route, navigation }: Props) {
+  useEffect(() => {
+    getValueFor("user").then((user) => {
+      if (!user) return;
+      setUser(JSON.parse(user));
+      console.log("user", user);
+    });
+  }, []);
+
   const [gameType, setGameType] = useState<playType>("Play Online");
   const [gameBotType, setGameBotType] = useState<botType>("ChessinBot");
   const [gameBotStrength, setGameBotStrength] = useState<strengthLevelType>(1);
   const [chosenColor, setChosenColor] =
     useState<PlayColorsContextType>("random");
+  const [user, setUser] = useState<User | null>(null);
 
   const setGame = (gmType: playType) => {
     setGameType(gmType);
@@ -78,7 +89,7 @@ export default function GameMenu({ route, navigation }: Props) {
                       </View>
                     </>
                   ) : (
-                    <PlayOnlineOptions navigation={navigation} />
+                    <PlayOnlineOptions navigation={navigation} user={user} />
                   )}
                 </View>
                 <View style={styles.bottomButtonsContainer}>

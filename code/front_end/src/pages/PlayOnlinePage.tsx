@@ -13,9 +13,20 @@ import { sampleMoves } from "../chess-logic/ChessConstants";
 import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
 import { Board } from "../chess-logic/board";
-import { getUser } from "../services/userServices";
-import { Player } from "../utils/PlayerUtilities";
+import { getUser, setUserDataFromResponse } from "../services/userServices";
+import { Player, responseUserToPlayer } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
+import {
+  searchForGame,
+  setPendingGameRequest,
+} from "../features/playOnline/services/searchGameService";
+import {
+  PendingChessGameRequest,
+  ChessGameResponse,
+} from "../utils/ServicesTypes";
+import { User, userToPlayer } from "../utils/PlayerUtilities";
+import { responseUserToUser } from "../utils/PlayerUtilities";
+import AnalyzeGamePage from "./AnalyzeGamePage";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -26,7 +37,26 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayOnline">;
 };
 
+const getBaseOpponent = (isOpponentWhite: boolean): Player => ({
+  firstName: "Maciej",
+  lastName: "Kowalski",
+  email: "maciej@gmail.com",
+  nameInGame: "miciex",
+  country: "Poland",
+  highestRanking: 1500,
+  ranking: {
+    blitz: 1500,
+    rapid: 1500,
+    bullet: 1500,
+    classical: 1500,
+  },
+  color: isOpponentWhite ? "white" : "black",
+});
+
 export default function PlayOnline({ navigation, route }: Props) {
+  const { request } = route.params;
+
+  const [user, setUser] = useState<User | null>(null);
   const [opponent, setOpponent] = useState<Player | null>(null);
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
   const [opponentClockInfo, setOpponentClockInfo] = useState<Date>();
@@ -36,47 +66,63 @@ export default function PlayOnline({ navigation, route }: Props) {
   //TODO: write reducer for boardState
   const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
   const [opacityGear, setOpacityGear] = useState(1);
+  const [foundGame, setFoundGame] = useState(false);
+  const [gameId, setGameId] = useState<Number>(-1);
 
-  //TODO: get opponent from server and user from react-native-storage
   useEffect(() => {
-    const isOpponentWhite = false; //Math.random() > 0.5;
-    setOpponent({
-      user: {
-        firstName: "Maciej",
-        lastName: "Kowalski",
-        email: "maciej@gmail.com",
-        nameInGame: "miciex",
-        country: "pl",
-        highestRanking: 1500,
-        ranking: {
-          blitz: 1500,
-          rapid: 1500,
-          bullet: 1500,
-          classical: 1500,
-        },
-      },
-      color: isOpponentWhite ? "white" : "black",
-    });
-
-    getValueFor("user").then((user) => {
-      if (user === null) return;
-      setMyPlayer({
-        user: JSON.parse(user),
-        color: isOpponentWhite ? "black" : "white",
+    getValueFor("user")
+      .then((user) => {
+        if (user === null) return;
+        return JSON.parse(user);
+      })
+      .then((user: User) => {
+        setUser(user);
+        console.log(user);
+        searchForGame(request)
+          .then((data: ChessGameResponse) => {
+            console.log(data);
+            setUpGame(data, user);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
+
+    // const isOpponentWhite = false; //Math.random() > 0.5;
+
+    // setOpponent(getBaseOpponent(isOpponentWhite));
   }, []);
 
   const toggleGear = () => {
     setGearModal(!gearModal);
   };
 
-  return myPlayer !== null ? (
+  const setUpGame = (data: ChessGameResponse, user: User) => {
+    if (data === null) return;
+    setFoundGame(true);
+    setGameId(data.id);
+    if (data.whiteUser.nameInGame === user.nameInGame) {
+      setOpponent(responseUserToPlayer(data.blackUser, "black"));
+      setMyPlayer(responseUserToPlayer(data.whiteUser, "white"));
+    } else if (data.blackUser.nameInGame === user.nameInGame) {
+      setOpponent(responseUserToPlayer(data.whiteUser, "white"));
+      setMyPlayer(responseUserToPlayer(data.blackUser, "black"));
+
+      setMyClockInfo(new Date(data.timeControl));
+      setOpponentClockInfo(new Date(data.timeControl));
+    }
+  };
+
+  console.log("myPlayer", myPlayer);
+
+  return myPlayer !== null && foundGame === true ? (
     <View style={styles.appContainer}>
       {gearModal ? (
         <>
           <SettingsGameModal toggleGear={toggleGear} gearModalOn={gearModal} />
-          {}
         </>
       ) : null}
       <View style={[styles.contentContainer, { opacity: opacityGear }]}>
@@ -86,9 +132,9 @@ export default function PlayOnline({ navigation, route }: Props) {
         <View style={styles.mainContentContainer}>
           <View style={styles.playerBarContainer}>
             <PlayerBar
-              player={opponent?.color === "black" ? opponent : myPlayer}
+              player={myPlayer.color === "black" ? myPlayer : opponent}
               timerInfo={
-                opponent?.color === "black" ? opponentClockInfo : myClockInfo
+                myPlayer.color === "black" ? myClockInfo : opponentClockInfo
               }
             />
           </View>
@@ -109,9 +155,9 @@ export default function PlayOnline({ navigation, route }: Props) {
           </Text>
           <View style={styles.playerBarContainer}>
             <PlayerBar
-              player={opponent?.color !== "black" ? opponent : myPlayer}
+              player={myPlayer.color === "white" ? myPlayer : opponent}
               timerInfo={
-                opponent?.color === "black" ? opponentClockInfo : myClockInfo
+                myPlayer.color === "white" ? opponentClockInfo : myClockInfo
               }
             />
           </View>

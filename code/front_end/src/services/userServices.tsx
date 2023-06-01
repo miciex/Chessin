@@ -1,12 +1,13 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
-import { setActive } from "../utils/ServicesConstants";
+import { setActive } from "../utils/ApiEndpoints";
 import { responseUserToUser } from "../utils/PlayerUtilities";
-import { refreshTokenLink } from "../utils/ServicesConstants";
+import { refreshTokenLink, findByEmailLink } from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
 import { AuthenticationResponse } from "../utils/ServicesTypes";
+import * as SecureStore from "expo-secure-store";
 
 export const storeUser = async (value: User) => {
   try {
@@ -23,6 +24,36 @@ export const getUser = async () => {
     if (user === null) return null;
     return JSON.parse(user);
   });
+};
+
+export const fetchUser = async (email: string) => {
+  const token = await SecureStore.getItemAsync("accessToken");
+  const user: any = await fetch(`${findByEmailLink}${email}`, {
+    method: "POST",
+    headers: new Headers({
+      "content-type": "application/json",
+      Authorization: `Bearer ${token}`,
+    }),
+  })
+    .then((response) => {
+      if (response.status === 200) return response.json();
+      else if (response.status === 400) {
+        throw new Error("Bad request");
+      } else if (response.status === 401) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .then((data) => {
+      return responseUserToUser(data, email);
+    })
+    .catch((err) => {
+      console.log("store user");
+      console.log(err);
+    });
+
+  return user;
 };
 
 export const setUserActive = async (active: boolean) => {

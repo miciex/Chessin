@@ -19,6 +19,7 @@ import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { setUserActive, resetAccessToken } from "./src/services/userServices";
+import { PendingChessGameRequest } from "./src/utils/ServicesTypes";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -27,7 +28,9 @@ export type RootStackParamList = {
   LastGame: undefined;
   Login: undefined;
   PlayBot: undefined;
-  PlayOnline: undefined;
+  PlayOnline: {
+    request: PendingChessGameRequest;
+  };
   PlayWithFriendsMenu: {};
   ProfilePage: undefined;
   Register: undefined;
@@ -43,16 +46,15 @@ const Routing = () => {
   const netInfo = useNetInfo();
 
   useEffect(() => {
-    const setNetInfo = setInterval(() => {
-      console.log("isConnected: ", netInfo.isConnected);
-      setUserActive(netInfo.isConnected ? true : false);
-    }, checkNetInfoInterval);
+    setUserActive(netInfo.isConnected ? true : false);
+  }, [netInfo.isConnected]);
+
+  useEffect(() => {
+    resetAccessToken();
     const resetToken = setInterval(() => {
       resetAccessToken();
     }, refreshTokenInterval);
     return () => {
-      console.log("clearing intervals");
-      clearInterval(setNetInfo);
       clearInterval(resetToken);
     };
   }, []);

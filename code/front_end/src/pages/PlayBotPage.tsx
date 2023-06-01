@@ -51,7 +51,7 @@ export default function PlayBot({ navigation, route }: Props) {
     getValueFor("user").then((user) => {
       if (user === null) return;
       setMyPlayer({
-        user: JSON.parse(user),
+        ...JSON.parse(user),
         color: isOpponentWhite ? "black" : "white",
       });
     });

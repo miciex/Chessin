@@ -1,3 +1,5 @@
+import { PendingChessGameRequest } from "./ServicesTypes";
+
 export const ColorsPallet = {
   lighter: "#ece0d1",
   light: "#dbc1ac",
@@ -41,3 +43,5 @@ export const notValidSurnameMessage: string =
   "Surname mustn`t contain numbers and must contain at least 3 characters.";
 export const notValidNickMessage: string =
   "Nick mustn`t contain numbers and must contain at least 3 characters.";
+
+export const searchRatingRange: number = 200;

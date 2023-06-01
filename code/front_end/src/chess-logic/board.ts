@@ -2,6 +2,7 @@ import { HashMap } from "../utils/Types";
 import { Move, getEmptyMove, moveFactory } from "./move";
 import { Pieces, Directions } from "./ChessConstants";
 import { FenToIntArray, boardToMap, mapToBoard } from "./helpMethods";
+import { ChessGameResponse } from "../utils/ServicesTypes";
 
 export type constructorArgs = {
     fenString?:string;

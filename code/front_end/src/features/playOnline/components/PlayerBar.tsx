@@ -17,17 +17,15 @@ export default function PlayerBar({ player, timerInfo }: Props) {
     <View style={styles.appContainer}>
       <View style={styles.textContainer}>
         <FontAwesome name="user-circle" size={32} color="black" />
-        <Text style={styles.text}>{player ? player.user.firstName : ""}</Text>
-        <Text style={styles.text}>
-          {player ? player.user.highestRanking : ""}
-        </Text>
+        <Text style={styles.text}>{player ? player.firstName : ""}</Text>
+        <Text style={styles.text}>{player ? player.highestRanking : ""}</Text>
       </View>
       <View style={styles.iconsContainer}>
         <View style={styles.timerContainer}>
           <Timer info={timerInfo} />
         </View>
         <CountryFlag
-          isoCode={countryToIsoCode(player?.user.country || "")}
+          isoCode={countryToIsoCode(player ? player.country : "")}
           size={24}
         />
       </View>

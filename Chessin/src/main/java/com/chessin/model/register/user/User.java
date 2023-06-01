@@ -28,6 +28,7 @@ public class User implements UserDetails {
     private String lastName;
     @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false, unique = true)
     private String nameInGame;
     private String password;
     private String role;

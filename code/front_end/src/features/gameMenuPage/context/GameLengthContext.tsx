@@ -10,6 +10,7 @@ export enum GameLengthTypeContextType {
   BULLET = "bullet",
   BLITZ = "blitz",
   RAPID = "rapid",
+  CLASSICAL = "classical",
   CUSTOM = "custom",
 }
 

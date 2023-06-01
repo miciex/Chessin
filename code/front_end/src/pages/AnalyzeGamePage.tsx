@@ -12,7 +12,7 @@ import { sampleMoves } from "../chess-logic/ChessConstants";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import { Board } from "../chess-logic/board";
 import { getUser } from "../services/userServices";
-import { Player, User } from "../utils/PlayerUtilities";
+import { Player, User, responseUserToPlayer } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
@@ -30,7 +30,8 @@ export default function AnalyzeGame({ navigation, route }: Props) {
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (user === null) return;
-      setPlayer({ user: JSON.parse(user), color: "white" });
+      const player = { ...JSON.parse(user), color: "white" };
+      setPlayer(player);
     });
   }, []);
 

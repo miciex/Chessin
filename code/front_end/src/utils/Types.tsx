@@ -62,6 +62,7 @@ export type Char =
   | "7"
   | "8"
   | "9"
+  | ""
   | null;
 
 export const Chars = [

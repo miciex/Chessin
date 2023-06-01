@@ -1,3 +1,6 @@
+import { responseUser } from "./PlayerUtilities";
+import { MoveResponse } from "../chess-logic/move";
+
 export type registerRequestType = {
   firstName: string;
   lastName: string;
@@ -24,3 +27,23 @@ export enum VerificationType {
   REMIND_PASSWORD,
   CHANGE_EMAIL,
 }
+
+//timeControl in seconds
+export type PendingChessGameRequest = {
+  email: string;
+  timeControl: number;
+  increment: number;
+  bottomRating: number;
+  topRating: number;
+  userRating: number;
+};
+
+export type ChessGameResponse = {
+  id: number;
+  whiteUser: responseUser;
+  blackUser: responseUser;
+  moves: Array<MoveResponse>;
+  availableCastles: Array<number>;
+  timeControl: number;
+  increment: number;
+};

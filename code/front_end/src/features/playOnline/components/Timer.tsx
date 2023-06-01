@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { Player } from "..";
 
 type Props = {
   info: Date | undefined;
@@ -10,7 +9,9 @@ export default function Timer({ info }: Props) {
   return (
     <View style={styles.appContainer}>
       <Text style={styles.appText}>
-        {info ? info.getMinutes.toString() + info.getSeconds.toString() : null}
+        {info
+          ? info.getMinutes().toString() + info.getSeconds().toString()
+          : null}
       </Text>
     </View>
   );

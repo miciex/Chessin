@@ -9,6 +9,17 @@ type constructorArgs = {
     move?:Move
 }
 
+export type MoveResponse = {
+    movedPiece:number;
+     startField:number;
+     endField:number;
+     takenPiece:number;
+     promotePiece:number;
+     gaveCheck:boolean;
+     takenPieceField:number;
+}
+
+
 export type Move = {
      movedPiece:number;
      startField:number;
