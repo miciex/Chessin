@@ -4,6 +4,8 @@ import com.chessin.model.register.authentication.refreshToken.RefreshTokenReposi
 import com.chessin.model.register.authentication.refreshToken.RefreshToken;
 import com.chessin.model.register.authentication.refreshToken.TokenRefreshException;
 import com.chessin.model.register.user.UserRepository;
+import com.chessin.model.utils.Constants;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,13 +15,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private final Long refreshTokenDurationMs = 86400000L;
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-    @Autowired
-    private UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
     public Optional<RefreshToken> findByToken(String token)
     {
@@ -30,7 +30,7 @@ public class RefreshTokenService {
     {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(userRepository.findById(userId).get());
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        refreshToken.setExpiryDate(Instant.now().plusMillis(Constants.Application.refreshTokenExpirationTime));
         refreshToken.setToken(UUID.randomUUID().toString());
 
         refreshToken = refreshTokenRepository.save(refreshToken);

@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +60,8 @@ public class ChessGameController {
                         //.moves(new ArrayList<>())
                         .build();
 
+                chessGameRepository.save(game);
+
                 pendingGames.get(foundGame.getUser().getEmail()).setId(game.getId());
 
                 activeBoards.put(game.getId(), Board.fromGame(game));
@@ -82,7 +85,7 @@ public class ChessGameController {
         pendingGames.put(request.getEmail(), pendingChessGame);
 
         synchronized (pendingGames.get(pendingChessGame.getUser().getEmail())) {
-            pendingGames.get(pendingChessGame.getUser().getEmail()).wait(60000);
+            pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.gameSearchTime);
         }
 
         synchronized (pendingGames.get(pendingChessGame.getUser().getEmail())) {
@@ -92,7 +95,7 @@ public class ChessGameController {
             }
             else
             {
-                pendingGames.get(pendingChessGame.getUser().getEmail()).wait(100);
+                pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.timeout);
 
                 ChessGame game = ChessGame.builder()
                         .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
@@ -171,16 +174,16 @@ public class ChessGameController {
 
             activeBoards.replace(request.getGameId(), board);
 
-            activeBoards.get(request.getGameId()).notifyAll();
+            activeGames.get(request.getGameId()).notifyAll();
 
-            activeGames.get(request.getGameId()).wait(60000);
+            activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
-            if(activeGames.get(request.getGameId()).getGameResult() != GameResults.NONE)
+            if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
             {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
-                chessGameRepository.save(activeGames.get(request.getGameId()));
+                //chessGameRepository.save(activeGames.get(request.getGameId()));
                 activeGames.remove(request.getGameId());
                 return ResponseEntity.ok().body(endBoard);
             }

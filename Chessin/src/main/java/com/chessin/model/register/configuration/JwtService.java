@@ -1,5 +1,6 @@
 package com.chessin.model.register.configuration;
 
+import com.chessin.model.utils.Constants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -20,7 +21,6 @@ import java.util.function.Function;
 public class JwtService {
 
     private static final String SECRET_KEY = "39792442264529482B4D6251655468576D5A7134743777217A25432A462D4A61";
-    private final int expirationTime = 1000 * 60 * 15 * 2137;
 
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
@@ -39,7 +39,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .setExpiration(new Date(System.currentTimeMillis() + Constants.Application.accessTokenExpirationTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
