@@ -23,8 +23,8 @@ import { ChessGameResponse } from "../utils/ServicesTypes";
 import { User, userToPlayer } from "../utils/PlayerUtilities";
 import ChessBoard from "../components/ChessBoard";
 import WaitingForGame from "../features/playOnline/components/WaitingForGame";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { listenForFirstMove } from "../features/playOnline/services/playOnlineService";
+import { BoardResponseToBoard } from "../chess-logic/board";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -120,8 +120,7 @@ export default function PlayOnline({ navigation, route }: Props) {
       cancelSearch(user.email);
       return;
     }
-    if (data.blackUser.nameInGame === user.nameInGame)
-      handleListnForFirstMove(data.id);
+    handleListnForFirstMove(data.id);
     setFoundGame(true);
     setGameId(data.id);
     if (data.whiteUser.nameInGame === user.nameInGame) {
@@ -147,14 +146,14 @@ export default function PlayOnline({ navigation, route }: Props) {
   const handleListnForFirstMove = (gameId: number) => {
     listenForFirstMove({ gameId })
       .then((res) => {
+        const board: Board = BoardResponseToBoard(res);
+        setBoardState(board);
         console.log("started listening for first move");
       })
       .catch((err) => {
         console.log(err);
       });
   };
-
-  console.log("myPlayer", myPlayer);
 
   const settings = gearModal ? (
     <>

@@ -14,6 +14,7 @@ export const listenForFirstMove = async (request: ListenForFirstMoveRequest) => 
         },
         body: JSON.stringify(request),
     }).then((response) => {
+        console.log("listen for first move response: ",response.status);
         if (response.status === 200) {
             return response.json();
         }else if(response.status === 400){
@@ -70,7 +71,6 @@ export const searchForGame = async (request: PendingChessGameRequest) => {
         },
         body: JSON.stringify(request),
     }).then((response) => {
-        console.log("search for game: ",response.status);
         if (response.status === 200) {
             return response.json();
         } else if(response.status === 400){
@@ -103,7 +103,6 @@ export const setPendingGameRequest = (email: string, timeControl: number, increm
 
 export const submitMove = async ( request: SubmitMoveRequest ) => {
     const accessToken = await getValueFor("accessToken");
-    console.log("submit move request: ",request);
     return await fetch(submitMoveLink, {
         method: "Post",
         headers: {
@@ -112,11 +111,9 @@ export const submitMove = async ( request: SubmitMoveRequest ) => {
         },
         body: JSON.stringify(request),
     }).then((response) => {
-        console.log("submit move: ",response.status);
         if (response.status === 200) {
             return response.json();
         } else if(response.status === 400){
-            console.log("submit move error: ",response);
             response.text().then((data) => {
                 console.log("submit move error: ",data);
         })

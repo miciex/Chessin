@@ -75,7 +75,10 @@ export default function PlayOnlineChessBoard({
       isDrawOffered: false,
     };
 
+    setBoard(playMove(move, board));
+
     submitMove(submitMoveRequest).then((data: BoardResponse) => {
+      console.log("data returned");
       if (!data) return;
       setBoard(BoardResponseToBoard(data));
     });
