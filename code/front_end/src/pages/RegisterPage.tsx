@@ -21,6 +21,7 @@ import ChooseCountry from "../features/register/ChooseCountry";
 import { countryIsoCodesType } from "../features/playOnline";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import { VerificationType } from "../utils/ServicesTypes";
+import { register } from "../services/AuthenticationServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -47,7 +48,10 @@ export default function Register({ navigation }: Props) {
   const [isRepeatPasswordValid, setIsRepeatPasswordValid] = useState<
     boolean | null
   >(null);
-  const [country, setCountry] = useState<countryIsoCodesType>();
+  const [country, setCountry] = useState<countryIsoCodesType>({
+    Name: "Poland",
+    Code: "PL",
+  });
   const [isCountryScollViewVisible, setIsCountryScollViewVisible] =
     useState<boolean>(false);
   const [isCountryValid, setIsCountryValid] = useState<boolean | null>(null);
@@ -141,17 +145,13 @@ export default function Register({ navigation }: Props) {
     setInputsValid();
     if (!areInputsValid()) return;
     console.log("register");
-    fetch(registerLink, {
-      body: JSON.stringify({
-        email,
-        password,
-        lastname: lastName,
-        firstname: firstName,
-        nameInGame: nick,
-        country: country?.Name,
-      }),
-      method: "POST",
-      headers: new Headers({ "content-type": "application/json" }),
+    register({
+      email,
+      password,
+      lastname: lastName,
+      firstname: firstName,
+      nameInGame: nick,
+      country: country.Name,
     })
       .then((response) => {
         console.log(response);

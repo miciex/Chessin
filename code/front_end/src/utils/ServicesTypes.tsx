@@ -2,10 +2,16 @@ import { responseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
 import { GameResults } from "../chess-logic/board";
 
-export type registerRequestType = {
-  firstName: string;
-  lastName: string;
-  nick: string;
+export type RegisterRequest = {
+  firstname: string;
+  lastname: string;
+  nameInGame: string;
+  email: string;
+  password: string;
+  country: string;
+};
+
+export type LoginRequest = {
   email: string;
   password: string;
 };
