@@ -2,6 +2,7 @@ package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.requests.CancelPendingChessGameRequest;
+import com.chessin.controller.requests.ListenForFirstMoveRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.controller.responses.ChessGameResponse;
@@ -128,6 +129,19 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("No search found");
 
         return ResponseEntity.ok().body("Search cancelled");
+    }
+
+    @PostMapping("/listenForFirstMove")
+    public ResponseEntity<?> listenForFirstMove(ListenForFirstMoveRequest request) throws InterruptedException {
+        if(!activeBoards.containsKey(request.getGameId()))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        synchronized(activeGames.get(request.getGameId()))
+        {
+            activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
+
+            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+        }
     }
 
     @PostMapping("/submitMove")
