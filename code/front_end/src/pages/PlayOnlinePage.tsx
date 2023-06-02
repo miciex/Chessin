@@ -12,7 +12,7 @@ import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../chess-logic/ChessConstants";
 import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
-import { Board, boardFactory } from "../chess-logic/board";
+import { Board, GameResults, boardFactory } from "../chess-logic/board";
 import { Player, responseUserToPlayer } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import {
@@ -25,6 +25,7 @@ import ChessBoard from "../components/ChessBoard";
 import WaitingForGame from "../features/playOnline/components/WaitingForGame";
 import { listenForFirstMove } from "../features/playOnline/services/playOnlineService";
 import { BoardResponseToBoard } from "../chess-logic/board";
+import GameFinishedOverlay from "../features/playOnline/components/GameFinishedOverlay";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -52,6 +53,15 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [gameId, setGameId] = useState<number>(-1);
 
   useEffect(() => {
+    searchNewGame();
+
+    return () => {
+      console.log("unmounting");
+      unMount();
+    };
+  }, []);
+
+  const searchNewGame = () => {
     setSearchingGame(true);
     getValueFor("user")
       .then((user) => {
@@ -72,12 +82,7 @@ export default function PlayOnline({ navigation, route }: Props) {
       .catch((err) => {
         console.log(err);
       });
-
-    return () => {
-      console.log("unmounting");
-      unMount();
-    };
-  }, []);
+  };
 
   const unMount = () => {
     if (!searchingGame) return;
@@ -160,6 +165,16 @@ export default function PlayOnline({ navigation, route }: Props) {
       <SettingsGameModal toggleGear={toggleGear} gearModalOn={gearModal} />
     </>
   ) : null;
+
+  const gameFinishedOverlay =
+    boardState.result === GameResults.NONE ? null : (
+      <GameFinishedOverlay
+        navigation={navigation}
+        whoWon={boardState.result}
+        searchForGame={searchNewGame}
+        whitesTurn={boardState.whiteToMove}
+      />
+    );
 
   return !searchingGame && myPlayer && myPlayer.color !== null ? (
     <View style={styles.appContainer}>

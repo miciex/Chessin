@@ -83,10 +83,7 @@ export default function PlayOnlineChessBoard({
       setBoard(BoardResponseToBoard(data));
     });
 
-    // board = playMove(move, board);
-
-    // setBoard(board);
-    // setActiveField(-1);
+    setActiveField(-1);
   };
 
   let copyPossibleMoves: Number[] = [0];
