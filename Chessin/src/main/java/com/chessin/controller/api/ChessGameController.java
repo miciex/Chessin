@@ -5,6 +5,7 @@ import com.chessin.controller.requests.CancelPendingChessGameRequest;
 import com.chessin.controller.requests.ListenForFirstMoveRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
+import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.*;
 import com.chessin.model.register.user.UserRepository;
@@ -143,7 +144,7 @@ public class ChessGameController {
         {
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
-            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
     }
 
@@ -186,7 +187,7 @@ public class ChessGameController {
                 activeBoards.replace(request.getGameId(), board);
                 activeGames.get(request.getGameId()).setGameResult(board.getGameResult());
                 activeGames.get(request.getGameId()).notifyAll();
-                return ResponseEntity.ok().body(board);
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
 
             activeBoards.replace(request.getGameId(), board);
@@ -202,10 +203,10 @@ public class ChessGameController {
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
                 //chessGameRepository.save(activeGames.get(request.getGameId()));
                 activeGames.remove(request.getGameId());
-                return ResponseEntity.ok().body(endBoard);
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
 
-            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
     }
 }
