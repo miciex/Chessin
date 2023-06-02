@@ -136,6 +136,9 @@ public class ChessGameController {
         if(!activeBoards.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found.");
 
+        if(activeBoards.get(request.getGameId()).getMoves().size() > 0)
+            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+
         synchronized(activeGames.get(request.getGameId()))
         {
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
