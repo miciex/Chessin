@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import ChessBoard from "../features/playOnline/components/ChessBoard";
+import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
@@ -49,7 +49,7 @@ export default function AnalyzeGame({ navigation, route }: Props) {
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.boardContainer}>
-            <ChessBoard
+            <PlayOnlineChessBoard
               board={boardState}
               setBoard={setBoardState}
               playersColor={player?.color === "white" ? player.color : null}

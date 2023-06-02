@@ -25,7 +25,12 @@ type Props = {
   gameId: number;
 };
 
-export default function ChessBoard({ board, setBoard, player, gameId }: Props) {
+export default function PlayOnlineChessBoard({
+  board,
+  setBoard,
+  player,
+  gameId,
+}: Props) {
   const [activeField, setActiveField] = useState(-1);
 
   const [possibleMoves, setPossibleMoves] = useState([-1]);

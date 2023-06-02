@@ -8,6 +8,7 @@ import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
 import { AuthenticationResponse } from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
+import { CodeVerificationRequest } from "../utils/ServicesTypes";
 
 export const storeUser = async (value: User) => {
   try {
@@ -125,9 +126,9 @@ export const resetAccessToken = async () => {
 
 export const setUserDataFromResponse = async (
   responseData: AuthenticationResponse,
-  email: string
+  codeVerificationRequest: CodeVerificationRequest | { email: string }
 ) => {
   await save("refreshToken", responseData.refreshToken);
   await save("accessToken", responseData.accessToken);
-  fetchandStoreUser(email);
+  fetchandStoreUser(codeVerificationRequest.email);
 };

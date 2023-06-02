@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import ChessBoard from "../features/playOnline/components/ChessBoard";
+import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
 import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
@@ -72,7 +72,7 @@ export default function PlayBot({ navigation, route }: Props) {
             )}
           </View>
           <View style={styles.boardContainer}>
-            <ChessBoard
+            <PlayOnlineChessBoard
               board={chessBoard}
               setBoard={setChessBoard}
               playersColor={myPlayer?.color ? myPlayer.color : "spectator"}

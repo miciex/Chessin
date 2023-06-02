@@ -9,7 +9,10 @@ import Submit from "../features/login/components/Submit";
 import { ColorsPallet } from "../utils/Constants";
 import { authenticateLink } from "../utils/ApiEndpoints";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
-import { AuthenticationResponse } from "../utils/ServicesTypes";
+import {
+  AuthenticationResponse,
+  VerificationType,
+} from "../utils/ServicesTypes";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
 import { emailRegex, passwordRegex } from "../utils/Constants";
 import AuthInput from "../features/authentication/components/AuthInput";
@@ -20,6 +23,7 @@ import {
 import { save, getValueFor } from "../utils/AsyncStoreFunctions";
 import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
 import { setUserDataFromResponse } from "../services/userServices";
+import { verifyCode } from "../services/AuthenticationServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
@@ -78,7 +82,7 @@ export default function Login({ route, navigation }: Props) {
         if (!responseData) {
           return false;
         }
-        setUserDataFromResponse(responseData, email);
+        setUserDataFromResponse(responseData, { email });
         return true;
       })
       .then((userSet: boolean) => {
@@ -97,8 +101,12 @@ export default function Login({ route, navigation }: Props) {
     <AuthCodeModal
       hideModal={hideModal}
       navigation={navigation}
-      email={email}
-      loginUser={true}
+      request={{
+        email: email,
+        verificationCode: "",
+        verificationType: VerificationType.AUTHENTICATE,
+      }}
+      handleVerifyCodeResponse={setUserDataFromResponse}
     />
   ) : (
     <View style={styles.appContainer}>

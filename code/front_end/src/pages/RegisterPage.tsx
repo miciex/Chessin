@@ -20,6 +20,7 @@ import {
 import ChooseCountry from "../features/register/ChooseCountry";
 import { countryIsoCodesType } from "../features/playOnline";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
+import { VerificationType } from "../utils/ServicesTypes";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -171,8 +172,16 @@ export default function Register({ navigation }: Props) {
     <AuthCodeModal
       hideModal={hideAuthCodeModal}
       navigation={navigation}
-      email={email}
-      loginUser={false}
+      request={{
+        email,
+        verificationCode: "",
+        verificationType: VerificationType.REGISTER,
+        password,
+        lastname: lastName,
+        firstname: firstName,
+        nameInGame: nick,
+        country: country?.Name,
+      }}
     />
   ) : (
     <View style={styles.appContainer}>

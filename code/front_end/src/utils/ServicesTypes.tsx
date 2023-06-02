@@ -75,3 +75,15 @@ export type BoardResponse = {
   visualBoard: Array<number>;
   startBoard: string;
 };
+
+export type CodeVerificationRequest = {
+  email: string;
+  verificationCode: string;
+  verificationType: VerificationType;
+  newPassword?: string;
+  password?: string;
+  firstname?: string;
+  lastname?: string;
+  nameInGame?: string;
+  country?: string;
+};

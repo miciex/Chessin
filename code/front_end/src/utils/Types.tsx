@@ -66,7 +66,6 @@ export type Char =
   | null;
 
 export const Chars = [
-  ,
   "a",
   "b",
   "c",
@@ -129,6 +128,7 @@ export const Chars = [
   "7",
   "8",
   "9",
+  "",
   null,
 ];
 export const isChar = (x: any): x is Char => Chars.includes(x);

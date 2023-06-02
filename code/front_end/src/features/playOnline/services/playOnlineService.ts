@@ -1,8 +1,35 @@
-import { searchNewGameLink, submitMoveLink } from "../../../utils/ApiEndpoints";
+import { searchNewGameLink, submitMoveLink, cancelSearchLink } from "../../../utils/ApiEndpoints";
 import { getValueFor } from "../../../utils/AsyncStoreFunctions";
 import { PendingChessGameRequest, SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { searchRatingRange } from "../../../utils/Constants";
 
+export const cancelSearch = async (email: string) => {
+    const accessToken = await getValueFor("accessToken");
+    
+    fetch(cancelSearchLink, {
+        method: "Post",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ email: email }),
+    }).then((response) => {
+        if (response.status === 200) {
+            return response.json();
+        }else if(response.status === 400){
+            response.text().then((data) => {
+                throw new Error(data);
+        }).catch((error) => {
+            throw new Error(error);
+        });
+    }else
+        {
+            throw new Error("Something went wrong");
+        }
+    }).catch((error) => {
+        throw new Error(error);
+    });
+};
 
 export const searchForGame = async (request: PendingChessGameRequest) => {
     const accessToken = await getValueFor("accessToken");
@@ -19,9 +46,13 @@ export const searchForGame = async (request: PendingChessGameRequest) => {
         if (response.status === 200) {
             return response.json();
         } else if(response.status === 400){
-            response.json().then((data) => {
+            response.text().then((data) => {
                 throw new Error(data);
-        })}else{
+        })
+        .catch((error) => {
+            throw new Error(error);
+        });
+    }else{
             throw new Error("Something went wrong");
         }
     })
@@ -58,9 +89,13 @@ export const submitMove = async ( request: SubmitMoveRequest ) => {
             return response.json();
         } else if(response.status === 400){
             console.log("submit move error: ",response);
-            response.json().then((data) => {
+            response.text().then((data) => {
                 console.log("submit move error: ",data);
-        })}else{
+        })
+        .catch((error) => {
+            throw new Error(error);
+        });
+    }else{
             throw new Error("Something went wrong");
         }
     }

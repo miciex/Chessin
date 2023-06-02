@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import ChessBoard from "../features/playOnline/components/ChessBoard";
+import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../chess-logic/ChessConstants";
@@ -49,7 +49,7 @@ export default function FreeBoard({ navigation, route }: Props) {
         <View style={styles.mainContentContainer}>
           <PiecesBar barColor="white" />
           <View style={styles.boardContainer}>
-            <ChessBoard
+            <PlayOnlineChessBoard
               board={chessBoard}
               setBoard={setChessBoard}
               playersColor={"spectator"}
