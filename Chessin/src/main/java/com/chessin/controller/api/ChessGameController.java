@@ -2,6 +2,7 @@ package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.requests.CancelPendingChessGameRequest;
+import com.chessin.controller.requests.ListenForFirstMoveRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.controller.responses.ChessGameResponse;
@@ -130,13 +131,29 @@ public class ChessGameController {
         return ResponseEntity.ok().body("Search cancelled");
     }
 
-    @PostMapping("/submitMove")
-    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request) throws InterruptedException {
+    @PostMapping("/listenForFirstMove")
+    public ResponseEntity<?> listenForFirstMove(ListenForFirstMoveRequest request) throws InterruptedException {
+        if(!activeBoards.containsKey(request.getGameId()))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        if(activeBoards.get(request.getGameId()).getMoves().size() > 0)
+            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+
         synchronized(activeGames.get(request.getGameId()))
         {
-            if(!activeBoards.containsKey(request.getGameId()))
-                return ResponseEntity.badRequest().body("Game not found.");
+            activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
+            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+        }
+    }
+
+    @PostMapping("/submitMove")
+    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request) throws InterruptedException {
+        if(!activeBoards.containsKey(request.getGameId()))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        synchronized(activeGames.get(request.getGameId()))
+        {
             Board board = activeBoards.get(request.getGameId());
 
             if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
