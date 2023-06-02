@@ -1,7 +1,35 @@
-import { searchNewGameLink, submitMoveLink, cancelSearchLink } from "../../../utils/ApiEndpoints";
+import { searchNewGameLink, submitMoveLink, cancelSearchLink, listenForFirstMoveLink } from "../../../utils/ApiEndpoints";
 import { getValueFor } from "../../../utils/AsyncStoreFunctions";
-import { PendingChessGameRequest, SubmitMoveRequest } from "../../../utils/ServicesTypes";
+import { PendingChessGameRequest, SubmitMoveRequest, ListenForFirstMoveRequest } from "../../../utils/ServicesTypes";
 import { searchRatingRange } from "../../../utils/Constants";
+
+export const listenForFirstMove = async (request: ListenForFirstMoveRequest) => {
+    const accessToken = await getValueFor("accessToken");
+
+    const response  = await fetch(listenForFirstMoveLink, {
+        method: "Post",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(request),
+    }).then((response) => {
+        if (response.status === 200) {
+            return response.json();
+        }else if(response.status === 400){
+            response.text().then((data) => {
+                throw new Error(data);
+        }).catch((error) => {
+            throw new Error(error);
+        });
+    }else{
+            throw new Error("Something went wrong");
+        }
+    }).catch((error) => {
+        throw new Error(error);
+    });
+    return response;
+};
 
 export const cancelSearch = async (email: string) => {
     const accessToken = await getValueFor("accessToken");

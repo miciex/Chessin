@@ -46,9 +46,18 @@ export default function AuthCodeModal({
   const itemElems = useRef<any>(new Array(InputLength));
 
   const submitCode = () => {
-    verifyCode(request)
+    console.log({
+      ...request,
+      verificationCode: inputs.join(""),
+    });
+    verifyCode({
+      ...request,
+      verificationCode: inputs.join(""),
+    })
       .then((data) => {
+        console.log("data", data);
         if (!handleVerifyCodeResponse) return;
+        console.log("sending data to handleVerifyCodeResponse");
         handleVerifyCodeResponse(data, {
           ...request,
           verificationCode: inputs.join(""),

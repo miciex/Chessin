@@ -24,6 +24,7 @@ import { User, userToPlayer } from "../utils/PlayerUtilities";
 import ChessBoard from "../components/ChessBoard";
 import WaitingForGame from "../features/playOnline/components/WaitingForGame";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { listenForFirstMove } from "../features/playOnline/services/playOnlineService";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -119,7 +120,8 @@ export default function PlayOnline({ navigation, route }: Props) {
       cancelSearch(user.email);
       return;
     }
-
+    if (data.blackUser.nameInGame === user.nameInGame)
+      handleListnForFirstMove(data.id);
     setFoundGame(true);
     setGameId(data.id);
     if (data.whiteUser.nameInGame === user.nameInGame) {
@@ -139,6 +141,17 @@ export default function PlayOnline({ navigation, route }: Props) {
         whiteToMove: data.whiteStarts,
       })
     );
+    setSearchingGame(false);
+  };
+
+  const handleListnForFirstMove = (gameId: number) => {
+    listenForFirstMove({ gameId })
+      .then((res) => {
+        console.log("started listening for first move");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   console.log("myPlayer", myPlayer);

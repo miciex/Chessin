@@ -93,3 +93,7 @@ export type CodeVerificationRequest = {
   nameInGame?: string;
   country?: string;
 };
+
+export type ListenForFirstMoveRequest = {
+  gameId: number;
+};

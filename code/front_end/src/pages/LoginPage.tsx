@@ -65,7 +65,14 @@ export default function Login({ route, navigation }: Props) {
           setShowAuthCode(true);
           return null;
         } else if (response.status === 400) {
-          throw new Error("Bad request");
+          response
+            .text()
+            .then((text) => {
+              throw new Error(text);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         } else {
           throw new Error("Something went wrong");
         }

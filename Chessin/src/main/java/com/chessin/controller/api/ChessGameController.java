@@ -132,7 +132,7 @@ public class ChessGameController {
     }
 
     @PostMapping("/listenForFirstMove")
-    public ResponseEntity<?> listenForFirstMove(ListenForFirstMoveRequest request) throws InterruptedException {
+    public ResponseEntity<?> listenForFirstMove(@RequestBody ListenForFirstMoveRequest request) throws InterruptedException {
         if(!activeBoards.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found.");
 

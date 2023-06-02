@@ -1,5 +1,5 @@
 import { CodeVerificationRequest, RegisterRequest, LoginRequest } from "../utils/ServicesTypes";
-import { verifyCodeLink, registerLink } from "../utils/ApiEndpoints";
+import { verifyCodeLink, registerLink, authenticateLink } from "../utils/ApiEndpoints";
 
 export const verifyCode = async (codeVerificationRequest: CodeVerificationRequest) => {
     const response = await fetch(verifyCodeLink, {
@@ -36,7 +36,7 @@ export const register = async (registerRequest: RegisterRequest) => {
 }
 
 export const login = async (loginRequest: LoginRequest) => {
-    const response = await fetch(registerLink, {
+    const response = await fetch(authenticateLink, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
