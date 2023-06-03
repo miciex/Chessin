@@ -94,7 +94,7 @@ export default function PlayOnline({ navigation, route }: Props) {
             />
           </View>
           <View style={styles.boardContainer}>
-            <ChessBoard board={boardState} setBoard={setBoardState} />
+            <ChessBoard board={boardState} setBoard={setBoardState} myPlayer={myPlayer}/>
           </View>
           <Text>
             <FontAwesome

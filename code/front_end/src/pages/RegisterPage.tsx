@@ -121,7 +121,8 @@ export default function Register({ navigation }: Props) {
   };
 
   const onSubmit = () => {
-    if (!areInputsValid()) return;
+    // if (!areInputsValid()) return;
+    console.log("submit")
     fetch(registerLink, {
       body: JSON.stringify({
         email,

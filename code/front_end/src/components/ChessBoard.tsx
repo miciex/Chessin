@@ -7,17 +7,19 @@ import {
   PossibleMoves,
   boardFactory,
   isWhite,
-  movePiece,
+  makeMove,
 } from "../utils/chess-calculations/board";
 import { Move, moveFactory } from "../utils/chess-calculations/move";
 import { ColorsPallet } from "../utils/Constants";
+import { Player } from "../utils/PlayerUtilities";
 
 type Props = {
   board: Board;
   setBoard: (board: Board) => void;
+  myPlayer: Player;
 };
 
-export default function ChessBoard({ board, setBoard }: Props) {
+export default function ChessBoard({ board, setBoard, myPlayer }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
   const [possibleMoves, setPossibleMoves] = useState([-1]);
@@ -28,24 +30,20 @@ export default function ChessBoard({ board, setBoard }: Props) {
     copyPossibleMoves = [...possibleMoves];
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
-    if (
-      (isWhite(data.fieldNumber, board.position) && board.whiteToMove) ||
-      isWhite(data.fieldNumber, board.position) !== board.whiteToMove
-    ) {
+    
+    if (data.fieldNumber in board.position && isWhite(data.fieldNumber, board.position) === (myPlayer.color === "white")) {
       setActiveField(data.fieldNumber);
       return;
     } else if (possibleMoves.includes(data.fieldNumber)) {
-      const brd: Board = boardFactory({ board });
-
-      brd.position = movePiece(
+      let brd: Board = boardFactory({ board });
+      brd = makeMove(
         moveFactory({
           pieces: brd.position,
           startField: activeField,
           endField: data.fieldNumber,
         }),
-        brd.position
+        brd
       );
-
       setBoard(brd);
     }
 
