@@ -1,4 +1,4 @@
-package com.chessin.model.register.authentication.requests;
+package com.chessin.controller.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PasswordChangeRequest {
+public class AuthenticationRequest {
 
     private String email;
-    private String oldPassword;
-    private String newPassword;
+    private String password;
+
 }

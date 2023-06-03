@@ -7,18 +7,19 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
 import { ColorsPallet } from "../utils/Constants";
-import { authenticateLink } from "../utils/ServicesConstants";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
-import { AuthenticationResponse } from "../utils/ServicesTypes";
-import { fetchandStoreUser } from "../features/authentication/services/loginServices";
+import {
+  AuthenticationResponse,
+  VerificationType,
+} from "../utils/ServicesTypes";
 import { emailRegex, passwordRegex } from "../utils/Constants";
 import AuthInput from "../features/authentication/components/AuthInput";
 import {
   notValidEmailMessage,
   notValidPasswordMessage,
 } from "../utils/Constants";
-import { save, getValueFor } from "../utils/AsyncStoreFunctions";
-import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
+import { setUserDataFromResponse } from "../services/userServices";
+import { login } from "../services/AuthenticationServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
@@ -31,15 +32,6 @@ export default function Login({ route, navigation }: Props) {
   const [password, setPassword] = useState<string>("");
   const [isPasswordValid, setIsPasswordValid] = useState<boolean | null>(null);
   const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
-
-  const setUserDataFromResponse = async (
-    responseData: AuthenticationResponse
-  ) => {
-    console.log(responseData);
-    await save("refreshToken", responseData.refreshToken);
-    await save("accessToken", responseData.accessToken);
-    fetchandStoreUser(email);
-  };
 
   const validataEmail = (): boolean => {
     return emailRegex.test(email);
@@ -63,12 +55,9 @@ export default function Login({ route, navigation }: Props) {
 
   const onSubmit = () => {
     if (!isDataValid()) return;
-    fetch(authenticateLink, {
-      body: JSON.stringify({ email, password }),
-      method: "POST",
-      headers: new Headers({ "content-type": "application/json" }),
-    })
+    login({ email, password })
       .then((response) => {
+        console.log(response.status);
         if (response.status === 200) {
           console.log(JSON.stringify(response));
           return response.json();
@@ -76,7 +65,14 @@ export default function Login({ route, navigation }: Props) {
           setShowAuthCode(true);
           return null;
         } else if (response.status === 400) {
-          throw new Error("Bad request");
+          response
+            .text()
+            .then((text) => {
+              throw new Error(text);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         } else {
           throw new Error("Something went wrong");
         }
@@ -85,7 +81,7 @@ export default function Login({ route, navigation }: Props) {
         if (!responseData) {
           return false;
         }
-        setUserDataFromResponse(responseData);
+        setUserDataFromResponse(responseData, { email });
         return true;
       })
       .then((userSet: boolean) => {
@@ -104,8 +100,12 @@ export default function Login({ route, navigation }: Props) {
     <AuthCodeModal
       hideModal={hideModal}
       navigation={navigation}
-      setUserDataFromResponse={setUserDataFromResponse}
-      email={email}
+      request={{
+        email: email,
+        verificationCode: "",
+        verificationType: VerificationType.AUTHENTICATE,
+      }}
+      handleVerifyCodeResponse={setUserDataFromResponse}
     />
   ) : (
     <View style={styles.appContainer}>

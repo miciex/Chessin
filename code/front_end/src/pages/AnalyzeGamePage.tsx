@@ -4,15 +4,15 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import ChessBoard from "../components/ChessBoard";
+import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
+import { sampleMoves } from "../chess-logic/ChessConstants";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
-import { Board } from "../utils/chess-calculations/board";
+import { Board } from "../chess-logic/board";
 import { getUser } from "../services/userServices";
-import { User } from "../utils/PlayerUtilities";
+import { Player, User, responseUserToPlayer } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
@@ -25,12 +25,13 @@ type Props = {
 };
 
 export default function AnalyzeGame({ navigation, route }: Props) {
-  const [user, setUser] = useState<User | null>();
+  const [player, setPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (user === null) return;
-      setUser(JSON.parse(user));
+      const player = { ...JSON.parse(user), color: "white" };
+      setPlayer(player);
     });
   }, []);
 
@@ -48,7 +49,11 @@ export default function AnalyzeGame({ navigation, route }: Props) {
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.boardContainer}>
-            <ChessBoard board={boardState} setBoard={setBoardState} />
+            <PlayOnlineChessBoard
+              board={boardState}
+              setBoard={setBoardState}
+              playersColor={player?.color === "white" ? player.color : null}
+            />
           </View>
         </View>
         <ScrollView

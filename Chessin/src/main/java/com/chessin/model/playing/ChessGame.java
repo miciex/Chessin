@@ -14,15 +14,21 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class ChessGame {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User whiteUser;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User blackUser;
-    @OneToMany(mappedBy = "chessGame")
+    @OneToMany(mappedBy = "chessGame", fetch = FetchType.EAGER)
     private ArrayList<Move> moves;
     //eventually change to 4 columns
     private int[] availableCastles;
+    private int timeControl;
+    private int increment;
+    private String startBoard;
+    private boolean whiteStarts;
+    private GameResults gameResult;
 
     public ChessGame(){
         this.moves = new ArrayList<>();

@@ -11,6 +11,7 @@ import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import ChooseYourLevelModal from "../features/home/components/ChooseYourLevelModal";
+// import { useNetInfo } from "@react-native-community/netinfo";
 
 //przykladowe stary gry
 const ended_games = [
@@ -82,7 +83,10 @@ type Props = {
 };
 
 const HomePage = ({ route, navigation }: Props) => {
+  const netInfo = useNetInfo();
   const [user, setUser] = useState<User>();
+
+  console.log(netInfo.isConnected);
 
   useEffect(() => {
     getValueFor("user").then((user) => {
@@ -95,6 +99,8 @@ const HomePage = ({ route, navigation }: Props) => {
   const toggleLevel = () => {
     setLevelModal(!levelModal);
   };
+  console.log(user);
+
   return (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>

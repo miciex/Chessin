@@ -1,18 +1,20 @@
+import { GameLengthTypeContextType } from "../features/gameMenuPage/context/GameLengthContext";
+
 export type User = {
-    firstName: String;
-    lastName: String;
-    email: String;
-    nameInGame: String;
+    firstname: string;
+    lastname: string;
+    email: string;
+    nameInGame: string;
     country: string;
     ranking: Rankings;
     highestRanking: number;
+    online?: boolean;
 };
 
 export type responseUser = {
     id: number;
     firstname: string;
-    lastName: string;
-    email: string;
+    lastname: string;
     nameInGame: string;
     password: string;
     role: string;
@@ -24,9 +26,18 @@ export type responseUser = {
 }
 
 export type Player = {
-    user: User;
-    color: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    nameInGame: string;
+    country: string;
+    ranking: Rankings;
+    highestRanking: number;
+    online?: boolean;
+    color: playColor;
 };
+
+export type playColor = "white" | "black" | "spectator" | null;
 
 export type Rankings = {
     bullet: number;
@@ -35,9 +46,7 @@ export type Rankings = {
     classical: number;
 };
 
-export const responseUserToUser = (responseUser: any): User => {
-    console.log("converting")
-    console.log(responseUser);
+export const responseUserToUser = (responseUser: responseUser, email:string): User => {
     
     const rankings:Rankings = {
         bullet: responseUser.ratingBullet,
@@ -45,10 +54,11 @@ export const responseUserToUser = (responseUser: any): User => {
         rapid: responseUser.ratingRapid,
         classical: responseUser.ratingClassical,
     }
+    
     return {
-        firstName: responseUser.firstname,
-        lastName: responseUser.lastName,
-        email: responseUser.email,
+        firstname: responseUser.firstname,
+        lastname: responseUser.lastname,
+        email: email,
         nameInGame: responseUser.nameInGame,
         country: responseUser.country,
         ranking: rankings,
@@ -56,8 +66,58 @@ export const responseUserToUser = (responseUser: any): User => {
     }
 } 
 
+export const responseUserToPlayer = (responseUser: responseUser, color: playColor, email?:string): Player => {
+    const rankings:Rankings = {
+        bullet: responseUser.ratingBullet,
+        blitz: responseUser.ratingBlitz,
+        rapid: responseUser.ratingRapid,
+        classical: responseUser.ratingClassical,
+    }
+    return {
+        firstname: responseUser.firstname,
+        lastname: responseUser.lastname,
+        email: email ? email : "",
+        nameInGame: responseUser.nameInGame,
+        country: responseUser.country,
+        ranking: rankings,
+        highestRanking: getHighestRanking(rankings),
+        color: color,
+    }
+}
+
+export const userToPlayer = (user: User, color: playColor): Player => {
+    return {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        nameInGame: user.nameInGame,
+        country: user.country,
+        ranking: user.ranking,
+        highestRanking: user.highestRanking,
+        online: user.online,
+        color: color,
+    }
+}
+
+
+
 export const getHighestRanking = (rankings: Rankings) => {
     const rankingValues = Object.values(rankings);
     const highestRanking = Math.max(...rankingValues);
     return highestRanking;
+}
+
+export const getRanking = (gameLength: GameLengthTypeContextType, user: User) => {
+    switch (gameLength) {
+        case "bullet":
+            return user.ranking.bullet;
+        case "blitz":
+            return user.ranking.blitz;
+        case "rapid":
+            return user.ranking.rapid;
+        case "classical":
+            return user.ranking.classical;
+        default:
+            return user.highestRanking;
+    }
 }

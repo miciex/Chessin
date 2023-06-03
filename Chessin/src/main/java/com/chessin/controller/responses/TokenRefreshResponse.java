@@ -1,4 +1,4 @@
-package com.chessin.model.register.authentication.responses;
+package com.chessin.controller.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

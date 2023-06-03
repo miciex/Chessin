@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "./src/pages/HomePage";
@@ -17,6 +17,9 @@ import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useNetInfo } from "@react-native-community/netinfo";
+import { setUserActive, resetAccessToken } from "./src/services/userServices";
+import { PendingChessGameRequest } from "./src/utils/ServicesTypes";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -25,7 +28,9 @@ export type RootStackParamList = {
   LastGame: undefined;
   Login: undefined;
   PlayBot: undefined;
-  PlayOnline: undefined;
+  PlayOnline: {
+    request: PendingChessGameRequest;
+  };
   PlayWithFriendsMenu: {};
   ProfilePage: undefined;
   Register: undefined;
@@ -33,8 +38,26 @@ export type RootStackParamList = {
   AnalyzeGame: undefined;
 };
 
+const refreshTokenInterval = 1000 * 60 * 14;
+const checkNetInfoInterval = 1000 * 60;
+
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
+  const netInfo = useNetInfo();
+
+  useEffect(() => {
+    setUserActive(netInfo.isConnected ? true : false);
+  }, [netInfo.isConnected]);
+
+  useEffect(() => {
+    resetAccessToken();
+    const resetToken = setInterval(() => {
+      resetAccessToken();
+    }, refreshTokenInterval);
+    return () => {
+      clearInterval(resetToken);
+    };
+  }, []);
 
   return (
     <NavigationContainer>

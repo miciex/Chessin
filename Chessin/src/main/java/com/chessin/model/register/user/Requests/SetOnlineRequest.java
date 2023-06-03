@@ -1,4 +1,4 @@
-package com.chessin.model.register.authentication.requests;
+package com.chessin.model.register.user.Requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenRefreshRequest {
-    private String refreshToken;
+public class SetOnlineRequest {
+    private boolean isOnline;
 }

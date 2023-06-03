@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Submit from "../features/login/components/Submit";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
 import { ColorsPallet } from "../utils/Constants";
-import { registerLink } from "../utils/ServicesConstants";
+import { registerLink } from "../utils/ApiEndpoints";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import AuthInput from "../features/authentication/components/AuthInput";
@@ -19,6 +19,9 @@ import {
 } from "../utils/Constants";
 import ChooseCountry from "../features/register/ChooseCountry";
 import { countryIsoCodesType } from "../features/playOnline";
+import AuthCodeModal from "../features/login/components/AuthCodeModal";
+import { VerificationType } from "../utils/ServicesTypes";
+import { register } from "../services/AuthenticationServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -45,10 +48,18 @@ export default function Register({ navigation }: Props) {
   const [isRepeatPasswordValid, setIsRepeatPasswordValid] = useState<
     boolean | null
   >(null);
-  const [country, setCountry] = useState<countryIsoCodesType>();
+  const [country, setCountry] = useState<countryIsoCodesType>({
+    Name: "Poland",
+    Code: "PL",
+  });
   const [isCountryScollViewVisible, setIsCountryScollViewVisible] =
     useState<boolean>(false);
   const [isCountryValid, setIsCountryValid] = useState<boolean | null>(null);
+  const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
+
+  const hideAuthCodeModal = (): void => {
+    setShowAuthCode(false);
+  };
 
   const validateFirstName = (): boolean => {
     return nameRegex.test(firstName);
@@ -120,24 +131,36 @@ export default function Register({ navigation }: Props) {
     );
   };
 
+  const setInputsValid = (): void => {
+    setIsFirstNameValid(validateFirstName());
+    setIsLastNameValid(validateLastName());
+    setIsNickValid(validateNick());
+    setIsEmailValid(validataEmail());
+    setIsPasswordValid(validatePassword());
+    setIsRepeatPasswordValid(validateRepeatPassword());
+    setIsCountryValid(validateCountry());
+  };
+
   const onSubmit = () => {
-    // if (!areInputsValid()) return;
-    console.log("submit")
-    fetch(registerLink, {
-      body: JSON.stringify({
-        email,
-        password,
-        lastname: lastName,
-        firstname: firstName,
-        nameInGame: nick,
-        country: country?.Name,
-      }),
-      method: "POST",
-      headers: new Headers({ "content-type": "application/json" }),
+    setInputsValid();
+    if (!areInputsValid()) return;
+    console.log("register");
+    register({
+      email,
+      password,
+      lastname: lastName,
+      firstname: firstName,
+      nameInGame: nick,
+      country: country.Name,
     })
       .then((response) => {
+        console.log(response);
         if (response.status === 200) {
           navigation.navigate("Home");
+        } else if (response.status === 202) {
+          setShowAuthCode(true);
+        } else if (response.status === 400) {
+          throw new Error("Bad request");
         }
       })
       .catch((error) => {
@@ -145,7 +168,22 @@ export default function Register({ navigation }: Props) {
       });
   };
 
-  return (
+  return showAuthCode ? (
+    <AuthCodeModal
+      hideModal={hideAuthCodeModal}
+      navigation={navigation}
+      request={{
+        email,
+        verificationCode: "",
+        verificationType: VerificationType.REGISTER,
+        password,
+        lastname: lastName,
+        firstname: firstName,
+        nameInGame: nick,
+        country: country?.Name,
+      }}
+    />
+  ) : (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
         <ScrollView

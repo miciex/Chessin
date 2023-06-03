@@ -1,5 +1,5 @@
 import { Pieces } from "./ChessConstants";
-import { Char } from "../Types";
+import { Char } from "../utils/Types";
 
 
 export const getPieceValue = (piece:number):number=>{
@@ -67,4 +67,12 @@ export const boardToMap = (board:Array<number>):{[key:number]:number}=>{
             map[i] =  board[i];
     }
     return map;
+}
+
+export const mapToBoard = (map:{[key:number]:number}):Array<number>=>{
+    let board:Array<number> = new Array(64).fill(0);
+    Object.entries(map).forEach(([key, value])=>{
+        board[parseInt(key)] = value;
+    })
+    return board;
 }

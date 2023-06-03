@@ -1,18 +1,20 @@
 import { View, StyleSheet, Text } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import TimeOptionsModal from "./TimeOptionsModal";
 import StartGameButton from "../../../components/StartGameButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
-import { ColorsPallet } from "../../../utils/Constants";
 import ChooseTimeButton from "./ChooseTimeButton";
 import ChooseFriendsToPlayWith from "./ChooseFriendsToPlayWith";
-import { User } from "../../../context/UserContext";
+import { User } from "../../../utils/PlayerUtilities";
 import {
   LengthType,
   GameLengthTypeContextType,
 } from "../context/GameLengthContext";
 import { chosenFriendContext } from "../context/ChosenFriendContext";
+import BaseButton from "../../../components/BaseButton";
+import { setPendingGameRequest } from "../../playOnline/services/playOnlineService";
+import { getRanking } from "../../../utils/PlayerUtilities";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -20,18 +22,98 @@ type Props = {
     "GameMenu",
     undefined
   >;
+  user: User | null;
 };
 
 const friends: Array<User> = [
-  { name: "Maciek", email: "maciej@gmail.com", country: "pl", ranking: 1500 },
-  { name: "Wojtek", email: "wojtek@gmail.com", country: "pl", ranking: 1500 },
-  { name: "Sławek", email: "sławek@gmail.com", country: "pl", ranking: 1500 },
-  { name: "Paweł", email: "paweł@gmail.com", country: "pl", ranking: 1500 },
-  { name: "Szymon", email: "szymon@gmail.com", country: "pl", ranking: 1500 },
-  { name: "Strzała", email: "strzała@gmail.com", country: "pl", ranking: 1500 },
+  {
+    firstName: "Maciek",
+    lastName: "mil",
+    nameInGame: "hello",
+    email: "maciej@gmail.com",
+    country: "Poland",
+    ranking: { blitz: 1500, bullet: 1500, rapid: 1500, classical: 1500 },
+    highestRanking: 1500,
+    online: true,
+  },
+  {
+    firstName: "Wojtek",
+    lastName: "Burek",
+    email: "wojtek@gmail.com",
+    country: "pl",
+    ranking: {
+      blitz: 1500,
+      bullet: 1500,
+      rapid: 1500,
+      classical: 1500,
+    },
+    highestRanking: 1500,
+    online: true,
+    nameInGame: "wojtek",
+  },
+  {
+    firstName: "Sławek",
+    lastName: "Dąbrowski",
+    nameInGame: "lelo",
+    email: "sławek@gmail.com",
+    country: "pl",
+    ranking: {
+      blitz: 1500,
+      bullet: 1500,
+      rapid: 1500,
+      classical: 1500,
+    },
+    highestRanking: 1500,
+    online: true,
+  },
+  {
+    firstName: "Paweł",
+    email: "paweł@gmail.com",
+    country: "pl",
+    ranking: {
+      blitz: 1500,
+      bullet: 1500,
+      rapid: 1500,
+      classical: 1500,
+    },
+    highestRanking: 1500,
+    online: true,
+    nameInGame: "pawel",
+    lastName: "Brzuszkiewicz",
+  },
+  {
+    firstName: "Szymon",
+    email: "szymon@gmail.com",
+    country: "pl",
+    ranking: {
+      blitz: 1500,
+      bullet: 1500,
+      rapid: 1500,
+      classical: 1500,
+    },
+    highestRanking: 1500,
+    online: true,
+    nameInGame: "szymon",
+    lastName: "Kowalski",
+  },
+  {
+    firstName: "Strzała",
+    email: "strzała@gmail.com",
+    country: "pl",
+    ranking: {
+      blitz: 1500,
+      bullet: 1500,
+      rapid: 1500,
+      classical: 1500,
+    },
+    highestRanking: 1500,
+    online: true,
+    nameInGame: "strzała",
+    lastName: "Kowalski",
+  },
 ];
 
-export default function PlayOnlineOptions({ navigation }: Props) {
+export default function PlayOnlineOptions({ navigation, user }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [gameTempo, setGameTempo] = useState<LengthType>({
     lengthType: GameLengthTypeContextType.BLITZ,
@@ -58,6 +140,20 @@ export default function PlayOnlineOptions({ navigation }: Props) {
     );
   };
 
+  const handlePlayOnline = () => {
+    console.log("user: ", user);
+    if (!user) return;
+    console.log("user email: ", user.email);
+    navigation.navigate("PlayOnline", {
+      request: setPendingGameRequest(
+        user.email,
+        gameTempo.totalTime,
+        gameTempo.increment,
+        getRanking(gameTempo.lengthType, user)
+      ),
+    });
+  };
+
   return (
     <chosenFriendContext.Provider value={chosenFriend}>
       <View style={styles.container}>
@@ -80,10 +176,7 @@ export default function PlayOnlineOptions({ navigation }: Props) {
             </View>
             <View style={styles.startGameButtonOuterContainer}>
               <View style={styles.startGameButtonInnerContainer}>
-                <StartGameButton
-                  navigation={navigation}
-                  navigationRoute="PlayOnline"
-                />
+                <BaseButton handlePress={handlePlayOnline} text="Play" />
               </View>
             </View>
           </View>

@@ -4,16 +4,16 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import ChessBoard from "../components/ChessBoard";
+import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
 import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
+import { sampleMoves } from "../chess-logic/ChessConstants";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { BotPlayer } from "../features/playOnline";
 import BotBar from "../features/play-with-bot/components/BotBar";
-import { Board } from "../utils/chess-calculations/board";
+import { Board } from "../chess-logic/board";
 import { Player } from "../utils/PlayerUtilities";
 import { getUser } from "../services/userServices";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
@@ -34,12 +34,10 @@ export default function PlayBot({ navigation, route }: Props) {
   const [chessBoard, setChessBoard] = useState<Board>(initialChessBoard);
   const [opponent, setOpponent] = useState<BotPlayer | null>(null);
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
-  const [isMyTurn, setIsMyTurn] = useState<boolean>(true);
   const [opponentClockInfo, setOpponentClockInfo] = useState<
     Date | undefined
   >();
   const [myClockInfo, setMyClockInfo] = useState<Date>();
-  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
   useEffect(() => {
     const isOpponentWhite = Math.random() > 0.5;
     setOpponent({
@@ -53,7 +51,7 @@ export default function PlayBot({ navigation, route }: Props) {
     getValueFor("user").then((user) => {
       if (user === null) return;
       setMyPlayer({
-        user: JSON.parse(user),
+        ...JSON.parse(user),
         color: isOpponentWhite ? "black" : "white",
       });
     });
@@ -74,7 +72,11 @@ export default function PlayBot({ navigation, route }: Props) {
             )}
           </View>
           <View style={styles.boardContainer}>
-            <ChessBoard board={chessBoard} setBoard={setChessBoard} />
+            <PlayOnlineChessBoard
+              board={chessBoard}
+              setBoard={setChessBoard}
+              playersColor={myPlayer?.color ? myPlayer.color : "spectator"}
+            />
           </View>
           <View style={styles.playerBarContainer}>
             {opponent?.color !== "black" ? (

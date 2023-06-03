@@ -1,5 +1,6 @@
-package com.chessin.model.register.user;
+package com.chessin.controller.responses;
 
+import com.chessin.model.register.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,26 +15,20 @@ public class UserResponse {
     private Long id;
     private String firstname;
     private String lastName;
-    private String email;
     private String nameInGame;
-    private String password;
-    private String role;
     private int ratingBlitz;
     private int ratingBullet;
     private int ratingRapid;
     private int ratingClassical;
     private String country;
 
-    public static UserResponse fromUser(User user){
+    public static UserResponse fromUser(User user) {
         return UserResponse
                 .builder()
                 .id(user.getId())
                 .firstname(user.getFirstname())
                 .lastName(user.getLastName())
-                .email(user.getEmail())
                 .nameInGame(user.getNameInGame())
-                .password(user.getPassword())
-                .role(user.getRole())
                 .ratingBlitz(user.getRatingBlitz())
                 .ratingBullet(user.getRatingBullet())
                 .ratingRapid(user.getRatingRapid())
@@ -42,16 +37,13 @@ public class UserResponse {
                 .build();
     }
 
-    public static User toUser(UserResponse userResponse){
+    public static User toUser(UserResponse userResponse) {
         return User
                 .builder()
                 .id(userResponse.getId())
                 .firstname(userResponse.getFirstname())
                 .lastName(userResponse.getLastName())
-                .email(userResponse.getEmail())
                 .nameInGame(userResponse.getNameInGame())
-                .password(userResponse.getPassword())
-                .role(userResponse.getRole())
                 .ratingBlitz(userResponse.getRatingBlitz())
                 .ratingBullet(userResponse.getRatingBullet())
                 .ratingRapid(userResponse.getRatingRapid())
@@ -59,5 +51,4 @@ public class UserResponse {
                 .country(userResponse.getCountry())
                 .build();
     }
-
 }

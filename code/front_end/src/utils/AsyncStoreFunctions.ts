@@ -7,10 +7,10 @@ export async function save(key:any, value:any) {
 export async function getValueFor(key:any) {
     let result = await SecureStore.getItemAsync(key);
     if (result) {
-      console.log("🔐 Here's your value 🔐 \n" + result);
+      // console.log("🔐 Here's your value 🔐 \n" + result);
       return result;
     } else {
-      console.log('No values stored under that key.');
+      // console.log('No values stored under that key.');
       return null
     }
   }

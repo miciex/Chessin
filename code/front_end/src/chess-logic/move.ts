@@ -9,6 +9,17 @@ type constructorArgs = {
     move?:Move
 }
 
+export type MoveResponse = {
+    movedPiece:number;
+     startField:number;
+     endField:number;
+     takenPiece:number;
+     promotePiece:number;
+     gaveCheck:boolean;
+     takenPieceField:number;
+}
+
+
 export type Move = {
      movedPiece:number;
      startField:number;
@@ -35,6 +46,19 @@ export type Move = {
         promotePiece: promotePiece?promotePiece:(move?move.promotePiece:0),
         continuations: continuations?continuations:[],
         gaveCheck: move?move.gaveCheck:false
+        }
+    }
+
+    export const getEmptyMove = ():Move =>{
+        return {
+            movedPiece:0,
+            startField:0,
+            endField:0,
+            takenPiece:0,
+            promotePiece:0,
+            continuations:[],
+            gaveCheck:false,
+            takenPieceField:0
         }
     }
     

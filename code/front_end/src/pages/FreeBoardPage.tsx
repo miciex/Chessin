@@ -4,14 +4,14 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import ChessBoard from "../components/ChessBoard";
+import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../utils/chess-calculations/ChessConstants";
+import { sampleMoves } from "../chess-logic/ChessConstants";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import PiecesBar from "../features/free-board/components/PiecesBar";
 import FunctionsBar from "../features/free-board/components/FunctionsBar";
-import { Board } from "../utils/chess-calculations/board";
+import { Board } from "../chess-logic/board";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 
@@ -49,7 +49,11 @@ export default function FreeBoard({ navigation, route }: Props) {
         <View style={styles.mainContentContainer}>
           <PiecesBar barColor="white" />
           <View style={styles.boardContainer}>
-            <ChessBoard board={chessBoard} setBoard={setChessBoard} />
+            <PlayOnlineChessBoard
+              board={chessBoard}
+              setBoard={setChessBoard}
+              playersColor={"spectator"}
+            />
           </View>
           <PiecesBar barColor="black" />
           <FunctionsBar />

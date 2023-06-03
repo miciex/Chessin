@@ -28,6 +28,7 @@ public class User implements UserDetails {
     private String lastName;
     @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false, unique = true)
     private String nameInGame;
     private String password;
     private String role;
@@ -39,11 +40,12 @@ public class User implements UserDetails {
     private int ratingRapid;
     private int ratingClassical;
     private String country;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<User> friends;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<ChessGame> chessGames;
     private boolean isOnline;
+    private boolean isActivated;
     //pfp
     //osobna tabela z oczekującymi grami
 

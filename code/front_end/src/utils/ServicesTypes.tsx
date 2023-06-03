@@ -1,7 +1,17 @@
-export type registerRequestType = {
-  firstName: string;
-  lastName: string;
-  nick: string;
+import { responseUser } from "./PlayerUtilities";
+import { MoveResponse } from "../chess-logic/move";
+import { GameResults } from "../chess-logic/board";
+
+export type RegisterRequest = {
+  firstname: string;
+  lastname: string;
+  nameInGame: string;
+  email: string;
+  password: string;
+  country: string;
+};
+
+export type LoginRequest = {
   email: string;
   password: string;
 };
@@ -24,3 +34,66 @@ export enum VerificationType {
   REMIND_PASSWORD,
   CHANGE_EMAIL,
 }
+
+//timeControl in seconds
+export type PendingChessGameRequest = {
+  email: string;
+  timeControl: number;
+  increment: number;
+  bottomRating: number;
+  topRating: number;
+  userRating: number;
+};
+
+export type ChessGameResponse = {
+  id: number;
+  whiteUser: responseUser;
+  blackUser: responseUser;
+  moves: Array<MoveResponse>;
+  availableCastles: Array<number>;
+  timeControl: number;
+  increment: number;
+  startBoard: string;
+  whiteStarts: boolean;
+};
+
+export type SubmitMoveRequest = {
+  gameId: number;
+  email: string;
+  movedPiece: number;
+  startField: number;
+  endField: number;
+  promotePiece: number;
+  isDrawOffered: boolean;
+};
+
+export type BoardResponse = {
+  moves: Array<MoveResponse>;
+  whiteTurn: boolean;
+  whiteEmail: string;
+  blackEmail: string;
+  position: { [key: number]: number };
+  positions: Array<{ [key: number]: number }>;
+  movesTo50MoveRule: number;
+  movedPieces: Array<number>;
+  availableCastles: Array<number>;
+  gameResult: GameResults;
+  visualBoard: Array<number>;
+  startBoard: string;
+};
+
+export type CodeVerificationRequest = {
+  email: string;
+  verificationCode: string;
+  verificationType: VerificationType;
+  newPassword?: string;
+  password?: string;
+  firstname?: string;
+  lastname?: string;
+  nameInGame?: string;
+  country?: string;
+};
+
+export type ListenForFirstMoveRequest = {
+  gameId: number;
+};

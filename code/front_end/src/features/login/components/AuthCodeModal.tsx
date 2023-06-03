@@ -1,66 +1,67 @@
-import { Modal, View, Pressable, StyleSheet, TextInput } from "react-native";
-import React, { useState, useContext, useRef } from "react";
+import {
+  Modal,
+  View,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  TextInputKeyPressEventData,
+} from "react-native";
+import React, { useState, useRef } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import { Char, isChar } from "../../../utils/Types";
-import { verifyCode } from "../../../utils/ServicesConstants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
-import { AuthenticationResponse } from "../../../utils/ServicesTypes";
 import { VerificationType } from "../../../utils/ServicesTypes";
 import { Entypo } from "@expo/vector-icons";
+import { StackParamList } from "../../../utils/Constants";
+import { setUserDataFromResponse } from "../../../services/userServices";
+import { verifyCode } from "../../../services/AuthenticationServices";
+import { CodeVerificationRequest } from "../../../utils/ServicesTypes";
+import { AuthenticationResponse } from "../../../utils/ServicesTypes";
 
 type Props = {
   hideModal: () => void;
-  navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
-  setUserDataFromResponse: (responseData: AuthenticationResponse) => void;
-  email: string;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    StackParamList,
+    undefined
+  >;
+  request: CodeVerificationRequest;
+  handleVerifyCodeResponse?: (
+    data: AuthenticationResponse,
+    request: CodeVerificationRequest
+  ) => void;
 };
 
 const InputLength = 8;
 export default function AuthCodeModal({
   hideModal,
   navigation,
-  setUserDataFromResponse,
-  email,
+  request,
+  handleVerifyCodeResponse,
 }: Props) {
-  const [inputs, setInputs] = useState<Char[]>(new Array(InputLength));
+  const [inputs, setInputs] = useState<Char[]>(new Array(InputLength).fill(""));
 
   const itemElems = useRef<any>(new Array(InputLength));
 
   const submitCode = () => {
-    fetch(verifyCode, {
-      body: JSON.stringify({
-        verificationCode: inputs.join(""),
-        email: email,
-        verificationType: VerificationType.AUTHENTICATE,
-        oldPassword: "",
-        newPassword: "",
-      }),
-      method: "POST",
-      headers: new Headers({ "content-type": "application/json" }),
+    console.log({
+      ...request,
+      verificationCode: inputs.join(""),
+    });
+    verifyCode({
+      ...request,
+      verificationCode: inputs.join(""),
     })
-      .then((response) => {
-        if (response.status === 200) {
-          console.log("200");
-          return response.json();
-        } else if (response.status === 400) {
-          console.log("400");
-          return response
-            .json()
-            .then((data) => {
-              console.log(data);
-              throw new Error(data);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-      })
       .then((data) => {
-        console.log(data);
-        setUserDataFromResponse(data);
-        return;
+        console.log("data", data);
+        if (!handleVerifyCodeResponse) return;
+        console.log("sending data to handleVerifyCodeResponse");
+        handleVerifyCodeResponse(data, {
+          ...request,
+          verificationCode: inputs.join(""),
+        });
       })
       .then(() => {
         navigation.navigate("Home");
@@ -76,9 +77,35 @@ export default function AuthCodeModal({
     let newInputs = [...inputs];
     newInputs[index] = text;
     setInputs(newInputs);
+
+    if (text.length === 0) return;
+
     itemElems.current[index + 1]?.focus();
     itemElems.current[0].blur();
     if (index + 1 === InputLength) itemElems.current[index]?.blur();
+  };
+
+  const handleKeyPress = (
+    nativeEvent: TextInputKeyPressEventData,
+    index: number
+  ) => {
+    console.log(nativeEvent.key);
+    if (nativeEvent.key === "Backspace" && index > 0 && inputs[index] === "") {
+      itemElems.current[index - 1]?.focus();
+      return;
+    }
+    if (
+      nativeEvent.key === "Backspace" &&
+      index === 0 &&
+      inputs[index] === ""
+    ) {
+      itemElems.current[index].blur();
+      return;
+    }
+    if (nativeEvent.key === " ") {
+      if (itemElems.current[index + 1]) itemElems.current[index + 1].focus();
+      else itemElems.current[index].blur();
+    }
   };
 
   const getInputsView = () => {
@@ -91,6 +118,9 @@ export default function AuthCodeModal({
           value={inputs[i]?.toString()}
           onChangeText={(text) => handleOnChange(text, i)}
           ref={(ref) => (itemElems.current[i] = ref)}
+          onKeyPress={({ nativeEvent }) => {
+            handleKeyPress(nativeEvent, i);
+          }}
         />
       );
     }

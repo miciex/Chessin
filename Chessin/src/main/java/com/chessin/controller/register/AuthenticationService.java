@@ -1,11 +1,11 @@
 package com.chessin.controller.register;
 
+import com.chessin.controller.requests.*;
 import com.chessin.model.register.authentication.refreshToken.RefreshTokenRepository;
 import com.chessin.model.register.authentication.refreshToken.RefreshToken;
-import com.chessin.model.register.authentication.requests.*;
 import com.chessin.model.register.authentication.verificationCode.VerificationCode;
 import com.chessin.model.register.authentication.verificationCode.VerificationCodeRepository;
-import com.chessin.model.register.authentication.responses.AuthenticationResponse;
+import com.chessin.controller.responses.AuthenticationResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.Provider;
 import com.chessin.model.register.user.User;
@@ -39,8 +39,9 @@ public class AuthenticationService {
     private final VerificationCodeRepository verificationCodeRepository;
     private final EmailService emailService;
 
-    public ResponseEntity<?> register(RegisterRequest request){
-
+    @Transactional
+    public ResponseEntity<?> register(RegisterRequest request)
+    {
         var user = User
                 .builder()
                 .firstname(request.getFirstname())
@@ -52,11 +53,34 @@ public class AuthenticationService {
                 .role(USER)
                 .isTwoFactorAuthenticationEnabled(true)
                 .provider(Provider.LOCAL)
+                .isActivated(false)
                 .build();
+
+        userRepository.save(user);
+
+        sendVerificationCode(userRepository.findByEmail(request.getEmail()).get());
+        return ResponseEntity.accepted().body("Verification code sent to your email address.");
+    }
+
+    public ResponseEntity<?> activateAccount(CodeVerificationRequest request){
+        if(!verificationCodeRepository.existsByCode(request.getVerificationCode()))
+            return ResponseEntity.badRequest().body("Code is incorrect.");
+
+        var code = verificationCodeRepository.findByCode(request.getVerificationCode()).get();
+
+        if(!code.getUser().getEmail().equals(request.getEmail()))
+            return ResponseEntity.badRequest().body("Code is incorrect.");
+
+        if(code.getExpiryDate().compareTo(Instant.now()) < 0)
+            return ResponseEntity.badRequest().body("Code is expired.");
+
+        var user = code.getUser();
 
         var jwtToken = jwtService.generateToken(user);
 
-        userRepository.save(user);
+        verificationCodeRepository.delete(code);
+
+        user.setActivated(true);
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
@@ -145,7 +169,7 @@ public class AuthenticationService {
             try
             {
                 authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getOldPassword()));
+                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             } catch(AuthenticationException e){
                 return ResponseEntity.badRequest().body("Password incorrect.");
             }
