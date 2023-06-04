@@ -50,6 +50,19 @@ export type Move = {
         }
     }
 
+export const copyMove = (move:Move):Move => {
+    return {
+        movedPiece: move.movedPiece,
+        startField: move.startField,
+        endField: move.endField,
+        takenPiece: move.takenPiece,
+        promotePiece: move.promotePiece,
+        continuations: [...move.continuations],
+        gaveCheck: move.gaveCheck,
+        takenPieceField: move.takenPieceField
+    }
+}
+
     export const getEmptyMove = ():Move =>{
         return {
             movedPiece:0,

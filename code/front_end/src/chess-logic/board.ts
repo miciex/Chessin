@@ -1,5 +1,5 @@
 import { HashMap } from "../utils/Types";
-import { Move, getEmptyMove, moveFactory } from "./move";
+import { Move, getEmptyMove, moveFactory, copyMove } from "./move";
 import { Pieces, Directions } from "./ChessConstants";
 import { FenToIntArray, boardToMap, mapToBoard } from "./helpMethods";
 import { ChessGameResponse } from "../utils/ServicesTypes";
@@ -64,6 +64,22 @@ export const boardFactory = ({fenString, whiteToMove, availableCastles, moves, b
         }
 }
 
+export const copyBoard = (board:Board):Board => {
+    return {
+        fen: board.fen,
+        visualBoard: [...board.visualBoard],
+        position: {...board.position},
+        whiteToMove: board.whiteToMove,
+        availableCastles: [...board.availableCastles],
+        moves: [...board.moves.map((move) => copyMove(move))],
+        positions: [...board.positions.map((position) => ({...position}))],
+        movesTo50MoveRule: board.movesTo50MoveRule,
+        movedPieces: [...board.movedPieces],
+        result: board.result
+    }
+}
+
+
     export const resetBoard = (fenString:string):Board =>{
         const visualBoard: Array<number> = FenToIntArray(fenString, 64);
         const position: {[key:number]:number} = boardToMap(visualBoard);
@@ -88,16 +104,20 @@ export const boardFactory = ({fenString, whiteToMove, availableCastles, moves, b
 
     export const checkGameResult = (board: Board):GameResults => {
         let result: GameResults = GameResults.NONE;
+        console.log("stalemate");
         if (isThreefold(board))
             result = GameResults.THREE_FOLD;
         else if (draw50MoveRule(board))
             result = GameResults.DRAW_50_MOVE_RULE;
-        else if (isStalemate(board))
+        else if (isStalemate(board)){
+            console.log("stalemate 2");
             result = GameResults.STALEMATE;
+        }
         else if (insufficientMaterial(board))
             result = GameResults.INSUFFICIENT_MATERIAL;
         else if (isMate(board))
             result = GameResults.MATE;
+        console.log("result: ", result);
         return result;
     }
 
@@ -577,13 +597,18 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     }
 
     export const isStalemate = (board: Board):boolean =>{
-        Object.entries(board.position).forEach(([key, value]) =>{
+        console.log("isStalemate")
+        for(let [key, value] of Object.entries(getPositionCopy(board.position))){
             if(value > 16 && !board.whiteToMove || value < 16 && board.whiteToMove){
                 const squares:Array<number> = PossibleMoves(Number(key), board);
-                if(squares.length>0&&deleteImpossibleMoves(squares, Number(key), board).length > 0) return false;
+                const possibleMoves = deleteImpossibleMoves(squares, Number(key), board);
+                if(possibleMoves.length > 0){
+                     return false;
+                }
             }
-        })
+        }
         if(isChecked(board) != -1) return false;
+        console.log("Board: " + board.position)
         return true;
     }
 
