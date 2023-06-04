@@ -10,7 +10,11 @@ export default function Timer({ info }: Props) {
     <View style={styles.appContainer}>
       <Text style={styles.appText}>
         {info
-          ? info.getMinutes().toString() + info.getSeconds().toString()
+          ? info.getMinutes().toString() +
+            ":" +
+            (info.getSeconds().toString().length === 1
+              ? "0" + info.getSeconds().toString()
+              : info.getSeconds().toString())
           : null}
       </Text>
     </View>

@@ -6,7 +6,8 @@ type constructorArgs = {
     endField?:number,
     promotePiece?:number,
     continuations?:Move[],
-    move?:Move
+    move?:Move,
+    movedPiece?:number
 }
 
 export type MoveResponse = {
@@ -31,10 +32,10 @@ export type Move = {
      continuations: Move[];
 }
     
-    export const moveFactory = ({pieces, startField, endField, promotePiece, move, continuations}:constructorArgs):Move =>{
+    export const moveFactory = ({pieces, startField, endField, movedPiece,promotePiece, move, continuations}:constructorArgs):Move =>{
         const startF = startField?startField:(move?move.startField:0);
         const endF = endField?endField:(move?move.endField:0);
-        const movedP = pieces&&startField?pieces[startField]:(move?move.movedPiece:0);
+        const movedP = movedPiece?movedPiece:(pieces&&startField?pieces[startField]:(move?move.movedPiece:0));
         const takenP = move?move.movedPiece:(pieces?calcTakenPiece(pieces, startF, endF, movedP):0);
 
         return {
@@ -42,7 +43,7 @@ export type Move = {
         endField: endF,
         movedPiece: movedP,
         takenPiece: takenP,
-        takenPieceField: move?move.takenPieceField:(pieces?calcTakenPieceField(pieces, startF, endF, movedP, takenP):0),
+        takenPieceField: move?move.takenPieceField:(pieces?calcTakenPieceField(pieces, startF, endF, movedP, takenP):-1),
         promotePiece: promotePiece?promotePiece:(move?move.promotePiece:0),
         continuations: continuations?continuations:[],
         gaveCheck: move?move.gaveCheck:false
@@ -58,7 +59,7 @@ export type Move = {
             promotePiece:0,
             continuations:[],
             gaveCheck:false,
-            takenPieceField:0
+            takenPieceField:-1
         }
     }
     

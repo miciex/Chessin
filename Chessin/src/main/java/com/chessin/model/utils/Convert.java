@@ -102,7 +102,7 @@ public class Convert {
 //        if (move.getPromotePiece() != 0) {
 //            note += "=" + toUpperCase(HelpMethods.intToCharPiece(move.getPromotePiece()));
 //        }
-//        if (move.isGaveCheck()) {
+//        if (move.gaveCheck()) {
 //            note += "+";
 //        }
 //        return note;

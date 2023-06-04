@@ -1,6 +1,6 @@
 import { Pieces } from "./ChessConstants";
 import { Char } from "../utils/Types";
-
+import { ALPHABET } from "../utils/Constants";
 
 export const getPieceValue = (piece:number):number=>{
     switch (piece % 8){
@@ -56,7 +56,6 @@ export const FenToIntArray = (fen:string, arrayLength:number):Array<number> =>{
         num++;
 
     }
-    console.log(arr);
     return arr;
 }
 
@@ -75,4 +74,21 @@ export const mapToBoard = (map:{[key:number]:number}):Array<number>=>{
         board[parseInt(key)] = value;
     })
     return board;
+}
+
+export const intToCharPiece = ( p:number):string =>{
+    switch (p % 8) {
+        case 1: return p < 16 ? 'K' : 'k';
+        case 2: return p < 16 ? 'P' : 'p';
+        case 3: return p < 16 ? 'R' : 'r';
+        case 4: return p < 16 ? 'N' : 'n';
+        case 5: return p < 16 ? 'B' : 'b';
+        case 6: p < 16 ? 'Q' : 'q';
+        default: return ' ';
+    };
+}
+
+
+export const fieldNumberToChessNotation = (fieldNumber:number):string =>{
+    return ALPHABET[fieldNumber%8] + (Math.ceil(8-fieldNumber/8)).toString();
 }

@@ -17,7 +17,7 @@ export default function PlayerBar({ player, timerInfo }: Props) {
     <View style={styles.appContainer}>
       <View style={styles.textContainer}>
         <FontAwesome name="user-circle" size={32} color="black" />
-        <Text style={styles.text}>{player ? player.firstName : ""}</Text>
+        <Text style={styles.text}>{player ? player.firstname : ""}</Text>
         <Text style={styles.text}>{player ? player.highestRanking : ""}</Text>
       </View>
       <View style={styles.iconsContainer}>

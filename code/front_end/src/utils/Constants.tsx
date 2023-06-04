@@ -45,3 +45,5 @@ export const notValidNickMessage: string =
   "Nick mustn`t contain numbers and must contain at least 3 characters.";
 
 export const searchRatingRange: number = 200;
+
+export const ALPHABET: string = "abcdefghijklmnopqrstuvwxyz";

@@ -14,7 +14,7 @@ export type constructorArgs = {
 }
 
 export const enum GameResults{
-    THREE_FOLD, MATE, DRAW_50_MOVE_RULE, INSUFFICIENT_MATERIAL, STALEMATE, NONE
+    THREE_FOLD = "THREE_FOLD", MATE = "MATE", DRAW_50_MOVE_RULE = "DRAW_50_MOVE_RULE", INSUFFICIENT_MATERIAL = "INSUFFICIENT_MATERIAL", STALEMATE = "STALEMATE", NONE = "NONE"
 }
 
 export type Board = {
@@ -32,7 +32,6 @@ export type Board = {
 
 export const BoardResponseToBoard = (boardResponse: BoardResponse):Board => {
     const moves = boardResponse.moves.map((move) => moveFactory(move));
-
     return {
         fen: boardResponse.startBoard,
         visualBoard: boardResponse.visualBoard,
@@ -89,11 +88,6 @@ export const boardFactory = ({fenString, whiteToMove, availableCastles, moves, b
 
     export const checkGameResult = (board: Board):GameResults => {
         let result: GameResults = GameResults.NONE;
-
-        //Do the same in engine
-        //movesTo50MoveRule = CheckGameResults.draw50MoveRuleCheck(move, movesTo50MoveRule);
-
-        console.log(board)
         if (isThreefold(board))
             result = GameResults.THREE_FOLD;
         else if (draw50MoveRule(board))
@@ -123,9 +117,7 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     return new Array();
         switch (piece) {
             case Pieces.PAWN: 
-                console.log("Pawn moves")
                 const possibleMoves = PossiblePawnMoves(piecePosition, board.position, board.moves);
-                console.log("PossibleMoves: ", possibleMoves)
                 return possibleMoves;
             case Pieces.KING:
                 return allPossibleKingMoves(piecePosition, board);
@@ -155,7 +147,7 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     export const addCastlingMoves = (piecePosition:number, board:Board):Array<number> => {
         let moves:Array<number> = new Array();
 
-        if (piecePosition === 4 && board.availableCastles[0] === 0 &&  (0 in board.position) && board.position[0] % 8 === Pieces.ROOK && isCastlingPossible(piecePosition, -1, board))
+        if (piecePosition === 4 && board.availableCastles[0] === 0 &&  (0 in board.position) && board.position[0] % 8 === Pieces.ROOK  &&isCastlingPossible(piecePosition, -1, board))
             moves.push(2);
         if (piecePosition === 4 && board.availableCastles[1] === 0 && (7 in board.position) && board.position[7] % 8 === Pieces.ROOK && isCastlingPossible(piecePosition, 1, board))
             moves.push(6);
@@ -163,7 +155,6 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
             moves.push(58);
         if (piecePosition === 60 && board.availableCastles[3] === 0 && (63 in board.position) && board.position[63] % 8 === Pieces.ROOK && isCastlingPossible(piecePosition, 1, board))
             moves.push(62);
-
         return moves;
     }
 
@@ -194,7 +185,6 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
 
     export const deleteImpossibleMoves = (moves:Array<number>, activeField:number, board:Board):Array<number> =>{
         let possibleMoves:Array<number> = [];
-        console.log("moves: ", moves);
         let multiplier:number = board.whiteToMove ? -1 : 1;
 
         if(moves.length > 0)
@@ -213,7 +203,6 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
             }
             board = unMakeMove(move, board);
         })
-        console.log(possibleMoves);
         return possibleMoves;
     }
 
@@ -305,11 +294,9 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
             let pos:number = mulptiplier * directions[i] + piecePosition;
             if (i < 2 && !(pos in position)) {
                 if (i === 0){
-                    console.log("first")
                     moves.push(pos);
                 }
                 else if (Math.floor((3.5 - mulptiplier * 2.5)) === Math.floor(piecePosition / 8) && !((pos - 8 * mulptiplier) in position)) {
-                    console.log("here")
                     moves.push(pos);
                 }
             } else if (i > 1 && (pos in position) && (position[pos] < 16 != white)) {
@@ -344,12 +331,11 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     
     export const allPossibleKingMoves = (piecePosition:number, board: Board):Array<number> => {
         let moves:Array<number> = specialPossibleMoves(piecePosition, Pieces.KING, board.position);
-        moves.push.apply([...addCastlingMoves(piecePosition, board)]);
-        return moves;
+        let castlingMoves:Array<number> = addCastlingMoves(piecePosition, board);
+        return [...moves, ...castlingMoves];
     }
 
     export const canMoveToSquare = (startPosition:number, piece:number, visualBoard: Array<number>, endPosition?:number):Array<number> =>{
-        
         let moveList:Array<number> = new Array();
         if (piece % 8 === Pieces.KNIGHT)
             Directions[Pieces.KNIGHT].forEach((i:number) => {
@@ -398,11 +384,10 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     }
 
     export const movePiece = (move:Move, position:{[key:number]:number}):{[key:number]:number} =>{
-        let newPosition:{[key:number]:number} = Object.assign({}, position);
+        let newPosition:{[key:number]:number} = {...position};
         if (move.movedPiece % 8 === Pieces.KING && Math.abs(move.startField - move.endField) === 2) {
-            //Changing rooks placement in castling
-            newPosition[(move.startField / 8) * 8 + move.startField % 8 + (move.endField - move.startField) / 2] = position[((move.startField / 8) * 8 + ((move.endField % 8) / 4) * 7)];
-            delete newPosition[((move.startField / 8) * 8 + ((move.endField % 8) / 4) * 7)];
+            newPosition[Math.floor(move.startField / 8) * 8 + move.startField % 8 + Math.floor((move.endField - move.startField) / 2)] = position[(Math.floor(move.startField / 8) * 8 + Math.floor((move.endField % 8) / 4) * 7)];
+            delete newPosition[(Math.floor(move.startField / 8) * 8 + Math.floor((move.endField % 8) / 4) * 7)];
         } else if (move.movedPiece % 8 === Pieces.PAWN && move.takenPiece % 8 === Pieces.PAWN && move.endField != move.takenPieceField) {
             //Removing the pawn which was taken end passant
             delete newPosition[move.takenPieceField];
@@ -481,7 +466,6 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     }
 
     export const playMove = (move:Move, board:Board):Board =>{
-        console.log("move: ", move);
         board = makeMove(move, board);
         board.visualBoard = mapToBoard(board.position);
         board.whiteToMove = !board.whiteToMove;
