@@ -11,7 +11,7 @@ import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import ChooseYourLevelModal from "../features/home/components/ChooseYourLevelModal";
-// import { useNetInfo } from "@react-native-community/netinfo";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 //przykladowe stary gry
 const ended_games = [

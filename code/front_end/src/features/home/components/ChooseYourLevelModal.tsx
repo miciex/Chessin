@@ -32,7 +32,7 @@ export default function ChooseYourLevelModal({toggleGear}: Props) {
                   toggleGear();
                 }}
               >
-                <Entypo name="cross" size={36} color="black" />
+                <Entypo name="cross" size={40} color="black" />
               </Pressable>
             </View>
           </View>
@@ -40,13 +40,14 @@ export default function ChooseYourLevelModal({toggleGear}: Props) {
         </View>
         <View style={styles.contentContainer} >
         {levels.map((level, index) => (
+          <View style={styles.record}>
             <Pressable android_ripple={{
                 color: ColorsPallet.darker,
                 borderless: false,
               }} onPress={()=>{
                 toggleGear();
-              }} style={styles.record}>
-                <Text style={{textAlign: "center", fontSize: 18}}>{level}</Text></Pressable>
+              }} style={{width: "100%", height: "100%",  justifyContent: "center",alignItems: "center", borderRadius: 16}} >
+                <Text style={{textAlign: "center", fontSize: 18}}>{level}</Text></Pressable></View>
           ))}
         </View>
       </View>
@@ -58,12 +59,12 @@ export default function ChooseYourLevelModal({toggleGear}: Props) {
 const styles = StyleSheet.create({
     
   container: {
-    width: "80%",
-    height: "80%",
+    width: "100%",
+    height: "100%",
     backgroundColor: ColorsPallet.light,
     gap: 16,
-    marginLeft: "10%",
-    marginTop: "10%",
+    marginTop: "40%",
+    borderRadius: 16,
   },
   closeModalButton: {
     width: "100%",
@@ -76,6 +77,7 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     paddingLeft: 16,
+    borderRadius: 15,
   },
   closeModalButtonInnerContainer: {
     borderRadius: 8,
@@ -89,6 +91,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
+    borderTopRightRadius: 16,
+    borderTopLeftRadius: 16,
   },
   headerText: {
     color: ColorsPallet.lighter,
@@ -98,17 +102,16 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 7,
     gap: 32,
-    alignItems: "center"
+    alignItems: "center",
+    marginTop: 15,
+    borderRadius: 15,
   },
   record: {
     width: "80%",
     height: 70,
-    backgroundColor: ColorsPallet.baseColor,
-    padding: 24,
-    paddingLeft: 25,
-    paddingRight: 25,
-    borderRadius: 12,
-    textAlign: "center",
-   
+    overflow: "hidden",
+    borderRadius: 8,
+    flexDirection: "row",
+    backgroundColor: ColorsPallet.baseColor
   }
 })

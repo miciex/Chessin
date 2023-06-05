@@ -1,16 +1,35 @@
 import { View, Text, StyleSheet, Image, Pressable} from "react-native";
-import React from "react";
+import React, {useState} from "react";
 
 import { ColorsPallet } from "../../../utils/Constants";
+import InvitationModal from "./InvitationModal";
 
 const SendInvitation = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  const handleModalTimeout = () => {
+    setModalVisible(false);
+  };
   return (
     <View style={styles.buttonContainer}>
     <Pressable style={styles.button} android_ripple={{
       color: ColorsPallet.darker,
       borderless: false,
     }}>
-   
+   <InvitationModal
+        visible={modalVisible}
+        duration={2000} // Display for 2 seconds
+        onTimeout={handleModalTimeout}
+        text="Wysłano Invite"
+      />
       <Text style={styles.text}>Send Invitation</Text>
    
     </Pressable>
