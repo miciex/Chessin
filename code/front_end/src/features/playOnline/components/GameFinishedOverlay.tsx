@@ -37,17 +37,24 @@ export default function GameFinishedOverlay({
     }
   };
 
-  const winnerText = getText();
+  const winnerText = "White won"; //getText();
 
   return (
     <View style={styles.container}>
-      <View>
-        <Text>Game finished</Text>
-        <Text>{winnerText}</Text>
+      <View style={styles.textContainer}>
+        <Text style={styles.text}>Game finished</Text>
+        <Text style={styles.winnerText}>{winnerText}</Text>
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.buttonContainer}>
           <BaseButton text="Play again" handlePress={searchForGame} />
+          <BaseButton
+            text="Go to Menu"
+            handlePress={() => {
+              navigation.navigate("GameMenu");
+            }}
+            color={ColorsPallet.baseColor}
+          />
         </View>
       </View>
     </View>
@@ -60,21 +67,31 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 16,
     backgroundColor: ColorsPallet.light,
-    opacity: 0.8,
+    // opacity: 0.8,
   },
   textContainer: {
     flex: 1,
     width: "100%",
     alignItems: "center",
+    justifyContent: "center",
   },
   buttonContainer: {
     width: "50%",
     height: 32,
+    gap: 16,
   },
   contentContainer: {
     flex: 2,
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  winnerText: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });

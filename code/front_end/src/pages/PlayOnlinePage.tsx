@@ -12,7 +12,13 @@ import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../chess-logic/ChessConstants";
 import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
-import { Board, GameResults, boardFactory } from "../chess-logic/board";
+import {
+  Board,
+  GameResults,
+  boardFactory,
+  playMove,
+  copyBoard,
+} from "../chess-logic/board";
 import { Player, responseUserToPlayer } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import {
@@ -26,6 +32,7 @@ import WaitingForGame from "../features/playOnline/components/WaitingForGame";
 import { listenForFirstMove } from "../features/playOnline/services/playOnlineService";
 import { BoardResponseToBoard } from "../chess-logic/board";
 import GameFinishedOverlay from "../features/playOnline/components/GameFinishedOverlay";
+import { Move } from "../chess-logic/move";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -51,12 +58,10 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [foundGame, setFoundGame] = useState(false);
   const [searchingGame, setSearchingGame] = useState(true);
   const [gameId, setGameId] = useState<number>(-1);
-
   useEffect(() => {
     searchNewGame();
 
     return () => {
-      console.log("unmounting");
       unMount();
     };
   }, []);
@@ -153,35 +158,49 @@ export default function PlayOnline({ navigation, route }: Props) {
       .then((res) => {
         const board: Board = BoardResponseToBoard(res);
         setBoardState(board);
-        console.log("started listening for first move");
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
+  const PlayMove = (move: Move) => {
+    setBoardState((prevBoard) => {
+      let newBoard = playMove(move, copyBoard(prevBoard));
+
+      return newBoard;
+    });
+  };
   const settings = gearModal ? (
     <>
       <SettingsGameModal toggleGear={toggleGear} gearModalOn={gearModal} />
     </>
   ) : null;
 
-  const gameFinishedOverlay =
-    boardState.result === GameResults.NONE ? null : (
-      <GameFinishedOverlay
-        navigation={navigation}
-        whoWon={boardState.result}
-        searchForGame={searchNewGame}
-        whitesTurn={boardState.whiteToMove}
-      />
-    );
+  const gameFinishedOverlay = (
+    // boardState.result !== GameResults.NONE ? (
+    <View style={styles.gameFinishedOverlayOuterContainer}>
+      <View style={styles.gameFinishedOverlayInnerContainer}>
+        <GameFinishedOverlay
+          navigation={navigation}
+          whoWon={boardState.result}
+          searchForGame={searchNewGame}
+          whitesTurn={boardState.whiteToMove}
+        />
+      </View>
+    </View>
+  );
+  // ) : null;
+
+  console.log("moves: ", boardState.moves);
 
   return !searchingGame && myPlayer && myPlayer.color !== null ? (
     <View style={styles.appContainer}>
       {settings}
+
       <View style={[styles.contentContainer, { opacity: opacityGear }]}>
         <View style={styles.gameRecordContainer}>
-          <GameRecord moves={sampleMoves} />
+          <GameRecord board={boardState} />
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.playerBarContainer}>
@@ -198,6 +217,7 @@ export default function PlayOnline({ navigation, route }: Props) {
               setBoard={setBoardState}
               player={myPlayer}
               gameId={gameId}
+              playMove={PlayMove}
             />
           </View>
           <Text>
@@ -218,6 +238,7 @@ export default function PlayOnline({ navigation, route }: Props) {
           </View>
         </View>
       </View>
+      {gameFinishedOverlay}
       <Footer navigation={navigation} />
     </View>
   ) : (
@@ -254,6 +275,7 @@ const styles = StyleSheet.create({
     flex: 8,
     alignItems: "center",
     gap: 16,
+    width: "100%",
   },
   boardContainer: {
     width: "90%",
@@ -266,6 +288,7 @@ const styles = StyleSheet.create({
   gameRecordContainer: {
     width: "100%",
     height: 32,
+    backgroundColor: ColorsPallet.dark,
   },
   mainContentContainer: {
     width: "100%",
@@ -283,6 +306,18 @@ const styles = StyleSheet.create({
   waitingForGameContainer: {
     width: "95%",
     height: "80%",
+    position: "absolute",
+  },
+  gameFinishedOverlayOuterContainer: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+  },
+  gameFinishedOverlayInnerContainer: {
+    marginTop: "30%",
+    width: "95%",
+    height: "63%",
     position: "absolute",
   },
 });

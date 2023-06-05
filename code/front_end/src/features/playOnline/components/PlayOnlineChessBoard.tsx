@@ -7,7 +7,6 @@ import {
   PossibleMoves,
   boardFactory,
   isWhite,
-  playMove,
   BoardResponseToBoard,
 } from "../../../chess-logic/board";
 import { moveFactory } from "../../../chess-logic/move";
@@ -23,6 +22,7 @@ type Props = {
   setBoard: (board: Board) => void;
   player: Player;
   gameId: number;
+  playMove: (move: Move) => void;
 };
 
 export default function PlayOnlineChessBoard({
@@ -30,6 +30,7 @@ export default function PlayOnlineChessBoard({
   setBoard,
   player,
   gameId,
+  playMove,
 }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
@@ -63,6 +64,7 @@ export default function PlayOnlineChessBoard({
       pieces: board.position,
       startField: activeField,
       endField: data.fieldNumber,
+      movedPiece: board.position[activeField],
     });
 
     const submitMoveRequest: SubmitMoveRequest = {
@@ -74,11 +76,9 @@ export default function PlayOnlineChessBoard({
       promotePiece: move.promotePiece,
       isDrawOffered: false,
     };
-
-    setBoard(playMove(move, board));
+    playMove(move);
 
     submitMove(submitMoveRequest).then((data: BoardResponse) => {
-      console.log("data returned");
       if (!data) return;
       setBoard(BoardResponseToBoard(data));
     });

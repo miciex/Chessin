@@ -31,7 +31,6 @@ export default function WaitingForGame() {
   }, []);
 
   const circles = translateY.map((item, index) => {
-    console.log(item);
     return (
       <Animated.View
         style={[{ transform: [{ translateY: item }] }]}
