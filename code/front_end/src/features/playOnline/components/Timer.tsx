@@ -1,41 +1,55 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
+import { Player } from "../../../utils/PlayerUtilities";
+import { Board } from "../../../chess-logic/board";
 
 type Props = {
   info: Date | undefined;
   gameStarted: boolean;
   gameFinished: boolean;
-  isMyTurn: boolean;
-  setTimer: (timer: Date) => void;
+  changeTimerBySeconds: (seconds: number) => void;
+  player: Player | null;
+  board: Board;
 };
 
 export default function Timer({
   info,
   gameFinished,
   gameStarted,
-  isMyTurn,
-  setTimer,
+  board,
+  player,
+  changeTimerBySeconds,
 }: Props) {
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (info && gameStarted && !gameFinished && isMyTurn) {
-        setTimer(new Date(info.setSeconds(info.getSeconds() - 1) * 1000));
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [info]);
+    setTimer();
+    return () => clearTimeout(timeout);
+  }, [board, gameStarted, gameFinished]);
+
+  let timeout: number;
+
+  const setTimer = () => {
+    if (
+      board.whiteToMove === (player?.color === "white") &&
+      gameStarted &&
+      !gameFinished
+    ) {
+      timeout = setTimeout(setTimer, 1000);
+
+      changeTimerBySeconds(-1000);
+    }
+  };
+
+  const time = info
+    ? info.getMinutes().toString() +
+      ":" +
+      (info.getSeconds().toString().length === 1
+        ? "0" + info.getSeconds().toString()
+        : info.getSeconds().toString())
+    : null;
 
   return (
     <View style={styles.appContainer}>
-      <Text style={styles.appText}>
-        {info
-          ? info.getMinutes().toString() +
-            ":" +
-            (info.getSeconds().toString().length === 1
-              ? "0" + info.getSeconds().toString()
-              : info.getSeconds().toString())
-          : null}
-      </Text>
+      <Text style={styles.appText}>{time}</Text>
     </View>
   );
 }

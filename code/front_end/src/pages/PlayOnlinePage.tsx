@@ -60,6 +60,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [gameStarted, setGameStarted] = useState(false);
   const [searchingGame, setSearchingGame] = useState(true);
   const [gameId, setGameId] = useState<number>(-1);
+  const [gameStartedDate, setGameStartedDate] = useState<Date>();
   useEffect(() => {
     searchNewGame();
 
@@ -160,12 +161,29 @@ export default function PlayOnline({ navigation, route }: Props) {
       .then((res) => {
         const board: Board = BoardResponseToBoard(res);
         setBoardState(board);
+        setGameStartedDate(new Date());
         setGameFinished(false);
         setGameStarted(true);
       })
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const updateMyClockInSeconds = (millis: number) => {
+    setMyClockInfo((prev) => {
+      if (prev === undefined) return prev;
+      console.log("update my clock");
+      return new Date(prev.setMilliseconds(prev.getMilliseconds() + millis));
+    });
+  };
+
+  const updateOpponentClockInSeconds = (millis: number) => {
+    setOpponentClockInfo((prev) => {
+      if (prev === undefined) return prev;
+      console.log("update opponent clock");
+      return new Date(prev.setMilliseconds(prev.getMilliseconds() + millis));
+    });
   };
 
   const PlayMove = (move: Move) => {
@@ -196,6 +214,7 @@ export default function PlayOnline({ navigation, route }: Props) {
     ) : null;
 
   // console.log("moves: ", boardState.moves);
+  console.log("timer: ", myClockInfo, opponentClockInfo);
 
   return !searchingGame && myPlayer && myPlayer.color !== null ? (
     <View style={styles.appContainer}>
@@ -210,10 +229,10 @@ export default function PlayOnline({ navigation, route }: Props) {
             <PlayerBar
               player={opponent}
               timerInfo={opponentClockInfo}
-              isWhitesTurn={boardState.whiteToMove}
+              board={boardState}
               gameStarted={gameStarted}
               gameFinished={gameFinished}
-              setTimer={setOpponentClockInfo}
+              changeTimerBySeconds={updateOpponentClockInSeconds}
             />
           </View>
           <View style={styles.boardContainer}>
@@ -237,10 +256,10 @@ export default function PlayOnline({ navigation, route }: Props) {
             <PlayerBar
               player={myPlayer}
               timerInfo={myClockInfo}
-              isWhitesTurn={boardState.whiteToMove}
+              board={boardState}
               gameStarted={gameStarted}
               gameFinished={gameFinished}
-              setTimer={setMyClockInfo}
+              changeTimerBySeconds={updateMyClockInSeconds}
             />
           </View>
         </View>

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import GameRecordMove from "./GameRecordMove";
 import { Move } from "../../../chess-logic/move";
@@ -12,15 +12,19 @@ type Props = {
 };
 export default function GameRecord({ board }: Props) {
   //TODO: convert moves to string array
-  const movesContent = board.moves.map((move, index) => {
-    return (
-      <GameRecordMove
-        move={moveToChessNotation(board, move)}
-        key={index}
-        handlePress={() => {}}
-      />
-    );
-  });
+  const movesContent = useMemo(
+    () =>
+      board.moves.map((move, index) => {
+        return (
+          <GameRecordMove
+            move={moveToChessNotation(board, move)}
+            key={index}
+            handlePress={() => {}}
+          />
+        );
+      }),
+    [board.moves]
+  );
 
   return (
     <View style={styles.appContainer}>

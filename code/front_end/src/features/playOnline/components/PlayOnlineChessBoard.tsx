@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { FieldInfo } from "..";
 import ChessBoardField from "../../../components/ChessBoardField";
 import {
@@ -37,14 +37,12 @@ export default function PlayOnlineChessBoard({
   const [possibleMoves, setPossibleMoves] = useState([-1]);
 
   const handleFieldPress = (data: FieldInfo) => {
-    console.log("data: ", data);
     //copy is needed for selection of fields
     // const number =
     // player.color === "white" ? data.fieldNumber : 63 - data.fieldNumber;
     const pm = PossibleMoves(data.fieldNumber, board);
     setPossibleMoves([...pm]);
     copyPossibleMoves = [...pm];
-    console.log("Possible moves: ", pm);
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
@@ -71,8 +69,6 @@ export default function PlayOnlineChessBoard({
       endField: data.fieldNumber,
       movedPiece: board.position[activeField],
     });
-
-    // console.log(data.fieldNumber);
 
     const submitMoveRequest: SubmitMoveRequest = {
       gameId: gameId,
@@ -101,8 +97,6 @@ export default function PlayOnlineChessBoard({
   //different for : white, black, active, possible move, possible move with piece
   const setBackgroundColor = (info: FieldInfo) => {
     //setting the background to white and black (normal chess board)
-    const number =
-      player.color === "white" ? info.fieldNumber : 63 - info.fieldNumber;
     backgroundColor =
       (info.fieldNumber % 2 === 0 &&
         Math.floor(info.fieldNumber / 8) % 2 === 0) ||
@@ -110,7 +104,10 @@ export default function PlayOnlineChessBoard({
         ? ColorsPallet.light
         : ColorsPallet.dark;
 
-    if (info.fieldNumber == activeField || copyPossibleMoves.includes(number)) {
+    if (
+      info.fieldNumber == activeField ||
+      copyPossibleMoves.includes(info.fieldNumber)
+    ) {
       backgroundColor =
         backgroundColor == ColorsPallet.light
           ? ColorsPallet.baseColor
@@ -143,7 +140,10 @@ export default function PlayOnlineChessBoard({
   possibleMoves.sort((a, b) => a - b);
   copyPossibleMoves = possibleMoves.filter((value) => value >= 0);
 
-  const renderedBoard = renderBoard();
+  const renderedBoard = useMemo(
+    () => renderBoard(),
+    [board, activeField, possibleMoves]
+  );
 
   return <View style={styles.container}>{renderedBoard}</View>;
 }

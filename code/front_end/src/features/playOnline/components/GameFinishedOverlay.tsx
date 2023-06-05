@@ -37,7 +37,7 @@ export default function GameFinishedOverlay({
     }
   };
 
-  const winnerText = "White won"; //getText();
+  const winnerText = getText();
 
   return (
     <View style={styles.container}>
