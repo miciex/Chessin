@@ -56,6 +56,8 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
   const [opacityGear, setOpacityGear] = useState(1);
   const [foundGame, setFoundGame] = useState(false);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
   const [searchingGame, setSearchingGame] = useState(true);
   const [gameId, setGameId] = useState<number>(-1);
   useEffect(() => {
@@ -158,6 +160,8 @@ export default function PlayOnline({ navigation, route }: Props) {
       .then((res) => {
         const board: Board = BoardResponseToBoard(res);
         setBoardState(board);
+        setGameFinished(false);
+        setGameStarted(true);
       })
       .catch((err) => {
         console.log(err);
@@ -177,22 +181,21 @@ export default function PlayOnline({ navigation, route }: Props) {
     </>
   ) : null;
 
-  const gameFinishedOverlay = (
-    // boardState.result !== GameResults.NONE ? (
-    <View style={styles.gameFinishedOverlayOuterContainer}>
-      <View style={styles.gameFinishedOverlayInnerContainer}>
-        <GameFinishedOverlay
-          navigation={navigation}
-          whoWon={boardState.result}
-          searchForGame={searchNewGame}
-          whitesTurn={boardState.whiteToMove}
-        />
+  const gameFinishedOverlay =
+    boardState.result !== GameResults.NONE ? (
+      <View style={styles.gameFinishedOverlayOuterContainer}>
+        <View style={styles.gameFinishedOverlayInnerContainer}>
+          <GameFinishedOverlay
+            navigation={navigation}
+            whoWon={boardState.result}
+            searchForGame={searchNewGame}
+            whitesTurn={boardState.whiteToMove}
+          />
+        </View>
       </View>
-    </View>
-  );
-  // ) : null;
+    ) : null;
 
-  console.log("moves: ", boardState.moves);
+  // console.log("moves: ", boardState.moves);
 
   return !searchingGame && myPlayer && myPlayer.color !== null ? (
     <View style={styles.appContainer}>
@@ -205,10 +208,12 @@ export default function PlayOnline({ navigation, route }: Props) {
         <View style={styles.mainContentContainer}>
           <View style={styles.playerBarContainer}>
             <PlayerBar
-              player={myPlayer.color === "black" ? myPlayer : opponent}
-              timerInfo={
-                myPlayer.color === "black" ? myClockInfo : opponentClockInfo
-              }
+              player={opponent}
+              timerInfo={opponentClockInfo}
+              isWhitesTurn={boardState.whiteToMove}
+              gameStarted={gameStarted}
+              gameFinished={gameFinished}
+              setTimer={setOpponentClockInfo}
             />
           </View>
           <View style={styles.boardContainer}>
@@ -230,10 +235,12 @@ export default function PlayOnline({ navigation, route }: Props) {
           </Text>
           <View style={styles.playerBarContainer}>
             <PlayerBar
-              player={myPlayer.color === "white" ? myPlayer : opponent}
-              timerInfo={
-                myPlayer.color === "white" ? myClockInfo : opponentClockInfo
-              }
+              player={myPlayer}
+              timerInfo={myClockInfo}
+              isWhitesTurn={boardState.whiteToMove}
+              gameStarted={gameStarted}
+              gameFinished={gameFinished}
+              setTimer={setMyClockInfo}
             />
           </View>
         </View>

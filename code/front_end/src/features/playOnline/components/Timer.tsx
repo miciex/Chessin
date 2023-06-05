@@ -1,11 +1,30 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 
 type Props = {
   info: Date | undefined;
+  gameStarted: boolean;
+  gameFinished: boolean;
+  isMyTurn: boolean;
+  setTimer: (timer: Date) => void;
 };
 
-export default function Timer({ info }: Props) {
+export default function Timer({
+  info,
+  gameFinished,
+  gameStarted,
+  isMyTurn,
+  setTimer,
+}: Props) {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (info && gameStarted && !gameFinished && isMyTurn) {
+        setTimer(new Date(info.setSeconds(info.getSeconds() - 1) * 1000));
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [info]);
+
   return (
     <View style={styles.appContainer}>
       <Text style={styles.appText}>

@@ -10,9 +10,20 @@ import { countryToIsoCode } from "..";
 type Props = {
   player: Player | null;
   timerInfo?: Date | undefined;
+  isWhitesTurn: boolean;
+  gameStarted: boolean;
+  gameFinished: boolean;
+  setTimer: (timer: Date) => void;
 };
 
-export default function PlayerBar({ player, timerInfo }: Props) {
+export default function PlayerBar({
+  player,
+  timerInfo,
+  gameFinished,
+  gameStarted,
+  isWhitesTurn,
+  setTimer,
+}: Props) {
   return (
     <View style={styles.appContainer}>
       <View style={styles.textContainer}>
@@ -22,7 +33,13 @@ export default function PlayerBar({ player, timerInfo }: Props) {
       </View>
       <View style={styles.iconsContainer}>
         <View style={styles.timerContainer}>
-          <Timer info={timerInfo} />
+          <Timer
+            info={timerInfo}
+            isMyTurn={(player?.color === "white") === isWhitesTurn}
+            gameFinished={gameFinished}
+            gameStarted={gameStarted}
+            setTimer={setTimer}
+          />
         </View>
         <CountryFlag
           isoCode={countryToIsoCode(player ? player.country : "")}

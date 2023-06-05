@@ -37,9 +37,14 @@ export default function PlayOnlineChessBoard({
   const [possibleMoves, setPossibleMoves] = useState([-1]);
 
   const handleFieldPress = (data: FieldInfo) => {
+    console.log("data: ", data);
     //copy is needed for selection of fields
-    setPossibleMoves(PossibleMoves(data.fieldNumber, board));
-    copyPossibleMoves = [...possibleMoves];
+    // const number =
+    // player.color === "white" ? data.fieldNumber : 63 - data.fieldNumber;
+    const pm = PossibleMoves(data.fieldNumber, board);
+    setPossibleMoves([...pm]);
+    copyPossibleMoves = [...pm];
+    console.log("Possible moves: ", pm);
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
@@ -66,6 +71,8 @@ export default function PlayOnlineChessBoard({
       endField: data.fieldNumber,
       movedPiece: board.position[activeField],
     });
+
+    // console.log(data.fieldNumber);
 
     const submitMoveRequest: SubmitMoveRequest = {
       gameId: gameId,
@@ -94,6 +101,8 @@ export default function PlayOnlineChessBoard({
   //different for : white, black, active, possible move, possible move with piece
   const setBackgroundColor = (info: FieldInfo) => {
     //setting the background to white and black (normal chess board)
+    const number =
+      player.color === "white" ? info.fieldNumber : 63 - info.fieldNumber;
     backgroundColor =
       (info.fieldNumber % 2 === 0 &&
         Math.floor(info.fieldNumber / 8) % 2 === 0) ||
@@ -101,17 +110,11 @@ export default function PlayOnlineChessBoard({
         ? ColorsPallet.light
         : ColorsPallet.dark;
 
-    if (info.fieldNumber == activeField) {
+    if (info.fieldNumber == activeField || copyPossibleMoves.includes(number)) {
       backgroundColor =
         backgroundColor == ColorsPallet.light
           ? ColorsPallet.baseColor
           : ColorsPallet.darker;
-    } else if (info.fieldNumber == copyPossibleMoves[0]) {
-      backgroundColor =
-        backgroundColor == ColorsPallet.light
-          ? ColorsPallet.baseColor
-          : ColorsPallet.darker;
-      copyPossibleMoves.shift();
     }
   };
 
@@ -119,11 +122,15 @@ export default function PlayOnlineChessBoard({
     const renderedBoard = [];
 
     for (let i = 0; i < 64; i++) {
-      setBackgroundColor({ piece: board.visualBoard[i], fieldNumber: i });
+      const number = player.color === "white" ? i : 63 - i;
+      setBackgroundColor({
+        piece: board.visualBoard[number],
+        fieldNumber: number,
+      });
       renderedBoard.push(
         <ChessBoardField
-          key={i}
-          info={{ piece: board.visualBoard[i], fieldNumber: i }}
+          key={number}
+          info={{ piece: board.visualBoard[number], fieldNumber: number }}
           handleFieldPress={handleFieldPress}
           backgroundColor={backgroundColor}
         />
