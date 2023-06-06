@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +41,16 @@ public class ChessGameService {
         board.setMovesTo50MoveRule(CheckGameResults.draw50MoveRuleCheck(move, board.getMovesTo50MoveRule()));
         board.setWhiteTurn(!board.isWhiteTurn());
         board.setGameResult(board.checkGameResult());
-        board.setVisualBoard(Convert.mapToBoard(board.getPosition()));
+        board.setVisualBoard(Convert.mapToBoard(board.getPosition()));;
+
+        long now = Instant.now().toEpochMilli();
+
+        if(!board.isWhiteTurn())
+            board.setWhiteTime(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+        else
+            board.setBlackTime(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+
+        board.setLastMoveTime(now);
 
         moveRepository.save(move);
 

@@ -5,10 +5,13 @@ import com.chessin.controller.requests.CancelPendingChessGameRequest;
 import com.chessin.controller.requests.ListenForFirstMoveRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
+import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.*;
+import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.utils.Constants;
+import com.nimbusds.jose.util.ArrayUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +21,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/api/v1/game")
@@ -42,6 +51,11 @@ public class ChessGameController {
 //            return ResponseEntity.badRequest().body("User is already searching for a game.");
 //        }
 
+        if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(request.getEmail()) || game.getBlackUser().getEmail().equals(request.getEmail())))
+        {
+            return ResponseEntity.badRequest().body("User is already playing a game.");
+        }
+
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
 
         if(foundGame != null)
@@ -50,14 +64,20 @@ public class ChessGameController {
             {
                 pendingGames.get(foundGame.getUser().getEmail()).setOpponent(userRepository.findByEmail(request.getEmail()).get());
 
+                int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
+                int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+
+                List<User> players = Arrays.asList(foundGame.getUser(), userRepository.findByEmail(request.getEmail()).get());
+
                 ChessGame game = ChessGame.builder()
                         .startBoard(Constants.Boards.classicBoard)
                         .whiteStarts(true)
-                        .whiteUser(foundGame.getUser())
-                        .blackUser(userRepository.findByEmail(request.getEmail()).get())
+                        .whiteUser(players.get(whitePlayerIndex))
+                        .blackUser(players.get(blackPlayerIndex))
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
+                        .startTime(Instant.now().toEpochMilli())
                         //.moves(new ArrayList<>())
                         .build();
 
@@ -98,21 +118,23 @@ public class ChessGameController {
             {
                 pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.timeout);
 
-                ChessGame game = ChessGame.builder()
-                        .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
-                        .startBoard(Constants.Boards.classicBoard)
-                        .whiteStarts(true)
-                        .whiteUser(pendingChessGame.getUser())
-                        .blackUser(pendingChessGame.getOpponent())
-                        .availableCastles(new int[]{0,0,0,0})
-                        .timeControl(pendingChessGame.getTimeControl())
-                        .increment(pendingChessGame.getIncrement())
-                        //.moves(new ArrayList<>())
-                        .build();
+
+//                ChessGame game = ChessGame.builder()
+//                        .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
+//                        .startBoard(Constants.Boards.classicBoard)
+//                        .whiteStarts(true)
+//                        .whiteUser(players.get(whitePlayerIndex))
+//                        .blackUser(players.get(blackPlayerIndex))
+//                        .availableCastles(new int[]{0,0,0,0})
+//                        .timeControl(pendingChessGame.getTimeControl())
+//                        .increment(pendingChessGame.getIncrement())
+//                        .startTime(Instant.now().toEpochMilli())
+//                        //.moves(new ArrayList<>())
+//                        .build();
 
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId())));
             }
         }
     }
@@ -143,11 +165,12 @@ public class ChessGameController {
         {
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
-            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
     }
 
     @PostMapping("/submitMove")
+    @Transactional
     public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request) throws InterruptedException {
         if(!activeBoards.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found.");
@@ -155,6 +178,25 @@ public class ChessGameController {
         synchronized(activeGames.get(request.getGameId()))
         {
             Board board = activeBoards.get(request.getGameId());
+            long now = Instant.now().toEpochMilli();
+            if(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
+            {
+                board.setGameResult(GameResults.WHITE_TIMEOUT);
+                board.setWhiteTime(0);
+                activeBoards.replace(request.getGameId(), board);
+                //activeGames.get(request.getGameId()).setGameResult(GameResults.WHITE_TIMEOUT);
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+            }
+            else if(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
+            {
+                board.setGameResult(GameResults.BLACK_TIMEOUT);
+                board.setBlackTime(0);
+                activeBoards.replace(request.getGameId(), board);
+                //activeGames.get(request.getGameId()).setGameResult(GameResults.BLACK_TIMEOUT);
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+            }
 
             if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
                 return ResponseEntity.badRequest().body("It's not your turn.");
@@ -184,9 +226,9 @@ public class ChessGameController {
             if(board.getGameResult() != GameResults.NONE)
             {
                 activeBoards.replace(request.getGameId(), board);
-                activeGames.get(request.getGameId()).setGameResult(board.getGameResult());
+                //activeGames.get(request.getGameId()).setGameResult(board.getGameResult());
                 activeGames.get(request.getGameId()).notifyAll();
-                return ResponseEntity.ok().body(board);
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
 
             activeBoards.replace(request.getGameId(), board);
@@ -200,12 +242,14 @@ public class ChessGameController {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
+                //activeGames.get(request.getGameId()).setMoves(endBoard.getMoves());
                 //chessGameRepository.save(activeGames.get(request.getGameId()));
+                chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
                 activeGames.remove(request.getGameId());
-                return ResponseEntity.ok().body(endBoard);
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
 
-            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
     }
 }

@@ -47,7 +47,7 @@ public class AuthenticationService {
                 .firstname(request.getFirstname())
                 .lastName(request.getLastname())
                 .nameInGame(request.getNameInGame())
-                .email(request.getEmail())
+                .email(request.getEmail().toLowerCase())
                 .country(request.getCountry())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(USER)

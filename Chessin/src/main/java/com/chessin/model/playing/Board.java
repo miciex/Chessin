@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -31,6 +32,9 @@ public class Board {
     GameResults gameResult;
     int[] visualBoard;
     String startBoard;
+    long whiteTime;
+    long blackTime;
+    long lastMoveTime;
 
     public static Board fromGame(ChessGame game)
     {
@@ -47,6 +51,9 @@ public class Board {
                 .gameResult(GameResults.NONE)
                 .visualBoard(FenToIntArray(game.getStartBoard(), 64))
                 .startBoard(game.getStartBoard())
+                .whiteTime(game.getTimeControl())
+                .blackTime(game.getTimeControl())
+                .lastMoveTime(game.getStartTime())
                 .build();
     }
 

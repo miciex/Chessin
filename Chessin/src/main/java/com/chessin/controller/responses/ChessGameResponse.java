@@ -21,8 +21,8 @@ public class ChessGameResponse {
     private UserResponse blackUser;
     private ArrayList<Move> moves;
     private int[] availableCastles;
-    private int timeControl;
-    private int increment;
+    private long timeControl;
+    private long increment;
     private String startBoard;
     private boolean whiteStarts;
 

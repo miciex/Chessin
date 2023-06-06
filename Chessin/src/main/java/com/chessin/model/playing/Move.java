@@ -1,6 +1,7 @@
 package com.chessin.model.playing;
 
 import com.chessin.model.utils.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +19,10 @@ import java.util.HashMap;
 public class Move {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    //@JsonIgnore
     private long Id;
     @ManyToOne(fetch = FetchType.EAGER)
+    //@JsonIgnore
     private ChessGame chessGame;
     private int movedPiece;
     private int startField;
