@@ -8,8 +8,10 @@ import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.*;
+import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.utils.Constants;
+import com.nimbusds.jose.util.ArrayUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,11 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/api/v1/game")
@@ -45,6 +51,11 @@ public class ChessGameController {
 //            return ResponseEntity.badRequest().body("User is already searching for a game.");
 //        }
 
+        if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(request.getEmail()) || game.getBlackUser().getEmail().equals(request.getEmail())))
+        {
+            return ResponseEntity.badRequest().body("User is already playing a game.");
+        }
+
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
 
         if(foundGame != null)
@@ -53,11 +64,16 @@ public class ChessGameController {
             {
                 pendingGames.get(foundGame.getUser().getEmail()).setOpponent(userRepository.findByEmail(request.getEmail()).get());
 
+                int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
+                int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+
+                List<User> players = Arrays.asList(foundGame.getUser(), userRepository.findByEmail(request.getEmail()).get());
+
                 ChessGame game = ChessGame.builder()
                         .startBoard(Constants.Boards.classicBoard)
                         .whiteStarts(true)
-                        .whiteUser(foundGame.getUser())
-                        .blackUser(userRepository.findByEmail(request.getEmail()).get())
+                        .whiteUser(players.get(whitePlayerIndex))
+                        .blackUser(players.get(blackPlayerIndex))
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
@@ -102,22 +118,23 @@ public class ChessGameController {
             {
                 pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.timeout);
 
-                ChessGame game = ChessGame.builder()
-                        .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
-                        .startBoard(Constants.Boards.classicBoard)
-                        .whiteStarts(true)
-                        .whiteUser(pendingChessGame.getUser())
-                        .blackUser(pendingChessGame.getOpponent())
-                        .availableCastles(new int[]{0,0,0,0})
-                        .timeControl(pendingChessGame.getTimeControl())
-                        .increment(pendingChessGame.getIncrement())
-                        .startTime(Instant.now().toEpochMilli())
-                        //.moves(new ArrayList<>())
-                        .build();
+
+//                ChessGame game = ChessGame.builder()
+//                        .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
+//                        .startBoard(Constants.Boards.classicBoard)
+//                        .whiteStarts(true)
+//                        .whiteUser(players.get(whitePlayerIndex))
+//                        .blackUser(players.get(blackPlayerIndex))
+//                        .availableCastles(new int[]{0,0,0,0})
+//                        .timeControl(pendingChessGame.getTimeControl())
+//                        .increment(pendingChessGame.getIncrement())
+//                        .startTime(Instant.now().toEpochMilli())
+//                        //.moves(new ArrayList<>())
+//                        .build();
 
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId())));
             }
         }
     }
