@@ -28,6 +28,9 @@ public class BoardResponse {
     GameResults gameResult;
     int[] visualBoard;
     String startBoard;
+    long whiteTime;
+    long blackTime;
+
 
     public static BoardResponse fromBoard(Board board)
     {
@@ -44,6 +47,8 @@ public class BoardResponse {
                 .visualBoard(board.getVisualBoard())
                 .startBoard(board.getStartBoard())
                 .moves(new ArrayList<>())
+                .whiteTime(board.getWhiteTime())
+                .blackTime(board.getBlackTime())
                 .build();
 
         board.getMoves().stream().map(MoveResponse::fromMove).forEach(response.moves::add);

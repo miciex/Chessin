@@ -19,10 +19,10 @@ import java.util.HashMap;
 public class Move {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonIgnore
+    //@JsonIgnore
     private long Id;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnore
+    //@JsonIgnore
     private ChessGame chessGame;
     private int movedPiece;
     private int startField;

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.ArrayList;
 
 @Entity
@@ -24,11 +25,12 @@ public class ChessGame {
     private ArrayList<Move> moves;
     //eventually change to 4 columns
     private int[] availableCastles;
-    private int timeControl;
-    private int increment;
+    private long timeControl;
+    private long increment;
     private String startBoard;
     private boolean whiteStarts;
     private GameResults gameResult;
+    private Instant startTime;
 
     public ChessGame(){
         this.moves = new ArrayList<>();

@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,6 +61,7 @@ public class ChessGameController {
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
+                        .startTime(Instant.now())
                         //.moves(new ArrayList<>())
                         .build();
 
@@ -149,6 +152,7 @@ public class ChessGameController {
     }
 
     @PostMapping("/submitMove")
+    @Transactional
     public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request) throws InterruptedException {
         if(!activeBoards.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found.");
@@ -156,6 +160,25 @@ public class ChessGameController {
         synchronized(activeGames.get(request.getGameId()))
         {
             Board board = activeBoards.get(request.getGameId());
+
+            if(board.getWhiteTime() - Duration.between(board.getLastMoveTime(), Instant.now()).abs().toSeconds() <= 0)
+            {
+                board.setGameResult(GameResults.WHITE_TIMEOUT);
+                board.setWhiteTime(0);
+                activeBoards.replace(request.getGameId(), board);
+                //activeGames.get(request.getGameId()).setGameResult(GameResults.WHITE_TIMEOUT);
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+            }
+            else if(board.getBlackTime() - Duration.between(board.getLastMoveTime(), Instant.now()).abs().toSeconds() <= 0)
+            {
+                board.setGameResult(GameResults.BLACK_TIMEOUT);
+                board.setBlackTime(0);
+                activeBoards.replace(request.getGameId(), board);
+                //activeGames.get(request.getGameId()).setGameResult(GameResults.BLACK_TIMEOUT);
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+            }
 
             if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
                 return ResponseEntity.badRequest().body("It's not your turn.");
@@ -185,7 +208,7 @@ public class ChessGameController {
             if(board.getGameResult() != GameResults.NONE)
             {
                 activeBoards.replace(request.getGameId(), board);
-                activeGames.get(request.getGameId()).setGameResult(board.getGameResult());
+                //activeGames.get(request.getGameId()).setGameResult(board.getGameResult());
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
@@ -201,7 +224,9 @@ public class ChessGameController {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
+                //activeGames.get(request.getGameId()).setMoves(endBoard.getMoves());
                 //chessGameRepository.save(activeGames.get(request.getGameId()));
+                chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
                 activeGames.remove(request.getGameId());
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
