@@ -39,16 +39,9 @@ export default function PlayOnlineChessBoard({
   const [possibleMoves, setPossibleMoves] = useState([-1]);
 
   const handleFieldPress = (data: FieldInfo) => {
-    console.log("data: ", data);
-    //copy is needed for selection of fields
-    // const number =
-    // player.color === "white" ? data.fieldNumber : 63 - data.fieldNumber;
     const pm = PossibleMoves(data.fieldNumber, board);
     const dmp = deleteImpossibleMoves(pm, data.fieldNumber, copyBoard(board));
     setPossibleMoves([...dmp]);
-    copyPossibleMoves = [...dmp];
-    console.log("Possible moves: ", pm);
-    console.log("deleteImpossibleMoves: ", dmp);
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
@@ -76,8 +69,6 @@ export default function PlayOnlineChessBoard({
       movedPiece: board.position[activeField],
     });
 
-    // console.log(data.fieldNumber);
-
     const submitMoveRequest: SubmitMoveRequest = {
       gameId: gameId,
       email: player.email,
@@ -97,8 +88,6 @@ export default function PlayOnlineChessBoard({
     setActiveField(-1);
   };
 
-  let copyPossibleMoves: Number[] = [0];
-
   let backgroundColor: string;
 
   //defining the color of background
@@ -112,10 +101,9 @@ export default function PlayOnlineChessBoard({
         ? ColorsPallet.light
         : ColorsPallet.dark;
 
-    // console.log(copyPossibleMoves);
     if (
       info.fieldNumber == activeField ||
-      copyPossibleMoves.includes(info.fieldNumber)
+      possibleMoves.includes(info.fieldNumber)
     ) {
       backgroundColor =
         backgroundColor == ColorsPallet.light
@@ -142,12 +130,9 @@ export default function PlayOnlineChessBoard({
         />
       );
     }
-    copyPossibleMoves = [];
 
     return renderedBoard;
   };
-  possibleMoves.sort((a, b) => a - b);
-  copyPossibleMoves = possibleMoves.filter((value) => value >= 0);
 
   const renderedBoard = renderBoard();
 

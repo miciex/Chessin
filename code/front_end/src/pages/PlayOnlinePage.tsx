@@ -25,7 +25,7 @@ import {
   cancelSearch,
   searchForGame,
 } from "../features/playOnline/services/playOnlineService";
-import { ChessGameResponse } from "../utils/ServicesTypes";
+import { ChessGameResponse, BoardResponse } from "../utils/ServicesTypes";
 import { User, userToPlayer } from "../utils/PlayerUtilities";
 import ChessBoard from "../components/ChessBoard";
 import WaitingForGame from "../features/playOnline/components/WaitingForGame";
@@ -50,6 +50,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
   const [opponentClockInfo, setOpponentClockInfo] = useState<Date>();
   const [myClockInfo, setMyClockInfo] = useState<Date>();
+  const [lastMoveDate, setLastMoveDate] = useState<Date>();
 
   const [gearModal, setGearModal] = useState(false);
   //TODO: write reducer for boardState
@@ -61,6 +62,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [searchingGame, setSearchingGame] = useState(true);
   const [gameId, setGameId] = useState<number>(-1);
   const [gameStartedDate, setGameStartedDate] = useState<Date>();
+
   useEffect(() => {
     searchNewGame();
 
@@ -84,11 +86,11 @@ export default function PlayOnline({ navigation, route }: Props) {
             setUpGame(data, user);
           })
           .catch((err) => {
-            console.log(err);
+            throw new Error(err);
           });
       })
       .catch((err) => {
-        console.log(err);
+        throw new Error(err);
       });
   };
 
@@ -106,11 +108,11 @@ export default function PlayOnline({ navigation, route }: Props) {
               console.log("game canceled");
             })
             .catch((err) => {
-              console.log(err);
+              throw new Error(err);
             });
         })
         .catch((err) => {
-          console.log(err);
+          throw new Error(err);
         });
       return;
     }
@@ -119,7 +121,7 @@ export default function PlayOnline({ navigation, route }: Props) {
         console.log("game canceled");
       })
       .catch((err) => {
-        console.log(err);
+        throw new Error(err);
       });
   };
 
@@ -158,15 +160,42 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleListnForFirstMove = (gameId: number) => {
     listenForFirstMove({ gameId })
-      .then((res) => {
+      .then((res: BoardResponse) => {
         const board: Board = BoardResponseToBoard(res);
         setBoardState(board);
         setGameStartedDate(new Date());
         setGameFinished(false);
         setGameStarted(true);
+
+        setGameStartedDate(new Date(res.lastMoveTime));
+        setLastMoveDate(new Date(res.lastMoveTime));
+        console.log(
+          "whites time: ",
+          res.whiteTime,
+          " blacks time",
+          res.blackTime
+        );
+        if (
+          (res.whiteTurn && myPlayer?.color === "black") ||
+          (!res.whiteTurn && myPlayer?.color === "white")
+        ) {
+          setMyClockInfo(new Date(res.whiteTime));
+        } else if (
+          (res.whiteTurn && opponent?.color === "black") ||
+          (!res.whiteTurn && opponent?.color === "white")
+        ) {
+          setOpponentClockInfo(new Date(res.whiteTime));
+        }
+
+        setMyClockInfo(
+          new Date(myPlayer?.color === "white" ? res.whiteTime : res.blackTime)
+        );
+        setOpponentClockInfo(
+          new Date(opponent?.color === "white" ? res.whiteTime : res.blackTime)
+        );
       })
       .catch((err) => {
-        console.log(err);
+        throw new Error(err);
       });
   };
 
@@ -210,8 +239,6 @@ export default function PlayOnline({ navigation, route }: Props) {
         </View>
       </View>
     ) : null;
-
-  // console.log("moves: ", boardState.moves);x
 
   return !searchingGame && myPlayer && myPlayer.color !== null ? (
     <View style={styles.appContainer}>

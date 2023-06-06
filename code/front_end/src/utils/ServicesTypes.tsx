@@ -80,6 +80,9 @@ export type BoardResponse = {
   gameResult: GameResults;
   visualBoard: Array<number>;
   startBoard: string;
+  whiteTime: number;
+  blackTime: number;
+  lastMoveTime: number;
 };
 
 export type CodeVerificationRequest = {

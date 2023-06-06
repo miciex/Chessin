@@ -15,7 +15,7 @@ export const storeUser = async (value: User) => {
     await AsynStorage.setItem("user", JSON.stringify(value));
     console.log("user stored");
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 
@@ -50,8 +50,7 @@ export const fetchUser = async (email: string) => {
       return responseUserToUser(data, email);
     })
     .catch((err) => {
-      console.log("store user");
-      console.log(err);
+      throw new Error(err);
     });
 
   return user;
@@ -81,10 +80,11 @@ export const setUserActive = async (active: boolean) => {
         .then((response) => {
           return response;
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          throw new Error(error);
+        });
     })
     .then((response) => {
-      console.log(response);
       if (response === undefined || response === null) return null;
       if (response.status === 200) {
         correct = true;
@@ -92,7 +92,9 @@ export const setUserActive = async (active: boolean) => {
         correct = false;
       }
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      throw new Error(error);
+    });
   return correct;
 };
 
@@ -120,7 +122,7 @@ export const resetAccessToken = async () => {
       await AsynStorage.setItem("accessToken", data.accessToken);
     })
     .catch((error) => {
-      console.error(error);
+      throw new Error(error);
     });
 };
 

@@ -39,7 +39,6 @@ export type RootStackParamList = {
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
-const checkNetInfoInterval = 1000 * 60;
 
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
