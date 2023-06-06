@@ -173,7 +173,6 @@ export default function PlayOnline({ navigation, route }: Props) {
   const updateMyClockInSeconds = (millis: number) => {
     setMyClockInfo((prev) => {
       if (prev === undefined) return prev;
-      console.log("update my clock");
       return new Date(prev.setMilliseconds(prev.getMilliseconds() + millis));
     });
   };
@@ -181,7 +180,6 @@ export default function PlayOnline({ navigation, route }: Props) {
   const updateOpponentClockInSeconds = (millis: number) => {
     setOpponentClockInfo((prev) => {
       if (prev === undefined) return prev;
-      console.log("update opponent clock");
       return new Date(prev.setMilliseconds(prev.getMilliseconds() + millis));
     });
   };
@@ -213,8 +211,7 @@ export default function PlayOnline({ navigation, route }: Props) {
       </View>
     ) : null;
 
-  // console.log("moves: ", boardState.moves);
-  console.log("timer: ", myClockInfo, opponentClockInfo);
+  // console.log("moves: ", boardState.moves);x
 
   return !searchingGame && myPlayer && myPlayer.color !== null ? (
     <View style={styles.appContainer}>

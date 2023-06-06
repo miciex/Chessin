@@ -230,10 +230,10 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
         let pos:number = piecePosition?piecePosition:findKing(position, whiteToMove);
         let white:boolean = isWhite(pos, position);
         if(Pieces.PiecesArray.length > 0)
-        Pieces.PiecesArray.forEach((i:number) =>{
+        for(let i of Pieces.PiecesArray) {
             if(isPieceAttackingTarget(i, pos, white, position))
                 return 1;
-        })
+        }
 
         return -1;
     }

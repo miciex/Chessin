@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { FieldInfo } from "..";
 import ChessBoardField from "../../../components/ChessBoardField";
 import {
@@ -8,6 +8,8 @@ import {
   boardFactory,
   isWhite,
   BoardResponseToBoard,
+  deleteImpossibleMoves,
+  copyBoard,
 } from "../../../chess-logic/board";
 import { moveFactory } from "../../../chess-logic/move";
 import { ColorsPallet } from "../../../utils/Constants";
@@ -37,12 +39,16 @@ export default function PlayOnlineChessBoard({
   const [possibleMoves, setPossibleMoves] = useState([-1]);
 
   const handleFieldPress = (data: FieldInfo) => {
+    console.log("data: ", data);
     //copy is needed for selection of fields
     // const number =
     // player.color === "white" ? data.fieldNumber : 63 - data.fieldNumber;
     const pm = PossibleMoves(data.fieldNumber, board);
-    setPossibleMoves([...pm]);
-    copyPossibleMoves = [...pm];
+    const dmp = deleteImpossibleMoves(pm, data.fieldNumber, copyBoard(board));
+    setPossibleMoves([...dmp]);
+    copyPossibleMoves = [...dmp];
+    console.log("Possible moves: ", pm);
+    console.log("deleteImpossibleMoves: ", dmp);
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
@@ -69,6 +75,8 @@ export default function PlayOnlineChessBoard({
       endField: data.fieldNumber,
       movedPiece: board.position[activeField],
     });
+
+    // console.log(data.fieldNumber);
 
     const submitMoveRequest: SubmitMoveRequest = {
       gameId: gameId,
@@ -104,6 +112,7 @@ export default function PlayOnlineChessBoard({
         ? ColorsPallet.light
         : ColorsPallet.dark;
 
+    // console.log(copyPossibleMoves);
     if (
       info.fieldNumber == activeField ||
       copyPossibleMoves.includes(info.fieldNumber)
@@ -140,10 +149,7 @@ export default function PlayOnlineChessBoard({
   possibleMoves.sort((a, b) => a - b);
   copyPossibleMoves = possibleMoves.filter((value) => value >= 0);
 
-  const renderedBoard = useMemo(
-    () => renderBoard(),
-    [board, activeField, possibleMoves]
-  );
+  const renderedBoard = renderBoard();
 
   return <View style={styles.container}>{renderedBoard}</View>;
 }
