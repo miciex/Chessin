@@ -43,12 +43,14 @@ public class ChessGameService {
         board.setGameResult(board.checkGameResult());
         board.setVisualBoard(Convert.mapToBoard(board.getPosition()));;
 
-        if(!board.isWhiteTurn())
-            board.setWhiteTime(board.getWhiteTime() - Duration.between(board.getLastMoveTime(), Instant.now()).abs().toSeconds() + game.getIncrement());
-        else
-            board.setBlackTime(board.getBlackTime() - Duration.between(board.getLastMoveTime(), Instant.now()).abs().toSeconds() + game.getIncrement());
+        long now = Instant.now().toEpochMilli();
 
-        board.setLastMoveTime(Instant.now());
+        if(!board.isWhiteTurn())
+            board.setWhiteTime(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+        else
+            board.setBlackTime(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+
+        board.setLastMoveTime(now);
 
         moveRepository.save(move);
 

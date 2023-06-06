@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,7 +31,7 @@ public class BoardResponse {
     String startBoard;
     long whiteTime;
     long blackTime;
-
+    long lastMoveTime;
 
     public static BoardResponse fromBoard(Board board)
     {
@@ -49,6 +50,7 @@ public class BoardResponse {
                 .moves(new ArrayList<>())
                 .whiteTime(board.getWhiteTime())
                 .blackTime(board.getBlackTime())
+                .lastMoveTime(board.getLastMoveTime())
                 .build();
 
         board.getMoves().stream().map(MoveResponse::fromMove).forEach(response.moves::add);

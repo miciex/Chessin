@@ -61,7 +61,7 @@ public class ChessGameController {
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
-                        .startTime(Instant.now())
+                        .startTime(Instant.now().toEpochMilli())
                         //.moves(new ArrayList<>())
                         .build();
 
@@ -111,6 +111,7 @@ public class ChessGameController {
                         .availableCastles(new int[]{0,0,0,0})
                         .timeControl(pendingChessGame.getTimeControl())
                         .increment(pendingChessGame.getIncrement())
+                        .startTime(Instant.now().toEpochMilli())
                         //.moves(new ArrayList<>())
                         .build();
 
@@ -160,8 +161,8 @@ public class ChessGameController {
         synchronized(activeGames.get(request.getGameId()))
         {
             Board board = activeBoards.get(request.getGameId());
-
-            if(board.getWhiteTime() - Duration.between(board.getLastMoveTime(), Instant.now()).abs().toSeconds() <= 0)
+            long now = Instant.now().toEpochMilli();
+            if(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
             {
                 board.setGameResult(GameResults.WHITE_TIMEOUT);
                 board.setWhiteTime(0);
@@ -170,7 +171,7 @@ public class ChessGameController {
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
-            else if(board.getBlackTime() - Duration.between(board.getLastMoveTime(), Instant.now()).abs().toSeconds() <= 0)
+            else if(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
             {
                 board.setGameResult(GameResults.BLACK_TIMEOUT);
                 board.setBlackTime(0);

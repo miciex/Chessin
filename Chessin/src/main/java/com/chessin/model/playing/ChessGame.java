@@ -30,7 +30,7 @@ public class ChessGame {
     private String startBoard;
     private boolean whiteStarts;
     private GameResults gameResult;
-    private Instant startTime;
+    private long startTime;
 
     public ChessGame(){
         this.moves = new ArrayList<>();

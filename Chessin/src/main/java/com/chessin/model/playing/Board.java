@@ -34,7 +34,7 @@ public class Board {
     String startBoard;
     long whiteTime;
     long blackTime;
-    Instant lastMoveTime;
+    long lastMoveTime;
 
     public static Board fromGame(ChessGame game)
     {
