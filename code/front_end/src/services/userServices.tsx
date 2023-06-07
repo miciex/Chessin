@@ -11,20 +11,22 @@ import * as SecureStore from "expo-secure-store";
 import { CodeVerificationRequest } from "../utils/ServicesTypes";
 
 export const storeUser = async (value: User) => {
-  try {
-    await AsynStorage.setItem("user", JSON.stringify(value));
-    console.log("user stored");
-  } catch (error) {
-    throw error;
-  }
+  await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
+    throw new Error(err);
+  });
+  console.log("user stored");
 };
 
 // getting data
 export const getUser = async () => {
-  getValueFor("user").then((user) => {
-    if (user === null) return null;
-    return JSON.parse(user);
-  });
+  getValueFor("user")
+    .then((user) => {
+      if (user === null) return null;
+      return JSON.parse(user);
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
 };
 
 export const fetchUser = async (email: string) => {
@@ -130,7 +132,13 @@ export const setUserDataFromResponse = async (
   responseData: AuthenticationResponse,
   codeVerificationRequest: CodeVerificationRequest | { email: string }
 ) => {
-  await save("refreshToken", responseData.refreshToken);
-  await save("accessToken", responseData.accessToken);
-  fetchandStoreUser(codeVerificationRequest.email);
+  await save("refreshToken", responseData.refreshToken).catch((error) => {
+    throw new Error(error);
+  });
+  await save("accessToken", responseData.accessToken).catch((error) => {
+    throw new Error(error);
+  });
+  fetchandStoreUser(codeVerificationRequest.email).catch((error) => {
+    throw new Error(error);
+  });
 };

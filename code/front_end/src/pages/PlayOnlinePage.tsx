@@ -9,7 +9,6 @@ import PlayerBar from "../features/playOnline/components/PlayerBar";
 import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../chess-logic/ChessConstants";
 import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
 import {
@@ -146,8 +145,8 @@ export default function PlayOnline({ navigation, route }: Props) {
       setMyPlayer({ ...user, color: "black" });
     }
 
-    setMyClockInfo(new Date(data.timeControl * 1000));
-    setOpponentClockInfo(new Date(data.timeControl * 1000));
+    setMyClockInfo(new Date(data.timeControl));
+    setOpponentClockInfo(new Date(data.timeControl));
 
     setBoardState(
       boardFactory({
@@ -266,6 +265,8 @@ export default function PlayOnline({ navigation, route }: Props) {
               player={myPlayer}
               gameId={gameId}
               playMove={PlayMove}
+              setMyClockInfo={setMyClockInfo}
+              setOpponentClockInfo={setOpponentClockInfo}
             />
           </View>
           <Text>

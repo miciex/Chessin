@@ -117,7 +117,7 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [gameTempo, setGameTempo] = useState<LengthType>({
     lengthType: GameLengthTypeContextType.BLITZ,
-    totalTime: 180,
+    totalTime: 3 * 60 * 1000,
     increment: 0,
   });
   const [chosenFriend, setChosenFriend] = useState<User | null>(null);

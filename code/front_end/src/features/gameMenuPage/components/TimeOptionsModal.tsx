@@ -8,20 +8,22 @@ import {
 import { ColorsPallet } from "../../../utils/Constants";
 import { Entypo } from "@expo/vector-icons";
 
+export const millis = 1000;
+
 const bulletGameLengths: Array<LengthType> = [
   {
     increment: 0,
-    totalTime: 60,
+    totalTime: 60 * millis,
     lengthType: GameLengthTypeContextType.BULLET,
   },
   {
-    increment: 1,
-    totalTime: 60,
+    increment: 1 * millis,
+    totalTime: 60 * millis,
     lengthType: GameLengthTypeContextType.BULLET,
   },
   {
-    increment: 1,
-    totalTime: 120,
+    increment: 1 * millis,
+    totalTime: 120 * millis,
     lengthType: GameLengthTypeContextType.BULLET,
   },
 ];
@@ -29,17 +31,17 @@ const bulletGameLengths: Array<LengthType> = [
 const blitzGameLengths: Array<LengthType> = [
   {
     increment: 0,
-    totalTime: 180,
+    totalTime: 180 * millis,
     lengthType: GameLengthTypeContextType.BLITZ,
   },
   {
-    increment: 2,
-    totalTime: 180,
+    increment: 2 * millis,
+    totalTime: 180 * millis,
     lengthType: GameLengthTypeContextType.BLITZ,
   },
   {
     increment: 0,
-    totalTime: 300,
+    totalTime: 300 * millis,
     lengthType: GameLengthTypeContextType.BLITZ,
   },
 ];
@@ -47,17 +49,17 @@ const blitzGameLengths: Array<LengthType> = [
 const rapidGameLengths: Array<LengthType> = [
   {
     increment: 0,
-    totalTime: 600,
+    totalTime: 600 * millis,
     lengthType: GameLengthTypeContextType.RAPID,
   },
   {
-    increment: 10,
-    totalTime: 600,
+    increment: 10 * millis,
+    totalTime: 600 * millis,
     lengthType: GameLengthTypeContextType.RAPID,
   },
   {
-    increment: 15,
-    totalTime: 900,
+    increment: 15 * millis,
+    totalTime: 900 * millis,
     lengthType: GameLengthTypeContextType.RAPID,
   },
 ];

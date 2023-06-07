@@ -34,8 +34,11 @@ export const gameLengthTypeContextTypeToIconName = (tempo: LengthType) => {
 export const lengthTypeToText: (tempo: LengthType) => string = (
   tempo: LengthType
 ) => {
+  const secondsTime = tempo.totalTime / 1000;
+  const secondsIncrement = tempo.increment / 1000;
+
   return (
-    (tempo.totalTime < 60 ? tempo.totalTime : tempo.totalTime / 60).toString() +
-    (tempo.increment > 0 ? "|" + tempo.increment.toString() : "")
+    (secondsTime < 60 ? secondsTime : secondsTime / 60).toString() +
+    (secondsIncrement > 0 ? "|" + secondsIncrement.toString() : "")
   );
 };

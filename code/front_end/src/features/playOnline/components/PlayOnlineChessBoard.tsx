@@ -25,6 +25,8 @@ type Props = {
   player: Player;
   gameId: number;
   playMove: (move: Move) => void;
+  setMyClockInfo: (timeLeft: Date) => void;
+  setOpponentClockInfo: (timeLeft: Date) => void;
 };
 
 export default function PlayOnlineChessBoard({
@@ -33,6 +35,8 @@ export default function PlayOnlineChessBoard({
   player,
   gameId,
   playMove,
+  setMyClockInfo,
+  setOpponentClockInfo,
 }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
@@ -83,6 +87,12 @@ export default function PlayOnlineChessBoard({
     submitMove(submitMoveRequest).then((data: BoardResponse) => {
       if (!data) return;
       setBoard(BoardResponseToBoard(data));
+      setMyClockInfo(
+        new Date(player.color === "white" ? data.whiteTime : data.blackTime)
+      );
+      setOpponentClockInfo(
+        new Date(player.color === "white" ? data.blackTime : data.whiteTime)
+      );
     });
 
     setActiveField(-1);
