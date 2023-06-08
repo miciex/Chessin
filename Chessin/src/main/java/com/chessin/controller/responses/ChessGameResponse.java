@@ -39,7 +39,8 @@ public class ChessGameResponse {
                 .whiteStarts(game.isWhiteStarts())
                 .build();
 
-        game.getMoves().stream().map(MoveResponse::fromMove).forEach(response.moves::add);
+        if(game.getMoves() != null)
+            game.getMoves().stream().map(MoveResponse::fromMove).forEach(response.moves::add);
 
         return response;
     }
