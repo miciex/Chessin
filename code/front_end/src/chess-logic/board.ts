@@ -252,7 +252,7 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
                 if(foundPiece < 16 === isTargetWhite) break;
                 if(foundPiece%8 === piece%8 || foundPiece%8 === Pieces.QUEEN)
                     return true;
-                else break;
+                break;
             }
         }
         return false;
@@ -262,17 +262,13 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
         let directions:Array<number> = getPieceDirections(piece);
         let checkingPosition:number;
         for(let i:number = 0; i<directions.length; i++){
-            checkingPosition = targetSquare;
-            while(IsCorrect(checkingPosition, directions[i])){
-            checkingPosition += directions[i];
+            checkingPosition = targetSquare + directions[i];
             if(!IsCorrect(targetSquare, directions[i])) continue;
             if(!(checkingPosition in position)) continue;
             let foundPiece:number = position[checkingPosition];
-            if(foundPiece < 16 === isTargetWhite) break;
-            if(foundPiece%8 === piece || foundPiece%8 === Pieces.QUEEN)
+            if(foundPiece%8 === piece && foundPiece < 16 !== isTargetWhite)
                 return true;
-            else break;
-            }
+            
         }
         return false;
     }
@@ -431,7 +427,7 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
             delete newPosition[move.startField + (move.endField - move.startField) / 2];
         }
         newPosition[move.startField] = move.movedPiece;
-        delete position[move.endField];
+        delete newPosition[move.endField];
         if (move.takenPiece > 0)
         newPosition[move.takenPieceField] = move.takenPiece;
         return newPosition;

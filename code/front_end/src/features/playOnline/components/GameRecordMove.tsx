@@ -6,15 +6,26 @@ import BaseButton from "../../../components/BaseButton";
 type Props = {
   handlePress: () => void;
   move: string;
+  currentPosition: number;
+  id: number;
 };
 
-export default function GameRecordMove({ handlePress, move }: Props) {
+export default function GameRecordMove({
+  handlePress,
+  move,
+  currentPosition,
+  id,
+}: Props) {
   return (
     <View style={styles.buttonContainer}>
       <BaseButton
         text={move}
-        handlePress={handlePress}
-        color={ColorsPallet.dark}
+        handlePress={() => {
+          handlePress();
+        }}
+        color={
+          id === currentPosition ? ColorsPallet.baseColor : ColorsPallet.dark
+        }
         fontColor={ColorsPallet.lighter}
       />
     </View>

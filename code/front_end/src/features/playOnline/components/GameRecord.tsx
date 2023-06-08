@@ -9,22 +9,28 @@ import { Board } from "../../../chess-logic/board";
 //TODO: change moves to array of Move type
 type Props = {
   board: Board;
+  currentPosition: number;
+  setCurrentPosition: (position: number) => void;
 };
-export default function GameRecord({ board }: Props) {
+export default function GameRecord({
+  board,
+  currentPosition,
+  setCurrentPosition,
+}: Props) {
   //TODO: convert moves to string array
-  const movesContent = useMemo(
-    () =>
-      board.moves.map((move, index) => {
-        return (
-          <GameRecordMove
-            move={moveToChessNotation(board, move)}
-            key={index}
-            handlePress={() => {}}
-          />
-        );
-      }),
-    [board.moves]
-  );
+  const movesContent = board.moves.map((move, index) => {
+    return (
+      <GameRecordMove
+        move={moveToChessNotation(board, move)}
+        key={index}
+        handlePress={() => {
+          setCurrentPosition(index);
+        }}
+        currentPosition={currentPosition}
+        id={index}
+      />
+    );
+  });
 
   return (
     <View style={styles.appContainer}>

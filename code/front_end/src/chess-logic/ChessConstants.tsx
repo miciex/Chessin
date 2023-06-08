@@ -43,6 +43,7 @@ export class Pieces {
 export class StartingPositions {
   public static readonly BASE_POSITION =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+  public static readonly EMPTY_BOARD = "8/8/8/8/8/8/8/8";
 }
 
 export const piecesNumbers = [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14];

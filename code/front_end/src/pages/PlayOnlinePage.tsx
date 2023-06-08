@@ -61,6 +61,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [searchingGame, setSearchingGame] = useState(true);
   const [gameId, setGameId] = useState<number>(-1);
   const [gameStartedDate, setGameStartedDate] = useState<Date>();
+  const [currentPosition, setCurrentPosition] = useState<number>(0);
 
   useEffect(() => {
     searchNewGame();
@@ -240,7 +241,11 @@ export default function PlayOnline({ navigation, route }: Props) {
 
       <View style={[styles.contentContainer, { opacity: opacityGear }]}>
         <View style={styles.gameRecordContainer}>
-          <GameRecord board={boardState} />
+          <GameRecord
+            board={boardState}
+            currentPosition={currentPosition}
+            setCurrentPosition={setCurrentPosition}
+          />
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.playerBarContainer}>
@@ -263,6 +268,8 @@ export default function PlayOnline({ navigation, route }: Props) {
               setMyClockInfo={setMyClockInfo}
               setOpponentClockInfo={setOpponentClockInfo}
               setLastMoveDate={setLastMoveDate}
+              currentPosition={currentPosition}
+              setCurrentPosition={setCurrentPosition}
             />
           </View>
           <Text>
