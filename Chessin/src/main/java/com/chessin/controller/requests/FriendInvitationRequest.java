@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddFriendRequest {
+public class FriendInvitationRequest {
     private String email;
     private String friendEmail;
 }

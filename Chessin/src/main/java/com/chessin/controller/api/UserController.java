@@ -1,7 +1,7 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.register.UserService;
-import com.chessin.controller.requests.AddFriendRequest;
+import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
 import com.chessin.model.register.user.User;
 import com.chessin.controller.responses.UserResponse;
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/addFriend")
-    public ResponseEntity<?> addFriend(@RequestBody AddFriendRequest request)
+    public ResponseEntity<?> addFriend(@RequestBody FriendInvitationRequest request)
     {
         if(!userRepository.existsByEmail(request.getEmail()))
             return ResponseEntity.badRequest().body("User does not exist");
