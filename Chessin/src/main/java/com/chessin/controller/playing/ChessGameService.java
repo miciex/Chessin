@@ -40,6 +40,9 @@ public class ChessGameService {
 
         board.getMoves().stream().map(MoveResponse::fromMove).forEach(movesToCheck::add);
 
+        if(moves.size() != movesToCheck.size())
+            return false;
+
         for(int i = 0; i < moves.size(); i++){
             if(!moves.get(i).equals(movesToCheck.get(i)))
                 return false;
