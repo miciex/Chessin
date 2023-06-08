@@ -252,4 +252,25 @@ public class ChessGameController {
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
     }
+
+    @PostMapping("/getGame/{gameId}")
+    public ResponseEntity<?> getGame(@PathVariable("gameId") String gameId)
+    {
+        long id;
+        try{
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Game not found.");
+        }
+
+        if(activeGames.containsKey(id))
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id)));
+
+        if(!chessGameRepository.existsById(id))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get()));
+    }
 }
