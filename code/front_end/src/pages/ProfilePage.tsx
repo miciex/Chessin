@@ -13,6 +13,7 @@ import { getUser } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
+import { fetchUser } from "../services/userServices";
 
 const ended_games = [
   {
@@ -90,6 +91,10 @@ type Props = {
 export default function ProfilePage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
   // const [data, loading, error] = useFetch("http://localhost:3000/user", {});
+
+  const wojtek = fetchUser("papiezwojtyla9@gmail.com");
+  console.log(wojtek)
+  console.log("wojtek")
 
   useEffect(() => {
     getValueFor("user").then((user) => {

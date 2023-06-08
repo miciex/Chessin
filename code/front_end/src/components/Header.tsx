@@ -30,6 +30,20 @@ export default function Header({ navigation }: Props) {
             color="black"
             style={styles.headerImage}
           />
+           
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            navigation.navigate("Notification");
+          }}
+        >
+          <FontAwesome
+            name="bell"
+            size={32}
+            color="black"
+            style={styles.headerImage}
+          />
+           
         </Pressable>
       </View>
     </View>
@@ -55,7 +69,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexDirection: "row",
-    width: "80%",
+    width: "90%",
     justifyContent: "space-evenly",
     alignItems: "center",
   },
