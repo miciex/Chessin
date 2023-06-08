@@ -3,6 +3,7 @@ package com.chessin.controller.api;
 import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
+import com.chessin.model.register.user.Requests.SetOnlineRequest;
 import com.chessin.model.register.user.User;
 import com.chessin.controller.responses.UserResponse;
 import com.chessin.model.register.user.UserRepository;
@@ -59,5 +60,11 @@ public class UserController {
             responses.add(FriendInvitationResponse.fromFriendInvitation(invitation));
 
         return ResponseEntity.ok().body(responses);
+    }
+
+    @PostMapping("/setActive/{email}")
+    public ResponseEntity<?> setActive(@PathVariable String email, @RequestBody SetOnlineRequest active) {
+        User user = userService.setActive(email, active.isOnline());
+        return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body("User not found.");
     }
 }
