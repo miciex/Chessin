@@ -33,7 +33,7 @@ export default function GameFinishedOverlay({
       case GameResults.MATE:
         return whitesTurn ? "Black won" : "White won";
       default:
-        return "";
+        return whoWon.toString();
     }
   };
 

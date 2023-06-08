@@ -168,12 +168,7 @@ export default function PlayOnline({ navigation, route }: Props) {
 
         setGameStartedDate(new Date(res.lastMoveTime));
         setLastMoveDate(new Date(res.lastMoveTime));
-        console.log(
-          "whites time: ",
-          res.whiteTime,
-          " blacks time",
-          res.blackTime
-        );
+
         if (
           (res.whiteTurn && myPlayer?.color === "black") ||
           (!res.whiteTurn && myPlayer?.color === "white")
@@ -267,6 +262,7 @@ export default function PlayOnline({ navigation, route }: Props) {
               playMove={PlayMove}
               setMyClockInfo={setMyClockInfo}
               setOpponentClockInfo={setOpponentClockInfo}
+              setLastMoveDate={setLastMoveDate}
             />
           </View>
           <Text>

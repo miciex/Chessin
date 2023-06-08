@@ -53,7 +53,6 @@ export default function ChessBoardField({
     <Pressable
       onPress={() => {
         handleFieldPress(info);
-        console.log(info);
       }}
       style={{ ...styles.container, backgroundColor: backgroundColor }}
       android_ripple={{

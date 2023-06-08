@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { FieldInfo } from "..";
 import ChessBoardField from "../../../components/ChessBoardField";
 import {
@@ -27,6 +27,7 @@ type Props = {
   playMove: (move: Move) => void;
   setMyClockInfo: (timeLeft: Date) => void;
   setOpponentClockInfo: (timeLeft: Date) => void;
+  setLastMoveDate: (date: Date) => void;
 };
 
 export default function PlayOnlineChessBoard({
@@ -37,6 +38,7 @@ export default function PlayOnlineChessBoard({
   playMove,
   setMyClockInfo,
   setOpponentClockInfo,
+  setLastMoveDate,
 }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
@@ -44,7 +46,10 @@ export default function PlayOnlineChessBoard({
 
   const handleFieldPress = (data: FieldInfo) => {
     const pm = PossibleMoves(data.fieldNumber, board);
+    if (data.piece % 8 === 1) console.log("pm: ", pm);
+
     const dmp = deleteImpossibleMoves(pm, data.fieldNumber, copyBoard(board));
+    if (data.piece % 8 === 1) console.log("dmp: ", dmp);
     setPossibleMoves([...dmp]);
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
@@ -93,6 +98,7 @@ export default function PlayOnlineChessBoard({
       setOpponentClockInfo(
         new Date(player.color === "white" ? data.blackTime : data.whiteTime)
       );
+      setLastMoveDate(new Date(data.lastMoveTime));
     });
 
     setActiveField(-1);
@@ -143,6 +149,11 @@ export default function PlayOnlineChessBoard({
 
     return renderedBoard;
   };
+
+  // const renderedBoard = useMemo(
+  //   () => renderBoard(),
+  //   [board, activeField, possibleMoves, player.color]
+  // );
 
   const renderedBoard = renderBoard();
 
