@@ -2,6 +2,7 @@ package com.chessin.controller.playing;
 
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
+import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.playing.*;
 import com.chessin.model.utils.Convert;
 import com.chessin.model.utils.HelpMethods;
@@ -32,6 +33,22 @@ public class ChessGameService {
         }
 
         return null;
+    }
+
+    public boolean validateMoves(List<MoveResponse> moves, Board board){
+        ArrayList<MoveResponse> movesToCheck = new ArrayList<>();
+
+        board.getMoves().stream().map(MoveResponse::fromMove).forEach(movesToCheck::add);
+
+        if(moves.size() != movesToCheck.size())
+            return false;
+
+        for(int i = 0; i < moves.size(); i++){
+            if(!moves.get(i).equals(movesToCheck.get(i)))
+                return false;
+        }
+
+        return true;
     }
 
     public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game){

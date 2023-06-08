@@ -2,7 +2,7 @@ package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.requests.CancelPendingChessGameRequest;
-import com.chessin.controller.requests.ListenForFirstMoveRequest;
+import com.chessin.controller.requests.ListenForMoveRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.controller.responses.BoardResponse;
@@ -11,22 +11,15 @@ import com.chessin.model.playing.*;
 import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.utils.Constants;
-import com.nimbusds.jose.util.ArrayUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import org.apache.tomcat.util.bcel.Const;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -153,19 +146,45 @@ public class ChessGameController {
         return ResponseEntity.ok().body("Search cancelled");
     }
 
-    @PostMapping("/listenForFirstMove")
-    public ResponseEntity<?> listenForFirstMove(@RequestBody ListenForFirstMoveRequest request) throws InterruptedException {
-        if(!activeBoards.containsKey(request.getGameId()))
-            return ResponseEntity.badRequest().body("Game not found.");
+    @PostMapping("/listenForMove")
+    public ResponseEntity<?> listenForMove(@RequestBody ListenForMoveRequest request) throws InterruptedException {
+        if(!activeGames.containsKey(request.getGameId()))
+            return ResponseEntity.badRequest().body("Game not found");
 
-        if(activeBoards.get(request.getGameId()).getMoves().size() > 0)
-            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+        if(chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
 
         synchronized(activeGames.get(request.getGameId()))
         {
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
+        }
+    }
+
+    @PostMapping("/listenForFirstMove/{gameId}")
+    public ResponseEntity<?> listenForFirstMove(@PathVariable String gameId) throws InterruptedException {
+        long id;
+
+        try {
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Invalid game id");
+        }
+
+        if(!activeBoards.containsKey(id))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        if(activeBoards.get(id).getMoves().size() > 0)
+            return ResponseEntity.ok().body(activeBoards.get(id));
+
+        synchronized(activeGames.get(id))
+        {
+            activeGames.get(id).wait(Constants.Application.waitForMoveTime);
+
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
         }
     }
 
@@ -251,5 +270,26 @@ public class ChessGameController {
 
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
+    }
+
+    @PostMapping("/getGame/{gameId}")
+    public ResponseEntity<?> getGame(@PathVariable("gameId") String gameId)
+    {
+        long id;
+        try{
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Game not found.");
+        }
+
+        if(activeGames.containsKey(id))
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id)));
+
+        if(!chessGameRepository.existsById(id))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get()));
     }
 }

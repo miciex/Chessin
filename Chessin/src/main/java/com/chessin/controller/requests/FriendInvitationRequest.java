@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListenForFirstMoveRequest {
-    private long gameId;
+public class FriendInvitationRequest {
+    private String email;
+    private String friendEmail;
 }
