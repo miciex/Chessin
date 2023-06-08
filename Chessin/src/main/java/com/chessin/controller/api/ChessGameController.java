@@ -163,7 +163,7 @@ public class ChessGameController {
     }
 
     @PostMapping("/listenForFirstMove/{gameId}")
-    public ResponseEntity<?> listenForMove(@PathVariable String gameId) throws InterruptedException {
+    public ResponseEntity<?> listenForFirstMove(@PathVariable String gameId) throws InterruptedException {
         long id;
 
         try {
