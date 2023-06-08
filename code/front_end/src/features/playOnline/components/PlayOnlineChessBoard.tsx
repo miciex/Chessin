@@ -170,8 +170,6 @@ export default function PlayOnlineChessBoard({
     [board, activeField, possibleMoves, player.color, currentPosition]
   );
 
-  // const renderedBoard = renderBoard();
-
   return <View style={styles.container}>{renderedBoard}</View>;
 }
 
