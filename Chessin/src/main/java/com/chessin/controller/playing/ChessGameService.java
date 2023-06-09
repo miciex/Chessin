@@ -56,11 +56,9 @@ public class ChessGameService {
         long now = Instant.now().toEpochMilli();
 
         if(board.isWhiteTurn())
-            now = board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now);
+            board.setWhiteTime(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now));
         else
-            now = board.getBlackTime() - Math.abs(board.getLastMoveTime() - now);
-
-        board.setLastMoveTime(now);
+            board.setBlackTime(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now));
 
         return board;
     }
