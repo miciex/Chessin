@@ -73,7 +73,7 @@ public class ChessGameService {
         board.setWhiteTurn(!board.isWhiteTurn());
         board.setGameResult(board.checkGameResult());
         board.setVisualBoard(Convert.mapToBoard(board.getPosition()));
-        ;
+        move.setAvailableCastles(board.getAvailableCastles());
 
         long now = Instant.now().toEpochMilli();
 

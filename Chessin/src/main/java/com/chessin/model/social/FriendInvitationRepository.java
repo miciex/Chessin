@@ -11,9 +11,7 @@ import java.util.Optional;
 public interface FriendInvitationRepository extends JpaRepository<FriendInvitation, Long> {
     boolean existsByUserEmail(String email);
     List<FriendInvitation> findAllByUserEmail(String email);
-
     @Modifying
-    void deleteByUserEmailAndFriendEmail(String userEmail, String friendEmail);
-
-    boolean existsByUserEmailAndFriendEmail(String userEmail, String friendEmail);
+    void deleteByUserEmailAndFriendNameInGame(String userEmail, String friendNickname);
+    boolean existsByUserEmailAndFriendNameInGame(String userEmail, String friendNickname);
 }
