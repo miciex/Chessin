@@ -4,6 +4,7 @@ import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
+import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
 import com.chessin.controller.responses.UserResponse;
 import com.chessin.model.register.user.UserRepository;
@@ -24,6 +25,7 @@ import java.util.*;
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     FriendInvitationRepository friendInvitationRepository;
 
     @PostMapping("/findByEmail/{email}")
@@ -36,13 +38,15 @@ public class UserController {
     @PostMapping("/addFriend")
     public ResponseEntity<?> addFriend(@RequestBody FriendInvitationRequest request)
     {
-        if(!userRepository.existsByEmail(request.getEmail()))
+        String email = jwtService.extractUsername(request.getAccessToken());
+
+        if(!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User does not exist");
         else if(!userRepository.existsByEmail(request.getFriendEmail()))
             return ResponseEntity.badRequest().body("Friend does not exist");
 
         friendInvitationRepository.save(FriendInvitation.builder()
-                .user(userRepository.findByEmail(request.getEmail()).get())
+                .user(userRepository.findByEmail(email).get())
                 .friend(userRepository.findByEmail(request.getFriendEmail()).get())
                 .date(Instant.now())
                 .build());
@@ -69,14 +73,16 @@ public class UserController {
     @PostMapping("/respondToInvitation")
     public ResponseEntity<?> respondToInvitation(@RequestBody FriendInvitationResponseRequest request)
     {
-        if(!friendInvitationRepository.existsByUserEmailAndFriendEmail(request.getEmail(), request.getFriendEmail()))
+        String email = jwtService.extractUsername(request.getAccessToken());
+
+        if(!friendInvitationRepository.existsByUserEmailAndFriendEmail(email, request.getFriendEmail()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
-        friendInvitationRepository.deleteByUserEmailAndFriendEmail(request.getEmail(), request.getFriendEmail());
+        friendInvitationRepository.deleteByUserEmailAndFriendEmail(email, request.getFriendEmail());
 
         if(request.getResponseType() == FriendInvitationResponseType.ACCEPT)
         {
-            User user = userRepository.findByEmail(request.getEmail()).get();
+            User user = userRepository.findByEmail(email).get();
             User friend = userRepository.findByEmail(request.getFriendEmail()).get();
 
             user.getFriends().add(friend);
@@ -108,12 +114,14 @@ public class UserController {
     @PostMapping("/removeFriend")
     public ResponseEntity<?> removeFriend(@RequestBody FriendInvitationRequest request)
     {
-        if(!userRepository.existsByEmail(request.getEmail()))
+        String email = jwtService.extractUsername(request.getAccessToken());
+
+        if(!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User does not exist.");
         else if(!userRepository.existsByEmail(request.getFriendEmail()))
             return ResponseEntity.badRequest().body("Friend does not exist.");
 
-        User user = userRepository.findByEmail(request.getEmail()).get();
+        User user = userRepository.findByEmail(email).get();
         User friend = userRepository.findByEmail(request.getFriendEmail()).get();
 
         user.getFriends().remove(friend);
@@ -128,10 +136,12 @@ public class UserController {
     @PostMapping("/removeInvitation")
     public ResponseEntity<?> removeInvitation(@RequestBody FriendInvitationRequest request)
     {
-        if(!friendInvitationRepository.existsByUserEmailAndFriendEmail(request.getEmail(), request.getFriendEmail()))
+        String email = jwtService.extractUsername(request.getAccessToken());
+
+        if(!friendInvitationRepository.existsByUserEmailAndFriendEmail(email, request.getFriendEmail()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
-        friendInvitationRepository.deleteByUserEmailAndFriendEmail(request.getEmail(), request.getFriendEmail());
+        friendInvitationRepository.deleteByUserEmailAndFriendEmail(email, request.getFriendEmail());
 
         return ResponseEntity.ok().body("Invitation removed.");
     }
