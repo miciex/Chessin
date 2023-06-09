@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FriendInvitationRequest {
-    private String accessToken;
     private String friendEmail;
 }

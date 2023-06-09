@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SubmitMoveRequest {
     private long gameId;
-    private String accessToken;
     private int movedPiece;
     private int startField;
     private int endField;

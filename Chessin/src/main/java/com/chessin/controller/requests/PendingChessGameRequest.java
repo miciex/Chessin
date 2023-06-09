@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PendingChessGameRequest {
-    private String accessToken;
     private int timeControl;
     private int increment;
     private int bottomRating;

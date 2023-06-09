@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SetActiveRequest {
-    private String accessToken;
     private boolean isOnline;
 }

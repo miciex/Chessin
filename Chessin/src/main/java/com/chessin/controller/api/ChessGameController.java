@@ -1,7 +1,6 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
-import com.chessin.controller.requests.CancelPendingChessGameRequest;
 import com.chessin.controller.requests.ListenForMoveRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
@@ -12,6 +11,7 @@ import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.utils.Constants;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,14 +40,14 @@ public class ChessGameController {
 
     @Transactional
     @PostMapping("/searchNewGame")
-    public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request) throws InterruptedException {
+    public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request, HttpServletRequest servlet) throws InterruptedException {
 
 //        if(pendingGames.containsKey(request.getEmail()))
 //        {
 //            return ResponseEntity.badRequest().body("User is already searching for a game.");
 //        }
 
-        String email = jwtService.extractUsername(request.getAccessToken());
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
         {
@@ -123,9 +123,9 @@ public class ChessGameController {
     }
 
     @PostMapping("/cancelSearch")
-    public ResponseEntity<?> cancelSearch(@RequestBody CancelPendingChessGameRequest request)
+    public ResponseEntity<?> cancelSearch(HttpServletRequest servlet)
     {
-        String email = jwtService.extractUsername(request.getAccessToken());
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User not found");
@@ -180,13 +180,13 @@ public class ChessGameController {
 
     @PostMapping("/submitMove")
     @Transactional
-    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request) throws InterruptedException {
+    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request, HttpServletRequest servlet) throws InterruptedException {
         if(!activeBoards.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found.");
 
         synchronized(activeGames.get(request.getGameId()))
         {
-            String email = jwtService.extractUsername(request.getAccessToken());
+            String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
             Board board = activeBoards.get(request.getGameId());
             long now = Instant.now().toEpochMilli();
