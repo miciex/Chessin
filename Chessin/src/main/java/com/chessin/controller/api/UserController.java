@@ -1,6 +1,7 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.register.UserService;
+import com.chessin.controller.requests.CheckInvitationsRequest;
 import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
@@ -28,9 +29,9 @@ public class UserController {
     private final JwtService jwtService;
     FriendInvitationRepository friendInvitationRepository;
 
-    @PostMapping("/findByEmail/{email}")
-    public ResponseEntity<?> findByEmail(@PathVariable String email){
-        Optional<User> user = userService.findByEmail(email);
+    @PostMapping("/findByEmail/{nickname}")
+    public ResponseEntity<?> findByNickname(@PathVariable String nickname){
+        Optional<User> user = userRepository.findByNameInGame(nickname);
         UserResponse userResponse = UserResponse.fromUser(user.orElseThrow());
         return ResponseEntity.ok().body(userResponse);
     }
@@ -54,9 +55,11 @@ public class UserController {
         return ResponseEntity.ok().body("Invitation sent");
     }
 
-    @PostMapping("/checkInvitations/{email}")
-    public ResponseEntity<?> checkInvitations(@PathVariable String email)
+    @PostMapping("/checkInvitations")
+    public ResponseEntity<?> checkInvitations(@RequestBody CheckInvitationsRequest request)
     {
+        String email = jwtService.extractUsername(request.getAccessToken());
+
         if(!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 
