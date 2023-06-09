@@ -1,8 +1,10 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.register.UserService;
+import com.chessin.controller.requests.CheckInvitationsRequest;
 import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
+import com.chessin.controller.requests.SetActiveRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
@@ -27,11 +29,19 @@ public class UserController {
     private final JwtService jwtService;
     FriendInvitationRepository friendInvitationRepository;
 
-    @PostMapping("/findByEmail/{email}")
-    public ResponseEntity<?> findByEmail(@PathVariable String email) {
-        Optional<User> user = userService.findByEmail(email);
+    @PostMapping("/findByNickname/{nickname}")
+    public ResponseEntity<?> findByNickname(@PathVariable String nickname) {
+        Optional<User> user = userRepository.findByNameInGame(nickname);
         UserResponse userResponse = UserResponse.fromUser(user.orElseThrow());
         return ResponseEntity.ok().body(userResponse);
+    }
+
+    @PostMapping("/setActive")
+    public ResponseEntity<?> setActive(@RequestBody SetActiveRequest request) {
+        String email = jwtService.extractUsername(request.getAccessToken());
+
+        User user = userService.setActive(email, request.isOnline());
+        return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body("User not found.");
     }
 
     @PostMapping("/addFriend")
@@ -52,8 +62,10 @@ public class UserController {
         return ResponseEntity.ok().body("Invitation sent");
     }
 
-    @PostMapping("/checkInvitations/{email}")
-    public ResponseEntity<?> checkInvitations(@PathVariable String email) {
+    @PostMapping("/checkInvitations")
+    public ResponseEntity<?> checkInvitations(@RequestBody CheckInvitationsRequest request) {
+        String email = jwtService.extractUsername(request.getAccessToken());
+
         if (!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 
@@ -68,7 +80,7 @@ public class UserController {
     }
 
     @PostMapping("/setActive/{email}")
-    public ResponseEntity<?> setActive(@PathVariable String email, @RequestBody SetOnlineRequest active) {
+    public ResponseEntity<?> setActive(@PathVariable String email, @RequestBody SetActiveRequest active) {
         User user = userService.setActive(email, active.isOnline());
         return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body("User not found.");
     }

@@ -1,6 +1,5 @@
 package com.chessin.controller.register;
 
-
 import com.chessin.model.register.user.Provider;
 import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
@@ -25,16 +24,12 @@ public class UserService {
         }
     }
 
-    public User setActive(String email, boolean active) {
-        User user = findByEmail(email).orElse(null);
-        if(user != null){
+    public User setActive(String nickname, boolean active) {
+        User user = userRepository.findByNameInGame(nickname).orElse(null);
+        if (user != null) {
             user.setOnline(active);
             userRepository.save(user);
         }
         return user;
-    }
-
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
     }
 }
