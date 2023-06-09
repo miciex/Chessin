@@ -24,4 +24,13 @@ public class UserService {
             userRepository.save(newUser);
         }
     }
+
+    public User setActive(String nickname, boolean active) {
+        User user = userRepository.findByNameInGame(nickname).orElse(null);
+        if(user != null){
+            user.setOnline(active);
+            userRepository.save(user);
+        }
+        return user;
+    }
 }

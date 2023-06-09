@@ -4,6 +4,7 @@ import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.CheckInvitationsRequest;
 import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
+import com.chessin.controller.requests.SetActiveRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
@@ -34,6 +35,14 @@ public class UserController {
         Optional<User> user = userRepository.findByNameInGame(nickname);
         UserResponse userResponse = UserResponse.fromUser(user.orElseThrow());
         return ResponseEntity.ok().body(userResponse);
+    }
+
+    @PostMapping("/setActive")
+    public ResponseEntity<?> setActive(@RequestBody SetActiveRequest request) {
+        String email = jwtService.extractUsername(request.getAccessToken());
+
+        User user = userService.setActive(email, request.isOnline());
+        return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body("User not found.");
     }
 
     @PostMapping("/addFriend")
