@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -291,5 +292,17 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Game not found.");
 
         return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get()));
+    }
+
+    @PostMapping("/getGameByUsername/{username}")
+    public ResponseEntity<?> getGameByUsername(@PathVariable String username)
+    {
+        Optional<ChessGame> game = activeGames.values().stream().filter(x -> x.getBlackUser().getNameInGame().equals(username) || x.getWhiteUser().getNameInGame().equals(username)).findFirst();
+
+        if(game.isPresent())
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get()));
+        else
+            return ResponseEntity.badRequest().body("This player is not playing any game.");
+
     }
 }
