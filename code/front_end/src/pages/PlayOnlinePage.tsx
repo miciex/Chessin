@@ -104,7 +104,7 @@ export default function PlayOnline({ navigation, route }: Props) {
       .then((user: User) => {
         setMyPlayer(userToPlayer(user, null));
 
-        searchForGame(request, user.nameInGame)
+        searchForGame(request)
           .then((response) => {
             if (response.status === 200) {
               response

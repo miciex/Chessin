@@ -114,7 +114,7 @@ export const cancelSearch = async (email: string) => {
     });
 };
 
-export const searchForGame = async (request: PendingChessGameRequest, username: string) => {
+export const searchForGame = async (request: PendingChessGameRequest) => {
     const accessToken = await getValueFor("accessToken");
 
     const response = await fetch(searchNewGameLink, {

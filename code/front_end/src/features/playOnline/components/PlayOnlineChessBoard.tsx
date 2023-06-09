@@ -58,7 +58,7 @@ export default function PlayOnlineChessBoard({
     const pm = PossibleMoves(data.fieldNumber, board);
 
     const dmp = deleteImpossibleMoves(pm, data.fieldNumber, copyBoard(board));
-    setPossibleMoves([...dmp]);
+    setPossibleMoves(dmp);
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (

@@ -79,12 +79,6 @@ public class UserController {
         return ResponseEntity.ok().body(responses);
     }
 
-    @PostMapping("/setActive/{email}")
-    public ResponseEntity<?> setActive(@PathVariable String email, @RequestBody SetActiveRequest active) {
-        User user = userService.setActive(email, active.isOnline());
-        return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body("User not found.");
-    }
-
     @PostMapping("/respondToInvitation")
     public ResponseEntity<?> respondToInvitation(@RequestBody FriendInvitationResponseRequest request) {
         String email = jwtService.extractUsername(request.getAccessToken());

@@ -1,9 +1,12 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
-import { setActive } from "../utils/ApiEndpoints";
 import { responseUserToUser } from "../utils/PlayerUtilities";
-import { refreshTokenLink, findByEmailLink } from "../utils/ApiEndpoints";
+import {
+  refreshTokenLink,
+  findByNicknameLink,
+  setActive,
+} from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
 import { AuthenticationResponse } from "../utils/ServicesTypes";
@@ -29,9 +32,9 @@ export const getUser = async () => {
     });
 };
 
-export const fetchUser = async (email: string) => {
+export const fetchUser = async (email: string, Nickname: string) => {
   const token = await SecureStore.getItemAsync("accessToken");
-  const user: any = await fetch(`${findByEmailLink}${email}`, {
+  const user: any = await fetch(`${findByNicknameLink}${Nickname}`, {
     method: "POST",
     headers: new Headers({
       "content-type": "application/json",
@@ -69,7 +72,7 @@ export const setUserActive = async (active: boolean) => {
     })
     .then(async (user) => {
       if (user === null) return null;
-      return fetch(`${setActive}${user.email}`, {
+      return fetch(`${setActive}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
