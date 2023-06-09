@@ -7,6 +7,7 @@ import com.chessin.model.playing.*;
 import com.chessin.model.utils.Convert;
 import com.chessin.model.utils.HelpMethods;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.context.TenantIdentifierMismatchException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,22 @@ public class ChessGameService {
         }
 
         return true;
+    }
+
+    public Board calculateTime(Board board)
+    {
+        long now = Instant.now().toEpochMilli();
+        long time;
+        if(board.isWhiteTurn()){
+            time = board.getWhiteTime()- Math.abs(board.getLastMoveTime() - now);
+            board.setWhiteTime(time);
+        }
+        else {
+            time = board.getBlackTime()- Math.abs(board.getLastMoveTime() - now);
+            board.setBlackTime(time);
+        }
+
+        return board;
     }
 
     public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game){

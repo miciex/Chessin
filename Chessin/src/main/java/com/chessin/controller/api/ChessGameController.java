@@ -47,7 +47,7 @@ public class ChessGameController {
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(request.getEmail()) || game.getBlackUser().getEmail().equals(request.getEmail())))
         {
-            return ResponseEntity.badRequest().body("User is already playing a game.");
+            return ResponseEntity.accepted().body("User is already playing a game.");
         }
 
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
@@ -152,8 +152,8 @@ public class ChessGameController {
         if(!activeGames.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found");
 
-        if(chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
+        if(!chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(request.getGameId()))));
 
         synchronized(activeGames.get(request.getGameId()))
         {
@@ -179,7 +179,7 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Game not found.");
 
         if(activeBoards.get(id).getMoves().size() > 0)
-            return ResponseEntity.ok().body(activeBoards.get(id));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id))));
 
         synchronized(activeGames.get(id))
         {

@@ -100,3 +100,8 @@ export type CodeVerificationRequest = {
 export type ListenForFirstMoveRequest = {
   gameId: number;
 };
+
+export type ListenForMoveRequest = {
+  gameId: number;
+  moves: Array<MoveResponse>;
+};

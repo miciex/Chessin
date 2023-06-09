@@ -12,3 +12,5 @@ export const searchNewGameLink = `${chessGameLink}searchNewGame`;
 export const cancelSearchLink = `${chessGameLink}cancelSearch`;
 export const submitMoveLink = `${chessGameLink}submitMove`;
 export const listenForFirstMoveLink = `${chessGameLink}listenForFirstMove/`;
+export const getGameByUsernameLink = `${chessGameLink}getGameByUsername/`;
+export const listenForMoveLink = `${chessGameLink}listenForMove`;

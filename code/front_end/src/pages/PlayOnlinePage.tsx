@@ -23,6 +23,8 @@ import { getValueFor } from "../utils/AsyncStoreFunctions";
 import {
   cancelSearch,
   searchForGame,
+  getGameByUsername,
+  listenForMove,
 } from "../features/playOnline/services/playOnlineService";
 import { ChessGameResponse, BoardResponse } from "../utils/ServicesTypes";
 import { User, userToPlayer } from "../utils/PlayerUtilities";
@@ -44,7 +46,6 @@ type Props = {
 };
 
 const timeFinishedDate = new Date(-2);
-
 export default function PlayOnline({ navigation, route }: Props) {
   const { request } = route.params;
 
@@ -103,9 +104,57 @@ export default function PlayOnline({ navigation, route }: Props) {
       .then((user: User) => {
         setMyPlayer(userToPlayer(user, null));
 
-        searchForGame(request)
-          .then((data: ChessGameResponse) => {
-            setUpGame(data, user);
+        searchForGame(request, user.nameInGame)
+          .then((response) => {
+            if (response.status === 200) {
+              response
+                .json()
+                .then((data: ChessGameResponse) => {
+                  setUpGame(data, user);
+                  handleListnForFirstMove(data.id);
+                })
+                .catch((err) => {
+                  throw new Error(err);
+                });
+            } else if (response.status === 202) {
+              getGameByUsername(user.nameInGame)
+                .then((data: ChessGameResponse | undefined) => {
+                  if (data === undefined) return;
+                  setUpGame(data, user);
+                  handleListnForFirstMove(data.id)
+                    .then((board: BoardResponse) => {
+                      setDataFromBoardResponse(board);
+                      listenForMove({
+                        gameId: data.id,
+                        moves: board.moves,
+                      })
+                        .then((board: BoardResponse | undefined) => {
+                          if (board === undefined) return;
+                          setDataFromBoardResponse(board);
+                        })
+                        .catch((err) => {
+                          throw new Error(err);
+                        });
+                    })
+                    .catch((err) => {
+                      throw new Error(err);
+                    });
+                })
+                .catch((err) => {
+                  throw new Error(err);
+                });
+            } else if (response.status === 400) {
+              response
+                .text()
+                .then((data) => {
+                  throw new Error(data);
+                })
+                .catch((error) => {
+                  throw new Error(error);
+                });
+            } else {
+              throw new Error("Something went wrong");
+            }
           })
           .catch((err) => {
             throw new Error(err);
@@ -151,13 +200,17 @@ export default function PlayOnline({ navigation, route }: Props) {
     setGearModal(!gearModal);
   };
 
-  const setUpGame = (data: ChessGameResponse, user: User) => {
+  const setUpGame = (
+    data: ChessGameResponse,
+    user: User,
+    gameStarted?: boolean
+  ) => {
     if (data.blackUser === null || data.whiteStarts === null) {
       setSearchingGame(false);
       cancelSearch(user.email);
       return;
     }
-    handleListnForFirstMove(data.id);
+
     setFoundGame(true);
     setGameId(data.id);
     if (data.whiteUser.nameInGame === user.nameInGame) {
@@ -180,41 +233,33 @@ export default function PlayOnline({ navigation, route }: Props) {
     setSearchingGame(false);
   };
 
-  const handleListnForFirstMove = (gameId: number) => {
+  const handleListnForFirstMove = async (gameId: number) => {
     console.log("listening for first move");
-    listenForFirstMove({ gameId })
+    return await listenForFirstMove({ gameId })
       .then((res: BoardResponse) => {
-        const board: Board = BoardResponseToBoard(res);
-        setBoardState(board);
-        setGameStartedDate(new Date());
-        setGameFinished(false);
-        setGameStarted(true);
-
-        setGameStartedDate(new Date(res.lastMoveTime));
-        setLastMoveDate(new Date(res.lastMoveTime));
-
-        if (
-          (res.whiteTurn && myPlayer?.color === "black") ||
-          (!res.whiteTurn && myPlayer?.color === "white")
-        ) {
-          setMyClockInfo(new Date(res.whiteTime));
-        } else if (
-          (res.whiteTurn && opponent?.color === "black") ||
-          (!res.whiteTurn && opponent?.color === "white")
-        ) {
-          setOpponentClockInfo(new Date(res.whiteTime));
-        }
-
-        setMyClockInfo(
-          new Date(myPlayer?.color === "white" ? res.whiteTime : res.blackTime)
-        );
-        setOpponentClockInfo(
-          new Date(opponent?.color === "white" ? res.whiteTime : res.blackTime)
-        );
+        setDataFromBoardResponse(res);
+        return res;
       })
       .catch((err) => {
         throw new Error(err);
       });
+  };
+
+  const setDataFromBoardResponse = (res: BoardResponse) => {
+    const board: Board = BoardResponseToBoard(res);
+    setBoardState(board);
+    setGameStartedDate(new Date());
+    setGameFinished(false);
+    setGameStarted(true);
+
+    setGameStartedDate(new Date(res.lastMoveTime));
+    setLastMoveDate(new Date(res.lastMoveTime));
+
+    let myTime = myPlayer?.color === "white" ? res.whiteTime : res.blackTime;
+    let opponentTime =
+      opponent?.color === "white" ? res.whiteTime : res.blackTime;
+    setMyClockInfo(new Date(myTime));
+    setOpponentClockInfo(new Date(opponentTime));
   };
 
   const updateMyClockInSeconds = (millis: number) => {
