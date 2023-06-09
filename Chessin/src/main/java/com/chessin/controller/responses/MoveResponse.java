@@ -21,6 +21,7 @@ public class MoveResponse {
     private int takenPieceField;
     int movesTo50MoveRule;
     int[] availableCastles;
+    long remainingTime;
 
     public static MoveResponse fromMove(Move move)
     {
