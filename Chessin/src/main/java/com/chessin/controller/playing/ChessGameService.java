@@ -70,7 +70,8 @@ public class ChessGameService {
         board.setMovesTo50MoveRule(CheckGameResults.draw50MoveRuleCheck(move, board.getMovesTo50MoveRule()));
         board.setWhiteTurn(!board.isWhiteTurn());
         board.setGameResult(board.checkGameResult());
-        board.setVisualBoard(Convert.mapToBoard(board.getPosition()));;
+        board.setVisualBoard(Convert.mapToBoard(board.getPosition()));
+        move.setAvailableCastles(board.getAvailableCastles());
 
         long now = Instant.now().toEpochMilli();
 

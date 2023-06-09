@@ -20,6 +20,7 @@ public class MoveResponse {
     private int promotePiece;
     private int takenPieceField;
     int movesTo50MoveRule;
+    int[] availableCastles;
 
     public static MoveResponse fromMove(Move move)
     {
@@ -31,6 +32,7 @@ public class MoveResponse {
                 .promotePiece(move.getPromotePiece())
                 .takenPieceField(move.getTakenPieceField())
                 .movesTo50MoveRule(move.getMovesTo50MoveRule())
+                .availableCastles(move.getAvailableCastles())
                 .build();
     }
 }

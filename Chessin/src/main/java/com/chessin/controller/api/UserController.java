@@ -52,12 +52,12 @@ public class UserController {
 
         if(!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User does not exist");
-        else if(!userRepository.existsByEmail(request.getFriendEmail()))
+        else if(!userRepository.existsByNameInGame(request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Friend does not exist");
 
         friendInvitationRepository.save(FriendInvitation.builder()
                 .user(userRepository.findByEmail(email).get())
-                .friend(userRepository.findByEmail(request.getFriendEmail()).get())
+                .friend(userRepository.findByNameInGame(request.getFriendNickname()).get())
                 .date(Instant.now())
                 .build());
 
@@ -87,15 +87,15 @@ public class UserController {
     {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByUserEmailAndFriendEmail(email, request.getFriendEmail()))
+        if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendEmail()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
-        friendInvitationRepository.deleteByUserEmailAndFriendEmail(email, request.getFriendEmail());
+        friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendEmail());
 
         if(request.getResponseType() == FriendInvitationResponseType.ACCEPT)
         {
             User user = userRepository.findByEmail(email).get();
-            User friend = userRepository.findByEmail(request.getFriendEmail()).get();
+            User friend = userRepository.findByNameInGame(request.getFriendEmail()).get();
 
             user.getFriends().add(friend);
             friend.getFriends().add(user);
@@ -130,11 +130,11 @@ public class UserController {
 
         if(!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User does not exist.");
-        else if(!userRepository.existsByEmail(request.getFriendEmail()))
+        else if(!userRepository.existsByNameInGame(request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Friend does not exist.");
 
         User user = userRepository.findByEmail(email).get();
-        User friend = userRepository.findByEmail(request.getFriendEmail()).get();
+        User friend = userRepository.findByNameInGame(request.getFriendNickname()).get();
 
         user.getFriends().remove(friend);
         friend.getFriends().remove(user);
@@ -150,10 +150,10 @@ public class UserController {
     {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByUserEmailAndFriendEmail(email, request.getFriendEmail()))
+        if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
-        friendInvitationRepository.deleteByUserEmailAndFriendEmail(email, request.getFriendEmail());
+        friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendNickname());
 
         return ResponseEntity.ok().body("Invitation removed.");
     }
