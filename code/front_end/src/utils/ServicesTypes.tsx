@@ -37,7 +37,6 @@ export enum VerificationType {
 
 //timeControl in seconds
 export type PendingChessGameRequest = {
-  email: string;
   timeControl: number;
   increment: number;
   bottomRating: number;
@@ -59,7 +58,6 @@ export type ChessGameResponse = {
 
 export type SubmitMoveRequest = {
   gameId: number;
-  email: string;
   movedPiece: number;
   startField: number;
   endField: number;

@@ -146,7 +146,6 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
     console.log("user email: ", user.email);
     navigation.navigate("PlayOnline", {
       request: setPendingGameRequest(
-        user.email,
         gameTempo.totalTime,
         gameTempo.increment,
         getRanking(gameTempo.lengthType, user)

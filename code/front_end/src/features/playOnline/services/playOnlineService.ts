@@ -86,7 +86,7 @@ export const listenForFirstMove = async (request: ListenForFirstMoveRequest) => 
     return response;
 };
 
-export const cancelSearch = async (email: string) => {
+export const cancelSearch = async () => {
     const accessToken = await getValueFor("accessToken");
     
     fetch(cancelSearchLink, {
@@ -95,7 +95,6 @@ export const cancelSearch = async (email: string) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ email: email }),
     }).then((response) => {
         if (response.status === 200) {
             return response.json();
@@ -133,9 +132,8 @@ export const searchForGame = async (request: PendingChessGameRequest) => {
     return response;
 };
 
-export const setPendingGameRequest = (email: string, timeControl: number, increment: number, userRating: number):PendingChessGameRequest => {
+export const setPendingGameRequest = (timeControl: number, increment: number, userRating: number):PendingChessGameRequest => {
     return {
-        email: email,
         timeControl: timeControl,
         increment: increment,
         userRating: userRating,

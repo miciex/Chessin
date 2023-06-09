@@ -5,7 +5,6 @@ import ChessBoardField from "../../../components/ChessBoardField";
 import {
   Board,
   PossibleMoves,
-  boardFactory,
   isWhite,
   BoardResponseToBoard,
   deleteImpossibleMoves,
@@ -31,6 +30,7 @@ type Props = {
   setLastMoveDate: (date: Date) => void;
   currentPosition: number;
   setCurrentPosition: (position: number) => void;
+  addIncrement: () => void;
 };
 
 export default function PlayOnlineChessBoard({
@@ -44,6 +44,7 @@ export default function PlayOnlineChessBoard({
   setLastMoveDate,
   currentPosition,
   setCurrentPosition,
+  addIncrement,
 }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
@@ -89,7 +90,6 @@ export default function PlayOnlineChessBoard({
 
     const submitMoveRequest: SubmitMoveRequest = {
       gameId: gameId,
-      email: player.email,
       movedPiece: move.movedPiece,
       startField: move.startField,
       endField: move.endField,
@@ -111,6 +111,7 @@ export default function PlayOnlineChessBoard({
         );
         setLastMoveDate(new Date(data.lastMoveTime));
         setCurrentPosition(data.positions.length - 1);
+        addIncrement();
       })
       .catch((error) => {
         throw error;

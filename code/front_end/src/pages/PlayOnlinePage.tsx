@@ -82,7 +82,6 @@ export default function PlayOnline({ navigation, route }: Props) {
       startField: -1,
       endField: -1,
       promotePiece: 0,
-      email: myPlayer ? myPlayer?.email : "",
       isDrawOffered: false,
     })
       .then((data: BoardResponse) => {
@@ -111,7 +110,15 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .json()
                 .then((data: ChessGameResponse) => {
                   setUpGame(data, user);
-                  handleListnForFirstMove(data.id);
+                  handleListnForFirstMove(
+                    data.id,
+                    data.whiteUser.nameInGame === user.nameInGame
+                      ? { ...user, color: "white" }
+                      : { ...user, color: "black" },
+                    data.whiteUser.nameInGame === user.nameInGame
+                      ? responseUserToPlayer(data.blackUser, "black")
+                      : responseUserToPlayer(data.whiteUser, "white")
+                  );
                 })
                 .catch((err) => {
                   throw new Error(err);
@@ -121,16 +128,40 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .then((data: ChessGameResponse | undefined) => {
                   if (data === undefined) return;
                   setUpGame(data, user);
-                  handleListnForFirstMove(data.id)
+                  handleListnForFirstMove(
+                    data.id,
+                    data.whiteUser.nameInGame === user.nameInGame
+                      ? { ...user, color: "white" }
+                      : { ...user, color: "black" },
+                    data.whiteUser.nameInGame === user.nameInGame
+                      ? responseUserToPlayer(data.blackUser, "black")
+                      : responseUserToPlayer(data.whiteUser, "white")
+                  )
                     .then((board: BoardResponse) => {
-                      setDataFromBoardResponse(board);
+                      setDataFromBoardResponse(
+                        board,
+                        data.whiteUser.nameInGame === user.nameInGame
+                          ? { ...user, color: "white" }
+                          : { ...user, color: "black" },
+                        data.whiteUser.nameInGame === user.nameInGame
+                          ? responseUserToPlayer(data.blackUser, "black")
+                          : responseUserToPlayer(data.whiteUser, "white")
+                      );
                       listenForMove({
                         gameId: data.id,
                         moves: board.moves,
                       })
                         .then((board: BoardResponse | undefined) => {
                           if (board === undefined) return;
-                          setDataFromBoardResponse(board);
+                          setDataFromBoardResponse(
+                            board,
+                            data.whiteUser.nameInGame === user.nameInGame
+                              ? { ...user, color: "white" }
+                              : { ...user, color: "black" },
+                            data.whiteUser.nameInGame === user.nameInGame
+                              ? responseUserToPlayer(data.blackUser, "black")
+                              : responseUserToPlayer(data.whiteUser, "white")
+                          );
                         })
                         .catch((err) => {
                           throw new Error(err);
@@ -174,7 +205,7 @@ export default function PlayOnline({ navigation, route }: Props) {
           return JSON.parse(user);
         })
         .then((user: User) => {
-          cancelSearch(user.email)
+          cancelSearch()
             .then((res) => {
               console.log("game canceled");
             })
@@ -187,7 +218,7 @@ export default function PlayOnline({ navigation, route }: Props) {
         });
       return;
     }
-    cancelSearch(myPlayer.email)
+    cancelSearch()
       .then((res) => {
         console.log("game canceled");
       })
@@ -196,18 +227,22 @@ export default function PlayOnline({ navigation, route }: Props) {
       });
   };
 
+  const addMyPlayerIncrement = () => {
+    if (myPlayer === null) return;
+    setMyClockInfo((prev) => {
+      if (prev === undefined) return undefined;
+      new Date(prev.getTime() + request.increment);
+    });
+  };
+
   const toggleGear = () => {
     setGearModal(!gearModal);
   };
 
-  const setUpGame = (
-    data: ChessGameResponse,
-    user: User,
-    gameStarted?: boolean
-  ) => {
+  const setUpGame = (data: ChessGameResponse, user: User) => {
     if (data.blackUser === null || data.whiteStarts === null) {
       setSearchingGame(false);
-      cancelSearch(user.email);
+      cancelSearch();
       return;
     }
 
@@ -233,11 +268,15 @@ export default function PlayOnline({ navigation, route }: Props) {
     setSearchingGame(false);
   };
 
-  const handleListnForFirstMove = async (gameId: number) => {
+  const handleListnForFirstMove = async (
+    gameId: number,
+    myPlayer: Player,
+    opponent: Player
+  ) => {
     console.log("listening for first move");
     return await listenForFirstMove({ gameId })
       .then((res: BoardResponse) => {
-        setDataFromBoardResponse(res);
+        setDataFromBoardResponse(res, myPlayer, opponent);
         return res;
       })
       .catch((err) => {
@@ -245,13 +284,17 @@ export default function PlayOnline({ navigation, route }: Props) {
       });
   };
 
-  const setDataFromBoardResponse = (res: BoardResponse) => {
+  const setDataFromBoardResponse = (
+    res: BoardResponse,
+    myPlayer: Player,
+    opponent: Player
+  ) => {
     const board: Board = BoardResponseToBoard(res);
     setBoardState(board);
     setGameStartedDate(new Date());
     setGameFinished(false);
     setGameStarted(true);
-
+    console.log("my player", myPlayer, "opponent", opponent);
     setGameStartedDate(new Date(res.lastMoveTime));
     setLastMoveDate(new Date(res.lastMoveTime));
 
@@ -260,6 +303,8 @@ export default function PlayOnline({ navigation, route }: Props) {
       opponent?.color === "white" ? res.whiteTime : res.blackTime;
     setMyClockInfo(new Date(myTime));
     setOpponentClockInfo(new Date(opponentTime));
+
+    setCurrentPosition(res.moves.length - 1);
   };
 
   const updateMyClockInSeconds = (millis: number) => {
@@ -338,6 +383,7 @@ export default function PlayOnline({ navigation, route }: Props) {
               setLastMoveDate={setLastMoveDate}
               currentPosition={currentPosition}
               setCurrentPosition={setCurrentPosition}
+              addIncrement={addMyPlayerIncrement}
             />
           </View>
           <View style={styles.gameOptionsContainer}>
