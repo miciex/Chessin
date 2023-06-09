@@ -34,6 +34,7 @@ public class MoveResponse {
                 .takenPieceField(move.getTakenPieceField())
                 .movesTo50MoveRule(move.getMovesTo50MoveRule())
                 .availableCastles(move.getAvailableCastles())
+                .remainingTime(move.getRemainingTime())
                 .build();
     }
 }

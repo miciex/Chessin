@@ -64,25 +64,24 @@ public class ChessGameService {
     }
 
     public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game){
-
         Move move = new Move(game, board.getPosition(), request.getStartField(), request.getEndField(), request.getPromotePiece());
+
+        long now = Instant.now().toEpochMilli();
+        if(!board.isWhiteTurn()) {
+            board.setWhiteTime(board.getLastMoveTimeForColor(true, game.isWhiteStarts()).orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+            move.setRemainingTime(board.getWhiteTime());
+        }
+        else {
+            board.setBlackTime(board.getLastMoveTimeForColor(false, game.isWhiteStarts()).orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+            move.setRemainingTime(board.getBlackTime());
+        }
+
         board.makeMove(move);
         board.setMovesTo50MoveRule(CheckGameResults.draw50MoveRuleCheck(move, board.getMovesTo50MoveRule()));
         board.setWhiteTurn(!board.isWhiteTurn());
         board.setGameResult(board.checkGameResult());
         board.setVisualBoard(Convert.mapToBoard(board.getPosition()));
         move.setAvailableCastles(board.getAvailableCastles());
-
-        long now = Instant.now().toEpochMilli();
-
-        if(!board.isWhiteTurn()) {
-            board.setWhiteTime(board.getLastMoveTimeForColor(true, game.isWhiteStarts()).orElse(game.getStartTime()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
-            move.setRemainingTime(board.getWhiteTime());
-        }
-        else {
-            board.setBlackTime(board.getLastMoveTimeForColor(false, game.isWhiteStarts()).orElse(game.getStartTime()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
-            move.setRemainingTime(board.getBlackTime());
-        }
 
         board.setLastMoveTime(now);
 
