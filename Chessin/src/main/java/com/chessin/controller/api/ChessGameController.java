@@ -76,7 +76,6 @@ public class ChessGameController {
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
                         .startTime(Instant.now().toEpochMilli())
-                        //.moves(new ArrayList<>())
                         .build();
 
                 chessGameRepository.save(game);
@@ -116,20 +115,6 @@ public class ChessGameController {
             {
                 pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.timeout);
 
-
-//                ChessGame game = ChessGame.builder()
-//                        .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
-//                        .startBoard(Constants.Boards.classicBoard)
-//                        .whiteStarts(true)
-//                        .whiteUser(players.get(whitePlayerIndex))
-//                        .blackUser(players.get(blackPlayerIndex))
-//                        .availableCastles(new int[]{0,0,0,0})
-//                        .timeControl(pendingChessGame.getTimeControl())
-//                        .increment(pendingChessGame.getIncrement())
-//                        .startTime(Instant.now().toEpochMilli())
-//                        //.moves(new ArrayList<>())
-//                        .build();
-
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
 
                 return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId())));
@@ -158,14 +143,14 @@ public class ChessGameController {
         if(!activeGames.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found");
 
-        if(chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
+        if(!chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
 
         synchronized(activeGames.get(request.getGameId()))
         {
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(request.getGameId()))));
         }
     }
 
@@ -191,7 +176,7 @@ public class ChessGameController {
         {
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
 
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id))));
         }
     }
 
@@ -212,7 +197,6 @@ public class ChessGameController {
                 board.setGameResult(GameResults.WHITE_TIMEOUT);
                 board.setWhiteTime(0);
                 activeBoards.replace(request.getGameId(), board);
-                //activeGames.get(request.getGameId()).setGameResult(GameResults.WHITE_TIMEOUT);
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
@@ -221,7 +205,6 @@ public class ChessGameController {
                 board.setGameResult(GameResults.BLACK_TIMEOUT);
                 board.setBlackTime(0);
                 activeBoards.replace(request.getGameId(), board);
-                //activeGames.get(request.getGameId()).setGameResult(GameResults.BLACK_TIMEOUT);
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
@@ -254,7 +237,6 @@ public class ChessGameController {
             if(board.getGameResult() != GameResults.NONE)
             {
                 activeBoards.replace(request.getGameId(), board);
-                //activeGames.get(request.getGameId()).setGameResult(board.getGameResult());
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
@@ -270,8 +252,6 @@ public class ChessGameController {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
-                //activeGames.get(request.getGameId()).setMoves(endBoard.getMoves());
-                //chessGameRepository.save(activeGames.get(request.getGameId()));
                 chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
                 activeGames.remove(request.getGameId());
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));

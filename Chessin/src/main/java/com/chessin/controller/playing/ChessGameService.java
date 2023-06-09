@@ -51,6 +51,20 @@ public class ChessGameService {
         return true;
     }
 
+    public Board calculateTime(Board board)
+    {
+        long now = Instant.now().toEpochMilli();
+
+        if(board.isWhiteTurn())
+            board.setWhiteTime(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now));
+        else
+            board.setBlackTime(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now));
+
+        board.setLastMoveTime(now);
+
+        return board;
+    }
+
     public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game){
 
         Move move = new Move(game, board.getPosition(), request.getStartField(), request.getEndField(), request.getPromotePiece());
