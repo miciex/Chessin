@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CancelPendingChessGameRequest {
-    private String email;
+    private String accessToken;
 }
