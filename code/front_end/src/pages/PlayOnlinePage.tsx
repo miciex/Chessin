@@ -32,6 +32,7 @@ import { listenForFirstMove } from "../features/playOnline/services/playOnlineSe
 import { BoardResponseToBoard } from "../chess-logic/board";
 import GameFinishedOverlay from "../features/playOnline/components/GameFinishedOverlay";
 import { Move } from "../chess-logic/move";
+import { submitMove } from "../features/playOnline/services/playOnlineService";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -41,6 +42,8 @@ type Props = {
   >;
   route: RouteProp<RootStackParamList, "PlayOnline">;
 };
+
+const timeFinishedDate = new Date(-2);
 
 export default function PlayOnline({ navigation, route }: Props) {
   const { request } = route.params;
@@ -70,6 +73,25 @@ export default function PlayOnline({ navigation, route }: Props) {
       unMount();
     };
   }, []);
+
+  if (myClockInfo && myClockInfo < timeFinishedDate && !gameFinished) {
+    submitMove({
+      movedPiece: 0,
+      gameId: gameId,
+      startField: -1,
+      endField: -1,
+      promotePiece: 0,
+      email: myPlayer ? myPlayer?.email : "",
+      isDrawOffered: false,
+    })
+      .then((data: BoardResponse) => {
+        setGameFinished(true);
+        setBoardState(BoardResponseToBoard(data));
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  }
 
   const searchNewGame = () => {
     setSearchingGame(true);
@@ -159,6 +181,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   };
 
   const handleListnForFirstMove = (gameId: number) => {
+    console.log("listening for first move");
     listenForFirstMove({ gameId })
       .then((res: BoardResponse) => {
         const board: Board = BoardResponseToBoard(res);
@@ -272,14 +295,20 @@ export default function PlayOnline({ navigation, route }: Props) {
               setCurrentPosition={setCurrentPosition}
             />
           </View>
-          <Text>
+          <View style={styles.gameOptionsContainer}>
+            <FontAwesome
+              name="flag-o"
+              size={34}
+              color="black"
+              onPress={() => {}}
+            />
             <FontAwesome
               name="gear"
               size={34}
               color="black"
               onPress={toggleGear}
             />
-          </Text>
+          </View>
           <View style={styles.playerBarContainer}>
             <PlayerBar
               player={myPlayer}
@@ -373,5 +402,12 @@ const styles = StyleSheet.create({
     width: "95%",
     height: "63%",
     position: "absolute",
+  },
+  gameOptionsContainer: {
+    width: "100%",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    flexDirection: "row",
+    height: 50,
   },
 });

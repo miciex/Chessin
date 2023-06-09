@@ -12,6 +12,8 @@ type Props = {
   board: Board;
 };
 
+const timeEndDate = new Date(0);
+
 export default function Timer({
   info,
   gameFinished,
@@ -23,7 +25,7 @@ export default function Timer({
   useEffect(() => {
     setTimer();
     return () => clearTimeout(timeout);
-  }, [board, gameStarted, gameFinished]);
+  }, [board.whiteToMove, gameStarted, gameFinished]);
 
   let timeout: number;
 
@@ -39,13 +41,16 @@ export default function Timer({
     }
   };
 
-  const time = info
-    ? info.getMinutes().toString() +
-      ":" +
-      (info.getSeconds().toString().length === 1
-        ? "0" + info.getSeconds().toString()
-        : info.getSeconds().toString())
-    : null;
+  // console.log(info?.getSeconds());
+
+  const time =
+    info && info >= timeEndDate
+      ? info.getMinutes().toString() +
+        ":" +
+        (info.getSeconds().toString().length === 1
+          ? "0" + info.getSeconds().toString()
+          : info.getSeconds().toString())
+      : "0:00";
 
   return (
     <View style={styles.appContainer}>

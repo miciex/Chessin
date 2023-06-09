@@ -99,18 +99,22 @@ export default function PlayOnlineChessBoard({
     playMove(move);
     setCurrentPosition(board.moves.length);
 
-    submitMove(submitMoveRequest).then((data: BoardResponse) => {
-      if (!data) return;
-      setBoard(BoardResponseToBoard(data));
-      setMyClockInfo(
-        new Date(player.color === "white" ? data.whiteTime : data.blackTime)
-      );
-      setOpponentClockInfo(
-        new Date(player.color === "white" ? data.blackTime : data.whiteTime)
-      );
-      setLastMoveDate(new Date(data.lastMoveTime));
-      setCurrentPosition(data.positions.length - 1);
-    });
+    submitMove(submitMoveRequest)
+      .then((data: BoardResponse) => {
+        if (!data) return;
+        setBoard(BoardResponseToBoard(data));
+        setMyClockInfo(
+          new Date(player.color === "white" ? data.whiteTime : data.blackTime)
+        );
+        setOpponentClockInfo(
+          new Date(player.color === "white" ? data.blackTime : data.whiteTime)
+        );
+        setLastMoveDate(new Date(data.lastMoveTime));
+        setCurrentPosition(data.positions.length - 1);
+      })
+      .catch((error) => {
+        throw error;
+      });
 
     setActiveField(-1);
   };
@@ -140,7 +144,6 @@ export default function PlayOnlineChessBoard({
   };
 
   const renderBoard = () => {
-    console.log(board);
     const renderedBoard = [];
     const visualBoard =
       board.positions[currentPosition] !== undefined

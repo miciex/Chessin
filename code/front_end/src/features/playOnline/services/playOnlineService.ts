@@ -6,13 +6,12 @@ import { searchRatingRange } from "../../../utils/Constants";
 export const listenForFirstMove = async (request: ListenForFirstMoveRequest) => {
     const accessToken = await getValueFor("accessToken");
 
-    const response  = await fetch(listenForFirstMoveLink, {
+    const response  = await fetch(`${listenForFirstMoveLink}${request.gameId}`, {
         method: "Post",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(request),
     }).then((response) => {
         console.log("listen for first move response: ",response.status);
         if (response.status === 200) {
