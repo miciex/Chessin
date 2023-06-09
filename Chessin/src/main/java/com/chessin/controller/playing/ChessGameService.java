@@ -77,10 +77,15 @@ public class ChessGameService {
 
         long now = Instant.now().toEpochMilli();
 
-        if (!board.isWhiteTurn())
-            board.setWhiteTime(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
-        else
-            board.setBlackTime(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+        if (!board.isWhiteTurn()) {
+            board.setWhiteTime(board.getLastMoveTimeForColor(true, game.isWhiteStarts()).orElse(game.getStartTime())
+                    - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+            move.setRemainingTime(board.getWhiteTime());
+        } else {
+            board.setBlackTime(board.getLastMoveTimeForColor(false, game.isWhiteStarts()).orElse(game.getStartTime())
+                    - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+            move.setRemainingTime(board.getBlackTime());
+        }
 
         board.setLastMoveTime(now);
 

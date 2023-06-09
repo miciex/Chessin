@@ -30,6 +30,7 @@ public class Move {
     private int takenPieceField;
     int movesTo50MoveRule;
     int[] availableCastles;
+    long remainingTime;
 
     public Move(ChessGame game, HashMap<Integer, Integer> pieces, int startField, int endField, int promotePiece){
         this.chessGame = game;
