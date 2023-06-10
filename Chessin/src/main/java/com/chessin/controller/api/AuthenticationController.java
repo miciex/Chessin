@@ -24,6 +24,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request){
+        request.setEmail(request.getEmail().toLowerCase());
 
         if(repository.existsByEmail(request.getEmail())){
             return ResponseEntity.badRequest().body("Email already exists in the database.");
@@ -34,6 +35,7 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request){
+        request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
@@ -44,6 +46,7 @@ public class AuthenticationController {
 
     @PostMapping("/verifyCode")
     public ResponseEntity<?> verifyCode(@RequestBody CodeVerificationRequest request){
+        request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
@@ -59,6 +62,7 @@ public class AuthenticationController {
 
     @PostMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest request){
+        request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
@@ -69,6 +73,7 @@ public class AuthenticationController {
 
     @PostMapping("/remindPassword")
     public ResponseEntity<?> remindPassword(@RequestBody PasswordRemindRequest request){
+        request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
@@ -79,6 +84,7 @@ public class AuthenticationController {
 
     @PostMapping("/2faEnabled")
     public ResponseEntity<?> twoFactorAuthenticationEnabled(@RequestBody TwoFactorAuthenticationEnabledRequest request){
+        request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
