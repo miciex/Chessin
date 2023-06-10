@@ -30,7 +30,6 @@ type Props = {
   setLastMoveDate: (date: Date) => void;
   currentPosition: number;
   setCurrentPosition: (position: number) => void;
-  addIncrement: () => void;
 };
 
 export default function PlayOnlineChessBoard({
@@ -44,7 +43,6 @@ export default function PlayOnlineChessBoard({
   setLastMoveDate,
   currentPosition,
   setCurrentPosition,
-  addIncrement,
 }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
@@ -98,20 +96,24 @@ export default function PlayOnlineChessBoard({
     };
     playMove(move);
     setCurrentPosition(board.moves.length);
+    // addIncrement();
 
     submitMove(submitMoveRequest)
       .then((data: BoardResponse) => {
         if (!data) return;
         setBoard(BoardResponseToBoard(data));
-        setMyClockInfo(
-          new Date(player.color === "white" ? data.whiteTime : data.blackTime)
+        console.log(
+          "white time: " + data.whiteTime + " black time: " + data.blackTime
         );
-        setOpponentClockInfo(
-          new Date(player.color === "white" ? data.blackTime : data.whiteTime)
-        );
-        setLastMoveDate(new Date(data.lastMoveTime));
+        console.log("player color: " + player.color);
+        const myTime =
+          player.color === "white" ? data.whiteTime : data.blackTime;
+        const opponentTime =
+          player.color === "white" ? data.blackTime : data.whiteTime;
+        setMyClockInfo(new Date(myTime));
+        setOpponentClockInfo(new Date(opponentTime));
+        // setLastMoveDate(new Date(data.lastMoveTime));
         setCurrentPosition(data.positions.length - 1);
-        addIncrement();
       })
       .catch((error) => {
         throw error;

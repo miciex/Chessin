@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,13 +54,19 @@ public class ChessGameService {
         return true;
     }
 
-    public Board calculateTime(Board board) {
+    public Board calculateTime(Board board, ChessGame game) {
         long now = Instant.now().toEpochMilli();
 
-        if (board.isWhiteTurn())
-            board.setWhiteTime(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now));
-        else
-            board.setBlackTime(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now));
+        if (board.isWhiteTurn()) {
+            Optional<Long> time = board.getLastMoveTimeForColor(true, true);
+            long time2 = time.map(aLong -> aLong - Math.abs(board.getLastMoveTime() - now) + game.getIncrement()).orElseGet(game::getTimeControl);
+            board.setWhiteTime(time2);
+        }
+        else {
+            Optional<Long> time = board.getLastMoveTimeForColor(false, true);
+            long time2 = time.map(aLong -> aLong - Math.abs(board.getLastMoveTime() - now) + game.getIncrement()).orElseGet(game::getTimeControl);
+            board.setBlackTime(time2);
+        }
 
         return board;
     }
@@ -69,13 +76,17 @@ public class ChessGameService {
                 request.getPromotePiece());
 
         long now = Instant.now().toEpochMilli();
-        if (!board.isWhiteTurn()) {
-            board.setWhiteTime(board.getLastMoveTimeForColor(true, game.isWhiteStarts()).orElse(game.getTimeControl())
-                    - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+        long diff = Math.abs(board.getLastMoveTime() - now);
+        long timeControl = game.getTimeControl();
+        if (board.isWhiteTurn()) {
+            Optional<Long> time = board.getLastMoveTimeForColor(true, game.isWhiteStarts());
+            long time2 = time.map(aLong -> aLong - diff + game.getIncrement()).orElse(board.getMoves().size() == 0 ? timeControl + game.getIncrement() : timeControl - diff + game.getIncrement());
+            board.setWhiteTime(time2);
             move.setRemainingTime(board.getWhiteTime());
         } else {
-            board.setBlackTime(board.getLastMoveTimeForColor(false, game.isWhiteStarts()).orElse(game.getTimeControl())
-                    - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+            Optional<Long> time = board.getLastMoveTimeForColor(false, game.isWhiteStarts());
+            long time2 = time.map(aLong -> aLong - diff + game.getIncrement()).orElse(board.getMoves().size() == 0 ? timeControl + game.getIncrement() : timeControl - diff + game.getIncrement());
+            board.setBlackTime(time2);
             move.setRemainingTime(board.getBlackTime());
         }
 

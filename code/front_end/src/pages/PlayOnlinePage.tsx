@@ -109,6 +109,7 @@ export default function PlayOnline({ navigation, route }: Props) {
               response
                 .json()
                 .then((data: ChessGameResponse) => {
+                  console.log("data", data);
                   setUpGame(data, user);
                   handleListnForFirstMove(
                     data.id,
@@ -138,30 +139,32 @@ export default function PlayOnline({ navigation, route }: Props) {
                       : responseUserToPlayer(data.whiteUser, "white")
                   )
                     .then((board: BoardResponse) => {
-                      setDataFromBoardResponse(
-                        board,
+                      const myPlayer: Player =
                         data.whiteUser.nameInGame === user.nameInGame
                           ? { ...user, color: "white" }
-                          : { ...user, color: "black" },
+                          : { ...user, color: "black" };
+                      const opponent =
                         data.whiteUser.nameInGame === user.nameInGame
                           ? responseUserToPlayer(data.blackUser, "black")
-                          : responseUserToPlayer(data.whiteUser, "white")
-                      );
+                          : responseUserToPlayer(data.whiteUser, "white");
+                      setDataFromBoardResponse(board, myPlayer, opponent);
+                      setTimeFromBoardResponse(board, myPlayer, opponent);
                       listenForMove({
                         gameId: data.id,
                         moves: board.moves,
                       })
                         .then((board: BoardResponse | undefined) => {
                           if (board === undefined) return;
-                          setDataFromBoardResponse(
-                            board,
+                          const myPlayer: Player =
                             data.whiteUser.nameInGame === user.nameInGame
                               ? { ...user, color: "white" }
-                              : { ...user, color: "black" },
+                              : { ...user, color: "black" };
+                          const opponent =
                             data.whiteUser.nameInGame === user.nameInGame
                               ? responseUserToPlayer(data.blackUser, "black")
-                              : responseUserToPlayer(data.whiteUser, "white")
-                          );
+                              : responseUserToPlayer(data.whiteUser, "white");
+                          setDataFromBoardResponse(board, myPlayer, opponent);
+                          setTimeFromBoardResponse(board, myPlayer, opponent);
                         })
                         .catch((err) => {
                           throw new Error(err);
@@ -227,14 +230,6 @@ export default function PlayOnline({ navigation, route }: Props) {
       });
   };
 
-  const addMyPlayerIncrement = () => {
-    if (myPlayer === null) return;
-    setMyClockInfo((prev) => {
-      if (prev === undefined) return undefined;
-      new Date(prev.getTime() + request.increment);
-    });
-  };
-
   const toggleGear = () => {
     setGearModal(!gearModal);
   };
@@ -277,6 +272,7 @@ export default function PlayOnline({ navigation, route }: Props) {
     return await listenForFirstMove({ gameId })
       .then((res: BoardResponse) => {
         setDataFromBoardResponse(res, myPlayer, opponent);
+        setTimeFromBoardResponse(res, myPlayer, opponent);
         return res;
       })
       .catch((err) => {
@@ -298,15 +294,20 @@ export default function PlayOnline({ navigation, route }: Props) {
     setGameStartedDate(new Date(res.lastMoveTime));
     setLastMoveDate(new Date(res.lastMoveTime));
 
+    setCurrentPosition(res.moves.length - 1);
+  };
+
+  const setTimeFromBoardResponse = (
+    res: BoardResponse,
+    myPlayer: Player,
+    opponent: Player
+  ) => {
     let myTime = myPlayer?.color === "white" ? res.whiteTime : res.blackTime;
     let opponentTime =
       opponent?.color === "white" ? res.whiteTime : res.blackTime;
     setMyClockInfo(new Date(myTime));
     setOpponentClockInfo(new Date(opponentTime));
-
-    setCurrentPosition(res.moves.length - 1);
   };
-
   const updateMyClockInSeconds = (millis: number) => {
     setMyClockInfo((prev) => {
       if (prev === undefined) return prev;
@@ -383,7 +384,6 @@ export default function PlayOnline({ navigation, route }: Props) {
               setLastMoveDate={setLastMoveDate}
               currentPosition={currentPosition}
               setCurrentPosition={setCurrentPosition}
-              addIncrement={addMyPlayerIncrement}
             />
           </View>
           <View style={styles.gameOptionsContainer}>

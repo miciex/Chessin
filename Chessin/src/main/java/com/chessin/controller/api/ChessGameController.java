@@ -144,7 +144,7 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Game not found");
 
         if(!chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(request.getGameId()))));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(request.getGameId()), activeGames.get(request.getGameId()))));
 
         synchronized(activeGames.get(request.getGameId()))
         {
@@ -169,7 +169,7 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Game not found.");
 
         if(activeBoards.get(id).getMoves().size() > 0)
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id))));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id), activeGames.get(id))));
 
         synchronized(activeGames.get(id))
         {
