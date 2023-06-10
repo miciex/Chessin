@@ -243,6 +243,13 @@ public class ChessGameController {
 
             activeGames.get(request.getGameId()).notifyAll();
 
+//            long waitTime;
+//
+//            if(board.isWhiteTurn())
+//                waitTime = Math.min(board.getWhiteTime(), Constants.Application.waitForMoveTime) + 100;
+//            else
+//                waitTime = Math.min(board.getBlackTime(), Constants.Application.waitForMoveTime) + 100;
+
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 
             if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)

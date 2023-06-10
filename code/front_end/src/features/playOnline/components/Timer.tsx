@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
 import { Player } from "../../../utils/PlayerUtilities";
-import { Board } from "../../../chess-logic/board";
+import { Board, GameResults } from "../../../chess-logic/board";
 
 type Props = {
   info: Date | undefined;
@@ -25,7 +25,7 @@ export default function Timer({
   useEffect(() => {
     setTimer();
     return () => clearTimeout(timeout);
-  }, [board.whiteToMove, gameStarted, gameFinished]);
+  }, [board.whiteToMove, gameStarted, board.result]);
 
   let timeout: number;
 
@@ -33,7 +33,7 @@ export default function Timer({
     if (
       board.whiteToMove === (player?.color === "white") &&
       gameStarted &&
-      !gameFinished
+      board.result === GameResults.NONE
     ) {
       timeout = setTimeout(setTimer, 1000);
 

@@ -53,18 +53,14 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
   const [opponentClockInfo, setOpponentClockInfo] = useState<Date>();
   const [myClockInfo, setMyClockInfo] = useState<Date>();
-  const [lastMoveDate, setLastMoveDate] = useState<Date>();
 
   const [gearModal, setGearModal] = useState(false);
   //TODO: write reducer for boardState
   const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
-  const [opacityGear, setOpacityGear] = useState(1);
-  const [foundGame, setFoundGame] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [searchingGame, setSearchingGame] = useState(true);
   const [gameId, setGameId] = useState<number>(-1);
-  const [gameStartedDate, setGameStartedDate] = useState<Date>();
   const [currentPosition, setCurrentPosition] = useState<number>(0);
 
   useEffect(() => {
@@ -201,26 +197,7 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const unMount = () => {
     if (!searchingGame) return;
-    if (myPlayer === null || myPlayer.email === null) {
-      getValueFor("user")
-        .then((user) => {
-          if (user === null) return;
-          return JSON.parse(user);
-        })
-        .then((user: User) => {
-          cancelSearch()
-            .then((res) => {
-              console.log("game canceled");
-            })
-            .catch((err) => {
-              throw new Error(err);
-            });
-        })
-        .catch((err) => {
-          throw new Error(err);
-        });
-      return;
-    }
+
     cancelSearch()
       .then((res) => {
         console.log("game canceled");
@@ -241,7 +218,6 @@ export default function PlayOnline({ navigation, route }: Props) {
       return;
     }
 
-    setFoundGame(true);
     setGameId(data.id);
     if (data.whiteUser.nameInGame === user.nameInGame) {
       setOpponent(responseUserToPlayer(data.blackUser, "black"));
@@ -287,12 +263,9 @@ export default function PlayOnline({ navigation, route }: Props) {
   ) => {
     const board: Board = BoardResponseToBoard(res);
     setBoardState(board);
-    setGameStartedDate(new Date());
     setGameFinished(false);
     setGameStarted(true);
     console.log("my player", myPlayer, "opponent", opponent);
-    setGameStartedDate(new Date(res.lastMoveTime));
-    setLastMoveDate(new Date(res.lastMoveTime));
 
     setCurrentPosition(res.moves.length - 1);
   };
@@ -353,7 +326,7 @@ export default function PlayOnline({ navigation, route }: Props) {
     <View style={styles.appContainer}>
       {settings}
 
-      <View style={[styles.contentContainer, { opacity: opacityGear }]}>
+      <View style={styles.contentContainer}>
         <View style={styles.gameRecordContainer}>
           <GameRecord
             board={boardState}
@@ -381,8 +354,8 @@ export default function PlayOnline({ navigation, route }: Props) {
               playMove={PlayMove}
               setMyClockInfo={setMyClockInfo}
               setOpponentClockInfo={setOpponentClockInfo}
-              setLastMoveDate={setLastMoveDate}
               currentPosition={currentPosition}
+              setGameStarted={setGameStarted}
               setCurrentPosition={setCurrentPosition}
             />
           </View>

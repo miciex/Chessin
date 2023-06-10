@@ -9,6 +9,7 @@ import {
   BoardResponseToBoard,
   deleteImpossibleMoves,
   copyBoard,
+  GameResults,
 } from "../../../chess-logic/board";
 import { moveFactory } from "../../../chess-logic/move";
 import { ColorsPallet } from "../../../utils/Constants";
@@ -27,8 +28,8 @@ type Props = {
   playMove: (move: Move) => void;
   setMyClockInfo: (timeLeft: Date) => void;
   setOpponentClockInfo: (timeLeft: Date) => void;
-  setLastMoveDate: (date: Date) => void;
   currentPosition: number;
+  setGameStarted: (gameStarted: boolean) => void;
   setCurrentPosition: (position: number) => void;
 };
 
@@ -40,8 +41,8 @@ export default function PlayOnlineChessBoard({
   playMove,
   setMyClockInfo,
   setOpponentClockInfo,
-  setLastMoveDate,
   currentPosition,
+  setGameStarted,
   setCurrentPosition,
 }: Props) {
   const [activeField, setActiveField] = useState(-1);
@@ -114,6 +115,7 @@ export default function PlayOnlineChessBoard({
         setOpponentClockInfo(new Date(opponentTime));
         // setLastMoveDate(new Date(data.lastMoveTime));
         setCurrentPosition(data.positions.length - 1);
+        if (data.gameResult !== GameResults.NONE) setGameStarted(false);
       })
       .catch((error) => {
         throw error;
