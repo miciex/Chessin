@@ -40,10 +40,10 @@ export default function Notification({ route, navigation }: Props) {
       <ScrollView>
         <View style={styles.contentContainer}>
         <Heading text={"Notifications"} />
-         <Invitation nick="shiter" rank={1200} navigation={navigation}/>
-         <Invitation nick="shiter" rank={1200} navigation={navigation}/>
+         <Invitation nick="Wojanix" rank={1200} navigation={navigation}/>
+         <Invitation nick="Wojanix" rank={1200} navigation={navigation}/>
          <Notify text="Gratulacje osiagnales 1000 elo"/>
-         <Invitation nick="shiter" rank={1200} navigation={navigation}/>
+         <Invitation nick="Wojanix" rank={1200} navigation={navigation}/>
         </View>
       </ScrollView>
     

@@ -9,6 +9,7 @@ import { fetchandStoreUser } from "../features/authentication/services/loginServ
 import { AuthenticationResponse } from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
 import { CodeVerificationRequest } from "../utils/ServicesTypes";
+import { addFriend } from "../utils/ApiEndpoints";
 
 export const storeUser = async (value: User) => {
   try {
@@ -132,3 +133,29 @@ export const setUserDataFromResponse = async (
   await save("accessToken", responseData.accessToken);
   fetchandStoreUser(codeVerificationRequest.email);
 };
+
+
+export const addFriendFunc = async (nick: String) =>{
+  const accessToken = await getValueFor("accessToken");
+  console.log(nick)
+  fetch(addFriend, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      friendNickname: nick,
+    })
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      return response.json();
+    } else {
+      throw new Error("Something went wrong on api server!");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+}

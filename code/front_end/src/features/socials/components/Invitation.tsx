@@ -13,6 +13,7 @@ import {
   import { NativeStackNavigationProp } from "@react-navigation/native-stack";
   import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
+import { addFriendFunc } from "../../../services/userServices";
   
   type Props = {
     nick: string;
@@ -58,12 +59,12 @@ import BaseButton from "../../../components/BaseButton";
         </View>
         
         <View style={{marginTop: 20}}>
-            <Text>
-                Wysłał ci zaproszenie do znajomych
+            <Text style={{textAlign: "center"}}>
+                Zaproszenie do znajomych
             </Text>
             <View style={{flexDirection: "row", justifyContent: "space-between"}}>
             <View style={styles.confirmButton}>
-                <BaseButton text="Accept" handlePress={()=>{console.log("Accepted")}} color="green"/>
+                <BaseButton text="Accept" handlePress={()=>{addFriendFunc(nick)}} color="green"/>
             </View>
             <View style={styles.confirmButton}>
                 <BaseButton text="Reject" handlePress={()=>{console.log("Rejected")}} color="red"/>
