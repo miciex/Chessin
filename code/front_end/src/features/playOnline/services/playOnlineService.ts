@@ -53,34 +53,34 @@ export const getGameByUsername = async (username: string) => {
             throw new Error("Something went wrong");
         }
     }).catch((error) => {
-        throw new Error(error);
-    });
-    return response;
-};
-
-export const listenForFirstMove = async (request: ListenForFirstMoveRequest) => {
-    const accessToken = await getValueFor("accessToken");
-
-    const response  = await fetch(`${listenForFirstMoveLink}${request.gameId}`, {
-        method: "Post",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-        },
-    }).then((response) => {
-        console.log("listen for first move response: ",response.status);
-        if (response.status === 200) {
-            return response.json();
-        }else if(response.status === 400){
-            response.text().then((data) => {
-                throw new Error(data);
-        }).catch((error) => {
             throw new Error(error);
         });
-    }else{
-            throw new Error("Something went wrong");
-        }
-    }).catch((error) => {
+        return response;
+    };
+
+    export const listenForFirstMove = async (request: ListenForFirstMoveRequest) => {
+        const accessToken = await getValueFor("accessToken");
+
+        const response  = await fetch(`${listenForFirstMoveLink}${request.gameId}`, {
+            method: "Post",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+        }).then((response) => {
+            console.log("listen for first move response: ",response.status);
+            if (response.status === 200) {
+                return response.json();
+            }else if(response.status === 400){
+                response.text().then((data) => {
+                    throw new Error(data);
+            }).catch((error) => {
+                throw new Error(error);
+            });
+        }else{
+                throw new Error("Something went wrong");
+            }
+        }).catch((error) => {
         throw new Error(error);
     });
     return response;
@@ -152,6 +152,7 @@ export const submitMove = async ( request: SubmitMoveRequest ) => {
         },
         body: JSON.stringify(request),
     }).then((response) => {
+        console.log("submit move response: ",response.status);
         if (response.status === 200) {
             return response.json();
         } else if(response.status === 400){

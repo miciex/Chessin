@@ -18,6 +18,7 @@ export type MoveResponse = {
      promotePiece:number;
      gaveCheck:boolean;
      takenPieceField:number;
+     remainingTime:number;
 }
 
 
