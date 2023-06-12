@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.time.Instant;
 import java.util.*;
 
@@ -28,10 +27,10 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final FriendInvitationRepository friendInvitationRepository;
+    FriendInvitationRepository friendInvitationRepository;
 
-    @PostMapping("/findByEmail/{nickname}")
-    public ResponseEntity<?> findByNickname(@PathVariable String nickname){
+    @PostMapping("/findByNickname/{nickname}")
+    public ResponseEntity<?> findByNickname(@PathVariable String nickname) {
         Optional<User> user = userRepository.findByNameInGame(nickname);
         UserResponse userResponse = UserResponse.fromUser(user.orElseThrow());
         return ResponseEntity.ok().body(userResponse);
@@ -46,13 +45,12 @@ public class UserController {
     }
 
     @PostMapping("/addFriend")
-    public ResponseEntity<?> addFriend(@RequestBody FriendInvitationRequest request, HttpServletRequest servlet)
-    {
+    public ResponseEntity<?> addFriend(@RequestBody FriendInvitationRequest request, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!userRepository.existsByEmail(email))
+        if (!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User does not exist");
-        else if(!userRepository.existsByNameInGame(request.getFriendNickname()))
+        else if (!userRepository.existsByNameInGame(request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Friend does not exist");
 
         friendInvitationRepository.save(FriendInvitation.builder()
@@ -65,35 +63,33 @@ public class UserController {
     }
 
     @PostMapping("/checkInvitations")
-    public ResponseEntity<?> checkInvitations(HttpServletRequest servlet)
-    {
+    public ResponseEntity<?> checkInvitations(HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByUserEmail(email))
+        if (!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 
         List<FriendInvitation> invitations = friendInvitationRepository.findAllByUserEmail(email);
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
-        for(FriendInvitation invitation : invitations)
+        for (FriendInvitation invitation : invitations)
             responses.add(FriendInvitationResponse.fromFriendInvitation(invitation));
 
         return ResponseEntity.ok().body(responses);
     }
 
     @PostMapping("/respondToInvitation")
-    public ResponseEntity<?> respondToInvitation(@RequestBody FriendInvitationResponseRequest request, HttpServletRequest servlet)
-    {
+    public ResponseEntity<?> respondToInvitation(@RequestBody FriendInvitationResponseRequest request,
+            HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendEmail()))
+        if (!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendEmail()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
         friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendEmail());
 
-        if(request.getResponseType() == FriendInvitationResponseType.ACCEPT)
-        {
+        if (request.getResponseType() == FriendInvitationResponseType.ACCEPT) {
             User user = userRepository.findByEmail(email).get();
             User friend = userRepository.findByNameInGame(request.getFriendEmail()).get();
 
@@ -108,29 +104,27 @@ public class UserController {
     }
 
     @PostMapping("/getFriends/{email}")
-    public ResponseEntity<?> getFriends(@PathVariable String email)
-    {
-        if(!userRepository.existsByEmail(email))
+    public ResponseEntity<?> getFriends(@PathVariable String email) {
+        if (!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User does not exist");
 
         User user = userRepository.findByEmail(email).get();
 
         List<UserResponse> friends = new ArrayList<>();
 
-        for(User friend : user.getFriends())
+        for (User friend : user.getFriends())
             friends.add(UserResponse.fromUser(friend));
 
         return ResponseEntity.ok().body(friends);
     }
 
     @PostMapping("/removeFriend")
-    public ResponseEntity<?> removeFriend(@RequestBody FriendInvitationRequest request, HttpServletRequest servlet)
-    {
+    public ResponseEntity<?> removeFriend(@RequestBody FriendInvitationRequest request, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!userRepository.existsByEmail(email))
+        if (!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User does not exist.");
-        else if(!userRepository.existsByNameInGame(request.getFriendNickname()))
+        else if (!userRepository.existsByNameInGame(request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Friend does not exist.");
 
         User user = userRepository.findByEmail(email).get();
@@ -146,11 +140,11 @@ public class UserController {
     }
 
     @PostMapping("/removeInvitation")
-    public ResponseEntity<?> removeInvitation(@RequestBody FriendInvitationRequest request, HttpServletRequest servlet)
-    {
+    public ResponseEntity<?> removeInvitation(@RequestBody FriendInvitationRequest request,
+            HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
+        if (!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
         friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendNickname());

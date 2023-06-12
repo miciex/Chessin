@@ -26,18 +26,31 @@ export default function GameFinishedOverlay({
   const getText = (): string => {
     switch (whoWon) {
       case GameResults.DRAW_50_MOVE_RULE:
+        return "Draw by 50 move rule";
       case GameResults.INSUFFICIENT_MATERIAL:
+        return "Draw by insufficient material";
       case GameResults.STALEMATE:
+        return "Draw by stalemate";
       case GameResults.THREE_FOLD:
-        return "Draw";
+        return "Draw by threefold repetition";
+      case GameResults.DRAW_AGREEMENT:
+        return "Draw by agreement";
+      case GameResults.BLACK_RESIGN:
+        return "Black resigned";
+      case GameResults.WHITE_RESIGN:
+        return "White resigned";
+      case GameResults.WHITE_TIMEOUT:
+        return "White lost on time";
+      case GameResults.BLACK_TIMEOUT:
+        return "Black lost on time";
       case GameResults.MATE:
-        return whitesTurn ? "Black won" : "White won";
+        return whitesTurn ? "Black won by mate" : "White won by mate";
       default:
-        return "";
+        return "Unknown result";
     }
   };
 
-  const winnerText = "White won"; //getText();
+  const winnerText = getText();
 
   return (
     <View style={styles.container}>

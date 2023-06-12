@@ -37,7 +37,6 @@ export enum VerificationType {
 
 //timeControl in seconds
 export type PendingChessGameRequest = {
-  email: string;
   timeControl: number;
   increment: number;
   bottomRating: number;
@@ -59,7 +58,6 @@ export type ChessGameResponse = {
 
 export type SubmitMoveRequest = {
   gameId: number;
-  email: string;
   movedPiece: number;
   startField: number;
   endField: number;
@@ -80,6 +78,9 @@ export type BoardResponse = {
   gameResult: GameResults;
   visualBoard: Array<number>;
   startBoard: string;
+  whiteTime: number;
+  blackTime: number;
+  lastMoveTime: number;
 };
 
 export type CodeVerificationRequest = {
@@ -101,3 +102,7 @@ export type ListenForFirstMoveRequest = {
 export type FriendInvitationRequest = {
   friendNickname:string;
 }
+export type ListenForMoveRequest = {
+  gameId: number;
+  moves: Array<MoveResponse>;
+};

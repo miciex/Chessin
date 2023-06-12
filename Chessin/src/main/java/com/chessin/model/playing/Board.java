@@ -541,7 +541,8 @@ public class Board {
 
     public Optional<Long> getLastMoveTimeForColor(boolean white, boolean whiteStarts)
     {
-        if(moves.size() == 0) return Optional.empty();
+        if(moves.size() == 0 || moves.size() == 1 && (whiteStarts && !white || !whiteStarts && white))
+            return Optional.empty();
 
         if(whiteStarts)
         {
@@ -552,8 +553,9 @@ public class Board {
             }
             else
             {
-                return moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-1).getRemainingTime())
+                Optional<Long> time = moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-1).getRemainingTime())
                         : Optional.of(moves.get(moves.size()-2).getRemainingTime());
+                return time;
             }
         }
         else

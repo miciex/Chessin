@@ -1,6 +1,5 @@
 package com.chessin.controller.register;
 
-
 import com.chessin.model.register.user.Provider;
 import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;

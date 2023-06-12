@@ -27,8 +27,8 @@ type Props = {
 
 const friends: Array<User> = [
   {
-    firstName: "Maciek",
-    lastName: "mil",
+    firstname: "Maciek",
+    lastname: "mil",
     nameInGame: "hello",
     email: "maciej@gmail.com",
     country: "Poland",
@@ -37,8 +37,8 @@ const friends: Array<User> = [
     online: true,
   },
   {
-    firstName: "Wojtek",
-    lastName: "Burek",
+    firstname: "Wojtek",
+    lastname: "Burek",
     email: "wojtek@gmail.com",
     country: "pl",
     ranking: {
@@ -52,8 +52,8 @@ const friends: Array<User> = [
     nameInGame: "wojtek",
   },
   {
-    firstName: "Sławek",
-    lastName: "Dąbrowski",
+    firstname: "Sławek",
+    lastname: "Dąbrowski",
     nameInGame: "lelo",
     email: "sławek@gmail.com",
     country: "pl",
@@ -67,7 +67,7 @@ const friends: Array<User> = [
     online: true,
   },
   {
-    firstName: "Paweł",
+    firstname: "Paweł",
     email: "paweł@gmail.com",
     country: "pl",
     ranking: {
@@ -79,10 +79,10 @@ const friends: Array<User> = [
     highestRanking: 1500,
     online: true,
     nameInGame: "pawel",
-    lastName: "Brzuszkiewicz",
+    lastname: "Brzuszkiewicz",
   },
   {
-    firstName: "Szymon",
+    firstname: "Szymon",
     email: "szymon@gmail.com",
     country: "pl",
     ranking: {
@@ -94,10 +94,10 @@ const friends: Array<User> = [
     highestRanking: 1500,
     online: true,
     nameInGame: "szymon",
-    lastName: "Kowalski",
+    lastname: "Kowalski",
   },
   {
-    firstName: "Strzała",
+    firstname: "Strzała",
     email: "strzała@gmail.com",
     country: "pl",
     ranking: {
@@ -109,7 +109,7 @@ const friends: Array<User> = [
     highestRanking: 1500,
     online: true,
     nameInGame: "strzała",
-    lastName: "Kowalski",
+    lastname: "Kowalski",
   },
 ];
 
@@ -117,7 +117,7 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [gameTempo, setGameTempo] = useState<LengthType>({
     lengthType: GameLengthTypeContextType.BLITZ,
-    totalTime: 180,
+    totalTime: 3 * 60 * 1000,
     increment: 0,
   });
   const [chosenFriend, setChosenFriend] = useState<User | null>(null);
@@ -146,7 +146,6 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
     console.log("user email: ", user.email);
     navigation.navigate("PlayOnline", {
       request: setPendingGameRequest(
-        user.email,
         gameTempo.totalTime,
         gameTempo.increment,
         getRanking(gameTempo.lengthType, user)

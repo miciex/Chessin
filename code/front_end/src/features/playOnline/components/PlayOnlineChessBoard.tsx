@@ -1,13 +1,15 @@
 import { View, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { FieldInfo } from "..";
 import ChessBoardField from "../../../components/ChessBoardField";
 import {
   Board,
   PossibleMoves,
-  boardFactory,
   isWhite,
   BoardResponseToBoard,
+  deleteImpossibleMoves,
+  copyBoard,
+  GameResults,
 } from "../../../chess-logic/board";
 import { moveFactory } from "../../../chess-logic/move";
 import { ColorsPallet } from "../../../utils/Constants";
@@ -16,6 +18,7 @@ import { submitMove } from "../services/playOnlineService";
 import { Move } from "../../../chess-logic/move";
 import { SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { BoardResponse } from "../../../utils/ServicesTypes";
+import { mapToBoard } from "../../../chess-logic/helpMethods";
 
 type Props = {
   board: Board;
@@ -23,6 +26,11 @@ type Props = {
   player: Player;
   gameId: number;
   playMove: (move: Move) => void;
+  setMyClockInfo: (timeLeft: Date) => void;
+  setOpponentClockInfo: (timeLeft: Date) => void;
+  currentPosition: number;
+  setGameStarted: (gameStarted: boolean) => void;
+  setCurrentPosition: (position: number) => void;
 };
 
 export default function PlayOnlineChessBoard({
@@ -31,15 +39,26 @@ export default function PlayOnlineChessBoard({
   player,
   gameId,
   playMove,
+  setMyClockInfo,
+  setOpponentClockInfo,
+  currentPosition,
+  setGameStarted,
+  setCurrentPosition,
 }: Props) {
   const [activeField, setActiveField] = useState(-1);
 
   const [possibleMoves, setPossibleMoves] = useState([-1]);
 
   const handleFieldPress = (data: FieldInfo) => {
-    //copy is needed for selection of fields
-    setPossibleMoves(PossibleMoves(data.fieldNumber, board));
-    copyPossibleMoves = [...possibleMoves];
+    if (currentPosition !== board.moves.length - 1) {
+      setCurrentPosition(board.moves.length - 1);
+      return;
+    }
+
+    const pm = PossibleMoves(data.fieldNumber, board);
+
+    const dmp = deleteImpossibleMoves(pm, data.fieldNumber, copyBoard(board));
+    setPossibleMoves(dmp);
 
     //if your white, its whites turn and you clicked on a white piece or the same with black
     if (
@@ -48,7 +67,8 @@ export default function PlayOnlineChessBoard({
     ) {
       setActiveField(data.fieldNumber);
       return;
-    } else if (
+    }
+    if (
       possibleMoves.includes(data.fieldNumber) &&
       (player.color === "white") === board.whiteToMove
     ) {
@@ -69,7 +89,6 @@ export default function PlayOnlineChessBoard({
 
     const submitMoveRequest: SubmitMoveRequest = {
       gameId: gameId,
-      email: player.email,
       movedPiece: move.movedPiece,
       startField: move.startField,
       endField: move.endField,
@@ -77,16 +96,33 @@ export default function PlayOnlineChessBoard({
       isDrawOffered: false,
     };
     playMove(move);
+    setCurrentPosition(board.moves.length);
+    // addIncrement();
 
-    submitMove(submitMoveRequest).then((data: BoardResponse) => {
-      if (!data) return;
-      setBoard(BoardResponseToBoard(data));
-    });
+    submitMove(submitMoveRequest)
+      .then((data: BoardResponse) => {
+        if (!data) return;
+        setBoard(BoardResponseToBoard(data));
+        console.log(
+          "white time: " + data.whiteTime + " black time: " + data.blackTime
+        );
+        console.log("player color: " + player.color);
+        const myTime =
+          player.color === "white" ? data.whiteTime : data.blackTime;
+        const opponentTime =
+          player.color === "white" ? data.blackTime : data.whiteTime;
+        setMyClockInfo(new Date(myTime));
+        setOpponentClockInfo(new Date(opponentTime));
+        // setLastMoveDate(new Date(data.lastMoveTime));
+        setCurrentPosition(data.positions.length - 1);
+        if (data.gameResult !== GameResults.NONE) setGameStarted(false);
+      })
+      .catch((error) => {
+        throw error;
+      });
 
     setActiveField(-1);
   };
-
-  let copyPossibleMoves: Number[] = [0];
 
   let backgroundColor: string;
 
@@ -101,42 +137,46 @@ export default function PlayOnlineChessBoard({
         ? ColorsPallet.light
         : ColorsPallet.dark;
 
-    if (info.fieldNumber == activeField) {
+    if (
+      info.fieldNumber == activeField ||
+      possibleMoves.includes(info.fieldNumber)
+    ) {
       backgroundColor =
         backgroundColor == ColorsPallet.light
           ? ColorsPallet.baseColor
           : ColorsPallet.darker;
-    } else if (info.fieldNumber == copyPossibleMoves[0]) {
-      backgroundColor =
-        backgroundColor == ColorsPallet.light
-          ? ColorsPallet.baseColor
-          : ColorsPallet.darker;
-      copyPossibleMoves.shift();
     }
   };
 
   const renderBoard = () => {
     const renderedBoard = [];
-
+    const visualBoard =
+      board.positions[currentPosition] !== undefined
+        ? mapToBoard(board.positions[currentPosition])
+        : board.visualBoard;
     for (let i = 0; i < 64; i++) {
-      setBackgroundColor({ piece: board.visualBoard[i], fieldNumber: i });
+      const number = player.color === "white" ? i : 63 - i;
+      setBackgroundColor({
+        piece: visualBoard[number],
+        fieldNumber: number,
+      });
       renderedBoard.push(
         <ChessBoardField
-          key={i}
-          info={{ piece: board.visualBoard[i], fieldNumber: i }}
+          key={number}
+          info={{ piece: visualBoard[number], fieldNumber: number }}
           handleFieldPress={handleFieldPress}
           backgroundColor={backgroundColor}
         />
       );
     }
-    copyPossibleMoves = [];
 
     return renderedBoard;
   };
-  possibleMoves.sort((a, b) => a - b);
-  copyPossibleMoves = possibleMoves.filter((value) => value >= 0);
 
-  const renderedBoard = renderBoard();
+  const renderedBoard = useMemo(
+    () => renderBoard(),
+    [board, activeField, possibleMoves, player.color, currentPosition]
+  );
 
   return <View style={styles.container}>{renderedBoard}</View>;
 }

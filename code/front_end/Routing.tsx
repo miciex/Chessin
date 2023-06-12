@@ -41,20 +41,23 @@ export type RootStackParamList = {
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
-const checkNetInfoInterval = 1000 * 60;
 
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
   const netInfo = useNetInfo();
 
   useEffect(() => {
-    setUserActive(netInfo.isConnected ? true : false);
+    setUserActive(netInfo.isConnected ? true : false).catch((err) => {
+      throw new Error(err);
+    });
   }, [netInfo.isConnected]);
 
   useEffect(() => {
     resetAccessToken();
     const resetToken = setInterval(() => {
-      resetAccessToken();
+      resetAccessToken().catch((err) => {
+        throw new Error(err);
+      });
     }, refreshTokenInterval);
     return () => {
       clearInterval(resetToken);

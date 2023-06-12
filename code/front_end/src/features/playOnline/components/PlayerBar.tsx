@@ -6,13 +6,25 @@ import { ColorsPallet } from "../../../utils/Constants";
 import Timer from "./Timer";
 import { FontAwesome } from "@expo/vector-icons";
 import { countryToIsoCode } from "..";
+import { Board } from "../../../chess-logic/board";
 
 type Props = {
   player: Player | null;
   timerInfo?: Date | undefined;
+  board: Board;
+  gameStarted: boolean;
+  gameFinished: boolean;
+  changeTimerBySeconds: (timer: number) => void;
 };
 
-export default function PlayerBar({ player, timerInfo }: Props) {
+export default function PlayerBar({
+  player,
+  timerInfo,
+  gameFinished,
+  gameStarted,
+  board,
+  changeTimerBySeconds,
+}: Props) {
   return (
     <View style={styles.appContainer}>
       <View style={styles.textContainer}>
@@ -22,7 +34,14 @@ export default function PlayerBar({ player, timerInfo }: Props) {
       </View>
       <View style={styles.iconsContainer}>
         <View style={styles.timerContainer}>
-          <Timer info={timerInfo} />
+          <Timer
+            info={timerInfo}
+            board={board}
+            player={player}
+            gameFinished={gameFinished}
+            gameStarted={gameStarted}
+            changeTimerBySeconds={changeTimerBySeconds}
+          />
         </View>
         <CountryFlag
           isoCode={countryToIsoCode(player ? player.country : "")}

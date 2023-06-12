@@ -14,7 +14,9 @@ export type constructorArgs = {
 }
 
 export const enum GameResults{
-    THREE_FOLD = "THREE_FOLD", MATE = "MATE", DRAW_50_MOVE_RULE = "DRAW_50_MOVE_RULE", INSUFFICIENT_MATERIAL = "INSUFFICIENT_MATERIAL", STALEMATE = "STALEMATE", NONE = "NONE"
+    THREE_FOLD = "THREE_FOLD", MATE = "MATE", DRAW_50_MOVE_RULE = "DRAW_50_MOVE_RULE", INSUFFICIENT_MATERIAL = "INSUFFICIENT_MATERIAL", 
+    STALEMATE = "STALEMATE", NONE = "NONE", BLACK_RESIGN = "BLACK_RESIGN", WHITE_RESIGN = "WHITE_RESIGN", 
+    WHITE_TIMEOUT = "WHITE_TIMEOUT", BLACK_TIMEOUT = "BLACK_TIMEOUT", DRAW_AGREEMENT = "DRAW_AGREEMENT",
 }
 
 export type Board = {
@@ -104,20 +106,17 @@ export const copyBoard = (board:Board):Board => {
 
     export const checkGameResult = (board: Board):GameResults => {
         let result: GameResults = GameResults.NONE;
-        console.log("stalemate");
         if (isThreefold(board))
             result = GameResults.THREE_FOLD;
         else if (draw50MoveRule(board))
             result = GameResults.DRAW_50_MOVE_RULE;
         else if (isStalemate(board)){
-            console.log("stalemate 2");
             result = GameResults.STALEMATE;
         }
         else if (insufficientMaterial(board))
             result = GameResults.INSUFFICIENT_MATERIAL;
         else if (isMate(board))
             result = GameResults.MATE;
-        console.log("result: ", result);
         return result;
     }
 
@@ -206,34 +205,37 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     export const deleteImpossibleMoves = (moves:Array<number>, activeField:number, board:Board):Array<number> =>{
         let possibleMoves:Array<number> = [];
         let multiplier:number = board.whiteToMove ? -1 : 1;
+        const piece = board.position[activeField] % 8;
 
         if(moves.length > 0)
-        moves.forEach((i:number) => {
+        for( let i of moves) {
             let move:Move = moveFactory({pieces: board.position,startField: activeField,endField: i});
-            let copy:{[key:number]:number} = board.position;
+            
             board = makeMove(move, board);
-
+            
             if (isChecked(board) === -1) {
-                if (copy[activeField] % 8 === Pieces.KING && Math.abs(i - activeField) === 2) {
-                    if (isChecked(board,activeField) === -1 && isChecked(board,activeField + (i - activeField) / 2) === -1 && isChecked(board,i) === -1)
-                        if (!(((activeField + (8 * multiplier)) in board.position) && isWhite(activeField + (8 * multiplier), board.position) != board.whiteToMove && board.position[activeField + (8 * multiplier)] % 8 === Pieces.PAWN))
+                if (board.position[i] % 8 === Pieces.KING && Math.abs(i - activeField) === 2) {
+                    if (isChecked(board,activeField) === -1 && isChecked(board, activeField + (i - activeField)/2) === -1 && isChecked(board, i) === -1){
+                        //Possibly can be deleted
+                        // if (!(((activeField + (8 * multiplier)) in board.position) && isWhite(activeField + (8 * multiplier), board.position) == board.whiteToMove && board.position[activeField + (8 * multiplier)] % 8 === Pieces.PAWN)){
                             possibleMoves.push(i);
+                        // }
+                    }
                 } else
                     possibleMoves.push(i);
             }
             board = unMakeMove(move, board);
-        })
+        }
         return possibleMoves;
     }
 
     export const  isChecked = ({position, whiteToMove}:Board, piecePosition?:number):number => {
         let pos:number = piecePosition?piecePosition:findKing(position, whiteToMove);
-        let white:boolean = isWhite(pos, position);
-        if(Pieces.PiecesArray.length > 0)
-        Pieces.PiecesArray.forEach((i:number) =>{
+        let white:boolean = whiteToMove;
+        for(let i of Pieces.PiecesArray) {
             if(isPieceAttackingTarget(i, pos, white, position))
                 return 1;
-        })
+        }
 
         return -1;
     }
@@ -250,7 +252,7 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
                 if(foundPiece < 16 === isTargetWhite) break;
                 if(foundPiece%8 === piece%8 || foundPiece%8 === Pieces.QUEEN)
                     return true;
-                else break;
+                break;
             }
         }
         return false;
@@ -264,8 +266,9 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
             if(!IsCorrect(targetSquare, directions[i])) continue;
             if(!(checkingPosition in position)) continue;
             let foundPiece:number = position[checkingPosition];
-            if(foundPiece%8 === piece && foundPiece < 16 != isTargetWhite)
+            if(foundPiece%8 === piece && foundPiece < 16 !== isTargetWhite)
                 return true;
+            
         }
         return false;
     }
@@ -284,7 +287,7 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
         return false;
     }
 
-    export const isPieceAttackingTarget =(piece:number, targetSquare:number, isTargetWhite:boolean, position: {[key:number]:number}):boolean =>{
+    export const isPieceAttackingTarget = (piece:number, targetSquare:number, isTargetWhite:boolean, position: {[key:number]:number}):boolean =>{
         switch (piece%8){
             case Pieces.ROOK: 
             case Pieces.BISHOP:
@@ -424,7 +427,7 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
             delete newPosition[move.startField + (move.endField - move.startField) / 2];
         }
         newPosition[move.startField] = move.movedPiece;
-        delete position[move.endField];
+        delete newPosition[move.endField];
         if (move.takenPiece > 0)
         newPosition[move.takenPieceField] = move.takenPiece;
         return newPosition;
@@ -488,18 +491,18 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     export const playMove = (move:Move, board:Board):Board =>{
         board = makeMove(move, board);
         board.visualBoard = mapToBoard(board.position);
-        board.whiteToMove = !board.whiteToMove;
         board.movesTo50MoveRule = draw50MoveRuleCheck(board);
         board.result = checkGameResult(board);
+        board.whiteToMove = !board.whiteToMove;
         return board;
     }
 
     export const unPlayMove = (move:Move, board:Board):Board =>{
         board = unMakeMove(move, board);
         board.visualBoard = mapToBoard(board.position);
-        board.whiteToMove = !board.whiteToMove;
         board.movesTo50MoveRule = board.movesTo50MoveRule > 0 ? board.movesTo50MoveRule - 1 : 0;
         board.result = GameResults.NONE;
+        board.whiteToMove = !board.whiteToMove;
         return board;
     }
 
@@ -597,7 +600,6 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
     }
 
     export const isStalemate = (board: Board):boolean =>{
-        console.log("isStalemate")
         for(let [key, value] of Object.entries(getPositionCopy(board.position))){
             if(value > 16 && !board.whiteToMove || value < 16 && board.whiteToMove){
                 const squares:Array<number> = PossibleMoves(Number(key), board);
@@ -608,7 +610,6 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
             }
         }
         if(isChecked(board) != -1) return false;
-        console.log("Board: " + board.position)
         return true;
     }
 

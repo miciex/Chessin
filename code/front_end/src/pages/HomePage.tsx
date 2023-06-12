@@ -89,9 +89,13 @@ const HomePage = ({ route, navigation }: Props) => {
   console.log(netInfo.isConnected);
 
   useEffect(() => {
-    getValueFor("user").then((user) => {
-      if (user) setUser(JSON.parse(user));
-    });
+    getValueFor("user")
+      .then((user) => {
+        if (user) setUser(JSON.parse(user));
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
   }, []);
 
   const [levelModal, setLevelModal] = useState(false);

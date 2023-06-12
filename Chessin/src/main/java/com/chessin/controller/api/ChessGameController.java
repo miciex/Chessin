@@ -51,7 +51,7 @@ public class ChessGameController {
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
         {
-            return ResponseEntity.badRequest().body("User is already playing a game.");
+            return ResponseEntity.accepted().body("User is already playing a game.");
         }
 
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
@@ -144,7 +144,7 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Game not found");
 
         if(!chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(request.getGameId()))));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(request.getGameId()), activeGames.get(request.getGameId()))));
 
         synchronized(activeGames.get(request.getGameId()))
         {
@@ -169,7 +169,7 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Game not found.");
 
         if(activeBoards.get(id).getMoves().size() > 0)
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id))));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id), activeGames.get(id))));
 
         synchronized(activeGames.get(id))
         {
@@ -242,6 +242,13 @@ public class ChessGameController {
             activeBoards.replace(request.getGameId(), board);
 
             activeGames.get(request.getGameId()).notifyAll();
+
+//            long waitTime;
+//
+//            if(board.isWhiteTurn())
+//                waitTime = Math.min(board.getWhiteTime(), Constants.Application.waitForMoveTime) + 100;
+//            else
+//                waitTime = Math.min(board.getBlackTime(), Constants.Application.waitForMoveTime) + 100;
 
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
 

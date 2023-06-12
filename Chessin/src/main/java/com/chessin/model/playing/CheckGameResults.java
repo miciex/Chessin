@@ -56,9 +56,7 @@ public class CheckGameResults {
     }
 
     public static boolean draw50MoveRule(int movesAmount){
-        if(movesAmount == 100)
-            return true;
-        return false;
+        return movesAmount == 100;
     }
 
     public static boolean insufficientMaterial(Board board){

@@ -1,9 +1,12 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
-import { setActive } from "../utils/ApiEndpoints";
 import { responseUserToUser } from "../utils/PlayerUtilities";
-import { refreshTokenLink, findByEmailLink } from "../utils/ApiEndpoints";
+import {
+  refreshTokenLink,
+  findByNicknameLink,
+  setActive,
+} from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
 import { AuthenticationResponse, CodeVerificationRequest , FriendInvitationRequest} from "../utils/ServicesTypes";
@@ -11,25 +14,27 @@ import * as SecureStore from "expo-secure-store";
 import { addFriend } from "../utils/ApiEndpoints";
 
 export const storeUser = async (value: User) => {
-  try {
-    await AsynStorage.setItem("user", JSON.stringify(value));
-    console.log("user stored");
-  } catch (error) {
-    console.log(error);
-  }
+  await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
+    throw new Error(err);
+  });
+  console.log("user stored");
 };
 
 // getting data
 export const getUser = async () => {
-  getValueFor("user").then((user) => {
-    if (user === null) return null;
-    return JSON.parse(user);
-  });
+  getValueFor("user")
+    .then((user) => {
+      if (user === null) return null;
+      return JSON.parse(user);
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
 };
 
-export const fetchUser = async (email: string) => {
+export const fetchUser = async (email: string, Nickname: string) => {
   const token = await SecureStore.getItemAsync("accessToken");
-  const user: any = await fetch(`${findByEmailLink}${email}`, {
+  const user: any = await fetch(`${findByNicknameLink}${Nickname}`, {
     method: "POST",
     headers: new Headers({
       "content-type": "application/json",
@@ -50,8 +55,7 @@ export const fetchUser = async (email: string) => {
       return responseUserToUser(data, email);
     })
     .catch((err) => {
-      console.log("store user");
-      console.log(err);
+      throw new Error(err);
     });
 
   return user;
@@ -68,7 +72,7 @@ export const setUserActive = async (active: boolean) => {
     })
     .then(async (user) => {
       if (user === null) return null;
-      return fetch(`${setActive}${user.email}`, {
+      return fetch(`${setActive}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,10 +85,11 @@ export const setUserActive = async (active: boolean) => {
         .then((response) => {
           return response;
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          throw new Error(error);
+        });
     })
     .then((response) => {
-      console.log(response);
       if (response === undefined || response === null) return null;
       if (response.status === 200) {
         correct = true;
@@ -92,7 +97,9 @@ export const setUserActive = async (active: boolean) => {
         correct = false;
       }
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      throw new Error(error);
+    });
   return correct;
 };
 
@@ -120,7 +127,7 @@ export const resetAccessToken = async () => {
       await AsynStorage.setItem("accessToken", data.accessToken);
     })
     .catch((error) => {
-      console.error(error);
+      throw new Error(error);
     });
 };
 
@@ -128,9 +135,15 @@ export const setUserDataFromResponse = async (
   responseData: AuthenticationResponse,
   codeVerificationRequest: CodeVerificationRequest | { email: string }
 ) => {
-  await save("refreshToken", responseData.refreshToken);
-  await save("accessToken", responseData.accessToken);
-  fetchandStoreUser(codeVerificationRequest.email);
+  await save("refreshToken", responseData.refreshToken).catch((error) => {
+    throw new Error(error);
+  });
+  await save("accessToken", responseData.accessToken).catch((error) => {
+    throw new Error(error);
+  });
+  fetchandStoreUser(codeVerificationRequest.email).catch((error) => {
+    throw new Error(error);
+  });
 };
 
 

@@ -158,6 +158,7 @@ export default function Register({ navigation }: Props) {
         if (response.status === 200) {
           navigation.navigate("Home");
         } else if (response.status === 202) {
+          console.log("What");
           setShowAuthCode(true);
         } else if (response.status === 400) {
           throw new Error("Bad request");
