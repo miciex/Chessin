@@ -7,8 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.swing.text.html.Option;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static com.chessin.model.utils.Constants.Pieces.*;
 import static com.chessin.model.utils.Convert.FenToIntArray;
@@ -31,6 +34,9 @@ public class Board {
     GameResults gameResult;
     int[] visualBoard;
     String startBoard;
+    long whiteTime;
+    long blackTime;
+    long lastMoveTime;
 
     public static Board fromGame(ChessGame game)
     {
@@ -47,6 +53,9 @@ public class Board {
                 .gameResult(GameResults.NONE)
                 .visualBoard(FenToIntArray(game.getStartBoard(), 64))
                 .startBoard(game.getStartBoard())
+                .whiteTime(game.getTimeControl())
+                .blackTime(game.getTimeControl())
+                .lastMoveTime(game.getStartTime())
                 .build();
     }
 
@@ -528,6 +537,38 @@ public class Board {
 
     public Move getLastMove(){
         return moves.size() > 0 ? moves.get(moves.size()-1) : new Move();
+    }
+
+    public Optional<Long> getLastMoveTimeForColor(boolean white, boolean whiteStarts)
+    {
+        if(moves.size() == 0) return Optional.empty();
+
+        if(whiteStarts)
+        {
+            if(white)
+            {
+                return moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-2).getRemainingTime())
+                        : Optional.of(moves.get(moves.size()-1).getRemainingTime());
+            }
+            else
+            {
+                return moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-1).getRemainingTime())
+                        : Optional.of(moves.get(moves.size()-2).getRemainingTime());
+            }
+        }
+        else
+        {
+            if(white)
+            {
+                return moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-1).getRemainingTime())
+                        : Optional.of(moves.get(moves.size()-2).getRemainingTime());
+            }
+            else
+            {
+                return moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-2).getRemainingTime())
+                        : Optional.of(moves.get(moves.size()-1).getRemainingTime());
+            }
+        }
     }
 
     public void removeLastMove(){ if(moves.size()>0) moves.remove(moves.size()-1);}

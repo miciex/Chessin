@@ -1,25 +1,29 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
-import com.chessin.controller.requests.CancelPendingChessGameRequest;
-import com.chessin.controller.requests.ListenForFirstMoveRequest;
+import com.chessin.controller.requests.ListenForMoveRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
+import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.*;
+import com.chessin.model.register.configuration.JwtService;
+import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.utils.Constants;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import org.apache.tomcat.util.bcel.Const;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/api/v1/game")
@@ -28,6 +32,7 @@ public class ChessGameController {
     private final ChessGameRepository chessGameRepository;
     private final ChessGameService chessGameService;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     private final ConcurrentHashMap<String, PendingChessGame> pendingGames = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Board> activeBoards = new ConcurrentHashMap<>();
@@ -35,12 +40,19 @@ public class ChessGameController {
 
     @Transactional
     @PostMapping("/searchNewGame")
-    public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request) throws InterruptedException {
+    public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request, HttpServletRequest servlet) throws InterruptedException {
 
 //        if(pendingGames.containsKey(request.getEmail()))
 //        {
 //            return ResponseEntity.badRequest().body("User is already searching for a game.");
 //        }
+
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
+        {
+            return ResponseEntity.badRequest().body("User is already playing a game.");
+        }
 
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
 
@@ -48,17 +60,22 @@ public class ChessGameController {
         {
             synchronized(pendingGames.get(foundGame.getUser().getEmail()))
             {
-                pendingGames.get(foundGame.getUser().getEmail()).setOpponent(userRepository.findByEmail(request.getEmail()).get());
+                pendingGames.get(foundGame.getUser().getEmail()).setOpponent(userRepository.findByEmail(email).get());
+
+                int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
+                int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+
+                List<User> players = Arrays.asList(foundGame.getUser(), userRepository.findByEmail(email).get());
 
                 ChessGame game = ChessGame.builder()
                         .startBoard(Constants.Boards.classicBoard)
                         .whiteStarts(true)
-                        .whiteUser(foundGame.getUser())
-                        .blackUser(userRepository.findByEmail(request.getEmail()).get())
+                        .whiteUser(players.get(whitePlayerIndex))
+                        .blackUser(players.get(blackPlayerIndex))
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
-                        //.moves(new ArrayList<>())
+                        .startTime(Instant.now().toEpochMilli())
                         .build();
 
                 chessGameRepository.save(game);
@@ -75,7 +92,7 @@ public class ChessGameController {
         }
 
         PendingChessGame pendingChessGame = PendingChessGame.builder()
-                .user(userRepository.findByEmail(request.getEmail()).get())
+                .user(userRepository.findByEmail(email).get())
                 .timeControl(request.getTimeControl())
                 .increment(request.getIncrement())
                 .bottomRating(request.getBottomRating())
@@ -83,7 +100,7 @@ public class ChessGameController {
                 .userRating(request.getUserRating())
                 .build();
 
-        pendingGames.put(request.getEmail(), pendingChessGame);
+        pendingGames.put(email, pendingChessGame);
 
         synchronized (pendingGames.get(pendingChessGame.getUser().getEmail())) {
             pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.gameSearchTime);
@@ -98,68 +115,102 @@ public class ChessGameController {
             {
                 pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.timeout);
 
-                ChessGame game = ChessGame.builder()
-                        .id(pendingGames.get(pendingChessGame.getUser().getEmail()).getId())
-                        .startBoard(Constants.Boards.classicBoard)
-                        .whiteStarts(true)
-                        .whiteUser(pendingChessGame.getUser())
-                        .blackUser(pendingChessGame.getOpponent())
-                        .availableCastles(new int[]{0,0,0,0})
-                        .timeControl(pendingChessGame.getTimeControl())
-                        .increment(pendingChessGame.getIncrement())
-                        //.moves(new ArrayList<>())
-                        .build();
-
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId())));
             }
         }
     }
 
     @PostMapping("/cancelSearch")
-    public ResponseEntity<?> cancelSearch(@RequestBody CancelPendingChessGameRequest request)
+    public ResponseEntity<?> cancelSearch(HttpServletRequest servlet)
     {
-        if(!userRepository.existsByEmail(request.getEmail()))
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body("User not found");
 
-        if(pendingGames.get(request.getEmail()) != null)
-            pendingGames.remove(request.getEmail());
+        if(pendingGames.get(email) != null)
+            pendingGames.remove(email);
         else
             return ResponseEntity.badRequest().body("No search found");
 
         return ResponseEntity.ok().body("Search cancelled");
     }
 
-    @PostMapping("/listenForFirstMove")
-    public ResponseEntity<?> listenForFirstMove(@RequestBody ListenForFirstMoveRequest request) throws InterruptedException {
-        if(!activeBoards.containsKey(request.getGameId()))
-            return ResponseEntity.badRequest().body("Game not found.");
+    @PostMapping("/listenForMove")
+    public ResponseEntity<?> listenForMove(@RequestBody ListenForMoveRequest request) throws InterruptedException {
+        if(!activeGames.containsKey(request.getGameId()))
+            return ResponseEntity.badRequest().body("Game not found");
 
-        if(activeBoards.get(request.getGameId()).getMoves().size() > 0)
-            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+        if(!chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(request.getGameId()))));
 
         synchronized(activeGames.get(request.getGameId()))
         {
             activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
+        }
+    }
 
-            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+    @PostMapping("/listenForFirstMove/{gameId}")
+    public ResponseEntity<?> listenForFirstMove(@PathVariable String gameId) throws InterruptedException {
+        long id;
+
+        try {
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Invalid game id");
+        }
+
+        if(!activeBoards.containsKey(id))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        if(activeBoards.get(id).getMoves().size() > 0)
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id))));
+
+        synchronized(activeGames.get(id))
+        {
+            activeGames.get(id).wait(Constants.Application.waitForMoveTime);
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
         }
     }
 
     @PostMapping("/submitMove")
-    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request) throws InterruptedException {
+    @Transactional
+    public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request, HttpServletRequest servlet) throws InterruptedException {
         if(!activeBoards.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found.");
 
         synchronized(activeGames.get(request.getGameId()))
         {
-            Board board = activeBoards.get(request.getGameId());
+            String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-            if(board.isWhiteTurn() && !board.getWhiteEmail().equals(request.getEmail())){
+            Board board = activeBoards.get(request.getGameId());
+            long now = Instant.now().toEpochMilli();
+            if(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
+            {
+                board.setGameResult(GameResults.WHITE_TIMEOUT);
+                board.setWhiteTime(0);
+                activeBoards.replace(request.getGameId(), board);
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+            }
+            else if(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
+            {
+                board.setGameResult(GameResults.BLACK_TIMEOUT);
+                board.setBlackTime(0);
+                activeBoards.replace(request.getGameId(), board);
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+            }
+
+            if(board.isWhiteTurn() && !board.getWhiteEmail().equals(email)){
                 return ResponseEntity.badRequest().body("It's not your turn.");
             }
-            else if(!board.isWhiteTurn() && !board.getBlackEmail().equals(request.getEmail())){
+            else if(!board.isWhiteTurn() && !board.getBlackEmail().equals(email)){
                 return ResponseEntity.badRequest().body("It's not your turn.");
             }
 
@@ -184,9 +235,8 @@ public class ChessGameController {
             if(board.getGameResult() != GameResults.NONE)
             {
                 activeBoards.replace(request.getGameId(), board);
-                activeGames.get(request.getGameId()).setGameResult(board.getGameResult());
                 activeGames.get(request.getGameId()).notifyAll();
-                return ResponseEntity.ok().body(board);
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
 
             activeBoards.replace(request.getGameId(), board);
@@ -200,12 +250,45 @@ public class ChessGameController {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
-                //chessGameRepository.save(activeGames.get(request.getGameId()));
+                chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
                 activeGames.remove(request.getGameId());
-                return ResponseEntity.ok().body(endBoard);
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
 
-            return ResponseEntity.ok().body(activeBoards.get(request.getGameId()));
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
+    }
+
+    @PostMapping("/getGame/{gameId}")
+    public ResponseEntity<?> getGame(@PathVariable("gameId") String gameId)
+    {
+        long id;
+        try{
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Game not found.");
+        }
+
+        if(activeGames.containsKey(id))
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id)));
+
+        if(!chessGameRepository.existsById(id))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get()));
+    }
+
+    @PostMapping("/getGameByUsername/{username}")
+    public ResponseEntity<?> getGameByUsername(@PathVariable String username)
+    {
+        Optional<ChessGame> game = activeGames.values().stream().filter(x -> x.getBlackUser().getNameInGame().equals(username) || x.getWhiteUser().getNameInGame().equals(username)).findFirst();
+
+        if(game.isPresent())
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get()));
+        else
+            return ResponseEntity.badRequest().body("This player is not playing any game.");
+
     }
 }

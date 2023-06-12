@@ -8,8 +8,8 @@ public class Constants {
 
     public static class Application
     {
-        public static final int gameSearchTime = 60000;
-        public static final int waitForMoveTime = 60000;
+        public static final int gameSearchTime = 1000 * 60 * 60;
+        public static final int waitForMoveTime = 1000 * 60 * 60;
         public static final int timeout = 100;
         public static final int accessTokenExpirationTime = 1000 * 60 * 15 * 2137;
         public static final int refreshTokenExpirationTime = 1000 * 60 * 60 * 24 * 7;

@@ -2,6 +2,7 @@ package com.chessin.controller.playing;
 
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
+import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.playing.*;
 import com.chessin.model.utils.Convert;
 import com.chessin.model.utils.HelpMethods;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,14 +35,55 @@ public class ChessGameService {
         return null;
     }
 
-    public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game){
+    public boolean validateMoves(List<MoveResponse> moves, Board board){
+        ArrayList<MoveResponse> movesToCheck = new ArrayList<>();
 
+        board.getMoves().stream().map(MoveResponse::fromMove).forEach(movesToCheck::add);
+
+        if(moves.size() != movesToCheck.size())
+            return false;
+
+        for(int i = 0; i < moves.size(); i++){
+            if(!moves.get(i).equals(movesToCheck.get(i)))
+                return false;
+        }
+
+        return true;
+    }
+
+    public Board calculateTime(Board board)
+    {
+        long now = Instant.now().toEpochMilli();
+
+        if(board.isWhiteTurn())
+            board.setWhiteTime(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now));
+        else
+            board.setBlackTime(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now));
+
+        return board;
+    }
+
+    public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game){
         Move move = new Move(game, board.getPosition(), request.getStartField(), request.getEndField(), request.getPromotePiece());
+
+        long now = Instant.now().toEpochMilli();
+        if(!board.isWhiteTurn()) {
+            board.setWhiteTime(board.getLastMoveTimeForColor(true, game.isWhiteStarts()).orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+            move.setRemainingTime(board.getWhiteTime());
+        }
+        else {
+            board.setBlackTime(board.getLastMoveTimeForColor(false, game.isWhiteStarts()).orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+            move.setRemainingTime(board.getBlackTime());
+        }
+
         board.makeMove(move);
         board.setMovesTo50MoveRule(CheckGameResults.draw50MoveRuleCheck(move, board.getMovesTo50MoveRule()));
         board.setWhiteTurn(!board.isWhiteTurn());
         board.setGameResult(board.checkGameResult());
         board.setVisualBoard(Convert.mapToBoard(board.getPosition()));
+        move.setAvailableCastles(board.getAvailableCastles());
+
+        board.setLastMoveTime(now);
 
         moveRepository.save(move);
 

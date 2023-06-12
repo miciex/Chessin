@@ -1,13 +1,14 @@
 package com.chessin.controller.requests;
 
-import com.chessin.model.register.user.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-public class CancelPendingChessGameRequest {
-    private String email;
+@AllArgsConstructor
+public class SetActiveRequest {
+    private boolean isOnline;
 }

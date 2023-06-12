@@ -19,26 +19,29 @@ public class ChessGameResponse {
     private long id;
     private UserResponse whiteUser;
     private UserResponse blackUser;
-    private ArrayList<Move> moves;
+    private ArrayList<MoveResponse> moves;
     private int[] availableCastles;
-    private int timeControl;
-    private int increment;
+    private long timeControl;
+    private long increment;
     private String startBoard;
     private boolean whiteStarts;
 
     public static ChessGameResponse fromChessGame(ChessGame game){
-        return ChessGameResponse
-                .builder()
+        ChessGameResponse response = ChessGameResponse.builder()
                 .id(game.getId())
                 .whiteUser(UserResponse.fromUser(game.getWhiteUser()))
                 .blackUser(UserResponse.fromUser(game.getBlackUser()))
-                .moves(game.getMoves())
+                .moves(new ArrayList<>())
                 .availableCastles(game.getAvailableCastles())
                 .timeControl(game.getTimeControl())
                 .increment(game.getIncrement())
                 .startBoard(game.getStartBoard())
                 .whiteStarts(game.isWhiteStarts())
                 .build();
-    }
 
+        if(game.getMoves() != null)
+            game.getMoves().stream().map(MoveResponse::fromMove).forEach(response.moves::add);
+
+        return response;
+    }
 }

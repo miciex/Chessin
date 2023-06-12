@@ -1,6 +1,7 @@
 package com.chessin.model.playing;
 
 import com.chessin.model.utils.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,8 @@ public class Move {
     private int promotePiece;
     private int takenPieceField;
     int movesTo50MoveRule;
+    int[] availableCastles;
+    long remainingTime;
 
     public Move(ChessGame game, HashMap<Integer, Integer> pieces, int startField, int endField, int promotePiece){
         this.chessGame = game;
