@@ -99,6 +99,8 @@ export default function PlayOnlineChessBoard({
     setCurrentPosition(board.moves.length);
     // addIncrement();
 
+    if (board.result !== GameResults.NONE && board.moves.length == 0)
+      setGameStarted(true);
     submitMove(submitMoveRequest)
       .then((data: BoardResponse) => {
         if (!data) return;
@@ -113,9 +115,11 @@ export default function PlayOnlineChessBoard({
           player.color === "white" ? data.blackTime : data.whiteTime;
         setMyClockInfo(new Date(myTime));
         setOpponentClockInfo(new Date(opponentTime));
-        // setLastMoveDate(new Date(data.lastMoveTime));
         setCurrentPosition(data.positions.length - 1);
         if (data.gameResult !== GameResults.NONE) setGameStarted(false);
+        else if (data.moves.length == 1) {
+          setGameStarted(true);
+        }
       })
       .catch((error) => {
         throw error;

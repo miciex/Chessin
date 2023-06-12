@@ -264,7 +264,6 @@ export default function PlayOnline({ navigation, route }: Props) {
     const board: Board = BoardResponseToBoard(res);
     setBoardState(board);
     setGameFinished(false);
-    setGameStarted(true);
     console.log("my player", myPlayer, "opponent", opponent);
 
     setCurrentPosition(res.moves.length - 1);
