@@ -9,10 +9,11 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
-import { getUser } from "../services/userServices";
+import { addFriendFunc, getUser } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
+import { fetchUser } from "../services/userServices";
 
 const ended_games = [
   {
@@ -91,6 +92,10 @@ export default function ProfilePage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
   // const [data, loading, error] = useFetch("http://localhost:3000/user", {});
 
+  const wojtek = fetchUser("papiezwojtyla9@gmail.com");
+  console.log(wojtek)
+  console.log("wojtek")
+
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (user === null) return;
@@ -131,7 +136,8 @@ export default function ProfilePage({ navigation, route }: Props) {
         <View style={styles.invite}>
           <BaseButton
             handlePress={() => {
-              console.log("inv");
+              addFriendFunc({friendNickname: "PabisackCox"})
+              // addFriendFunc(user?  user?.nameInGame : "")
             }}
             text="Send Invitation"
           />

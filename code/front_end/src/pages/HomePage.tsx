@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
 import React, { useState, useEffect } from "react";
 import { User } from "../utils/PlayerUtilities";
 import { RootStackParamList } from "../../Routing";
@@ -10,6 +10,7 @@ import TopButtons from "../features/home/components/TopButtons";
 import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
+import ChooseYourLevelModal from "../features/home/components/ChooseYourLevelModal";
 import { useNetInfo } from "@react-native-community/netinfo";
 
 //przykladowe stary gry
@@ -97,12 +98,24 @@ const HomePage = ({ route, navigation }: Props) => {
       });
   }, []);
 
+  const [levelModal, setLevelModal] = useState(false);
+
+  const toggleLevel = () => {
+    setLevelModal(!levelModal);
+  };
   console.log(user);
 
   return (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
         <ScrollView>
+          <Text onPress={()=>setLevelModal(!levelModal)}>click</Text>
+        {levelModal ? (
+        <>
+            <ChooseYourLevelModal toggleGear={toggleLevel} gearModalOn={levelModal} />
+          {}
+        </>
+      ) : null}
           <View style={{ width: "100%", alignItems: "center" }}>
             <TopButtons navigation={navigation} />
             <View style={styles.oldGamesButton}>
@@ -114,6 +127,7 @@ const HomePage = ({ route, navigation }: Props) => {
               />
             </View>
 
+          
             {ended_games.map((gracz, index) => (
               <View style={{ width: "90%" }}>
                 <EndedGame

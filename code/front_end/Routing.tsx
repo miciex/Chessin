@@ -13,6 +13,7 @@ import PlayWithFriendsMenu from "./src/pages/PlayWithFriendsMenuPage";
 import ProfilePage from "./src/pages/ProfilePage";
 import Register from "./src/pages/RegisterPage";
 import Socials from "./src/pages/SocialsPage";
+import NotificationPage from "./src/pages/NotificationPage";
 import { ColorsPallet } from "./src/utils/Constants";
 import Header from "./src/components/Header";
 import AnalyzeGame from "./src/pages/AnalyzeGamePage";
@@ -36,6 +37,7 @@ export type RootStackParamList = {
   Register: undefined;
   Socials: undefined;
   AnalyzeGame: undefined;
+  Notification: undefined;
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
@@ -136,6 +138,14 @@ const Routing = () => {
         <Stack.Screen
           name="ProfilePage"
           component={ProfilePage}
+          options={({ navigation }) => ({
+            headerStyle: styles.header,
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
+        />
+        <Stack.Screen
+          name="Notification"
+          component={NotificationPage}
           options={({ navigation }) => ({
             headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,

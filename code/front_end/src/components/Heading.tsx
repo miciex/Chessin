@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
     padding: 17,
     backgroundColor: ColorsPallet.dark,
     marginTop: 8,
-    marginBottom: 8,
     display: "flex",
     flexDirection: "row",
   },

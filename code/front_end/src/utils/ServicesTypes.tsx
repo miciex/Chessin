@@ -99,6 +99,9 @@ export type ListenForFirstMoveRequest = {
   gameId: number;
 };
 
+export type FriendInvitationRequest = {
+  friendNickname:string;
+}
 export type ListenForMoveRequest = {
   gameId: number;
   moves: Array<MoveResponse>;

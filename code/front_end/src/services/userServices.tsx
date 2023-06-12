@@ -9,9 +9,9 @@ import {
 } from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
-import { AuthenticationResponse } from "../utils/ServicesTypes";
+import { AuthenticationResponse, CodeVerificationRequest , FriendInvitationRequest} from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
-import { CodeVerificationRequest } from "../utils/ServicesTypes";
+import { addFriend } from "../utils/ApiEndpoints";
 
 export const storeUser = async (value: User) => {
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
@@ -145,3 +145,30 @@ export const setUserDataFromResponse = async (
     throw new Error(error);
   });
 };
+
+
+export const addFriendFunc = async (request: FriendInvitationRequest) =>{
+  const accessToken = await getValueFor("accessToken");
+  console.log(request)
+  console.log(addFriend)
+  const response = await fetch(addFriend, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(request)
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      console.log("send request")
+      return response.text();
+    } else {
+      throw new Error("Something went wrong on api server!");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+  return response;
+}

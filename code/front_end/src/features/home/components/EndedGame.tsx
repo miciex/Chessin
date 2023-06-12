@@ -42,10 +42,7 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
   };
 
   const goToFriendsProfile = () => {
-    navigation.navigate("ProfilePage", {
-      nick,
-      rank,
-    });
+    navigation.navigate("ProfilePage");
   };
 
   return (

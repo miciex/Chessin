@@ -26,7 +26,7 @@ public class UserService {
 
     public User setActive(String nickname, boolean active) {
         User user = userRepository.findByNameInGame(nickname).orElse(null);
-        if (user != null) {
+        if(user != null){
             user.setOnline(active);
             userRepository.save(user);
         }

@@ -9,6 +9,8 @@ import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
 import Footer from "../components/Footer";
 import Heading from "../components/Heading";
+import Invitation from "../features/socials/components/Invitation";
+import Notify from "../features/socials/components/Notify";
 
 const ended_games = [
   { date: "01.10.2022", playerNick: "Pusznik", rank: 1500, lastGameResult: "win" },
@@ -26,33 +28,25 @@ const ended_games = [
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,
-    "LastGame",
+    "Notification",
     undefined
   >;
-  route: RouteProp<RootStackParamList, "LastGame">;
+  route: RouteProp<RootStackParamList, "Notification">;
 };
 
-export default function LastGame({ route, navigation }: Props) {
+export default function Notification({ route, navigation }: Props) {
   return (
     <View style={styles.appContainer}>
       <ScrollView>
         <View style={styles.contentContainer}>
-        <Heading text={"Old Games"} />
-          {ended_games.map((gracz, index) => (
-            <View style={{width: "90%"}}>
-            <EndedGame
-              nick={gracz.playerNick}
-              rank={gracz.rank}
-              result={gracz.lastGameResult}
-              navigation={navigation}
-              key={index}
-              date={gracz.date}
-            />
-            </View>
-          ))}
+        <Heading text={"Notifications"} />
+         <Invitation nick="Wojanix" rank={1200} navigation={navigation}/>
+         <Invitation nick="Wojanix" rank={1200} navigation={navigation}/>
+         <Notify text="Gratulacje osiagnales 1000 elo"/>
+         <Invitation nick="Wojanix" rank={1200} navigation={navigation}/>
         </View>
       </ScrollView>
-      <Footer navigation={navigation} />
+    
     </View>
   );
 }

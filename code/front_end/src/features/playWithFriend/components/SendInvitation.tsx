@@ -1,16 +1,46 @@
 import { View, Text, StyleSheet, Image, Pressable} from "react-native";
-import React from "react";
+import React, {useState} from "react";
 
 import { ColorsPallet } from "../../../utils/Constants";
+import InvitationModal from "./InvitationModal";
+import { addFriendFunc } from "../../../services/userServices";
 
-const SendInvitation = () => {
+type Props = {
+  nick: string;
+}
+
+const SendInvitation = ({nick}: Props) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  const handleModalTimeout = () => {
+    setModalVisible(false);
+  };
+
+  const handleAddFriend = ( ) => {
+    addFriendFunc({friendNickname: nick}).then((data)=>{
+      console.log(data)
+    }).catch(err => {throw new Error(err)})
+  }
   return (
     <View style={styles.buttonContainer}>
     <Pressable style={styles.button} android_ripple={{
       color: ColorsPallet.darker,
       borderless: false,
-    }}>
-   
+    }} onPress={()=>{addFriendFunc({friendNickname: nick})}}>
+   <InvitationModal
+        visible={modalVisible}
+        duration={2000} // Display for 2 seconds
+        onTimeout={handleModalTimeout}
+        text="Wysłano Invite"
+      />
       <Text style={styles.text}>Send Invitation</Text>
    
     </Pressable>
