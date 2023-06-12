@@ -9,7 +9,7 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
-import { getUser } from "../services/userServices";
+import { addFriendFunc, getUser } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
@@ -136,7 +136,8 @@ export default function ProfilePage({ navigation, route }: Props) {
         <View style={styles.invite}>
           <BaseButton
             handlePress={() => {
-              console.log("inv");
+              addFriendFunc({friendNickname: "PabisackCox"})
+              // addFriendFunc(user?  user?.nameInGame : "")
             }}
             text="Send Invitation"
           />

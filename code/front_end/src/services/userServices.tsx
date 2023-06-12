@@ -6,9 +6,8 @@ import { responseUserToUser } from "../utils/PlayerUtilities";
 import { refreshTokenLink, findByEmailLink } from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
-import { AuthenticationResponse } from "../utils/ServicesTypes";
+import { AuthenticationResponse, CodeVerificationRequest , FriendInvitationRequest} from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
-import { CodeVerificationRequest } from "../utils/ServicesTypes";
 import { addFriend } from "../utils/ApiEndpoints";
 
 export const storeUser = async (value: User) => {
@@ -135,22 +134,22 @@ export const setUserDataFromResponse = async (
 };
 
 
-export const addFriendFunc = async (nick: String) =>{
+export const addFriendFunc = async (request: FriendInvitationRequest) =>{
   const accessToken = await getValueFor("accessToken");
-  console.log(nick)
-  fetch(addFriend, {
+  console.log(request)
+  console.log(addFriend)
+  const response = await fetch(addFriend, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({
-      friendNickname: nick,
-    })
+    body: JSON.stringify(request)
   })
   .then((response) => {
     if (response.status === 200) {
-      return response.json();
+      console.log("send request")
+      return response.text();
     } else {
       throw new Error("Something went wrong on api server!");
     }
@@ -158,4 +157,5 @@ export const addFriendFunc = async (nick: String) =>{
   .catch((error) => {
     console.error(error);
   });
+  return response;
 }

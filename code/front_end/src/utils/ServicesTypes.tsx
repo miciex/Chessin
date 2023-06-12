@@ -97,3 +97,7 @@ export type CodeVerificationRequest = {
 export type ListenForFirstMoveRequest = {
   gameId: number;
 };
+
+export type FriendInvitationRequest = {
+  friendNickname:string;
+}
