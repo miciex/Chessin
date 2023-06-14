@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React from "react";
+import React, {useState} from "react";
 
 import { ColorsPallet } from "../utils/Constants";
 import SendInvitation from "../features/playWithFriend/components/SendInvitation";
@@ -10,96 +10,100 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
+import { handleSearchBarSocials, setUserDataFromResponse } from "../services/userServices";
+import { HandleSearchBarSocials } from "../utils/ServicesTypes";
+import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
+import { User } from "../utils/PlayerUtilities";
 
-const friends = [
+const [friends, setFriends]= useState( [
   {
-    playerNick: "Pusznik",
+    nick: "Pusznik",
     rank: 1500,
     active: false,
     playing: false,
     avatar: "",
   },
   {
-    playerNick: "MaciekNieBij",
+    nick: "MaciekNieBij",
     rank: 1500,
     active: true,
     playing: true,
     avatar: "",
   },
   {
-    playerNick: "Slaweczuk",
+    nick: "Slaweczuk",
     rank: 1500,
     active: true,
     playing: false,
     avatar: "",
   },
   {
-    playerNick: "Strzała",
+    nick: "Strzała",
     rank: 1500,
     active: false,
     playing: false,
     avatar: "",
   },
   {
-    playerNick: "Bestia",
+    nick: "Bestia",
     rank: 1500,
     active: false,
     playing: false,
     avatar: "",
   },
-  { playerNick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
+  { nick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
   {
-    playerNick: "Zocho",
+    nick: "Zocho",
     rank: 1300,
     active: false,
     playing: false,
     avatar: "",
   },
   {
-    playerNick: "Strzała",
+    nick: "Strzała",
     rank: 1500,
     active: false,
     playing: false,
     avatar: "",
   },
   {
-    playerNick: "Bestia",
+    nick: "Bestia",
     rank: 1500,
     active: false,
     playing: false,
     avatar: "",
   },
-  { playerNick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
+  { nick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
   {
-    playerNick: "Zocho",
+    nick: "Zocho",
     rank: 1300,
     active: false,
     playing: false,
     avatar: "",
   },
   {
-    playerNick: "Strzała",
+    nick: "Strzała",
     rank: 1500,
     active: false,
     playing: false,
     avatar: "",
   },
   {
-    playerNick: "Bestia",
+    nick: "Bestia",
     rank: 1500,
     active: false,
     playing: false,
     avatar: "",
   },
-  { playerNick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
+  { nick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
   {
-    playerNick: "Zocho",
+    nick: "Zocho",
     rank: 1300,
     active: false,
     playing: false,
     avatar: "",
   },
-];
+]);
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -110,22 +114,31 @@ type Props = {
   route: RouteProp<RootStackParamList, "Socials">;
 };
 
+
+
 export default function Socials({ route, navigation }: Props) {
+
+  const [users, setUsers] = useState<Array<User>>([])
+
+  const handleSearchBar = (searchBar: HandleSearchBarSocials) =>{
+  handleSearchBarSocials(searchBar).then((data) =>{ 
+    if(data === undefined) return
+    setUsers(data.map(x => responseUserToUser(x, "")))
+  })
+  }
+
+  
   return (
     <View style={styles.appContainer}>
       <View style={styles.formContainer}>
-        <SendInvitation />
        
-        <InputField placeholder="Search" />
+        <InputField placeholder="Search" onChange={e=>{handleSearchBar({searchNickname: e})}} />
         <ScrollView>
           <View style={styles.scrollView}>
             {friends.map((gracz) => (
               <Friend
-                nick={gracz.playerNick}
-                rank={gracz.rank}
-                active={gracz.active}
-                playing={gracz.playing}
-                navigation={navigation}
+                  user={gracz}
+                  navigation={navigation}
               />
             ))}
           </View>

@@ -5,48 +5,37 @@ import { Fontisto } from "@expo/vector-icons";
 import { ColorsPallet, StackParamList } from "../../../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
+import { UserSocials } from "../../../utils/ServicesTypes";
 
 type Props = {
-  nick: string;
-  rank: Number;
-  active: boolean;
-  playing: boolean;
-  navigateToPlayWithFriend?: Function;
+  user: UserSocials;
   navigation: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
     undefined
   >;
 };
-const Friend = ({ navigation, nick, rank, playing, active }: Props) => {
+const Friend = ({ navigation, user }: Props) => {
+
+  
   const PlayingEye = () => {
-    if (!playing) {
+    if (!user.playing) {
       return null;
     }
     return <FontAwesome5 name="eye" size={18} color="green" />;
   };
   const Online = () => {
-    if (!active) {
+    if (!user.active) {
       return <Fontisto name="radio-btn-active" size={9} color="black" />;
     }
     return <Fontisto name="radio-btn-active" size={9} color="green" />;
   };
 
   const goToFriendsMenu = () => {
-    navigation.navigate("PlayWithFriendsMenu", {
-      nick,
-      rank,
-      playing,
-      active,
-    });
+    navigation.navigate("PlayWithFriendsMenu");
   };
   const goToFriendsProfile = () => {
-    navigation.navigate("ProfilePage", {
-      nick,
-      rank,
-      playing,
-      active
-    });
+    navigation.navigate("ProfilePage");
   };
   return (
     <View style={styles.record}>
@@ -63,7 +52,7 @@ const Friend = ({ navigation, nick, rank, playing, active }: Props) => {
         }}
       />             
       <Text >
-        <Online /> {nick} {rank.toString()}
+        <Online /> {user.nick} {user.rank.toString()}
       </Text>
       </Pressable>
       </View>

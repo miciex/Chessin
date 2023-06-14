@@ -106,3 +106,13 @@ export type ListenForMoveRequest = {
   gameId: number;
   moves: Array<MoveResponse>;
 };
+
+export type HandleFriendInvitation = {
+  friendEmail: string;
+  responseType: boolean;
+
+}
+
+export type HandleSearchBarSocials = {
+  searchNickname: string;
+}

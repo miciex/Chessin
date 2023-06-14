@@ -13,9 +13,11 @@ import {
   import { NativeStackNavigationProp } from "@react-navigation/native-stack";
   import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
-import { addFriendFunc } from "../../../services/userServices";
+import { addFriendFunc, handleFriendInvitationFunc } from "../../../services/userServices";
+
   
   type Props = {
+    email: string,
     nick: string;
     rank: Number;
     navigation: NativeStackNavigationProp<
@@ -25,7 +27,7 @@ import { addFriendFunc } from "../../../services/userServices";
     >;
   };
   
-  const Invitation = ({ nick, rank, navigation }: Props) => {
+  const Invitation = ({email, nick, rank, navigation }: Props) => {
     const goToFriendsProfile = () => {
       navigation.navigate("ProfilePage");
     };
@@ -64,7 +66,7 @@ import { addFriendFunc } from "../../../services/userServices";
             </Text>
             <View style={{flexDirection: "row", justifyContent: "space-between"}}>
             <View style={styles.confirmButton}>
-                <BaseButton text="Accept" handlePress={()=>{addFriendFunc(nick)}} color="green"/>
+                <BaseButton text="Accept" handlePress={()=>{handleFriendInvitationFunc({friendEmail: email, responseType: true})}} color="green"/>
             </View>
             <View style={styles.confirmButton}>
                 <BaseButton text="Reject" handlePress={()=>{console.log("Rejected")}} color="red"/>

@@ -1,15 +1,17 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
-import { User } from "../utils/PlayerUtilities";
+import { User, responseUser } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { responseUserToUser } from "../utils/PlayerUtilities";
 import {
   refreshTokenLink,
   findByNicknameLink,
   setActive,
+  friendInvitation,
+  getUsersByNicknameLink,
 } from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
-import { AuthenticationResponse, CodeVerificationRequest , FriendInvitationRequest} from "../utils/ServicesTypes";
+import { AuthenticationResponse, CodeVerificationRequest , FriendInvitationRequest, HandleFriendInvitation, HandleSearchBarSocials} from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
 import { addFriend } from "../utils/ApiEndpoints";
 
@@ -170,5 +172,58 @@ export const addFriendFunc = async (request: FriendInvitationRequest) =>{
   .catch((error) => {
     console.error(error);
   });
+  return response;
+}
+
+
+export const handleFriendInvitationFunc = async (request: HandleFriendInvitation) =>{
+  const accessToken = await getValueFor("accessToken");
+  console.log(request)
+  const response = await fetch(friendInvitation, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(request)
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      console.log("send request")
+      return response.text();
+    } else {
+      throw new Error("Something went wrong on api server!");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+  return response;
+}
+
+
+export async function handleSearchBarSocials (request: HandleSearchBarSocials){
+  const accessToken = await getValueFor("accessToken");
+
+  const response = await fetch(getUsersByNicknameLink, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(request)
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      console.log("send request")
+      return response.json() as unknown as Array<responseUser>;
+        } else {
+      throw new Error("Something went wrong on api server!");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+  console.log(response)
   return response;
 }

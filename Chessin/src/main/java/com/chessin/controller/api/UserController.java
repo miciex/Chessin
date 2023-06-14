@@ -28,7 +28,7 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    FriendInvitationRepository friendInvitationRepository;
+    private final FriendInvitationRepository friendInvitationRepository;
 
     @PostMapping("/findByNickname/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname) {
