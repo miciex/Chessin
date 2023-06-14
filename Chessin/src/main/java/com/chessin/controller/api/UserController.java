@@ -5,6 +5,7 @@ import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.requests.SetActiveRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
+import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
 import com.chessin.controller.responses.UserResponse;
@@ -34,6 +35,17 @@ public class UserController {
         Optional<User> user = userRepository.findByNameInGame(nickname);
         UserResponse userResponse = UserResponse.fromUser(user.orElseThrow());
         return ResponseEntity.ok().body(userResponse);
+    }
+
+    @PostMapping("/findUsersByNickname/{nickname}")
+    public ResponseEntity<?> findUsersByNickname(@PathVariable String nickname)
+    {
+        List<User> users = userRepository.findByNameInGameContaining(nickname);
+        List<UserResponse> responses = new ArrayList<>();
+
+        users.stream().map(UserResponse::fromUser).forEach(responses::add);
+
+        return ResponseEntity.ok().body(users);
     }
 
     @PostMapping("/setActive")
