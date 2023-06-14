@@ -1,4 +1,4 @@
-export const baseLink = "http:/192.168.27.112:8080/api/v1/";
+export const baseLink = "http:/192.168.10.136:8080/api/v1/";
 export const authLink = `${baseLink}auth/`;
 export const registerLink = `${authLink}register`;
 export const authenticateLink = `${authLink}authenticate`;
@@ -7,7 +7,7 @@ export const verifyCodeLink = `${authLink}verifyCode`;
 export const userLink = `${baseLink}user/`;
 export const findByNicknameLink = `${userLink}findByNickname/`;
 export const setActive = `${userLink}setActive`;
-export const addFriendLink = `${userLink}addFriend`;
+
 export const checkInvitationsLink = `${userLink}checkInvitations`;
 export const respondtoInvitationLink = `${userLink}respondToInvitation`;
 export const removeFriendLink = `${userLink}removeFriend`;
@@ -16,9 +16,9 @@ export const chessGameLink = `${baseLink}game/`;
 export const searchNewGameLink = `${chessGameLink}searchNewGame`;
 export const cancelSearchLink = `${chessGameLink}cancelSearch`;
 export const submitMoveLink = `${chessGameLink}submitMove`;
-export const addFriend = `${userLink}addFriend`;
 export const friendInvitation = `${userLink}respondToInvitation`;
+export const addFriendLink = `${userLink}addFriend`;
 export const listenForFirstMoveLink = `${chessGameLink}listenForFirstMove/`;
 export const getGameByUsernameLink = `${chessGameLink}getGameByUsername/`;
 export const listenForMoveLink = `${chessGameLink}listenForMove`;
-export const getUsersByNicknameLink = `${userLink}getUsersByNickname/`;
+export const findUsersByNickname = `${userLink}findUsersByNickname/`;

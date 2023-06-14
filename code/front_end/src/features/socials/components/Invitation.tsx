@@ -14,6 +14,7 @@ import {
   import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
 import { addFriendFunc, handleFriendInvitationFunc } from "../../../services/userServices";
+import { FriendInvitationResponseType } from "../../../utils/ServicesTypes";
 
   
   type Props = {
@@ -66,10 +67,10 @@ import { addFriendFunc, handleFriendInvitationFunc } from "../../../services/use
             </Text>
             <View style={{flexDirection: "row", justifyContent: "space-between"}}>
             <View style={styles.confirmButton}>
-                <BaseButton text="Accept" handlePress={()=>{handleFriendInvitationFunc({friendEmail: email, responseType: true})}} color="green"/>
+                <BaseButton text="Accept" handlePress={()=>{handleFriendInvitationFunc({friendEmail: email, responseType: FriendInvitationResponseType.DECLINE})}} color="green"/>
             </View>
             <View style={styles.confirmButton}>
-                <BaseButton text="Reject" handlePress={()=>{console.log("Rejected")}} color="red"/>
+                <BaseButton text="Reject" handlePress={()=>{handleFriendInvitationFunc({friendEmail: email, responseType: FriendInvitationResponseType.ACCEPT})}} color="red"/>
             </View>
             </View>
           </View>

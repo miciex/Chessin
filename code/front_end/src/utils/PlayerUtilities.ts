@@ -9,6 +9,7 @@ export type User = {
     ranking: Rankings;
     highestRanking: number;
     online?: boolean;
+    playing?:boolean;
 };
 
 export type responseUser = {

@@ -34,7 +34,7 @@ const SendInvitation = ({nick}: Props) => {
     <Pressable style={styles.button} android_ripple={{
       color: ColorsPallet.darker,
       borderless: false,
-    }} onPress={()=>{addFriendFunc({friendNickname: nick})}}>
+    }} onPress={()=>{handleAddFriend}}>
    <InvitationModal
         visible={modalVisible}
         duration={2000} // Display for 2 seconds

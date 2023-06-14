@@ -109,10 +109,14 @@ export type ListenForMoveRequest = {
 
 export type HandleFriendInvitation = {
   friendEmail: string;
-  responseType: boolean;
+  responseType: FriendInvitationResponseType;
 
 }
 
 export type HandleSearchBarSocials = {
   searchNickname: string;
+}
+
+export enum FriendInvitationResponseType {
+  ACCEPT="ACCEPT", DECLINE="DECLINE"
 }

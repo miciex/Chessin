@@ -7,13 +7,13 @@ import {
   findByNicknameLink,
   setActive,
   friendInvitation,
-  getUsersByNicknameLink,
+  findUsersByNickname,
+  addFriendLink,
 } from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
 import { AuthenticationResponse, CodeVerificationRequest , FriendInvitationRequest, HandleFriendInvitation, HandleSearchBarSocials} from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
-import { addFriend } from "../utils/ApiEndpoints";
 
 export const storeUser = async (value: User) => {
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
@@ -152,8 +152,7 @@ export const setUserDataFromResponse = async (
 export const addFriendFunc = async (request: FriendInvitationRequest) =>{
   const accessToken = await getValueFor("accessToken");
   console.log(request)
-  console.log(addFriend)
-  const response = await fetch(addFriend, {
+  const response = await fetch(addFriendLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -205,13 +204,14 @@ export const handleFriendInvitationFunc = async (request: HandleFriendInvitation
 export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
 
-  const response = await fetch(getUsersByNicknameLink, {
+  console.log(`${findUsersByNickname}${request.searchNickname}`)
+  console.log(`shit`)
+  const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(request)
+    }
   })
   .then((response) => {
     if (response.status === 200) {

@@ -15,95 +15,6 @@ import { HandleSearchBarSocials } from "../utils/ServicesTypes";
 import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
 import { User } from "../utils/PlayerUtilities";
 
-const [friends, setFriends]= useState( [
-  {
-    nick: "Pusznik",
-    rank: 1500,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  {
-    nick: "MaciekNieBij",
-    rank: 1500,
-    active: true,
-    playing: true,
-    avatar: "",
-  },
-  {
-    nick: "Slaweczuk",
-    rank: 1500,
-    active: true,
-    playing: false,
-    avatar: "",
-  },
-  {
-    nick: "Strzała",
-    rank: 1500,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  {
-    nick: "Bestia",
-    rank: 1500,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  { nick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
-  {
-    nick: "Zocho",
-    rank: 1300,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  {
-    nick: "Strzała",
-    rank: 1500,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  {
-    nick: "Bestia",
-    rank: 1500,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  { nick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
-  {
-    nick: "Zocho",
-    rank: 1300,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  {
-    nick: "Strzała",
-    rank: 1500,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  {
-    nick: "Bestia",
-    rank: 1500,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-  { nick: "Sharku", rank: 1000, active: true, playing: true, avatar: "" },
-  {
-    nick: "Zocho",
-    rank: 1300,
-    active: false,
-    playing: false,
-    avatar: "",
-  },
-]);
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -129,17 +40,20 @@ export default function Socials({ route, navigation }: Props) {
 
   
   return (
+    
     <View style={styles.appContainer}>
       <View style={styles.formContainer}>
        
         <InputField placeholder="Search" onChange={e=>{handleSearchBar({searchNickname: e})}} />
         <ScrollView>
           <View style={styles.scrollView}>
-            {friends.map((gracz) => (
+            {users.map((gracz) => (
+              
               <Friend
                   user={gracz}
                   navigation={navigation}
               />
+              
             ))}
           </View>
         </ScrollView>

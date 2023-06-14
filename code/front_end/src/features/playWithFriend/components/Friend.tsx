@@ -5,10 +5,10 @@ import { Fontisto } from "@expo/vector-icons";
 import { ColorsPallet, StackParamList } from "../../../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
-import { UserSocials } from "../../../utils/ServicesTypes";
+import {User } from "../../../utils/PlayerUtilities";
 
 type Props = {
-  user: UserSocials;
+  user: User;
   navigation: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
@@ -17,6 +17,7 @@ type Props = {
 };
 const Friend = ({ navigation, user }: Props) => {
 
+  console.log(user.ranking)
   
   const PlayingEye = () => {
     if (!user.playing) {
@@ -25,7 +26,7 @@ const Friend = ({ navigation, user }: Props) => {
     return <FontAwesome5 name="eye" size={18} color="green" />;
   };
   const Online = () => {
-    if (!user.active) {
+    if (!user.online) {
       return <Fontisto name="radio-btn-active" size={9} color="black" />;
     }
     return <Fontisto name="radio-btn-active" size={9} color="green" />;
@@ -52,7 +53,7 @@ const Friend = ({ navigation, user }: Props) => {
         }}
       />             
       <Text >
-        <Online /> {user.nick} {user.rank.toString()}
+        <Online /> {user.nameInGame} {user.ranking.classical.toString()}
       </Text>
       </Pressable>
       </View>

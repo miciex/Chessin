@@ -92,10 +92,6 @@ export default function ProfilePage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
   // const [data, loading, error] = useFetch("http://localhost:3000/user", {});
 
-  const wojtek = fetchUser("papiezwojtyla9@gmail.com");
-  console.log(wojtek)
-  console.log("wojtek")
-
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (user === null) return;
@@ -121,6 +117,11 @@ export default function ProfilePage({ navigation, route }: Props) {
     navigation.navigate("PlayWithFriendsMenu", {});
   };
 
+  const handleAddFriend = ( ) => {
+    addFriendFunc({friendNickname: user ? user.nameInGame : ""}).then((data)=>{
+      console.log(data)
+    }).catch(err => {throw new Error(err)})
+  }
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -136,7 +137,7 @@ export default function ProfilePage({ navigation, route }: Props) {
         <View style={styles.invite}>
           <BaseButton
             handlePress={() => {
-              addFriendFunc({friendNickname: "PabisackCox"})
+              handleAddFriend
               // addFriendFunc(user?  user?.nameInGame : "")
             }}
             text="Send Invitation"
