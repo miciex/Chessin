@@ -120,3 +120,7 @@ export type HandleSearchBarSocials = {
 export enum FriendInvitationResponseType {
   ACCEPT="ACCEPT", DECLINE="DECLINE"
 }
+
+export type NameInGame = {
+  nameInGame: string;
+}

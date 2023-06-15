@@ -1,16 +1,18 @@
 import { View, Text,StyleSheet,Image } from 'react-native'
 import React from 'react'
 import { ColorsPallet } from '../../../utils/Constants'
+import { Rankings } from '../../../utils/PlayerUtilities';
 
 type Props = {
-    nick: String;
-    rank: Number;
+    nick: string;
+    rank: Rankings;
     active?: boolean;
     playing?: boolean;
-    avatar?: String
+    avatar?: string
+    country: string;
 }
 
-export default function Profile({nick, rank, active, playing, avatar}:Props) {
+export default function Profile({nick, rank, active, playing, avatar, country}:Props) {
   return (
     <View style={styles.profile}>
       <View style={styles.left}>
@@ -23,15 +25,15 @@ export default function Profile({nick, rank, active, playing, avatar}:Props) {
        <Image
         style={styles.flag}
         source={{
-          uri: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Flag_of_Poland.svg/1200px-Flag_of_Poland.svg.png',
+          uri: `https://en.wikipedia.org/wiki/Flag_of_Italy#/media/File:Flag_of_Italy.svg`,
         }}
       />
       </View>
       <View style={styles.right}>
         <Text style={[styles.text, styles.name]}>{nick}</Text>
-        <Text style={[styles.text, styles.rank]}>Bullet {rank.toString()}</Text>
-        <Text style={[styles.text, styles.rank]}>Rapid {rank.toString()}</Text>
-        <Text style={[styles.text, styles.rank]}>Blitz {rank.toString()}</Text>
+        <Text style={[styles.text, styles.rank]}>Bullet {rank.bullet.toString()}</Text>
+        <Text style={[styles.text, styles.rank]}>Rapid {rank.rapid.toString()}</Text>
+        <Text style={[styles.text, styles.rank]}>Blitz {rank.blitz.toString()}</Text>
       </View>
     </View>
   )

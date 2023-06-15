@@ -20,7 +20,7 @@ import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { setUserActive, resetAccessToken } from "./src/services/userServices";
-import { PendingChessGameRequest } from "./src/utils/ServicesTypes";
+import { NameInGame, PendingChessGameRequest } from "./src/utils/ServicesTypes";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -33,7 +33,10 @@ export type RootStackParamList = {
     request: PendingChessGameRequest;
   };
   PlayWithFriendsMenu: {};
-  ProfilePage: undefined;
+  ProfilePage: {
+    nameInGame: string
+    
+  };
   Register: undefined;
   Socials: undefined;
   AnalyzeGame: undefined;

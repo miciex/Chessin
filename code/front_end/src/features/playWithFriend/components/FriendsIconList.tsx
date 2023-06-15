@@ -32,9 +32,7 @@ export default function FriendsIconList({navigation}: Props) {
     avatar: string;
 }) => {
     navigation.navigate("ProfilePage", {
-      nick: player.playerNick,
-      rank: player.rank,
-      avatar: player.avatar
+      nameInGame: player.playerNick
     });
   };
  

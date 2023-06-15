@@ -16,8 +16,6 @@ type Props = {
   >;
 };
 const Friend = ({ navigation, user }: Props) => {
-
-  console.log(user.ranking)
   
   const PlayingEye = () => {
     if (!user.playing) {
@@ -33,10 +31,10 @@ const Friend = ({ navigation, user }: Props) => {
   };
 
   const goToFriendsMenu = () => {
-    navigation.navigate("PlayWithFriendsMenu");
+    navigation.navigate("PlayWithFriendsMenu", {nameInGame:user.nameInGame});
   };
   const goToFriendsProfile = () => {
-    navigation.navigate("ProfilePage");
+    navigation.navigate("ProfilePage", {nameInGame:user.nameInGame});
   };
   return (
     <View style={styles.record}>

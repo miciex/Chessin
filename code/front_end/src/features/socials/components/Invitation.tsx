@@ -30,7 +30,7 @@ import { FriendInvitationResponseType } from "../../../utils/ServicesTypes";
   
   const Invitation = ({email, nick, rank, navigation }: Props) => {
     const goToFriendsProfile = () => {
-      navigation.navigate("ProfilePage");
+      navigation.navigate("ProfilePage", {nameInGame: nick});
     };
   
     return (

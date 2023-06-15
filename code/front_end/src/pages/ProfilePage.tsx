@@ -90,14 +90,25 @@ type Props = {
 
 export default function ProfilePage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
-  // const [data, loading, error] = useFetch("http://localhost:3000/user", {});
+  
+  const nameInGame = route.params.nameInGame;
 
   useEffect(() => {
-    getValueFor("user").then((user) => {
+   
+    if(nameInGame=="user"){
+      getValueFor("user").then((user) => {
       if (user === null) return;
       setUser(JSON.parse(user));
-    });
-  }, []);
+    })} else {
+      fetchUser("", nameInGame).then((user) => {
+        console.log("yep2")
+        if (user === null){
+          return;
+        } 
+        setUser(user);
+      })
+    };
+  }, [nameInGame]);
 
   let component = ended_games.slice(0, 5).map((game) => {
     return (
@@ -109,10 +120,6 @@ export default function ProfilePage({ navigation, route }: Props) {
       />
     );
   });
-
-  let playing = false;
-  let active = false;
-
   const goToFriendsMenu = () => {
     navigation.navigate("PlayWithFriendsMenu", {});
   };
@@ -127,10 +134,11 @@ export default function ProfilePage({ navigation, route }: Props) {
       <View style={styles.container}>
         <View style={styles.profile}>
           <Profile
-            nick={user ? user.nameInGame : ""}
-            rank={user ? user.highestRanking : 0}
-            active={active}
-            playing={playing}
+            nick={user ? user.nameInGame : "Doesnt exist"}
+            rank={user ? user.ranking : {blitz: 0, bullet: 0, rapid: 0, classical: 0}}
+            active={user ? user.online : false}
+            playing={user ? user.playing : false}
+            country={user ? user.country : "Poland"}
           />
         </View>
 
@@ -138,7 +146,6 @@ export default function ProfilePage({ navigation, route }: Props) {
           <BaseButton
             handlePress={() => {
               handleAddFriend
-              // addFriendFunc(user?  user?.nameInGame : "")
             }}
             text="Send Invitation"
           />
