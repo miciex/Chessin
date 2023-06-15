@@ -17,4 +17,7 @@ public interface VerificationCodeRepository extends JpaRepository<VerificationCo
 
     @Modifying
     int deleteByUser(User user);
+
+    @Modifying
+    int deleteByUserId(Long userId);
 }

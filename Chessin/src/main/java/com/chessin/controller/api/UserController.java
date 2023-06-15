@@ -5,6 +5,7 @@ import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.requests.SetActiveRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
+import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
 import com.chessin.controller.responses.UserResponse;
@@ -36,6 +37,16 @@ public class UserController {
         return ResponseEntity.ok().body(userResponse);
     }
 
+    @PostMapping("/findUsersByNickname/{nickname}")
+    public ResponseEntity<?> findUsersByNickname(@PathVariable String nickname) {
+        List<User> users = userRepository.findByNameInGameContaining(nickname);
+        List<UserResponse> responses = new ArrayList<>();
+
+        users.stream().map(UserResponse::fromUser).forEach(responses::add);
+
+        return ResponseEntity.ok().body(users);
+    }
+
     @PostMapping("/setActive")
     public ResponseEntity<?> setActive(@RequestBody SetActiveRequest request, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -49,9 +60,9 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if (!userRepository.existsByEmail(email))
-            return ResponseEntity.badRequest().body("User does not exist");
+            return ResponseEntity.badRequest().body("User does not exist.");
         else if (!userRepository.existsByNameInGame(request.getFriendNickname()))
-            return ResponseEntity.badRequest().body("Friend does not exist");
+            return ResponseEntity.badRequest().body("Friend does not exist.");
 
         friendInvitationRepository.save(FriendInvitation.builder()
                 .user(userRepository.findByEmail(email).get())
