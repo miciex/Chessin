@@ -194,7 +194,7 @@ public class AuthenticationService {
         verificationCodeRepository.delete(code);
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
+        //userRepository.save(user);
 
         return ResponseEntity.ok("Password changed successfully.");
     }
@@ -205,7 +205,7 @@ public class AuthenticationService {
 
         if(verificationCodeRepository.existsByUserId(user.getId())) {
             if (verificationCodeRepository.findByUserId(user.getId()).get().getExpiryDate().compareTo(Instant.now()) < 0) {
-                verificationCodeRepository.deleteByUser(user);
+                verificationCodeRepository.deleteByUserId(user.getId());
                 code = new VerificationCode();
                 code.setUser(user);
                 verificationCodeRepository.save(code);

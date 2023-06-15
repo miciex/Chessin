@@ -28,10 +28,7 @@ type Props = {
     undefined
   >;
   request: CodeVerificationRequest;
-  handleVerifyCodeResponse?: (
-    data: AuthenticationResponse,
-    request: CodeVerificationRequest
-  ) => void;
+  handleVerifyCodeResponse?: (response: Response) => void;
 };
 
 const InputLength = 8;
@@ -54,17 +51,9 @@ export default function AuthCodeModal({
       ...request,
       verificationCode: inputs.join(""),
     })
-      .then((data) => {
-        console.log("data", data);
-        if (!handleVerifyCodeResponse) return;
-        console.log("sending data to handleVerifyCodeResponse");
-        handleVerifyCodeResponse(data, {
-          ...request,
-          verificationCode: inputs.join(""),
-        });
-      })
-      .then(() => {
-        navigation.navigate("Home");
+      .then((response) => {
+        if (handleVerifyCodeResponse === undefined) return;
+        handleVerifyCodeResponse(response);
       })
       .catch((err) => {
         console.log(err);

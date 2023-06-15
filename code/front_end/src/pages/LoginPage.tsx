@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text, Pressable } from "react-native";
 import React, { useState, useRef } from "react";
 import Footer from "../components/Footer";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
@@ -92,6 +92,23 @@ export default function Login({ route, navigation }: Props) {
       });
   };
 
+  const handleVerifyCodeResponse = (response: Response) => {
+    if (response.status === 200) {
+      response.json().then((data) => {
+        setUserDataFromResponse(data, { email });
+      });
+    } else if (response.status === 400) {
+      response
+        .text()
+        .then((data) => {
+          throw new Error(data);
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    }
+  };
+
   const hideModal = () => {
     setShowAuthCode(false);
   };
@@ -105,34 +122,53 @@ export default function Login({ route, navigation }: Props) {
         verificationCode: "",
         verificationType: VerificationType.AUTHENTICATE,
       }}
-      handleVerifyCodeResponse={setUserDataFromResponse}
+      handleVerifyCodeResponse={handleVerifyCodeResponse}
     />
   ) : (
     <View style={styles.appContainer}>
       <View style={styles.formContainer}>
-        <AuthInput
-          placeholder="Email"
-          value={email}
-          onChange={setEmail}
-          isValid={isEmailValid}
-          notValidText={notValidEmailMessage}
-          onSubmitEditing={setEmailValid}
-        />
-        <AuthInput
-          placeholder="Password"
-          value={password}
-          onChange={setPassword}
-          securityTextEntry={true}
-          isValid={isPasswordValid}
-          notValidText={notValidPasswordMessage}
-          onSubmitEditing={setPasswordValid}
-        />
-        <Submit onSubmit={onSubmit} />
+        <View style={styles.inputsContainer}>
+          <AuthInput
+            placeholder="Email"
+            value={email}
+            onChange={setEmail}
+            isValid={isEmailValid}
+            notValidText={notValidEmailMessage}
+            onSubmitEditing={setEmailValid}
+          />
+          <AuthInput
+            placeholder="Password"
+            value={password}
+            onChange={setPassword}
+            securityTextEntry={true}
+            isValid={isPasswordValid}
+            notValidText={notValidPasswordMessage}
+            onSubmitEditing={setPasswordValid}
+          />
 
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          <Submit onSubmit={onSubmit} />
+        </View>
+
+        <View style={styles.logosContainer}>
           <LogInWithOtherFirm brand="google" />
           <LogInWithOtherFirm brand="facebook" />
           <LogInWithOtherFirm brand="apple" />
+        </View>
+        <View style={styles.authLinksContainer}>
+          <Pressable
+            onPress={() => {
+              navigation.navigate("ResetPassword");
+            }}
+          >
+            <Text>Reset your password</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              navigation.navigate("Register");
+            }}
+          >
+            <Text>Register</Text>
+          </Pressable>
         </View>
       </View>
       <Footer navigation={navigation} />
@@ -149,10 +185,27 @@ const styles = StyleSheet.create({
     width: "80%",
     rowGap: 8,
   },
+  logosContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    flex: 1,
+  },
   appContainer: {
     backgroundColor: ColorsPallet.light,
     flex: 1,
     alignContent: "stretch",
     alignItems: "center",
+  },
+  authLinksContainer: {
+    width: "100%",
+    height: 50,
+    gap: 8,
+  },
+  inputsContainer: {
+    width: "100%",
+    gap: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 3,
   },
 });

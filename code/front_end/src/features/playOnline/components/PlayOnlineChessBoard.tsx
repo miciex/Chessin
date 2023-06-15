@@ -19,6 +19,7 @@ import { Move } from "../../../chess-logic/move";
 import { SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { BoardResponse } from "../../../utils/ServicesTypes";
 import { mapToBoard } from "../../../chess-logic/helpMethods";
+import { listenForMove } from "../services/playOnlineService";
 
 type Props = {
   board: Board;
@@ -103,29 +104,35 @@ export default function PlayOnlineChessBoard({
       setGameStarted(true);
     submitMove(submitMoveRequest)
       .then((data: BoardResponse) => {
-        if (!data) return;
-        setBoard(BoardResponseToBoard(data));
-        console.log(
-          "white time: " + data.whiteTime + " black time: " + data.blackTime
+        setDataFromBoardResponse(data);
+        listenForMove({ gameId, moves: data.moves }).then(
+          (res: BoardResponse | undefined) => {
+            if (res === undefined) return;
+            setDataFromBoardResponse(res);
+          }
         );
-        console.log("player color: " + player.color);
-        const myTime =
-          player.color === "white" ? data.whiteTime : data.blackTime;
-        const opponentTime =
-          player.color === "white" ? data.blackTime : data.whiteTime;
-        setMyClockInfo(new Date(myTime));
-        setOpponentClockInfo(new Date(opponentTime));
-        setCurrentPosition(data.positions.length - 1);
-        if (data.gameResult !== GameResults.NONE) setGameStarted(false);
-        else if (data.moves.length == 1) {
-          setGameStarted(true);
-        }
       })
       .catch((error) => {
         throw error;
       });
 
     setActiveField(-1);
+  };
+
+  const setDataFromBoardResponse = (data: BoardResponse) => {
+    if (!data) return;
+    setBoard(BoardResponseToBoard(data));
+    console.log("player color: " + player.color);
+    const myTime = player.color === "white" ? data.whiteTime : data.blackTime;
+    const opponentTime =
+      player.color === "white" ? data.blackTime : data.whiteTime;
+    setMyClockInfo(new Date(myTime));
+    setOpponentClockInfo(new Date(opponentTime));
+    setCurrentPosition(data.positions.length - 1);
+    if (data.gameResult !== GameResults.NONE) setGameStarted(false);
+    else if (data.moves.length == 1) {
+      setGameStarted(true);
+    }
   };
 
   let backgroundColor: string;
