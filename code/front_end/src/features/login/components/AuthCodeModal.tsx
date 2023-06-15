@@ -12,13 +12,10 @@ import { Char, isChar } from "../../../utils/Types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
-import { VerificationType } from "../../../utils/ServicesTypes";
 import { Entypo } from "@expo/vector-icons";
 import { StackParamList } from "../../../utils/Constants";
-import { setUserDataFromResponse } from "../../../services/userServices";
 import { verifyCode } from "../../../services/AuthenticationServices";
 import { CodeVerificationRequest } from "../../../utils/ServicesTypes";
-import { AuthenticationResponse } from "../../../utils/ServicesTypes";
 
 type Props = {
   hideModal: () => void;
@@ -34,7 +31,6 @@ type Props = {
 const InputLength = 8;
 export default function AuthCodeModal({
   hideModal,
-  navigation,
   request,
   handleVerifyCodeResponse,
 }: Props) {

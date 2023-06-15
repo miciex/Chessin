@@ -1,14 +1,10 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import {
   twoFaEnabled,
   changePassword,
-  verifyCode,
 } from "../services/AuthenticationServices";
-import {
-  CodeVerificationRequest,
-  TwoFactorAuthenticationResponse,
-} from "../utils/ServicesTypes";
+import { TwoFactorAuthenticationResponse } from "../utils/ServicesTypes";
 import {
   notValidEmailMessage,
   notValidPasswordMessage,
@@ -25,7 +21,7 @@ import { RouteProp } from "@react-navigation/native";
 import Footer from "../components/Footer";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import { VerificationType } from "../utils/ServicesTypes";
-
+import { logoutUser } from "../services/userServices";
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,
@@ -65,6 +61,7 @@ export default function ResetPasswordPage({ navigation, route }: Props) {
     twoFaEnabled({ email })
       .then((response) => {
         if (response.status === 200) {
+          logoutUser();
           return response.text() as unknown as TwoFactorAuthenticationResponse;
         } else if (response.status === 400) {
           response
@@ -117,13 +114,13 @@ export default function ResetPasswordPage({ navigation, route }: Props) {
   const handleVerifyCodeResponse = async (response: Response) => {
     //TODO: logoutUser
     if (response.status === 200) {
-      return response
+      return await response
         .text()
-        .then((data) => {
-          console.log(data);
+        .then(() => {
+          logoutUser();
           navigation.navigate("Home");
         })
-        .catch((err) => {
+        .catch((err: any) => {
           throw new Error(err);
         });
     } else if (response.status === 400) {

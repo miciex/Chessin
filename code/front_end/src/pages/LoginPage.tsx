@@ -1,5 +1,5 @@
 import { View, StyleSheet, Text, Pressable } from "react-native";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Footer from "../components/Footer";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -20,6 +20,7 @@ import {
 } from "../utils/Constants";
 import { setUserDataFromResponse } from "../services/userServices";
 import { login } from "../services/AuthenticationServices";
+import BaseButton from "../components/BaseButton";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
@@ -92,11 +93,22 @@ export default function Login({ route, navigation }: Props) {
       });
   };
 
-  const handleVerifyCodeResponse = (response: Response) => {
+  const handleVerifyCodeResponse = async (response: Response) => {
+    console.log("status: ", response.status);
     if (response.status === 200) {
-      response.json().then((data) => {
-        setUserDataFromResponse(data, { email });
-      });
+      console.log("correct code");
+      response
+        .json()
+        .then((data) => {
+          setUserDataFromResponse(data, { email });
+          console.log("setting user data");
+        })
+        .then(() => {
+          navigation.navigate("Home");
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
     } else if (response.status === 400) {
       response
         .text()
@@ -155,20 +167,24 @@ export default function Login({ route, navigation }: Props) {
           <LogInWithOtherFirm brand="apple" />
         </View>
         <View style={styles.authLinksContainer}>
-          <Pressable
-            onPress={() => {
-              navigation.navigate("ResetPassword");
-            }}
-          >
-            <Text>Reset your password</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              navigation.navigate("Register");
-            }}
-          >
-            <Text>Register</Text>
-          </Pressable>
+          <View style={styles.authLinkButton}>
+            <BaseButton
+              text="Reset your password"
+              handlePress={() => {
+                navigation.navigate("ResetPassword");
+              }}
+              color={ColorsPallet.light}
+            />
+          </View>
+          <View style={styles.authLinkButton}>
+            <BaseButton
+              text="Register"
+              handlePress={() => {
+                navigation.navigate("Register");
+              }}
+              color={ColorsPallet.light}
+            />
+          </View>
         </View>
       </View>
       <Footer navigation={navigation} />
@@ -198,8 +214,10 @@ const styles = StyleSheet.create({
   },
   authLinksContainer: {
     width: "100%",
-    height: 50,
+    height: 70,
     gap: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   inputsContainer: {
     width: "100%",
@@ -207,5 +225,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 3,
+  },
+  authLinkButton: {
+    width: "60%",
+    height: 24,
+    overflow: "hidden",
+    alignItems: "center",
   },
 });
