@@ -205,7 +205,7 @@ public class AuthenticationService {
 
         if(verificationCodeRepository.existsByUserId(user.getId())) {
             if (verificationCodeRepository.findByUserId(user.getId()).get().getExpiryDate().compareTo(Instant.now()) < 0) {
-                verificationCodeRepository.deleteByUser(user);
+                verificationCodeRepository.deleteByUserId(user.getId());
                 code = new VerificationCode();
                 code.setUser(user);
                 verificationCodeRepository.save(code);
