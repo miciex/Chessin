@@ -1,5 +1,5 @@
-import { View, StyleSheet } from "react-native";
-import React, { useState, useMemo } from "react";
+import { View, StyleSheet, Animated } from "react-native";
+import React, { useState, useMemo, useRef } from "react";
 import { FieldInfo } from "..";
 import ChessBoardField from "../../../components/ChessBoardField";
 import {
@@ -49,6 +49,10 @@ export default function PlayOnlineChessBoard({
   const [activeField, setActiveField] = useState(-1);
 
   const [possibleMoves, setPossibleMoves] = useState([-1]);
+
+  // const dimensions = getDimensions();
+
+  const touch = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
   const handleFieldPress = (data: FieldInfo) => {
     if (currentPosition !== board.moves.length - 1) {
@@ -177,6 +181,8 @@ export default function PlayOnlineChessBoard({
           info={{ piece: visualBoard[number], fieldNumber: number }}
           handleFieldPress={handleFieldPress}
           backgroundColor={backgroundColor}
+          activeField={activeField}
+          position={touch}
         />
       );
     }
@@ -189,7 +195,27 @@ export default function PlayOnlineChessBoard({
     [board, activeField, possibleMoves, player.color, currentPosition]
   );
 
-  return <View style={styles.container}>{renderedBoard}</View>;
+  return (
+    <View
+      onTouchStart={(evt) => {
+        console.log(evt.nativeEvent.locationX, evt.nativeEvent.locationY);
+      }}
+      // onStartShouldSetResponder={() => true}
+      // onResponderMove={(event) => {
+      //   console.log(
+      //     "x: " + event.nativeEvent.locationX,
+      //     "y: " + event.nativeEvent.locationY
+      //   );
+      //   touch.setValue({
+      //     x: event.nativeEvent.locationX,
+      //     y: event.nativeEvent.locationY,
+      //   });
+      // }}
+      style={styles.container}
+    >
+      {renderedBoard}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

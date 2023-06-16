@@ -1,40 +1,32 @@
-import { View, Text, StyleSheet, Modal, Pressable } from "react-native";
-import React, { useState, useEffect } from "react";
+import {StyleSheet, View} from "react-native";
+import React, {useEffect, useState} from "react";
 import Footer from "../components/Footer";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../Routing";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {RouteProp} from "@react-navigation/native";
+import {RootStackParamList} from "../../Routing";
 import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
-import { getInitialChessBoard } from "../features/playOnline";
+import {getInitialChessBoard} from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
-import { ColorsPallet } from "../utils/Constants";
-import { FontAwesome } from "@expo/vector-icons";
+import {ColorsPallet} from "../utils/Constants";
+import {FontAwesome} from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
-import {
-  Board,
-  GameResults,
-  boardFactory,
-  playMove,
-  copyBoard,
-} from "../chess-logic/board";
-import { Player, responseUserToPlayer } from "../utils/PlayerUtilities";
-import { getValueFor } from "../utils/AsyncStoreFunctions";
+import {Board, boardFactory, BoardResponseToBoard, copyBoard, GameResults, playMove,} from "../chess-logic/board";
+import {Player, responseUserToPlayer, User, userToPlayer} from "../utils/PlayerUtilities";
+import {getValueFor} from "../utils/AsyncStoreFunctions";
 import {
   cancelSearch,
-  searchForGame,
   getGameByUsername,
+  listenForFirstMove,
   listenForMove,
+  searchForGame,
+  submitMove,
 } from "../features/playOnline/services/playOnlineService";
-import { ChessGameResponse, BoardResponse } from "../utils/ServicesTypes";
-import { User, userToPlayer } from "../utils/PlayerUtilities";
+import {BoardResponse, ChessGameResponse} from "../utils/ServicesTypes";
 import ChessBoard from "../components/ChessBoard";
 import WaitingForGame from "../features/playOnline/components/WaitingForGame";
-import { listenForFirstMove } from "../features/playOnline/services/playOnlineService";
-import { BoardResponseToBoard } from "../chess-logic/board";
 import GameFinishedOverlay from "../features/playOnline/components/GameFinishedOverlay";
-import { Move } from "../chess-logic/move";
-import { submitMove } from "../features/playOnline/services/playOnlineService";
+import {Move} from "../chess-logic/move";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -296,9 +288,7 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const PlayMove = (move: Move) => {
     setBoardState((prevBoard) => {
-      let newBoard = playMove(move, copyBoard(prevBoard));
-
-      return newBoard;
+      return playMove(move, copyBoard(prevBoard));
     });
   };
   const settings = gearModal ? (

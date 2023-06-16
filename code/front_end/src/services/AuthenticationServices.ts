@@ -1,24 +1,24 @@
 import {
   CodeVerificationRequest,
-  RegisterRequest,
   LoginRequest,
   PasswordChangeRequest,
   PasswordRemindRequest,
+  RegisterRequest,
   TwoFactorAuthenticationEnabledRequest,
 } from "../utils/ServicesTypes";
 import {
-  verifyCodeLink,
-  registerLink,
   authenticateLink,
   changePasswordLink,
+  registerLink,
   remindPasswordLink,
   twofaEnabledLink,
+  verifyCodeLink,
 } from "../utils/ApiEndpoints";
 
 export const verifyCode = async (
   codeVerificationRequest: CodeVerificationRequest
 ) => {
-  const response = await fetch(verifyCodeLink, {
+  return await fetch(verifyCodeLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -27,11 +27,10 @@ export const verifyCode = async (
   }).catch((error) => {
     throw new Error(error.message);
   });
-  return response;
 };
 
 export const register = async (registerRequest: RegisterRequest) => {
-  const response = await fetch(registerLink, {
+  return await fetch(registerLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -40,11 +39,10 @@ export const register = async (registerRequest: RegisterRequest) => {
   }).catch((error) => {
     throw new Error(error.message);
   });
-  return response;
 };
 
 export const login = async (loginRequest: LoginRequest) => {
-  const response = await fetch(authenticateLink, {
+  return await fetch(authenticateLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -53,13 +51,12 @@ export const login = async (loginRequest: LoginRequest) => {
   }).catch((error) => {
     throw new Error(error);
   });
-  return response;
 };
 
 export const changePassword = async (
   changePasswordRequest: PasswordChangeRequest
 ) => {
-  const response = await fetch(changePasswordLink, {
+  return await fetch(changePasswordLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,13 +65,12 @@ export const changePassword = async (
   }).catch((err) => {
     throw new Error(err);
   });
-  return response;
 };
 
 export const remindPassword = async (
   remindPasswordRequest: PasswordRemindRequest
 ) => {
-  const response = await fetch(remindPasswordLink, {
+  return await fetch(remindPasswordLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -83,13 +79,12 @@ export const remindPassword = async (
   }).catch((err) => {
     throw new Error(err);
   });
-  return response;
 };
 
 export const twoFaEnabled = async (
   twoFaEnabledRequest: TwoFactorAuthenticationEnabledRequest
 ) => {
-  const response = await fetch(twofaEnabledLink, {
+  return await fetch(twofaEnabledLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -98,5 +93,4 @@ export const twoFaEnabled = async (
   }).catch((err) => {
     throw new Error(err);
   });
-  return response;
 };

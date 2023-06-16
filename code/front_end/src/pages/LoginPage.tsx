@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, Pressable } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import Footer from "../components/Footer";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";

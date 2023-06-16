@@ -1,28 +1,10 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
-import { User } from "../utils/PlayerUtilities";
-import { getValueFor } from "../utils/AsyncStoreFunctions";
-import { responseUserToUser } from "../utils/PlayerUtilities";
-import {
-  refreshTokenLink,
-  findByNicknameLink,
-  setActive,
-} from "../utils/ApiEndpoints";
-import { save } from "../utils/AsyncStoreFunctions";
-import { fetchandStoreUser } from "../features/authentication/services/loginServices";
-import {
-  AuthenticationResponse,
-  CodeVerificationRequest,
-  FriendInvitationRequest,
-} from "../utils/ServicesTypes";
+import {responseUserToUser, User} from "../utils/PlayerUtilities";
+import {getValueFor, save} from "../utils/AsyncStoreFunctions";
+import {addFriend, findByNicknameLink, refreshTokenLink, setActive,} from "../utils/ApiEndpoints";
+import {fetchandStoreUser} from "../features/authentication/services/loginServices";
+import {AuthenticationResponse, CodeVerificationRequest, FriendInvitationRequest,} from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
-import { addFriend } from "../utils/ApiEndpoints";
-
-export const storeUser = async (value: User) => {
-  await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
-    throw new Error(err);
-  });
-  console.log("user stored");
-};
 
 // getting data
 export const getUser = async () => {
@@ -95,11 +77,7 @@ export const setUserActive = async (active: boolean) => {
     })
     .then((response) => {
       if (response === undefined || response === null) return null;
-      if (response.status === 200) {
-        correct = true;
-      } else {
-        correct = false;
-      }
+      correct = response.status === 200;
     })
     .catch((error) => {
       throw new Error(error);
@@ -154,7 +132,7 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
   const accessToken = await getValueFor("accessToken");
   console.log(request);
   console.log(addFriend);
-  const response = await fetch(addFriend, {
+  return await fetch(addFriend, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -162,18 +140,17 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
     },
     body: JSON.stringify(request),
   })
-    .then((response) => {
-      if (response.status === 200) {
-        console.log("send request");
-        return response.text();
-      } else {
-        throw new Error("Something went wrong on api server!");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-  return response;
+      .then((response) => {
+        if (response.status === 200) {
+          console.log("send request");
+          return response.text();
+        } else {
+          throw new Error("Something went wrong on api server!");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 };
 
 export const logoutUser = async () => {
