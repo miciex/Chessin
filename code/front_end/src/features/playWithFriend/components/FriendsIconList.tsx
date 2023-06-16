@@ -1,18 +1,19 @@
 import { View, Text ,Image, StyleSheet, ScrollView, Pressable} from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { RootStackParamList } from '../../../../Routing'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../../utils/Constants'
 import { ColorsPallet } from '../../../utils/Constants'
+import { getFriendsList } from '../../../services/userServices'
 //powinien byc jakis dostep do baxy danych ktory mi da id i avatar najlepszych friends jako objecty
 
 const bestFriends = [
-    {rank: 1000, playerNick: "Pusznik", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
-    {rank: 1000, playerNick: "MaciekNieBij" , avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
-    {rank: 1000, playerNick: "Slaweczuk", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
-    {rank: 1000, playerNick: "Strzała", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
-    {rank: 1000, playerNick: "Bestia", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
-    {rank: 1000, playerNick: "Sharku", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
+    {email: "", rank: 1000, playerNick: "Pusznik", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
+    {email: "", rank: 1000, playerNick: "MaciekNieBij" , avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
+    {email: "", rank: 1000, playerNick: "Slaweczuk", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
+    {email: "", rank: 1000, playerNick: "Strzała", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
+    {email: "", rank: 1000, playerNick: "Bestia", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
+    {email: "", rank: 1000, playerNick: "Sharku", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
 ]
 
 type Props={
@@ -24,7 +25,13 @@ type Props={
   
 }
 
-export default function FriendsIconList({navigation}: Props) {
+
+  
+  useEffect(()=>{
+    console.log(emailProp)
+    // console.log(getFriendsList(emailProp))
+    console.log("lalalalall")
+  }, [email])
 
   const goToFriendsProfile = (player: {
     rank: number;
@@ -32,7 +39,7 @@ export default function FriendsIconList({navigation}: Props) {
     avatar: string;
 }) => {
     navigation.navigate("ProfilePage", {
-      nameInGame: player.playerNick
+      nameInGame: player.playerNick,
     });
   };
  
@@ -55,7 +62,6 @@ export default function FriendsIconList({navigation}: Props) {
                    uri: player.avatar,
                  }}
             />
-          <Text style={styles.text}>{player.playerNick}</Text>
           </View></Pressable>
         })}
       </View>

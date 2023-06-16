@@ -22,3 +22,4 @@ export const listenForFirstMoveLink = `${chessGameLink}listenForFirstMove/`;
 export const getGameByUsernameLink = `${chessGameLink}getGameByUsername/`;
 export const listenForMoveLink = `${chessGameLink}listenForMove`;
 export const findUsersByNickname = `${userLink}findUsersByNickname/`;
+export const getFriends = `${userLink}getFriends/`;

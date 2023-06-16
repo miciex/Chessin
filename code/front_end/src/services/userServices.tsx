@@ -9,6 +9,7 @@ import {
   friendInvitation,
   findUsersByNickname,
   addFriendLink,
+  getFriends,
 } from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
@@ -164,7 +165,6 @@ export const addFriendFunc = async (request: FriendInvitationRequest) =>{
   })
   .then((response) => {
     if (response.status === 200) {
-      console.log("send request")
       return response.text();
     } else {
       throw new Error("Something went wrong on api server!");
@@ -190,7 +190,6 @@ export const handleFriendInvitationFunc = async (request: HandleFriendInvitation
   })
   .then((response) => {
     if (response.status === 200) {
-      console.log("send request")
       return response.text();
     } else {
       throw new Error("Something went wrong on api server!");
@@ -207,7 +206,6 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
 
   console.log(`${findUsersByNickname}${request.searchNickname}`)
-  console.log(`shit`)
   const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
     method: "POST",
     headers: {
@@ -217,7 +215,29 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   })
   .then((response) => {
     if (response.status === 200) {
-      console.log("send request")
+      return response.json() as unknown as Array<responseUser>;
+        } else {
+      throw new Error("Something went wrong on api server!");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+  console.log(response)
+  return response;
+}
+
+
+export const getFriendsList =async (email:string) => {
+  const accessToken = await getValueFor("accessToken");
+  const response = await fetch(`${getFriends}${email}`,{
+    method: "POST",
+    headers:{
+      "Content-Type": "application/json",
+      Authorization: `Bearer${accessToken}`,
+    }
+  }).then((response) => {
+    if (response.status === 200) {
       return response.json() as unknown as Array<responseUser>;
         } else {
       throw new Error("Something went wrong on api server!");
