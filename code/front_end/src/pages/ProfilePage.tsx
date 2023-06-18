@@ -101,7 +101,6 @@ export default function ProfilePage({ navigation, route }: Props) {
       setUser(JSON.parse(user));
     })} else {
       fetchUser("", nameInGame).then((user) => {
-        console.log("yep2")
         if (user === null){
           return;
         } 
@@ -163,7 +162,7 @@ export default function ProfilePage({ navigation, route }: Props) {
           navigation={navigation}
           stringNavigation={"Socials"}
         />
-        <FriendsIconList navigation={navigation} />
+        <FriendsIconList navigation={navigation} nameInGame={user ? user.nameInGame : ""}/>
         <Heading
           text={"Old Games"}
           navigation={navigation}

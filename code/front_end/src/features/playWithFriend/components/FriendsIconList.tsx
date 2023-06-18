@@ -22,16 +22,16 @@ type Props={
     StackParamList,
     undefined
   >;
-  
+  nameInGame: string;
 }
 
-
+export default function FriendsIconList ({ navigation, nameInGame }: Props){
   
   useEffect(()=>{
-    console.log(emailProp)
-    // console.log(getFriendsList(emailProp))
-    console.log("lalalalall")
-  }, [email])
+    console.log(getFriendsList(nameInGame))
+    console.log("^fridsn list")
+    console.log("")
+  }, [nameInGame])
 
   const goToFriendsProfile = (player: {
     rank: number;
@@ -62,6 +62,7 @@ type Props={
                    uri: player.avatar,
                  }}
             />
+            <Text style={styles.text}>{player.playerNick}</Text>
           </View></Pressable>
         })}
       </View>

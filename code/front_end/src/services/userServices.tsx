@@ -200,7 +200,6 @@ export const handleFriendInvitationFunc = async (request: HandleFriendInvitation
 export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
 
-  console.log(`${findUsersByNickname}${request.searchNickname}`)
   const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
     method: "POST",
     headers: {
@@ -209,6 +208,7 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
     }
   })
   .then((response) => {
+    
     if (response.status === 200) {
       return response.json() as unknown as Array<responseUser>;
         } else {
@@ -223,25 +223,38 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
 }
 
 
-export const getFriendsList =async (email:string) => {
+export async function getFriendsList  (nameInGame:string){
   const accessToken = await getValueFor("accessToken");
-  const response = await fetch(`${getFriends}${email}`,{
+  console.log(`${getFriends}${nameInGame}`)
+  const response = await fetch(`${getFriends}${nameInGame}`,{
     method: "POST",
-    headers:{
+    headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer${accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
     }
   }).then((response) => {
+    console.log(response)
+    console.log(" the response")
     if (response.status === 200) {
       return response.json() as unknown as Array<responseUser>;
+        } else if (response.status === 400) {
+          throw new Error("Bad request");
+        } else if (response.status === 401) {
+          throw new Error("Unauthorized");
         } else {
-      throw new Error("Something went wrong on api server!");
-    }
+          throw new Error("Something went wrong");
+        }
   })
   .catch((error) => {
+
+    // console.error("shit333333fuccccckk");
     console.error(error);
   });
+
+  console.log("")
   console.log(response)
+  console.log("shit22222")
+  console.log("")
   return response;
 }
 
