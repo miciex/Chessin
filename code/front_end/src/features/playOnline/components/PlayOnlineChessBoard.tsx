@@ -1,5 +1,5 @@
-import { View, StyleSheet } from "react-native";
-import React, { useState, useMemo } from "react";
+import { View, StyleSheet, Animated } from "react-native";
+import React, { useState, useMemo, useRef } from "react";
 import { FieldInfo } from "..";
 import ChessBoardField from "../../../components/ChessBoardField";
 import {
@@ -19,6 +19,7 @@ import { Move } from "../../../chess-logic/move";
 import { SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { BoardResponse } from "../../../utils/ServicesTypes";
 import { mapToBoard } from "../../../chess-logic/helpMethods";
+import { listenForMove } from "../services/playOnlineService";
 
 type Props = {
   board: Board;
@@ -48,6 +49,10 @@ export default function PlayOnlineChessBoard({
   const [activeField, setActiveField] = useState(-1);
 
   const [possibleMoves, setPossibleMoves] = useState([-1]);
+
+  // const dimensions = getDimensions();
+
+  const touch = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
   const handleFieldPress = (data: FieldInfo) => {
     if (currentPosition !== board.moves.length - 1) {
@@ -99,29 +104,39 @@ export default function PlayOnlineChessBoard({
     setCurrentPosition(board.moves.length);
     // addIncrement();
 
+    if (board.result !== GameResults.NONE && board.moves.length == 0)
+      setGameStarted(true);
     submitMove(submitMoveRequest)
       .then((data: BoardResponse) => {
-        if (!data) return;
-        setBoard(BoardResponseToBoard(data));
-        console.log(
-          "white time: " + data.whiteTime + " black time: " + data.blackTime
+        setDataFromBoardResponse(data);
+        listenForMove({ gameId, moves: data.moves }).then(
+          (res: BoardResponse | undefined) => {
+            if (res === undefined) return;
+            setDataFromBoardResponse(res);
+          }
         );
-        console.log("player color: " + player.color);
-        const myTime =
-          player.color === "white" ? data.whiteTime : data.blackTime;
-        const opponentTime =
-          player.color === "white" ? data.blackTime : data.whiteTime;
-        setMyClockInfo(new Date(myTime));
-        setOpponentClockInfo(new Date(opponentTime));
-        // setLastMoveDate(new Date(data.lastMoveTime));
-        setCurrentPosition(data.positions.length - 1);
-        if (data.gameResult !== GameResults.NONE) setGameStarted(false);
       })
       .catch((error) => {
         throw error;
       });
 
     setActiveField(-1);
+  };
+
+  const setDataFromBoardResponse = (data: BoardResponse) => {
+    if (!data) return;
+    setBoard(BoardResponseToBoard(data));
+    console.log("player color: " + player.color);
+    const myTime = player.color === "white" ? data.whiteTime : data.blackTime;
+    const opponentTime =
+      player.color === "white" ? data.blackTime : data.whiteTime;
+    setMyClockInfo(new Date(myTime));
+    setOpponentClockInfo(new Date(opponentTime));
+    setCurrentPosition(data.positions.length - 1);
+    if (data.gameResult !== GameResults.NONE) setGameStarted(false);
+    else if (data.moves.length == 1) {
+      setGameStarted(true);
+    }
   };
 
   let backgroundColor: string;
@@ -166,6 +181,8 @@ export default function PlayOnlineChessBoard({
           info={{ piece: visualBoard[number], fieldNumber: number }}
           handleFieldPress={handleFieldPress}
           backgroundColor={backgroundColor}
+          activeField={activeField}
+          position={touch}
         />
       );
     }
@@ -178,7 +195,27 @@ export default function PlayOnlineChessBoard({
     [board, activeField, possibleMoves, player.color, currentPosition]
   );
 
-  return <View style={styles.container}>{renderedBoard}</View>;
+  return (
+    <View
+      onTouchStart={(evt) => {
+        console.log(evt.nativeEvent.locationX, evt.nativeEvent.locationY);
+      }}
+      // onStartShouldSetResponder={() => true}
+      // onResponderMove={(event) => {
+      //   console.log(
+      //     "x: " + event.nativeEvent.locationX,
+      //     "y: " + event.nativeEvent.locationY
+      //   );
+      //   touch.setValue({
+      //     x: event.nativeEvent.locationX,
+      //     y: event.nativeEvent.locationY,
+      //   });
+      // }}
+      style={styles.container}
+    >
+      {renderedBoard}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

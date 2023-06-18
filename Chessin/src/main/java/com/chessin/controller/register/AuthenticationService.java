@@ -194,7 +194,7 @@ public class AuthenticationService {
         verificationCodeRepository.delete(code);
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
+        //userRepository.save(user);
 
         return ResponseEntity.ok("Password changed successfully.");
     }

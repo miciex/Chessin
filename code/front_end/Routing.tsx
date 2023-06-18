@@ -21,6 +21,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { setUserActive, resetAccessToken } from "./src/services/userServices";
 import { NameInGame, PendingChessGameRequest } from "./src/utils/ServicesTypes";
+import ResetPasswordPage from "./src/pages/ResetPasswordPage";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -41,6 +42,7 @@ export type RootStackParamList = {
   Socials: undefined;
   AnalyzeGame: undefined;
   Notification: undefined;
+  ResetPassword: undefined;
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
@@ -176,6 +178,14 @@ const Routing = () => {
           name="AnalyzeGame"
           component={AnalyzeGame}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPasswordPage}
+          options={({ navigation }) => ({
+            headerStyle: styles.header,
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

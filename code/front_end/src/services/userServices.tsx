@@ -96,11 +96,7 @@ export const setUserActive = async (active: boolean) => {
     })
     .then((response) => {
       if (response === undefined || response === null) return null;
-      if (response.status === 200) {
-        correct = true;
-      } else {
-        correct = false;
-      }
+      correct = response.status === 200;
     })
     .catch((error) => {
       throw new Error(error);
@@ -151,8 +147,7 @@ export const setUserDataFromResponse = async (
   });
 };
 
-
-export const addFriendFunc = async (request: FriendInvitationRequest) =>{
+export const addFriendFunc = async (request: FriendInvitationRequest) => {
   const accessToken = await getValueFor("accessToken");
   console.log(request)
   const response = await fetch(addFriendLink, {
@@ -161,7 +156,7 @@ export const addFriendFunc = async (request: FriendInvitationRequest) =>{
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify(request)
+    body: JSON.stringify(request),
   })
   .then((response) => {
     if (response.status === 200) {
@@ -249,3 +244,17 @@ export const getFriendsList =async (email:string) => {
   console.log(response)
   return response;
 }
+
+export const logoutUser = async () => {
+  Promise.all([
+    save("refreshToken", undefined),
+    save("accessToken", undefined),
+    save("user", undefined),
+  ])
+    .then(() => {
+      console.log("logged out succesfully");
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+};

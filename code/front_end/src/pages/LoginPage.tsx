@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Footer from "../components/Footer";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -20,6 +20,7 @@ import {
 } from "../utils/Constants";
 import { setUserDataFromResponse } from "../services/userServices";
 import { login } from "../services/AuthenticationServices";
+import BaseButton from "../components/BaseButton";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
@@ -92,6 +93,34 @@ export default function Login({ route, navigation }: Props) {
       });
   };
 
+  const handleVerifyCodeResponse = async (response: Response) => {
+    console.log("status: ", response.status);
+    if (response.status === 200) {
+      console.log("correct code");
+      response
+        .json()
+        .then((data) => {
+          setUserDataFromResponse(data, { email });
+          console.log("setting user data");
+        })
+        .then(() => {
+          navigation.navigate("Home");
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    } else if (response.status === 400) {
+      response
+        .text()
+        .then((data) => {
+          throw new Error(data);
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    }
+  };
+
   const hideModal = () => {
     setShowAuthCode(false);
   };
@@ -105,34 +134,57 @@ export default function Login({ route, navigation }: Props) {
         verificationCode: "",
         verificationType: VerificationType.AUTHENTICATE,
       }}
-      handleVerifyCodeResponse={setUserDataFromResponse}
+      handleVerifyCodeResponse={handleVerifyCodeResponse}
     />
   ) : (
     <View style={styles.appContainer}>
       <View style={styles.formContainer}>
-        <AuthInput
-          placeholder="Email"
-          value={email}
-          onChange={setEmail}
-          isValid={isEmailValid}
-          notValidText={notValidEmailMessage}
-          onSubmitEditing={setEmailValid}
-        />
-        <AuthInput
-          placeholder="Password"
-          value={password}
-          onChange={setPassword}
-          securityTextEntry={true}
-          isValid={isPasswordValid}
-          notValidText={notValidPasswordMessage}
-          onSubmitEditing={setPasswordValid}
-        />
-        <Submit onSubmit={onSubmit} />
+        <View style={styles.inputsContainer}>
+          <AuthInput
+            placeholder="Email"
+            value={email}
+            onChange={setEmail}
+            isValid={isEmailValid}
+            notValidText={notValidEmailMessage}
+            onSubmitEditing={setEmailValid}
+          />
+          <AuthInput
+            placeholder="Password"
+            value={password}
+            onChange={setPassword}
+            securityTextEntry={true}
+            isValid={isPasswordValid}
+            notValidText={notValidPasswordMessage}
+            onSubmitEditing={setPasswordValid}
+          />
 
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          <Submit onSubmit={onSubmit} />
+        </View>
+
+        <View style={styles.logosContainer}>
           <LogInWithOtherFirm brand="google" />
           <LogInWithOtherFirm brand="facebook" />
           <LogInWithOtherFirm brand="apple" />
+        </View>
+        <View style={styles.authLinksContainer}>
+          <View style={styles.authLinkButton}>
+            <BaseButton
+              text="Reset your password"
+              handlePress={() => {
+                navigation.navigate("ResetPassword");
+              }}
+              color={ColorsPallet.light}
+            />
+          </View>
+          <View style={styles.authLinkButton}>
+            <BaseButton
+              text="Register"
+              handlePress={() => {
+                navigation.navigate("Register");
+              }}
+              color={ColorsPallet.light}
+            />
+          </View>
         </View>
       </View>
       <Footer navigation={navigation} />
@@ -149,10 +201,35 @@ const styles = StyleSheet.create({
     width: "80%",
     rowGap: 8,
   },
+  logosContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    flex: 1,
+  },
   appContainer: {
     backgroundColor: ColorsPallet.light,
     flex: 1,
     alignContent: "stretch",
+    alignItems: "center",
+  },
+  authLinksContainer: {
+    width: "100%",
+    height: 70,
+    gap: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  inputsContainer: {
+    width: "100%",
+    gap: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 3,
+  },
+  authLinkButton: {
+    width: "60%",
+    height: 24,
+    overflow: "hidden",
     alignItems: "center",
   },
 });

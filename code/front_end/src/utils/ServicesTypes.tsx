@@ -100,8 +100,8 @@ export type ListenForFirstMoveRequest = {
 };
 
 export type FriendInvitationRequest = {
-  friendNickname:string;
-}
+  friendNickname: string;
+};
 export type ListenForMoveRequest = {
   gameId: number;
   moves: Array<MoveResponse>;
@@ -124,3 +124,19 @@ export enum FriendInvitationResponseType {
 export type NameInGame = {
   nameInGame: string;
 }
+export type PasswordChangeRequest = {
+  email: string;
+  oldPassword?: string;
+  newPassword?: string;
+};
+
+export type PasswordRemindRequest = {
+  email: string;
+  newPassword: string;
+};
+
+export type TwoFactorAuthenticationEnabledRequest = {
+  email: string;
+};
+
+export type TwoFactorAuthenticationResponse = "True" | "False";

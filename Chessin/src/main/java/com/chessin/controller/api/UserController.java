@@ -38,8 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/findUsersByNickname/{nickname}")
-    public ResponseEntity<?> findUsersByNickname(@PathVariable String nickname)
-    {
+    public ResponseEntity<?> findUsersByNickname(@PathVariable String nickname) {
         List<User> users = userRepository.findByNameInGameContaining(nickname);
         List<UserResponse> responses = new ArrayList<>();
 
@@ -61,9 +60,9 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if (!userRepository.existsByEmail(email))
-            return ResponseEntity.badRequest().body("User does not exist");
+            return ResponseEntity.badRequest().body("User does not exist.");
         else if (!userRepository.existsByNameInGame(request.getFriendNickname()))
-            return ResponseEntity.badRequest().body("Friend does not exist");
+            return ResponseEntity.badRequest().body("Friend does not exist.");
 
         friendInvitationRepository.save(FriendInvitation.builder()
                 .user(userRepository.findByEmail(email).get())

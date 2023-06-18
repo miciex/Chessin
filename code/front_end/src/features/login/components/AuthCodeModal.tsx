@@ -12,13 +12,10 @@ import { Char, isChar } from "../../../utils/Types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
-import { VerificationType } from "../../../utils/ServicesTypes";
 import { Entypo } from "@expo/vector-icons";
 import { StackParamList } from "../../../utils/Constants";
-import { setUserDataFromResponse } from "../../../services/userServices";
 import { verifyCode } from "../../../services/AuthenticationServices";
 import { CodeVerificationRequest } from "../../../utils/ServicesTypes";
-import { AuthenticationResponse } from "../../../utils/ServicesTypes";
 
 type Props = {
   hideModal: () => void;
@@ -28,16 +25,12 @@ type Props = {
     undefined
   >;
   request: CodeVerificationRequest;
-  handleVerifyCodeResponse?: (
-    data: AuthenticationResponse,
-    request: CodeVerificationRequest
-  ) => void;
+  handleVerifyCodeResponse?: (response: Response) => void;
 };
 
 const InputLength = 8;
 export default function AuthCodeModal({
   hideModal,
-  navigation,
   request,
   handleVerifyCodeResponse,
 }: Props) {
@@ -54,17 +47,9 @@ export default function AuthCodeModal({
       ...request,
       verificationCode: inputs.join(""),
     })
-      .then((data) => {
-        console.log("data", data);
-        if (!handleVerifyCodeResponse) return;
-        console.log("sending data to handleVerifyCodeResponse");
-        handleVerifyCodeResponse(data, {
-          ...request,
-          verificationCode: inputs.join(""),
-        });
-      })
-      .then(() => {
-        navigation.navigate("Home");
+      .then((response) => {
+        if (handleVerifyCodeResponse === undefined) return;
+        handleVerifyCodeResponse(response);
       })
       .catch((err) => {
         console.log(err);
