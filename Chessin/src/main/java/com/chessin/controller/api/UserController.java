@@ -29,7 +29,7 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    FriendInvitationRepository friendInvitationRepository;
+    private final FriendInvitationRepository friendInvitationRepository;
 
     @PostMapping("/findByEmail/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname){
@@ -66,8 +66,9 @@ public class UserController {
             return ResponseEntity.badRequest().body("User does not exist.");
         else if(!userRepository.existsByNameInGame(request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Friend does not exist.");
-
-        if(friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
+        else if(email.equals(userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail()))
+            return ResponseEntity.badRequest().body("You cannot add yourself as a friend.");
+        else if(friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Invitation already sent.");
 
         friendInvitationRepository.save(FriendInvitation.builder()
