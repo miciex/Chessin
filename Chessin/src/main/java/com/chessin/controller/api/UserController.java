@@ -117,8 +117,6 @@ public class UserController {
     @PostMapping("/getFriends/{nickname}")
     public ResponseEntity<?> getFriends(@PathVariable String nickname)
     {
-        if(!userRepository.existsByEmail(nickname))
-            return ResponseEntity.badRequest().body("User does not exist");
 
         User user = userRepository.findByNameInGame(nickname).get();
 
