@@ -87,6 +87,7 @@ public class UserController {
         for (FriendInvitation invitation : invitations)
             responses.add(FriendInvitationResponse.fromFriendInvitation(invitation));
 
+
         return ResponseEntity.ok().body(responses);
     }
 
@@ -117,6 +118,11 @@ public class UserController {
     @PostMapping("/getFriends/{nickname}")
     public ResponseEntity<?> getFriends(@PathVariable String nickname)
     {
+<<<<<<< Updated upstream
+=======
+        if(!userRepository.existsByNameInGame(nickname))
+            return ResponseEntity.badRequest().body("User does not exist");
+>>>>>>> Stashed changes
 
         User user = userRepository.findByNameInGame(nickname).get();
 

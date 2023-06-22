@@ -92,7 +92,7 @@ export default function ProfilePage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
   
   const nameInGame = route.params.nameInGame;
-
+  
   useEffect(() => {
    
     if(nameInGame=="user"){

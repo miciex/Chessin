@@ -10,6 +10,7 @@ import {
   findUsersByNickname,
   addFriendLink,
   getFriends,
+  checkInvitationsLink
 } from "../utils/ApiEndpoints";
 import { save } from "../utils/AsyncStoreFunctions";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
@@ -200,6 +201,7 @@ export const handleFriendInvitationFunc = async (request: HandleFriendInvitation
 export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
 
+  console.log(`${findUsersByNickname}${request.searchNickname}`)
   const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
     method: "POST",
     headers: {
@@ -218,14 +220,12 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   .catch((error) => {
     console.error(error);
   });
-  console.log(response)
   return response;
 }
 
 
 export async function getFriendsList  (nameInGame:string){
   const accessToken = await getValueFor("accessToken");
-  console.log(`${getFriends}${nameInGame}`)
   const response = await fetch(`${getFriends}${nameInGame}`,{
     method: "POST",
     headers: {
@@ -233,9 +233,40 @@ export async function getFriendsList  (nameInGame:string){
       Authorization: `Bearer ${accessToken}`,
     }
   }).then((response) => {
-    console.log(response)
-    console.log(" the response")
+    console.log("not shit")
     if (response.status === 200) {
+      console.log("stat200 god")
+      return response.json() as unknown as Array<responseUser>;
+        } else if (response.status === 400) {
+          throw new Error("Bad request");
+        } else if (response.status === 401) {
+          throw new Error("Unauthorized");
+        } else {
+          throw new Error("Something went wrong");
+        }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+  return response;
+}
+
+
+export const checkInvitations = async () =>{
+  console.log("1 checkpoint")
+  const accessToken = await getValueFor("accessToken");
+  
+  console.log("2 checkpoint")
+  const response = await fetch(checkInvitationsLink,{
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }
+  }).then((response) => {
+    console.log("SDsdsd")
+    if (response.status === 200) {
+    
       return response.json() as unknown as Array<responseUser>;
         } else if (response.status === 400) {
           throw new Error("Bad request");
@@ -247,16 +278,15 @@ export async function getFriendsList  (nameInGame:string){
   })
   .catch((error) => {
 
-    // console.error("shit333333fuccccckk");
-    console.error(error);
+  console.log("2 checkpoint")
+    throw new Error(error);
   });
-
-  console.log("")
+  
+  console.log("3 checkpoint")
   console.log(response)
-  console.log("shit22222")
-  console.log("")
   return response;
 }
+
 
 export const logoutUser = async () => {
   Promise.all([

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import EndedGame from "../features/home/components/EndedGame";
 import { ColorsPallet } from "../utils/Constants";
@@ -11,6 +11,8 @@ import Footer from "../components/Footer";
 import Heading from "../components/Heading";
 import Invitation from "../features/socials/components/Invitation";
 import Notify from "../features/socials/components/Notify";
+import { checkInvitations } from "../services/userServices";
+import { User, responseUserToUser } from "../utils/PlayerUtilities";
 
 const ended_games = [
   { date: "01.10.2022", playerNick: "Pusznik", rank: 1500, lastGameResult: "win" },
@@ -35,15 +37,27 @@ type Props = {
 };
 
 export default function Notification({ route, navigation }: Props) {
+
+  const [invitations, setInvitations] = useState<Array<User>>([])
+
+  useEffect(()=>{
+   
+
+    checkInvitations().then((data) =>{ 
+      if(data === undefined) return
+      setInvitations(data.map(x => responseUserToUser(x, "")))
+    })
+  }, [])
   return (
     <View style={styles.appContainer}>
       <ScrollView>
         <View style={styles.contentContainer}>
         <Heading text={"Notifications"} />
-         <Invitation nick="Wojanix" rank={1200} navigation={navigation} email="wojtek.burek@gmail.com"/>
-         <Invitation nick="Wojanix" rank={1200} navigation={navigation} email="wojtek.burek@gmail.com"/>
+        {invitations.map(player=>(
+             <Invitation nick={player.nameInGame} rank={player.highestRanking} navigation={navigation} email={player.email}/>
+        ))}
          <Notify text="Gratulacje osiagnales 1000 elo"/>
-         <Invitation nick="Wojanix" rank={1200} navigation={navigation} email="wojtek.burek@gmail.com"/>
+         
         </View>
       </ScrollView>
     

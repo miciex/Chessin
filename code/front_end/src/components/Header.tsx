@@ -21,7 +21,7 @@ export default function Header({ navigation }: Props) {
         <Text style={styles.headerText}>Chessin</Text>
         <Pressable
           onPress={() => {
-            navigation.navigate("ProfilePage", {nameInGame: "user"});
+            navigation.navigate("ProfilePage", {nameInGame: "IsaacCox"});
           }}
         >
           <FontAwesome

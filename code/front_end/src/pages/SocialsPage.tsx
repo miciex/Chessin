@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 
 import { ColorsPallet } from "../utils/Constants";
 import InputField from "../components/InputField";
@@ -29,13 +29,14 @@ type Props = {
 export default function Socials({ route, navigation }: Props) {
 
   const [users, setUsers] = useState<Array<User>>([])
-
-  const handleSearchBar = (searchBar: HandleSearchBarSocials) =>{
-  handleSearchBarSocials(searchBar).then((data) =>{ 
-    if(data === undefined) return
-    setUsers(data.map(x => responseUserToUser(x, "")))
-  })
-  }
+  const [searchValue, setSearchValue] = useState<HandleSearchBarSocials>({searchNickname: "p"})
+  
+  useEffect(()=>{
+    if(searchValue.searchNickname)handleSearchBarSocials(searchValue).then((data) =>{ 
+      if(data === undefined) return
+      setUsers(data.map(x => responseUserToUser(x, "")))
+    })
+  }, [searchValue])
 
   
   return (
@@ -43,7 +44,7 @@ export default function Socials({ route, navigation }: Props) {
     <View style={styles.appContainer}>
       <View style={styles.formContainer}>
        
-        <InputField placeholder="Search" onChange={e=>{handleSearchBar({searchNickname: e})}} />
+        <InputField placeholder="Search" onChange={e=>{setSearchValue({searchNickname: e})}} />
         <ScrollView>
           <View style={styles.scrollView}>
             {users.map((gracz) => (
