@@ -92,7 +92,7 @@ public class UserController {
         if(!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 
-        List<FriendInvitation> invitations = friendInvitationRepository.findAllByUserEmail(email);
+        List<FriendInvitation> invitations = friendInvitationRepository.findAllByFriendEmail(email);
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
