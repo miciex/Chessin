@@ -63,6 +63,10 @@ public class UserController {
             return ResponseEntity.badRequest().body("User does not exist.");
         else if (!userRepository.existsByNameInGame(request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Friend does not exist.");
+        else if(email.equals(userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail()))
+            return ResponseEntity.badRequest().body("You cannot add yourself as a friend.");
+        else if(friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
+            return ResponseEntity.badRequest().body("Invitation already sent.");
 
         friendInvitationRepository.save(FriendInvitation.builder()
                 .user(userRepository.findByEmail(email).get())
