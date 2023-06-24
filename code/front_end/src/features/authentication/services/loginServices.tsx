@@ -1,18 +1,15 @@
 import * as SecureStore from "expo-secure-store";
-import { findByEmailLink } from "../../../utils/ApiEndpoints";
-import {
-  User,
-  responseUser,
-  responseUserToUser,
-} from "../../../utils/PlayerUtilities";
+import { findUserbyTokenLink } from "../../../utils/ApiEndpoints";
+import { User, loggedUserToUser } from "../../../utils/PlayerUtilities";
 import { save } from "../../../utils/AsyncStoreFunctions";
 import { fetchUser } from "../../../services/userServices";
+import { loggedUserResponse } from "../../../utils/ServicesTypes";
 
 export const fetchandStoreUser = async (email: string) => {
   return SecureStore.getItemAsync("accessToken")
     .then(async (token) => {
       let user: any;
-      await fetch(`${findByEmailLink}${email}`, {
+      await fetch(findUserbyTokenLink, {
         method: "POST",
         headers: new Headers({
           "content-type": "application/json",
@@ -20,7 +17,8 @@ export const fetchandStoreUser = async (email: string) => {
         }),
       })
         .then((response) => {
-          if (response.status === 200) return response.json();
+          if (response.status === 200)
+            return response.json() as unknown as loggedUserResponse;
           else if (response.status === 400) {
             throw new Error("Bad request");
           } else if (response.status === 401) {
@@ -31,7 +29,7 @@ export const fetchandStoreUser = async (email: string) => {
         })
         .then((data) => {
           console.log("user data: ", email);
-          let user: User = responseUserToUser(data, email);
+          let user: User = loggedUserToUser(data);
           console.log("changed user: ", user);
           save("user", JSON.stringify(user));
         })

@@ -8,7 +8,7 @@ import FreeBoard from "./src/pages/FreeBoardPage";
 import LastGame from "./src/pages/LastGamePage";
 import Login from "./src/pages/LoginPage";
 import PlayBot from "./src/pages/PlayBotPage";
-import PlayOnline from "./src/pages/PlayOnlinePage";
+// import PlayOnline from "./src/pages/PlayOnlinePage";
 import PlayWithFriendsMenu from "./src/pages/PlayWithFriendsMenuPage";
 import ProfilePage from "./src/pages/ProfilePage";
 import Register from "./src/pages/RegisterPage";
@@ -22,6 +22,7 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import { setUserActive, resetAccessToken } from "./src/services/userServices";
 import { PendingChessGameRequest } from "./src/utils/ServicesTypes";
 import ResetPasswordPage from "./src/pages/ResetPasswordPage";
+import PlayOnline from "./src/pages/PlayOnline";
 
 export type RootStackParamList = {
   Home: undefined;

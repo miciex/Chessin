@@ -1,11 +1,11 @@
-import { View, Pressable, Text, StyleSheet } from "react-native";
+import { View, Pressable, Text, StyleSheet, ViewStyle } from "react-native";
 import React from "react";
 import { ColorsPallet } from "../utils/Constants";
 
 type Props = {
   handlePress: () => void;
   text: string;
-  style?: StyleSheet.AbsoluteFillStyle;
+  style?: ViewStyle;
   color?: string;
   fontSizeProps?: number;
   fontColor?: string;

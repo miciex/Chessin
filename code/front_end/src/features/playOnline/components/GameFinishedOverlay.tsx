@@ -6,6 +6,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import { StackParamList } from "../../../utils/Constants";
 import { GameResults } from "../../../chess-logic/board";
+import {
+  PlayOnlineState,
+  PlayOnlineAction,
+} from "../reducers/PlayOnlineReducer";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -13,18 +17,16 @@ type Props = {
     StackParamList,
     undefined
   >;
-  searchForGame: () => void;
-  whoWon: GameResults;
-  whitesTurn: boolean;
+  state: PlayOnlineState;
+  dispatch: React.Dispatch<PlayOnlineAction>;
 };
 export default function GameFinishedOverlay({
+  state,
+  dispatch,
   navigation,
-  whoWon,
-  searchForGame,
-  whitesTurn,
 }: Props) {
   const getText = (): string => {
-    switch (whoWon) {
+    switch (state.board.result) {
       case GameResults.DRAW_50_MOVE_RULE:
         return "Draw by 50 move rule";
       case GameResults.INSUFFICIENT_MATERIAL:
@@ -44,7 +46,9 @@ export default function GameFinishedOverlay({
       case GameResults.BLACK_TIMEOUT:
         return "Black lost on time";
       case GameResults.MATE:
-        return whitesTurn ? "Black won by mate" : "White won by mate";
+        return state.board.whiteToMove
+          ? "Black won by mate"
+          : "White won by mate";
       default:
         return "Unknown result";
     }
@@ -52,35 +56,52 @@ export default function GameFinishedOverlay({
 
   const winnerText = getText();
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.textContainer}>
-        <Text style={styles.text}>Game finished</Text>
-        <Text style={styles.winnerText}>{winnerText}</Text>
-      </View>
-      <View style={styles.contentContainer}>
-        <View style={styles.buttonContainer}>
-          <BaseButton text="Play again" handlePress={searchForGame} />
-          <BaseButton
-            text="Go to Menu"
-            handlePress={() => {
-              navigation.navigate("GameMenu");
-            }}
-            color={ColorsPallet.baseColor}
-          />
+  const searchForGame = () => {
+    dispatch({ type: "setGameFinished", payload: false });
+  };
+
+  return state.board.result !== GameResults.NONE ? (
+    <View style={styles.outerContainer}>
+      <View style={styles.container}>
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>Game finished</Text>
+          <Text style={styles.winnerText}>{winnerText}</Text>
+        </View>
+        <View style={styles.contentContainer}>
+          <View style={styles.buttonContainer}>
+            <BaseButton text="Play again" handlePress={searchForGame} />
+            <BaseButton
+              text="Go to Menu"
+              handlePress={() => {
+                navigation.navigate("GameMenu");
+              }}
+              color={ColorsPallet.baseColor}
+            />
+          </View>
         </View>
       </View>
     </View>
-  );
+  ) : null;
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    zIndex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
   container: {
     width: "100%",
     height: "100%",
     borderRadius: 16,
     backgroundColor: ColorsPallet.light,
-    // opacity: 0.8,
+    opacity: 0.8,
+    position: "absolute",
   },
   textContainer: {
     flex: 1,

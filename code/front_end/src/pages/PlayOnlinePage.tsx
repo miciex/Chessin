@@ -1,19 +1,31 @@
-import {StyleSheet, View} from "react-native";
-import React, {useEffect, useState} from "react";
+import { StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import Footer from "../components/Footer";
-import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import {RouteProp} from "@react-navigation/native";
-import {RootStackParamList} from "../../Routing";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../Routing";
 import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
-import {getInitialChessBoard} from "../features/playOnline";
+import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
-import {ColorsPallet} from "../utils/Constants";
-import {FontAwesome} from "@expo/vector-icons";
+import { ColorsPallet } from "../utils/Constants";
+import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
-import {Board, boardFactory, BoardResponseToBoard, copyBoard, GameResults, playMove,} from "../chess-logic/board";
-import {Player, responseUserToPlayer, User, userToPlayer} from "../utils/PlayerUtilities";
-import {getValueFor} from "../utils/AsyncStoreFunctions";
+import {
+  Board,
+  boardFactory,
+  BoardResponseToBoard,
+  copyBoard,
+  GameResults,
+  playMove,
+} from "../chess-logic/board";
+import {
+  Player,
+  responseUserToPlayer,
+  User,
+  userToPlayer,
+} from "../utils/PlayerUtilities";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 import {
   cancelSearch,
   getGameByUsername,
@@ -22,11 +34,12 @@ import {
   searchForGame,
   submitMove,
 } from "../features/playOnline/services/playOnlineService";
-import {BoardResponse, ChessGameResponse} from "../utils/ServicesTypes";
+import { BoardResponse, ChessGameResponse } from "../utils/ServicesTypes";
 import ChessBoard from "../components/ChessBoard";
 import WaitingForGame from "../features/playOnline/components/WaitingForGame";
 import GameFinishedOverlay from "../features/playOnline/components/GameFinishedOverlay";
-import {Move} from "../chess-logic/move";
+import TestBoard from "../features/playOnline/components/Board";
+import { Move } from "../chess-logic/move";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -97,7 +110,6 @@ export default function PlayOnline({ navigation, route }: Props) {
               response
                 .json()
                 .then((data: ChessGameResponse) => {
-                  console.log("data", data);
                   setUpGame(data, user);
                   handleListnForFirstMove(
                     data.id,
@@ -206,7 +218,9 @@ export default function PlayOnline({ navigation, route }: Props) {
   const setUpGame = (data: ChessGameResponse, user: User) => {
     if (data.blackUser === null || data.whiteStarts === null) {
       setSearchingGame(false);
-      cancelSearch();
+      cancelSearch().catch((err) => {
+        throw new Error(err);
+      });
       return;
     }
 
@@ -236,7 +250,6 @@ export default function PlayOnline({ navigation, route }: Props) {
     myPlayer: Player,
     opponent: Player
   ) => {
-    console.log("listening for first move");
     return await listenForFirstMove({ gameId })
       .then((res: BoardResponse) => {
         setDataFromBoardResponse(res, myPlayer, opponent);
@@ -256,8 +269,6 @@ export default function PlayOnline({ navigation, route }: Props) {
     const board: Board = BoardResponseToBoard(res);
     setBoardState(board);
     setGameFinished(false);
-    console.log("my player", myPlayer, "opponent", opponent);
-
     setCurrentPosition(res.moves.length - 1);
   };
 
@@ -335,18 +346,7 @@ export default function PlayOnline({ navigation, route }: Props) {
             />
           </View>
           <View style={styles.boardContainer}>
-            <PlayOnlineChessBoard
-              board={boardState}
-              setBoard={setBoardState}
-              player={myPlayer}
-              gameId={gameId}
-              playMove={PlayMove}
-              setMyClockInfo={setMyClockInfo}
-              setOpponentClockInfo={setOpponentClockInfo}
-              currentPosition={currentPosition}
-              setGameStarted={setGameStarted}
-              setCurrentPosition={setCurrentPosition}
-            />
+            <TestBoard board={boardState} />
           </View>
           <View style={styles.gameOptionsContainer}>
             <FontAwesome
@@ -381,7 +381,7 @@ export default function PlayOnline({ navigation, route }: Props) {
     <View style={styles.appContainer}>
       <View style={styles.searchingGameContentContainer}>
         <View style={styles.boardContainer}>
-          <ChessBoard />
+          <TestBoard board={boardState} />
         </View>
         <View>
           <FontAwesome

@@ -146,14 +146,12 @@ export default function PlayOnlineChessBoard({
   const setBackgroundColor = (info: FieldInfo) => {
     //setting the background to white and black (normal chess board)
     backgroundColor =
-      (info.fieldNumber % 2 === 0 &&
-        Math.floor(info.fieldNumber / 8) % 2 === 0) ||
-      (info.fieldNumber % 2 === 1 && Math.floor(info.fieldNumber / 8) % 2 === 1)
+      info.fieldNumber % 2 === Math.floor(info.fieldNumber / 8) % 2
         ? ColorsPallet.light
         : ColorsPallet.dark;
 
     if (
-      info.fieldNumber == activeField ||
+      info.fieldNumber === activeField ||
       possibleMoves.includes(info.fieldNumber)
     ) {
       backgroundColor =

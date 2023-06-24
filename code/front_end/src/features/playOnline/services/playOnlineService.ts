@@ -33,7 +33,6 @@ export const listenForMove = async (request: ListenForMoveRequest) => {
 
 export const getGameByUsername = async (username: string) => {
     const accessToken = await getValueFor("accessToken");
-    
     const response = await fetch(`${getGameByUsernameLink}${username}`, {
         method: "POST",
         headers: {
@@ -42,6 +41,7 @@ export const getGameByUsername = async (username: string) => {
         },
     }).then((response) => {
         if (response.status === 200) {
+            console.log("get game by username response: ",response.status);
             return response.json() as Promise<ChessGameResponse>;
         } else if(response.status === 400){
             response.text().then((data) => {
@@ -126,9 +126,11 @@ export const searchForGame = async (request: PendingChessGameRequest) => {
     })
    
     .catch((error) => {
+        console.log("game not found")
         throw new Error(error);
     }
     );
+    console.log("game found")
     return response;
 };
 

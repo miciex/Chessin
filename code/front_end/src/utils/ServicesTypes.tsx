@@ -123,3 +123,16 @@ export type TwoFactorAuthenticationEnabledRequest = {
 };
 
 export type TwoFactorAuthenticationResponse = "True" | "False";
+
+export type loggedUserResponse = {
+  email: string;
+  id: number;
+  firstname: string;
+  lastname: string;
+  nameInGame: string;
+  ratingBlitz: number;
+  ratingBullet: number;
+  ratingRapid: number;
+  ratingClassical: number;
+  country: string;
+};

@@ -82,6 +82,8 @@ export const copyBoard = (board:Board):Board => {
 }
 
 
+
+
     export const resetBoard = (fenString:string):Board =>{
         const visualBoard: Array<number> = FenToIntArray(fenString, 64);
         const position: {[key:number]:number} = boardToMap(visualBoard);
@@ -162,6 +164,10 @@ export const PossibleMoves = (piecePosition:number, board:Board):Array<number> =
 
         return possibleMoves;
     }
+    export const possibleMovesAfterCheck = (piecePosition: number, board:Board):Array<number> => {
+        const possibleMoves = PossibleMoves(piecePosition, board);     
+        return deleteImpossibleMoves(possibleMoves, piecePosition, board);
+    } 
 
     export const addCastlingMoves = (piecePosition:number, board:Board):Array<number> => {
         let moves:Array<number> = new Array();

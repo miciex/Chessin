@@ -1,31 +1,26 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import CountryFlag from "react-native-country-flag";
-import { Player } from "../../../utils/PlayerUtilities";
-import { ColorsPallet } from "../../../utils/Constants";
-import Timer from "./Timer";
 import { FontAwesome } from "@expo/vector-icons";
 import { countryToIsoCode } from "..";
-import { Board } from "../../../chess-logic/board";
-import { PlayOnlineState } from "../../../pages/PlayOnline";
+import CountryFlag from "react-native-country-flag";
+import { ColorsPallet } from "../../../utils/Constants";
+import PlayerTimer from "./PlayerTimer";
+import {
+  PlayOnlineAction,
+  PlayOnlineState,
+} from "../reducers/PlayOnlineReducer";
+import Timer from "./Timer";
 
 type Props = {
-  player: Player | null;
-  timerInfo?: Date | undefined;
-  board: Board;
-  gameStarted: boolean;
-  gameFinished: boolean;
-  changeTimerBySeconds: (timer: number) => void;
+  state: PlayOnlineState;
+  dispatch: React.Dispatch<PlayOnlineAction>;
+  isMyPlayer: boolean;
 };
 
-export default function PlayerBar({
-  player,
-  timerInfo,
-  gameFinished,
-  gameStarted,
-  board,
-  changeTimerBySeconds,
-}: Props) {
+export default function Bar({ state, dispatch, isMyPlayer }: Props) {
+  console.log("myPlayer: ", state.myPlayer, ", opponent: ", state.opponent);
+  const player = isMyPlayer ? state.myPlayer : state.opponent;
+
   return (
     <View style={styles.appContainer}>
       <View style={styles.textContainer}>
@@ -35,13 +30,10 @@ export default function PlayerBar({
       </View>
       <View style={styles.iconsContainer}>
         <View style={styles.timerContainer}>
-          <Timer
-            info={timerInfo}
-            board={board}
-            player={player}
-            gameFinished={gameFinished}
-            gameStarted={gameStarted}
-            changeTimerBySeconds={changeTimerBySeconds}
+          <PlayerTimer
+            isMyPlayer={isMyPlayer}
+            state={state}
+            dispatch={dispatch}
           />
         </View>
         <CountryFlag
@@ -55,14 +47,14 @@ export default function PlayerBar({
 
 const styles = StyleSheet.create({
   appContainer: {
-    width: "100%",
+    width: "90%",
     flexDirection: "row",
     padding: 8,
     backgroundColor: ColorsPallet.baseColor,
     justifyContent: "space-between",
     alignItems: "center",
     borderRadius: 8,
-    height: "100%",
+    height: 48,
   },
   text: {
     fontSize: 20,
