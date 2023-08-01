@@ -20,7 +20,6 @@ export default function TestBoard({ state, dispatch }: Props) {
   const possibleMoves = useRef<Animated.Value[]>([]);
 
   useEffect(() => {
-    console.log("length: ", activeValues.current.length);
     for (let i = 0; i < 64; i++) {
       activeValues.current.push(new Animated.Value(0));
       possibleMoves.current.push(new Animated.Value(0));

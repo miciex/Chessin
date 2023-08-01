@@ -2,7 +2,10 @@ import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
 import { Player } from "../../../utils/PlayerUtilities";
 import { Board, GameResults } from "../../../chess-logic/board";
-import { PlayOnlineAction, PlayOnlineState } from "../../../pages/PlayOnline";
+import {
+  PlayOnlineState,
+  PlayOnlineAction,
+} from "../reducers/PlayOnlineReducer";
 
 type Props = {
   state: PlayOnlineState;
@@ -37,8 +40,6 @@ export default function PlayerTimer({ state, isMyPlayer, dispatch }: Props) {
       });
     }
   };
-
-  // console.log(info?.getSeconds());
 
   const time =
     player?.timeLeft && player.timeLeft >= timeEndDate

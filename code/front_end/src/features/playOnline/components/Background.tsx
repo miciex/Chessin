@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Dimensions } from "react-native";
 
-const WHITE = "#F5F5F5";
+const WHITE = "#E2E2E2";
 const BLACK = "#222222";
 
 interface RowProps {

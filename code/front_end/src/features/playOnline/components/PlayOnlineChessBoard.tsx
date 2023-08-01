@@ -126,7 +126,6 @@ export default function PlayOnlineChessBoard({
   const setDataFromBoardResponse = (data: BoardResponse) => {
     if (!data) return;
     setBoard(BoardResponseToBoard(data));
-    console.log("player color: " + player.color);
     const myTime = player.color === "white" ? data.whiteTime : data.blackTime;
     const opponentTime =
       player.color === "white" ? data.blackTime : data.whiteTime;
@@ -194,23 +193,7 @@ export default function PlayOnlineChessBoard({
   );
 
   return (
-    <View
-      onTouchStart={(evt) => {
-        console.log(evt.nativeEvent.locationX, evt.nativeEvent.locationY);
-      }}
-      // onStartShouldSetResponder={() => true}
-      // onResponderMove={(event) => {
-      //   console.log(
-      //     "x: " + event.nativeEvent.locationX,
-      //     "y: " + event.nativeEvent.locationY
-      //   );
-      //   touch.setValue({
-      //     x: event.nativeEvent.locationX,
-      //     y: event.nativeEvent.locationY,
-      //   });
-      // }}
-      style={styles.container}
-    >
+    <View onTouchStart={(evt) => {}} style={styles.container}>
       {renderedBoard}
     </View>
   );

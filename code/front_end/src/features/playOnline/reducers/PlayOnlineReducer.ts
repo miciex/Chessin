@@ -1,9 +1,9 @@
-import { Board, BoardResponseToBoard, playMove } from "../../../chess-logic/board";
+import { Board, BoardResponseToBoard, GameResults, playMove } from "../../../chess-logic/board";
 import { Player, User, getBasePlayer, responseUserToPlayer } from "../../../utils/PlayerUtilities";
 import { Move } from "../../../chess-logic/move";
 import { getInitialChessBoard } from "..";
-import { BoardResponse, ChessGameResponse } from "../../../utils/ServicesTypes";
-import { cancelSearch } from "../services/playOnlineService";
+import { BoardResponse, ChessGameResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
+import { cancelSearch, submitMove } from "../services/playOnlineService";
 
 export type PlayOnlineState = {
     board: Board;
@@ -63,6 +63,9 @@ export type PlayOnlineState = {
       }
     | {
         type: "playMove";
+        payload: Move;
+      }| {
+        type: "playMoveAction";
         payload: Move;
       }
     | {
@@ -144,7 +147,7 @@ export  function reducer(
       case "reset":
         return initialState;
       case "playMove":
-        return { ...state, board: playMove(action.payload, state.board) };
+        return { ...state, board: playMove(action.payload, state.board), currentPosition: state.currentPosition + 1, gameStarted: true };
       case "updateOpponentClockByMilliseconds":
         return {
           ...state,
@@ -166,12 +169,12 @@ export  function reducer(
           },
         };
       case "setDataFromBoardResponse":
-        return {...state, board: BoardResponseToBoard(action.payload.boardResponse), myPlayer: action.payload.myPlayer, opponent: action.payload.opponent};
+        return {...state, board: BoardResponseToBoard(action.payload.boardResponse), myPlayer: action.payload.myPlayer, opponent: action.payload.opponent, currentPosition: action.payload.boardResponse.moves.length-1};
       case "setTimeFromBoardResponse":
             return {...state, myPlayer: {...state.myPlayer, timeLeft: new Date( state.myPlayer?.color === "white" ? action.payload.boardResponse.whiteTime :action.payload.boardResponse.blackTime)}, opponent: {...state.opponent, timeLeft: new Date( state.myPlayer?.color === "black" ? action.payload.boardResponse.whiteTime :action.payload.boardResponse.blackTime)}};
       case "setUpGame":
         if (action.payload.chessGameResponse.blackUser === null || action.payload.chessGameResponse.whiteUser === null) {
-            cancelSearch().then(() => console.log("search cancelled")).catch((err) => console.log(err));
+            cancelSearch().then(() => console.log("search cancelled")).catch((err) => {throw new Error(err)});
             return {...state, searchingGame: false, gameStarted: false, gameFinished: false, board: getInitialChessBoard(), myPlayer: getBasePlayer(), opponent: getBasePlayer(), gameId: -1, currentPosition: 0};
           }
           const isMyPlayerWhite = action.payload.chessGameResponse.whiteUser.nameInGame === action.payload.user.nameInGame

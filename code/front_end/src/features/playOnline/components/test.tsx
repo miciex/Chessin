@@ -23,7 +23,6 @@ export default function App() {
         { dx: pan.x, dy: pan.y },
       ] as any),
       onPanResponderRelease: () => {
-        console.log("release");
         pan.extractOffset;
         Animated.spring(pan, {
           toValue: { x: 0, y: 0 },

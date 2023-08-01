@@ -6,7 +6,13 @@ import {
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
 import { possibleMovesAfterCheck } from "../../../chess-logic/board";
-import { moveFactory } from "../../../chess-logic/move";
+import { Move, moveFactory } from "../../../chess-logic/move";
+import {
+  BoardResponse,
+  ListenForMoveRequest,
+  SubmitMoveRequest,
+} from "../../../utils/ServicesTypes";
+import { listenForMove, submitMove } from "../services/playOnlineService";
 
 const yellow = "rgba(255, 255, 0, 0.5)";
 type pos = { x: number; y: number };
@@ -85,7 +91,6 @@ export default function Piece({
     for (let i = 0; i < 64; i++) {
       activeValues.current[i].setValue(0);
     }
-    // console.log("reset active values");
   };
 
   const findActiveValue = (id: number): number => {
@@ -129,18 +134,73 @@ export default function Piece({
   };
 
   const setPossibleMoves = (moves: number[]) => {
-    for (let i = 0; i < 64; i++) {
-      if (moves.includes(i)) {
-        possibleMoves.current[i].setValue(1);
-      } else {
-        possibleMoves.current[i].setValue(0);
+    if (
+      (state.myPlayer.color === "white" && id > 16) ||
+      (state.myPlayer.color === "black" && id < 16) ||
+      id === 0
+    )
+      resetPossibleMoves();
+    else
+      for (let i = 0; i < 64; i++) {
+        if (moves.includes(i)) {
+          possibleMoves.current[i].setValue(1);
+        } else {
+          possibleMoves.current[i].setValue(0);
+        }
       }
-    }
   };
 
   const isPossibleMove = (id: number): boolean => {
     if (Number(JSON.stringify(possibleMoves.current[id])) === 1) return true;
     return false;
+  };
+
+  const handleMove = (move: Move) => {
+    const submitMoveRequest: SubmitMoveRequest = {
+      gameId: state.gameId,
+      movedPiece: move.movedPiece,
+      startField: move.startField,
+      endField: move.endField,
+      promotePiece: move.promotePiece,
+      isDrawOffered: false,
+    };
+    dispatch({
+      type: "playMove",
+      payload: move,
+    });
+    submitMove(submitMoveRequest)
+      .then((boardResponse: BoardResponse) => {
+        dispatch({
+          type: "setDataFromBoardResponse",
+          payload: {
+            boardResponse,
+            myPlayer: state.myPlayer,
+            opponent: state.opponent,
+          },
+        });
+        console.log(boardResponse);
+        listenForMove({
+          gameId: state.gameId,
+          moves: boardResponse.moves,
+        })
+          .then((res: BoardResponse | undefined) => {
+            if (res === undefined) return;
+            dispatch({
+              type: "setDataFromBoardResponse",
+              payload: {
+                boardResponse,
+                myPlayer: state.myPlayer,
+                opponent: state.opponent,
+              },
+            });
+          })
+          .catch((err) => {
+            throw new Error(err);
+          });
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
   };
 
   const panResponder = useRef(
@@ -151,14 +211,13 @@ export default function Piece({
       onPanResponderStart(e, gestureState) {
         const activeField = findActiveValue(positionNumber);
         if (isPossibleMove(positionNumber)) {
-          dispatch({
-            type: "playMove",
-            payload: moveFactory({
-              pieces: state.board.position,
-              startField: activeField,
-              endField: positionNumber,
-            }),
+          const move = moveFactory({
+            pieces: state.board.position,
+            startField: activeField,
+            endField: positionNumber,
           });
+          handleMove(move);
+
           resetActiveValues();
           resetPossibleMoves();
 
@@ -186,16 +245,14 @@ export default function Piece({
               Math.round((position.y + gestureState.dy) / SIZE) * 8
           )
         ) {
-          dispatch({
-            type: "playMove",
-            payload: moveFactory({
-              pieces: state.board.position,
-              startField: positionNumber,
-              endField:
-                Math.round((position.x + gestureState.dx) / SIZE) +
-                Math.round((position.y + gestureState.dy) / SIZE) * 8,
-            }),
+          const move = moveFactory({
+            pieces: state.board.position,
+            startField: positionNumber,
+            endField:
+              Math.round((position.x + gestureState.dx) / SIZE) +
+              Math.round((position.y + gestureState.dy) / SIZE) * 8,
           });
+          handleMove(move);
           resetPossibleMoves();
         }
 

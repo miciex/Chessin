@@ -18,7 +18,6 @@ type Props = {
 };
 
 export default function Bar({ state, dispatch, isMyPlayer }: Props) {
-  console.log("myPlayer: ", state.myPlayer, ", opponent: ", state.opponent);
   const player = isMyPlayer ? state.myPlayer : state.opponent;
 
   return (

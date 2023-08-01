@@ -78,13 +78,10 @@ export default function PlayOnline({ navigation, route }: Props) {
 
         searchForGame(request)
           .then((response) => {
-            console.log(response.status);
             if (response.status === 200) {
               response
                 .json()
                 .then((data: ChessGameResponse) => {
-                  // console.log("got game");
-                  console.log(data);
                   dispatch({
                     type: "setUpGame",
                     payload: { chessGameResponse: data, user },
@@ -114,8 +111,6 @@ export default function PlayOnline({ navigation, route }: Props) {
               getGameByUsername(user.nameInGame)
                 .then((data: ChessGameResponse | undefined) => {
                   if (data === undefined) return;
-                  console.log("got game");
-                  console.log(data);
                   dispatch({
                     type: "setUpGame",
                     payload: { chessGameResponse: data, user },
@@ -138,7 +133,6 @@ export default function PlayOnline({ navigation, route }: Props) {
                       : responseUserToPlayer(data.whiteUser, "white")
                   )
                     .then((board: BoardResponse) => {
-                      console.log("data", board);
                       const myPlayer: Player =
                         data.whiteUser.nameInGame === user.nameInGame
                           ? {
@@ -238,16 +232,10 @@ export default function PlayOnline({ navigation, route }: Props) {
   const unMount = () => {
     if (!state.searchingGame) return;
 
-    cancelSearch()
-      .then((res) => {
-        console.log("game canceled");
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
+    cancelSearch().catch((err) => {
+      throw new Error(err);
+    });
   };
-
-  // console.log(state);
 
   const handleListnForFirstMove = async (
     gameId: number,

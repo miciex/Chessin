@@ -9,7 +9,6 @@ export default function WaitingForGame() {
 
   useEffect(() => {
     const animations = [];
-    console.log("animations");
     for (let i = 0; i < translateY.length; i++) {
       translateY[i] = new Animated.Value(0);
       animations.push(

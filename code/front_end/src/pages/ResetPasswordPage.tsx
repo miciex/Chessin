@@ -92,7 +92,6 @@ export default function ResetPasswordPage({ navigation, route }: Props) {
       .then((response) => {
         if (response.status === 202) {
           setShowCodeModal(true);
-          console.log("code sent");
         } else if (response.status === 200) {
           navigation.navigate("Home");
         } else if (response.status === 400) {

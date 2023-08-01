@@ -39,10 +39,6 @@ export default function AuthCodeModal({
   const itemElems = useRef<any>(new Array(InputLength));
 
   const submitCode = () => {
-    console.log({
-      ...request,
-      verificationCode: inputs.join(""),
-    });
     verifyCode({
       ...request,
       verificationCode: inputs.join(""),
@@ -52,7 +48,7 @@ export default function AuthCodeModal({
         handleVerifyCodeResponse(response);
       })
       .catch((err) => {
-        console.log(err);
+        throw new Error(err);
       });
   };
 
@@ -74,7 +70,6 @@ export default function AuthCodeModal({
     nativeEvent: TextInputKeyPressEventData,
     index: number
   ) => {
-    console.log(nativeEvent.key);
     if (nativeEvent.key === "Backspace" && index > 0 && inputs[index] === "") {
       itemElems.current[index - 1]?.focus();
       return;

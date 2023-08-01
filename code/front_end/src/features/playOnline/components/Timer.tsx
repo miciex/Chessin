@@ -41,8 +41,6 @@ export default function Timer({
     }
   };
 
-  // console.log(info?.getSeconds());
-
   const time =
     info && info >= timeEndDate
       ? info.getMinutes().toString() +

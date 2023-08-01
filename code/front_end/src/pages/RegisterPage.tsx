@@ -23,10 +23,7 @@ import { VerificationType } from "../utils/ServicesTypes";
 import { register } from "../services/AuthenticationServices";
 
 type Props = {
-  navigation: NativeStackNavigationProp<
-    RootStackParamList,
-    "Register"
-  >;
+  navigation: NativeStackNavigationProp<RootStackParamList, "Register">;
 };
 
 export default function Register({ navigation }: Props) {
@@ -142,7 +139,6 @@ export default function Register({ navigation }: Props) {
   const onSubmit = () => {
     setInputsValid();
     if (!areInputsValid()) return;
-    console.log("register");
     register({
       email,
       password,
@@ -152,18 +148,16 @@ export default function Register({ navigation }: Props) {
       country: country.Name,
     })
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
           navigation.navigate("Home");
         } else if (response.status === 202) {
-          console.log("What");
           setShowAuthCode(true);
         } else if (response.status === 400) {
           throw new Error("Bad request");
         }
       })
       .catch((error) => {
-        console.log(error);
+        throw new Error(error);
       });
   };
 

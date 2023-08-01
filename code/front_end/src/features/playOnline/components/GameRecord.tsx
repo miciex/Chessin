@@ -5,17 +5,19 @@ import GameRecordMove from "./GameRecordMove";
 import { Move } from "../../../chess-logic/move";
 import { moveToChessNotation } from "../../../chess-logic/convertion";
 import { Board } from "../../../chess-logic/board";
+import {
+  PlayOnlineAction,
+  PlayOnlineState,
+} from "../reducers/PlayOnlineReducer";
 
 //TODO: change moves to array of Move type
 type Props = {
-  board: Board;
-  currentPosition: number;
-  setCurrentPosition: (position: number) => void;
+  state: PlayOnlineState;
+  dispatch: React.Dispatch<PlayOnlineAction>;
 };
 export default function GameRecord({
-  board,
-  currentPosition,
-  setCurrentPosition,
+  state: { board, currentPosition },
+  dispatch,
 }: Props) {
   //TODO: convert moves to string array
   const movesContent = board.moves.map((move, index) => {
@@ -24,7 +26,7 @@ export default function GameRecord({
         move={moveToChessNotation(board, move)}
         key={index}
         handlePress={() => {
-          setCurrentPosition(index);
+          dispatch({ type: "setCurrentPosition", payload: index });
         }}
         currentPosition={currentPosition}
         id={index}

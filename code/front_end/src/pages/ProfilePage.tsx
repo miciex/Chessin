@@ -93,9 +93,6 @@ export default function ProfilePage({ navigation, route }: Props) {
   // const [data, loading, error] = useFetch("http://localhost:3000/user", {});
 
   const wojtek = fetchUser("papiezwojtyla9@gmail.com");
-  console.log(wojtek)
-  console.log("wojtek")
-
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (user === null) return;
@@ -136,7 +133,7 @@ export default function ProfilePage({ navigation, route }: Props) {
         <View style={styles.invite}>
           <BaseButton
             handlePress={() => {
-              addFriendFunc({friendNickname: "PabisackCox"})
+              addFriendFunc({ friendNickname: "PabisackCox" });
               // addFriendFunc(user?  user?.nameInGame : "")
             }}
             text="Send Invitation"

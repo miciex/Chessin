@@ -41,7 +41,6 @@ export const getGameByUsername = async (username: string) => {
         },
     }).then((response) => {
         if (response.status === 200) {
-            console.log("get game by username response: ",response.status);
             return response.json() as Promise<ChessGameResponse>;
         } else if(response.status === 400){
             response.text().then((data) => {
@@ -68,7 +67,6 @@ export const getGameByUsername = async (username: string) => {
                 Authorization: `Bearer ${accessToken}`,
             },
         }).then((response) => {
-            console.log("listen for first move response: ",response.status);
             if (response.status === 200) {
                 return response.json();
             }else if(response.status === 400){
@@ -126,11 +124,9 @@ export const searchForGame = async (request: PendingChessGameRequest) => {
     })
    
     .catch((error) => {
-        console.log("game not found")
         throw new Error(error);
     }
     );
-    console.log("game found")
     return response;
 };
 
@@ -154,12 +150,11 @@ export const submitMove = async ( request: SubmitMoveRequest ) => {
         },
         body: JSON.stringify(request),
     }).then((response) => {
-        console.log("submit move response: ",response.status);
         if (response.status === 200) {
             return response.json();
         } else if(response.status === 400){
             response.text().then((data) => {
-                console.log("submit move error: ",data);
+                throw new Error(`submit move error: ${data}`);
         })
         .catch((error) => {
             throw new Error(error);

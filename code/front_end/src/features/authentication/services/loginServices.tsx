@@ -34,13 +34,12 @@ export const fetchandStoreUser = async (email: string) => {
           save("user", JSON.stringify(user));
         })
         .catch((err) => {
-          console.log("store user");
-          console.log(err);
+          throw new Error(err);
         });
       return user;
     })
     .catch((err) => {
-      console.log(err);
+      throw new Error(err);
     });
 };
 
