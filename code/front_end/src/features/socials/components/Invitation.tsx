@@ -76,10 +76,10 @@ import { User } from "../../../utils/PlayerUtilities";
         <View >
             <View style={{flexDirection: "row", justifyContent: "space-evenly"}}>
             <View style={styles.confirmButton}>
-                <BaseButton text="Accept" handlePress={()=>{handleFriendInvitationFunc({friendEmail: email, responseType: FriendInvitationResponseType.ACCEPT})}} color="green"/>
+                <BaseButton text="Accept" handlePress={()=>{handleFriendInvitationFunc({friendNick: nick, responseType: FriendInvitationResponseType.ACCEPT})}} color="green"/>
             </View>
             <View style={styles.confirmButton}>
-                <BaseButton text="Reject" handlePress={()=>{handleFriendInvitationFunc({friendEmail: email, responseType: FriendInvitationResponseType.DECLINE})}} color="red"/>
+                <BaseButton text="Reject" handlePress={()=>{handleFriendInvitationFunc({friendNick: nick, responseType: FriendInvitationResponseType.DECLINE})}} color="red"/>
             </View>
             </View>
           </View>

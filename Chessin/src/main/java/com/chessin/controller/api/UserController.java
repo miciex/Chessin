@@ -91,7 +91,6 @@ public class UserController {
     @PostMapping("/checkInvitations")
     public ResponseEntity<?> checkInvitations(HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
-
         if (!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 

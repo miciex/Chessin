@@ -108,7 +108,7 @@ export type ListenForMoveRequest = {
 };
 
 export type HandleFriendInvitation = {
-  friendEmail: string;
+  friendNick: string;
   responseType: FriendInvitationResponseType;
 
 }

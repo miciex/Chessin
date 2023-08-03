@@ -39,11 +39,12 @@ type Props = {
 export default function Notification({ route, navigation }: Props) {
 
   const [invitations, setInvitations] = useState<Array<User>>([])
-
+  
   useEffect(()=>{
-   
+    
 
     checkInvitations().then((data) =>{ 
+      console.log(data)
       if(data === undefined) return
       setInvitations(data.map(x => responseUserToUser(x, "")))
     })

@@ -125,7 +125,6 @@ export default function ProfilePage({ navigation, route }: Props) {
 
   const handleAddFriend = ( ) => {
     addFriendFunc({friendNickname: user ? user.nameInGame : ""}).then((data)=>{
-      console.log(data)
     }).catch(err => {throw new Error(err)})
   }
   return (

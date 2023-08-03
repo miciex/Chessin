@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../../utils/Constants'
 import { ColorsPallet } from '../../../utils/Constants'
 import { getFriendsList } from '../../../services/userServices'
+import { User, responseUserToPlayer, responseUserToUser } from '../../../utils/PlayerUtilities'
 //powinien byc jakis dostep do baxy danych ktory mi da id i avatar najlepszych friends jako objecty
 
 const bestFriends = [
@@ -27,17 +28,29 @@ type Props={
 
 export default function FriendsIconList ({ navigation, nameInGame }: Props){
   
+  const [friends, setFriends] = useState<Array<User>>([])
+
   useEffect(()=>{
-    const friends = getFriendsList(nameInGame);
+    if(nameInGame)getFriendsList(nameInGame).then((data) =>{ 
+      if(data === undefined) return
+      setFriends(data.map(x => responseUserToUser(x, "")))
+    })
   }, [nameInGame])
 
-  const goToFriendsProfile = (player: {
-    rank: number;
-    playerNick: string;
-    avatar: string;
-}) => {
+
+
+
+
+
+
+
+
+
+  const goToFriendsProfile = (
+    playerNick: string
+) => {
     navigation.navigate("ProfilePage", {
-      nameInGame: player.playerNick,
+      nameInGame: playerNick,
     });
   };
  
@@ -46,9 +59,9 @@ export default function FriendsIconList ({ navigation, nameInGame }: Props){
       <ScrollView horizontal={true}>
      
       <View style={styles.imageContainer}>
-        {bestFriends.map((player)=>{
+        {friends.map((player)=>{
             return <Pressable onPress={()=>{
-                goToFriendsProfile(player)}} 
+                goToFriendsProfile(player.nameInGame)}} 
                 android_ripple={{
                     color: ColorsPallet.darker,
                     borderless: false,
@@ -57,10 +70,10 @@ export default function FriendsIconList ({ navigation, nameInGame }: Props){
               <Image
                  style={styles.imageIcon}
                  source={{
-                   uri: player.avatar,
+                   uri: player.country,
                  }}
             />
-            <Text style={styles.text}>{player.playerNick}</Text>
+            <Text style={styles.text}>{player.nameInGame}</Text>
           </View></Pressable>
         })}
       </View>
