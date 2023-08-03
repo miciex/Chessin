@@ -5,6 +5,7 @@ import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.requests.SetActiveRequest;
 import com.chessin.controller.responses.FriendInvitationResponse;
+import com.chessin.controller.responses.LoggedUserResponse;
 import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
@@ -45,6 +46,16 @@ public class UserController {
         users.stream().map(UserResponse::fromUser).forEach(responses::add);
 
         return ResponseEntity.ok().body(users);
+    }
+
+    @PostMapping("/findUserByToken")
+    public ResponseEntity<?> findUserByToken(HttpServletRequest servlet) {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isEmpty())
+            return ResponseEntity.badRequest().body("User not found.");
+        LoggedUserResponse userResponse = LoggedUserResponse.fromUser(user.orElseThrow());
+        return ResponseEntity.ok().body(userResponse);
     }
 
     @PostMapping("/setActive")

@@ -58,9 +58,7 @@ export default function Login({ route, navigation }: Props) {
     if (!isDataValid()) return;
     login({ email, password })
       .then((response) => {
-        console.log(response.status);
         if (response.status === 200) {
-          console.log(JSON.stringify(response));
           return response.json();
         } else if (response.status === 202) {
           setShowAuthCode(true);
@@ -72,7 +70,7 @@ export default function Login({ route, navigation }: Props) {
               throw new Error(text);
             })
             .catch((error) => {
-              console.log(error);
+              throw new Error(error);
             });
         } else {
           throw new Error("Something went wrong");
@@ -89,19 +87,16 @@ export default function Login({ route, navigation }: Props) {
         if (userSet) navigation.navigate("Home");
       })
       .catch((error) => {
-        console.log(error);
+        throw new Error(error);
       });
   };
 
   const handleVerifyCodeResponse = async (response: Response) => {
-    console.log("status: ", response.status);
     if (response.status === 200) {
-      console.log("correct code");
       response
         .json()
         .then((data) => {
           setUserDataFromResponse(data, { email });
-          console.log("setting user data");
         })
         .then(() => {
           navigation.navigate("Home");

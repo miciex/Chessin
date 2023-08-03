@@ -86,8 +86,6 @@ const HomePage = ({ route, navigation }: Props) => {
   const netInfo = useNetInfo();
   const [user, setUser] = useState<User>();
 
-  console.log(netInfo.isConnected);
-
   useEffect(() => {
     getValueFor("user")
       .then((user) => {
@@ -103,19 +101,21 @@ const HomePage = ({ route, navigation }: Props) => {
   const toggleLevel = () => {
     setLevelModal(!levelModal);
   };
-  console.log(user);
 
   return (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
         <ScrollView>
-          <Text onPress={()=>setLevelModal(!levelModal)}>click</Text>
-        {levelModal ? (
-        <>
-            <ChooseYourLevelModal toggleGear={toggleLevel} gearModalOn={levelModal} />
-          {}
-        </>
-      ) : null}
+          <Text onPress={() => setLevelModal(!levelModal)}>click</Text>
+          {levelModal ? (
+            <>
+              <ChooseYourLevelModal
+                toggleGear={toggleLevel}
+                gearModalOn={levelModal}
+              />
+              {}
+            </>
+          ) : null}
           <View style={{ width: "100%", alignItems: "center" }}>
             <TopButtons navigation={navigation} />
             <View style={styles.oldGamesButton}>
@@ -127,7 +127,6 @@ const HomePage = ({ route, navigation }: Props) => {
               />
             </View>
 
-          
             {ended_games.map((gracz, index) => (
               <View style={{ width: "90%" }}>
                 <EndedGame

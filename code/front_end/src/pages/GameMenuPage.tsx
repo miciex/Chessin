@@ -42,7 +42,6 @@ export default function GameMenu({ route, navigation }: Props) {
     getValueFor("user").then((user) => {
       if (!user) return;
       setUser(JSON.parse(user));
-      console.log("user", user);
     });
   }, []);
 

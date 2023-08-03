@@ -33,7 +33,6 @@ export const listenForMove = async (request: ListenForMoveRequest) => {
 
 export const getGameByUsername = async (username: string) => {
     const accessToken = await getValueFor("accessToken");
-    
     const response = await fetch(`${getGameByUsernameLink}${username}`, {
         method: "POST",
         headers: {
@@ -68,7 +67,6 @@ export const getGameByUsername = async (username: string) => {
                 Authorization: `Bearer ${accessToken}`,
             },
         }).then((response) => {
-            console.log("listen for first move response: ",response.status);
             if (response.status === 200) {
                 return response.json();
             }else if(response.status === 400){
@@ -152,12 +150,11 @@ export const submitMove = async ( request: SubmitMoveRequest ) => {
         },
         body: JSON.stringify(request),
     }).then((response) => {
-        console.log("submit move response: ",response.status);
         if (response.status === 200) {
             return response.json();
         } else if(response.status === 400){
             response.text().then((data) => {
-                console.log("submit move error: ",data);
+                throw new Error(`submit move error: ${data}`);
         })
         .catch((error) => {
             throw new Error(error);

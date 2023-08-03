@@ -62,8 +62,6 @@ export default function ChessBoardField({
 
   const piece = convertToIcon(info.piece);
 
-  // console.log(position.x, position.y);
-
   return (
     <Pressable
       onPress={() => {

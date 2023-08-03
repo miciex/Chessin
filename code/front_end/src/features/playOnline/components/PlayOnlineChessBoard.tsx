@@ -126,7 +126,6 @@ export default function PlayOnlineChessBoard({
   const setDataFromBoardResponse = (data: BoardResponse) => {
     if (!data) return;
     setBoard(BoardResponseToBoard(data));
-    console.log("player color: " + player.color);
     const myTime = player.color === "white" ? data.whiteTime : data.blackTime;
     const opponentTime =
       player.color === "white" ? data.blackTime : data.whiteTime;
@@ -146,14 +145,12 @@ export default function PlayOnlineChessBoard({
   const setBackgroundColor = (info: FieldInfo) => {
     //setting the background to white and black (normal chess board)
     backgroundColor =
-      (info.fieldNumber % 2 === 0 &&
-        Math.floor(info.fieldNumber / 8) % 2 === 0) ||
-      (info.fieldNumber % 2 === 1 && Math.floor(info.fieldNumber / 8) % 2 === 1)
+      info.fieldNumber % 2 === Math.floor(info.fieldNumber / 8) % 2
         ? ColorsPallet.light
         : ColorsPallet.dark;
 
     if (
-      info.fieldNumber == activeField ||
+      info.fieldNumber === activeField ||
       possibleMoves.includes(info.fieldNumber)
     ) {
       backgroundColor =
@@ -196,23 +193,7 @@ export default function PlayOnlineChessBoard({
   );
 
   return (
-    <View
-      onTouchStart={(evt) => {
-        console.log(evt.nativeEvent.locationX, evt.nativeEvent.locationY);
-      }}
-      // onStartShouldSetResponder={() => true}
-      // onResponderMove={(event) => {
-      //   console.log(
-      //     "x: " + event.nativeEvent.locationX,
-      //     "y: " + event.nativeEvent.locationY
-      //   );
-      //   touch.setValue({
-      //     x: event.nativeEvent.locationX,
-      //     y: event.nativeEvent.locationY,
-      //   });
-      // }}
-      style={styles.container}
-    >
+    <View onTouchStart={(evt) => {}} style={styles.container}>
       {renderedBoard}
     </View>
   );

@@ -1,19 +1,31 @@
-import {StyleSheet, View} from "react-native";
-import React, {useEffect, useState} from "react";
+import { StyleSheet, View } from "react-native";
+import React, { useEffect, useState, useReducer } from "react";
 import Footer from "../components/Footer";
-import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import {RouteProp} from "@react-navigation/native";
-import {RootStackParamList} from "../../Routing";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../Routing";
 import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
-import {getInitialChessBoard} from "../features/playOnline";
+import { getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
-import {ColorsPallet} from "../utils/Constants";
-import {FontAwesome} from "@expo/vector-icons";
+import { ColorsPallet } from "../utils/Constants";
+import { FontAwesome } from "@expo/vector-icons";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
-import {Board, boardFactory, BoardResponseToBoard, copyBoard, GameResults, playMove,} from "../chess-logic/board";
-import {Player, responseUserToPlayer, User, userToPlayer} from "../utils/PlayerUtilities";
-import {getValueFor} from "../utils/AsyncStoreFunctions";
+import {
+  Board,
+  boardFactory,
+  BoardResponseToBoard,
+  copyBoard,
+  GameResults,
+  playMove,
+} from "../chess-logic/board";
+import {
+  Player,
+  responseUserToPlayer,
+  User,
+  userToPlayer,
+} from "../utils/PlayerUtilities";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 import {
   cancelSearch,
   getGameByUsername,
@@ -22,11 +34,16 @@ import {
   searchForGame,
   submitMove,
 } from "../features/playOnline/services/playOnlineService";
-import {BoardResponse, ChessGameResponse} from "../utils/ServicesTypes";
+import { BoardResponse, ChessGameResponse } from "../utils/ServicesTypes";
 import ChessBoard from "../components/ChessBoard";
 import WaitingForGame from "../features/playOnline/components/WaitingForGame";
 import GameFinishedOverlay from "../features/playOnline/components/GameFinishedOverlay";
-import {Move} from "../chess-logic/move";
+import TestBoard from "../features/playOnline/components/Board";
+import { Move } from "../chess-logic/move";
+import {
+  reducer,
+  initialState,
+} from "../features/playOnline/reducers/PlayOnlineReducer";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -41,20 +58,21 @@ const timeFinishedDate = new Date(-2);
 export default function PlayOnline({ navigation, route }: Props) {
   const { request } = route.params;
 
-  const [opponent, setOpponent] = useState<Player | null>(null);
-  const [myPlayer, setMyPlayer] = useState<Player | null>(null);
+  const [playOnlineState, dispatch] = useReducer(reducer, initialState);
   const [opponentClockInfo, setOpponentClockInfo] = useState<Date>();
   const [myClockInfo, setMyClockInfo] = useState<Date>();
 
   const [gearModal, setGearModal] = useState(false);
-  //TODO: write reducer for boardState
-  const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
-  const [gameFinished, setGameFinished] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [searchingGame, setSearchingGame] = useState(true);
-  const [gameId, setGameId] = useState<number>(-1);
-  const [currentPosition, setCurrentPosition] = useState<number>(0);
-
+  const {
+    myPlayer,
+    gameFinished,
+    opponent,
+    board,
+    gameId,
+    gameStarted,
+    searchingGame,
+    currentPosition,
+  } = playOnlineState;
   useEffect(() => {
     searchNewGame();
 
@@ -73,8 +91,8 @@ export default function PlayOnline({ navigation, route }: Props) {
       isDrawOffered: false,
     })
       .then((data: BoardResponse) => {
-        setGameFinished(true);
-        setBoardState(BoardResponseToBoard(data));
+        dispatch({ type: "setGameFinished", payload: true });
+        dispatch({ type: "setBoard", payload: BoardResponseToBoard(data) });
       })
       .catch((err) => {
         throw new Error(err);
@@ -82,14 +100,14 @@ export default function PlayOnline({ navigation, route }: Props) {
   }
 
   const searchNewGame = () => {
-    setSearchingGame(true);
+    dispatch({ type: "setSearchingGame", payload: true });
     getValueFor("user")
       .then((user) => {
         if (user === null) return;
         return JSON.parse(user);
       })
       .then((user: User) => {
-        setMyPlayer(userToPlayer(user, null));
+        dispatch({ type: "setMyPlayer", payload: userToPlayer(user, null) });
 
         searchForGame(request)
           .then((response) => {
@@ -97,16 +115,18 @@ export default function PlayOnline({ navigation, route }: Props) {
               response
                 .json()
                 .then((data: ChessGameResponse) => {
-                  console.log("data", data);
                   setUpGame(data, user);
+                  const isMyPlayerWhite =
+                    data.whiteUser.nameInGame === user.nameInGame;
+                  const myColor = isMyPlayerWhite ? "white" : "black";
+                  const opponentColor = isMyPlayerWhite ? "black" : "white";
                   handleListnForFirstMove(
                     data.id,
-                    data.whiteUser.nameInGame === user.nameInGame
-                      ? { ...user, color: "white" }
-                      : { ...user, color: "black" },
-                    data.whiteUser.nameInGame === user.nameInGame
-                      ? responseUserToPlayer(data.blackUser, "black")
-                      : responseUserToPlayer(data.whiteUser, "white")
+                    userToPlayer(user, myColor),
+                    responseUserToPlayer(
+                      data[`${opponentColor}User`],
+                      opponentColor
+                    )
                   );
                 })
                 .catch((err) => {
@@ -117,24 +137,24 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .then((data: ChessGameResponse | undefined) => {
                   if (data === undefined) return;
                   setUpGame(data, user);
+                  const isMyPlayerWhite =
+                    data.whiteUser.nameInGame === user.nameInGame;
+                  const myColor = isMyPlayerWhite ? "white" : "black";
+                  const opponentColor = isMyPlayerWhite ? "black" : "white";
                   handleListnForFirstMove(
                     data.id,
-                    data.whiteUser.nameInGame === user.nameInGame
-                      ? { ...user, color: "white" }
-                      : { ...user, color: "black" },
-                    data.whiteUser.nameInGame === user.nameInGame
-                      ? responseUserToPlayer(data.blackUser, "black")
-                      : responseUserToPlayer(data.whiteUser, "white")
+                    userToPlayer(user, myColor),
+                    responseUserToPlayer(
+                      data[`${opponentColor}User`],
+                      opponentColor
+                    )
                   )
                     .then((board: BoardResponse) => {
-                      const myPlayer: Player =
-                        data.whiteUser.nameInGame === user.nameInGame
-                          ? { ...user, color: "white" }
-                          : { ...user, color: "black" };
-                      const opponent =
-                        data.whiteUser.nameInGame === user.nameInGame
-                          ? responseUserToPlayer(data.blackUser, "black")
-                          : responseUserToPlayer(data.whiteUser, "white");
+                      const myPlayer: Player = userToPlayer(user, myColor);
+                      const opponent = responseUserToPlayer(
+                        data[`${opponentColor}User`],
+                        opponentColor
+                      );
                       setDataFromBoardResponse(board, myPlayer, opponent);
                       setTimeFromBoardResponse(board, myPlayer, opponent);
                       listenForMove({
@@ -143,14 +163,6 @@ export default function PlayOnline({ navigation, route }: Props) {
                       })
                         .then((board: BoardResponse | undefined) => {
                           if (board === undefined) return;
-                          const myPlayer: Player =
-                            data.whiteUser.nameInGame === user.nameInGame
-                              ? { ...user, color: "white" }
-                              : { ...user, color: "black" };
-                          const opponent =
-                            data.whiteUser.nameInGame === user.nameInGame
-                              ? responseUserToPlayer(data.blackUser, "black")
-                              : responseUserToPlayer(data.whiteUser, "white");
                           setDataFromBoardResponse(board, myPlayer, opponent);
                           setTimeFromBoardResponse(board, myPlayer, opponent);
                         })
@@ -190,13 +202,9 @@ export default function PlayOnline({ navigation, route }: Props) {
   const unMount = () => {
     if (!searchingGame) return;
 
-    cancelSearch()
-      .then((res) => {
-        console.log("game canceled");
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
+    cancelSearch().catch((err) => {
+      throw new Error(err);
+    });
   };
 
   const toggleGear = () => {
@@ -205,30 +213,39 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const setUpGame = (data: ChessGameResponse, user: User) => {
     if (data.blackUser === null || data.whiteStarts === null) {
-      setSearchingGame(false);
-      cancelSearch();
+      dispatch({ type: "setSearchingGame", payload: false });
+      cancelSearch().catch((err) => {
+        throw new Error(err);
+      });
       return;
     }
 
-    setGameId(data.id);
+    dispatch({ type: "setGameId", payload: data.id });
     if (data.whiteUser.nameInGame === user.nameInGame) {
-      setOpponent(responseUserToPlayer(data.blackUser, "black"));
-      setMyPlayer({ ...user, color: "white" });
+      dispatch({
+        type: "setOpponent",
+        payload: responseUserToPlayer(data.blackUser, "black"),
+      });
+      dispatch({ type: "setMyPlayer", payload: userToPlayer(user, "white") });
     } else if (data.blackUser.nameInGame === user.nameInGame) {
-      setOpponent(responseUserToPlayer(data.whiteUser, "white"));
-      setMyPlayer({ ...user, color: "black" });
+      dispatch({
+        type: "setOpponent",
+        payload: responseUserToPlayer(data.whiteUser, "white"),
+      });
+      dispatch({ type: "setMyPlayer", payload: userToPlayer(user, "black") });
     }
 
     setMyClockInfo(new Date(data.timeControl));
     setOpponentClockInfo(new Date(data.timeControl));
 
-    setBoardState(
-      boardFactory({
+    dispatch({
+      type: "setBoard",
+      payload: boardFactory({
         fenString: data.startBoard,
         whiteToMove: data.whiteStarts,
-      })
-    );
-    setSearchingGame(false);
+      }),
+    });
+    dispatch({ type: "setSearchingGame", payload: false });
   };
 
   const handleListnForFirstMove = async (
@@ -236,7 +253,6 @@ export default function PlayOnline({ navigation, route }: Props) {
     myPlayer: Player,
     opponent: Player
   ) => {
-    console.log("listening for first move");
     return await listenForFirstMove({ gameId })
       .then((res: BoardResponse) => {
         setDataFromBoardResponse(res, myPlayer, opponent);
@@ -254,11 +270,9 @@ export default function PlayOnline({ navigation, route }: Props) {
     opponent: Player
   ) => {
     const board: Board = BoardResponseToBoard(res);
-    setBoardState(board);
-    setGameFinished(false);
-    console.log("my player", myPlayer, "opponent", opponent);
-
-    setCurrentPosition(res.moves.length - 1);
+    dispatch({ type: "setBoard", payload: board });
+    dispatch({ type: "setGameFinished", payload: false });
+    dispatch({ type: "setCurrentPosition", payload: res.moves.length - 1 });
   };
 
   const setTimeFromBoardResponse = (
@@ -286,11 +300,6 @@ export default function PlayOnline({ navigation, route }: Props) {
     });
   };
 
-  const PlayMove = (move: Move) => {
-    setBoardState((prevBoard) => {
-      return playMove(move, copyBoard(prevBoard));
-    });
-  };
   const settings = gearModal ? (
     <>
       <SettingsGameModal toggleGear={toggleGear} gearModalOn={gearModal} />
@@ -298,14 +307,13 @@ export default function PlayOnline({ navigation, route }: Props) {
   ) : null;
 
   const gameFinishedOverlay =
-    boardState.result !== GameResults.NONE ? (
+    board.result !== GameResults.NONE ? (
       <View style={styles.gameFinishedOverlayOuterContainer}>
         <View style={styles.gameFinishedOverlayInnerContainer}>
           <GameFinishedOverlay
             navigation={navigation}
-            whoWon={boardState.result}
-            searchForGame={searchNewGame}
-            whitesTurn={boardState.whiteToMove}
+            state={playOnlineState}
+            dispatch={dispatch}
           />
         </View>
       </View>
@@ -317,36 +325,21 @@ export default function PlayOnline({ navigation, route }: Props) {
 
       <View style={styles.contentContainer}>
         <View style={styles.gameRecordContainer}>
-          <GameRecord
-            board={boardState}
-            currentPosition={currentPosition}
-            setCurrentPosition={setCurrentPosition}
-          />
+          <GameRecord state={playOnlineState} dispatch={dispatch} />
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.playerBarContainer}>
             <PlayerBar
               player={opponent}
               timerInfo={opponentClockInfo}
-              board={boardState}
+              board={board}
               gameStarted={gameStarted}
               gameFinished={gameFinished}
               changeTimerBySeconds={updateOpponentClockInSeconds}
             />
           </View>
           <View style={styles.boardContainer}>
-            <PlayOnlineChessBoard
-              board={boardState}
-              setBoard={setBoardState}
-              player={myPlayer}
-              gameId={gameId}
-              playMove={PlayMove}
-              setMyClockInfo={setMyClockInfo}
-              setOpponentClockInfo={setOpponentClockInfo}
-              currentPosition={currentPosition}
-              setGameStarted={setGameStarted}
-              setCurrentPosition={setCurrentPosition}
-            />
+            <TestBoard state={playOnlineState} dispatch={dispatch} />
           </View>
           <View style={styles.gameOptionsContainer}>
             <FontAwesome
@@ -366,7 +359,7 @@ export default function PlayOnline({ navigation, route }: Props) {
             <PlayerBar
               player={myPlayer}
               timerInfo={myClockInfo}
-              board={boardState}
+              board={board}
               gameStarted={gameStarted}
               gameFinished={gameFinished}
               changeTimerBySeconds={updateMyClockInSeconds}
@@ -381,7 +374,7 @@ export default function PlayOnline({ navigation, route }: Props) {
     <View style={styles.appContainer}>
       <View style={styles.searchingGameContentContainer}>
         <View style={styles.boardContainer}>
-          <ChessBoard />
+          <TestBoard state={playOnlineState} dispatch={dispatch} />
         </View>
         <View>
           <FontAwesome

@@ -1,4 +1,5 @@
 import { GameLengthTypeContextType } from "../features/gameMenuPage/context/GameLengthContext";
+import { loggedUserResponse } from "./ServicesTypes";
 
 export type User = {
     firstname: string;
@@ -36,6 +37,7 @@ export type Player = {
     highestRanking: number;
     online?: boolean;
     color: playColor;
+    timeLeft:Date | null;
 };
 
 export type playColor = "white" | "black" | "spectator" | null;
@@ -46,6 +48,25 @@ export type Rankings = {
     rapid: number;
     classical: number;
 };
+
+export const getBasePlayer = (): Player => {
+    return {
+        firstname: "",
+        lastname: "",
+        email: "",
+        nameInGame: "",
+        country: "",
+        ranking: {
+            bullet: 0,
+            blitz: 0,
+            rapid: 0,
+            classical: 0,
+        },
+        highestRanking: 0,
+        color: null,
+        timeLeft: null,
+    }
+}
 
 export const responseUserToUser = (responseUser: responseUser, email:string): User => {
     
@@ -67,6 +88,25 @@ export const responseUserToUser = (responseUser: responseUser, email:string): Us
     }
 } 
 
+export const loggedUserToUser = (loggedUser: loggedUserResponse): User => {
+    const rankings:Rankings = {
+        bullet: loggedUser.ratingBullet,
+        blitz: loggedUser.ratingBlitz,
+        rapid: loggedUser.ratingRapid,
+        classical: loggedUser.ratingClassical,
+    }
+
+    return {
+        firstname: loggedUser.firstname,
+        lastname: loggedUser.lastname,
+        email: loggedUser.email,
+        nameInGame: loggedUser.nameInGame,
+        country: loggedUser.country,
+        ranking: rankings,
+        highestRanking: getHighestRanking(rankings),
+    }
+}
+
 export const responseUserToPlayer = (responseUser: responseUser, color: playColor, email?:string): Player => {
     const rankings:Rankings = {
         bullet: responseUser.ratingBullet,
@@ -83,6 +123,7 @@ export const responseUserToPlayer = (responseUser: responseUser, color: playColo
         ranking: rankings,
         highestRanking: getHighestRanking(rankings),
         color: color,
+        timeLeft: null,
     }
 }
 
@@ -97,6 +138,7 @@ export const userToPlayer = (user: User, color: playColor): Player => {
         highestRanking: user.highestRanking,
         online: user.online,
         color: color,
+        timeLeft: null,
     }
 }
 

@@ -15,6 +15,7 @@ export const checkInvitationsLink = `${userLink}checkInvitations`;
 export const respondtoInvitationLink = `${userLink}respondToInvitation`;
 export const removeFriendLink = `${userLink}removeFriend`;
 export const removeInvitationLink = `${userLink}removeInvitation`;
+export const findUserbyTokenLink = `${userLink}findUserByToken`;
 export const chessGameLink = `${baseLink}game/`;
 export const searchNewGameLink = `${chessGameLink}searchNewGame`;
 export const cancelSearchLink = `${chessGameLink}cancelSearch`;
