@@ -28,11 +28,7 @@ type Props={
 export default function FriendsIconList ({ navigation, nameInGame }: Props){
   
   useEffect(()=>{
-    console.log(nameInGame)
     const friends = getFriendsList(nameInGame);
-    console.log(friends)
-    console.log("^fridsn list")
-    console.log("")
   }, [nameInGame])
 
   const goToFriendsProfile = (player: {

@@ -36,7 +36,7 @@ export const getUser = async () => {
     });
 };
 
-export const fetchUser = async (email: string, Nickname: string) => {
+export const fetchUser = async ( Nickname: string, email?: string) => {
   const token = await SecureStore.getItemAsync("accessToken");
   const user: any = await fetch(`${findByNicknameLink}${Nickname}`, {
     method: "POST",
@@ -56,7 +56,7 @@ export const fetchUser = async (email: string, Nickname: string) => {
       }
     })
     .then((data) => {
-      return responseUserToUser(data, email);
+      return responseUserToUser(data, email ? email : "");
     })
     .catch((err) => {
       return {country: "none", firstname: "doesnt exist", lastname: "doesnt exist", email: "doesnt exist", nameInGame: "doesnt exist", highestRanking: 0, ranking: {blitz: 0, bullet: 0, rapid: 0, classical: 0}};
@@ -150,7 +150,6 @@ export const setUserDataFromResponse = async (
 
 export const addFriendFunc = async (request: FriendInvitationRequest) => {
   const accessToken = await getValueFor("accessToken");
-  console.log(request)
   const response = await fetch(addFriendLink, {
     method: "POST",
     headers: {
@@ -175,7 +174,6 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
 
 export const handleFriendInvitationFunc = async (request: HandleFriendInvitation) =>{
   const accessToken = await getValueFor("accessToken");
-  console.log(request)
   const response = await fetch(friendInvitation, {
     method: "POST",
     headers: {
@@ -201,7 +199,6 @@ export const handleFriendInvitationFunc = async (request: HandleFriendInvitation
 export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
 
-  console.log(`${findUsersByNickname}${request.searchNickname}`)
   const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
     method: "POST",
     headers: {
@@ -233,9 +230,7 @@ export async function getFriendsList  (nameInGame:string){
       Authorization: `Bearer ${accessToken}`,
     }
   }).then((response) => {
-    console.log("not shit")
     if (response.status === 200) {
-      console.log("stat200 god")
       return response.json() as unknown as Array<responseUser>;
         } else if (response.status === 400) {
           throw new Error("Bad request");
@@ -253,10 +248,8 @@ export async function getFriendsList  (nameInGame:string){
 
 
 export const checkInvitations = async () =>{
-  console.log("1 checkpoint")
   const accessToken = await getValueFor("accessToken");
   
-  console.log("2 checkpoint")
   const response = await fetch(checkInvitationsLink,{
     method: "POST",
     headers: {
@@ -264,7 +257,6 @@ export const checkInvitations = async () =>{
       Authorization: `Bearer ${accessToken}`,
     }
   }).then((response) => {
-    console.log("SDsdsd")
     if (response.status === 200) {
     
       return response.json() as unknown as Array<responseUser>;
@@ -278,12 +270,9 @@ export const checkInvitations = async () =>{
   })
   .catch((error) => {
 
-  console.log("2 checkpoint")
     throw new Error(error);
   });
   
-  console.log("3 checkpoint")
-  console.log(response)
   return response;
 }
 

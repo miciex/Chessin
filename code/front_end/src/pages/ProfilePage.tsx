@@ -91,11 +91,11 @@ type Props = {
 export default function ProfilePage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
   
-  const nameInGame = route.params.nameInGame;
+  const nameInGame = route?.params?.nameInGame;
   
   useEffect(() => {
    
-    if(nameInGame=="user"){
+    if(nameInGame===undefined){
       getValueFor("user").then((user) => {
       if (user === null) return;
       setUser(JSON.parse(user));

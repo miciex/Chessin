@@ -26,7 +26,6 @@ const SendInvitation = ({nick}: Props) => {
 
   const handleAddFriend = ( ) => {
     addFriendFunc({friendNickname: nick}).then((data)=>{
-      console.log(data)
     }).catch(err => {throw new Error(err)})
   }
   return (

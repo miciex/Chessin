@@ -28,9 +28,7 @@ export const fetchandStoreUser = async (email: string) => {
           }
         })
         .then((data) => {
-          console.log("user data: ", email);
           let user: User = loggedUserToUser(data);
-          console.log("changed user: ", user);
           save("user", JSON.stringify(user));
         })
         .catch((err) => {

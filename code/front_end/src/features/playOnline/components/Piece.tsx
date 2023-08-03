@@ -178,7 +178,6 @@ export default function Piece({
             opponent: state.opponent,
           },
         });
-        console.log(boardResponse);
         listenForMove({
           gameId: state.gameId,
           moves: boardResponse.moves,

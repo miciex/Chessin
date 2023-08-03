@@ -36,9 +36,9 @@ export type RootStackParamList = {
   };
   PlayWithFriendsMenu: {};
   ProfilePage: {
-    nameInGame: string
+    nameInGame: string 
     
-  };
+  } | undefined;
   Register: undefined;
   Socials: undefined;
   AnalyzeGame: undefined;
