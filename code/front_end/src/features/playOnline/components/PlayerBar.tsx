@@ -7,7 +7,6 @@ import Timer from "./Timer";
 import { FontAwesome } from "@expo/vector-icons";
 import { countryToIsoCode } from "..";
 import { Board } from "../../../chess-logic/board";
-import { PlayOnlineState } from "../../../pages/PlayOnline";
 
 type Props = {
   player: Player | null;

@@ -8,7 +8,6 @@ import FreeBoard from "./src/pages/FreeBoardPage";
 import LastGame from "./src/pages/LastGamePage";
 import Login from "./src/pages/LoginPage";
 import PlayBot from "./src/pages/PlayBotPage";
-// import PlayOnline from "./src/pages/PlayOnlinePage";
 import PlayWithFriendsMenu from "./src/pages/PlayWithFriendsMenuPage";
 import ProfilePage from "./src/pages/ProfilePage";
 import Register from "./src/pages/RegisterPage";
@@ -34,7 +33,7 @@ export type RootStackParamList = {
   PlayOnline: {
     request: PendingChessGameRequest;
   };
-  PlayWithFriendsMenu: {};
+  PlayWithFriendsMenu: undefined;
   ProfilePage: undefined;
   Register: undefined;
   Socials: undefined;

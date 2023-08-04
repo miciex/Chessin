@@ -1,16 +1,8 @@
-import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  View,
-  PanResponder,
-  Animated,
-  Platform,
-} from "react-native";
+import { StyleSheet, Text, View, PanResponder, Animated } from "react-native";
 import { useState, useRef } from "react";
 
 export default function App() {
-  const [activeField, setActiveField] = useState<number>(0);
+  const [activeField] = useState<number>(0);
 
   const pan = useRef(new Animated.ValueXY()).current;
 
@@ -53,13 +45,6 @@ export default function App() {
               styles.innerField,
               { backgroundColor: setBackGroundColor(i) },
               0 === i ? pan.getLayout() : null,
-              // 0 === i
-              //   ? {
-              //       position: "relative",
-              //       // zIndex: 100,
-              //       backgroundColor: "blue",
-              //     }
-              //   : null,
             ]}
             key={Math.random()}
             {...panResponder.panHandlers}

@@ -1,4 +1,4 @@
-import { useContext, createContext } from "react";
+import { createContext } from "react";
 
 export type playType = "Play Online" | "Play With Bot";
 

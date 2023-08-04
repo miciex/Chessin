@@ -2,7 +2,6 @@ import * as SecureStore from "expo-secure-store";
 import { findUserbyTokenLink } from "../../../utils/ApiEndpoints";
 import { User, loggedUserToUser } from "../../../utils/PlayerUtilities";
 import { save } from "../../../utils/AsyncStoreFunctions";
-import { fetchUser } from "../../../services/userServices";
 import { loggedUserResponse } from "../../../utils/ServicesTypes";
 
 export const fetchandStoreUser = async (email: string) => {

@@ -1,8 +1,7 @@
 import { View, Dimensions, StyleSheet, Animated } from "react-native";
-import { Board } from "../../../chess-logic/board";
 import Piece from "./Piece";
 import Background from "./Background";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import {
   PlayOnlineAction,
   PlayOnlineState,
@@ -12,10 +11,10 @@ type Props = {
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
 };
-const SIZE = Dimensions.get("window").width / 8;
-export default function TestBoard({ state, dispatch }: Props) {
-  const [active, setActive] = useState<null | number>(null);
 
+const SIZE = Dimensions.get("window").width / 8;
+
+export default function TestBoard({ state, dispatch }: Props) {
   const activeValues = useRef<Animated.Value[]>([]);
   const possibleMoves = useRef<Animated.Value[]>([]);
 
@@ -26,24 +25,37 @@ export default function TestBoard({ state, dispatch }: Props) {
     }
   }, []);
 
+  const pieces = useMemo<JSX.Element[]>(() => {
+    let brd = state.board.visualBoard.map((piece, i) => {
+      return (
+        <Piece
+          key={Math.random()}
+          id={piece}
+          position={{ x: SIZE * (i % 8), y: SIZE * Math.floor(i / 8) }}
+          state={state}
+          dispatch={dispatch}
+          activeValues={activeValues}
+          possibleMoves={possibleMoves}
+          positionNumber={i}
+        />
+      );
+    });
+    if (state.myPlayer?.color === "black") {
+      brd.reverse();
+    }
+    return brd;
+  }, [
+    state.board,
+    state.currentPosition,
+    state.searchingGame,
+    state.board.visualBoard,
+  ]);
+
   return activeValues.current.length > 0 ? (
     <View style={styles.container}>
       <View style={{ width: SIZE * 8, height: SIZE * 8 }}>
         <Background />
-        {state.board.visualBoard.map((piece, i) => {
-          return (
-            <Piece
-              key={Math.random()}
-              id={piece}
-              position={{ x: SIZE * (i % 8), y: SIZE * Math.floor(i / 8) }}
-              state={state}
-              dispatch={dispatch}
-              activeValues={activeValues}
-              possibleMoves={possibleMoves}
-              positionNumber={i}
-            />
-          );
-        })}
+        {pieces}
       </View>
     </View>
   ) : null;

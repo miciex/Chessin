@@ -1,8 +1,6 @@
-import { Pressable, Text, StyleSheet } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
-import { ColorsPallet } from "../../../utils/Constants";
 import BaseButton from "../../../components/BaseButton";
 
 type Props = {
@@ -17,13 +15,3 @@ export default function SingButton({ navigation, text }: Props) {
 
   return <BaseButton handlePress={handlePress} text={text} />;
 }
-
-const styles = StyleSheet.create({
-  button: {
-    width: "40%",
-    backgroundColor: ColorsPallet.baseColor,
-  },
-  buttonText: {
-    color: ColorsPallet.darker,
-  },
-});

@@ -1,11 +1,7 @@
 import { View, StyleSheet, Text } from "react-native";
 import React from "react";
 import PlayOnlineElement from "./PlayOnlineElement";
-import {
-  LengthType,
-  GameLengthTypeContextType,
-} from "../context/GameLengthContext";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LengthType } from "../context/GameLengthContext";
 import { gameLengthTypeContextTypeToIconName } from "../services/HelpFunctions";
 
 type Props = {

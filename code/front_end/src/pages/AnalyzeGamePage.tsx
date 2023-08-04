@@ -1,19 +1,18 @@
 import { View, StyleSheet, ScrollView } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useReducer } from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
-import { getInitialChessBoard } from "../features/playOnline";
+import PlayOnlineBoard from "../features/playOnline/components/Board";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import { sampleMoves } from "../chess-logic/ChessConstants";
 import { StringMoveToText } from "../utils/ChessConvertionFunctions";
-import { Board } from "../chess-logic/board";
-import { getUser } from "../services/userServices";
-import { Player, User, responseUserToPlayer } from "../utils/PlayerUtilities";
-import { getValueFor } from "../utils/AsyncStoreFunctions";
+import {
+  reducer,
+  initialState,
+} from "../features/playOnline/reducers/PlayOnlineReducer";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -24,18 +23,8 @@ type Props = {
   route: RouteProp<RootStackParamList, "AnalyzeGame">;
 };
 
-export default function AnalyzeGame({ navigation, route }: Props) {
-  const [player, setPlayer] = useState<Player | null>(null);
-
-  useEffect(() => {
-    getValueFor("user").then((user) => {
-      if (user === null) return;
-      const player = { ...JSON.parse(user), color: "white" };
-      setPlayer(player);
-    });
-  }, []);
-
-  const [boardState, setBoardState] = useState<Board>(getInitialChessBoard());
+export default function AnalyzeGame({ navigation }: Props) {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const analyzisContent = sampleMoves.map((move, index) => (
     <StringMoveToText move={move} key={index} />
@@ -45,15 +34,11 @@ export default function AnalyzeGame({ navigation, route }: Props) {
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
         <View style={styles.gameRecordContainer}>
-          <GameRecord moves={sampleMoves} />
+          <GameRecord state={state} dispatch={dispatch} />
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.boardContainer}>
-            <PlayOnlineChessBoard
-              board={boardState}
-              setBoard={setBoardState}
-              playersColor={player?.color === "white" ? player.color : null}
-            />
+            <PlayOnlineBoard state={state} dispatch={dispatch} />
           </View>
         </View>
         <ScrollView

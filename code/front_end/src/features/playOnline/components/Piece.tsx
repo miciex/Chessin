@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { Animated, Dimensions, PanResponder, View } from "react-native";
+import React, { useRef } from "react";
+import { Animated, Dimensions, PanResponder } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
   PlayOnlineAction,
@@ -7,11 +7,7 @@ import {
 } from "../reducers/PlayOnlineReducer";
 import { possibleMovesAfterCheck } from "../../../chess-logic/board";
 import { Move, moveFactory } from "../../../chess-logic/move";
-import {
-  BoardResponse,
-  ListenForMoveRequest,
-  SubmitMoveRequest,
-} from "../../../utils/ServicesTypes";
+import { BoardResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { listenForMove, submitMove } from "../services/playOnlineService";
 
 const yellow = "rgba(255, 255, 0, 0.5)";
@@ -85,15 +81,13 @@ export default function Piece({
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const panCut = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
-  // const [possibleMoves, setPossibleMoves] = useState<number[]>([]);
-
   const resetActiveValues = () => {
     for (let i = 0; i < 64; i++) {
       activeValues.current[i].setValue(0);
     }
   };
 
-  const findActiveValue = (id: number): number => {
+  const findActiveValue = (): number => {
     for (let i = 0; i < 64; i++) {
       if (Number(JSON.stringify(activeValues.current[i])) === 1) {
         return i;
@@ -112,25 +106,10 @@ export default function Piece({
     }
   };
 
-  const isPieceActive = (id: number): boolean => {
-    if (Number(JSON.stringify(activeValues.current[id])) === 1) return true;
-    return false;
-  };
-
   const resetPossibleMoves = () => {
     for (let i = 0; i < 64; i++) {
       possibleMoves.current[i].setValue(0);
     }
-  };
-
-  const findPossibleMoves = (id: number): number[] => {
-    const moves: number[] = [];
-    for (let i = 0; i < 64; i++) {
-      if (Number(JSON.stringify(possibleMoves.current[i])) === 1) {
-        moves.push(i);
-      }
-    }
-    return moves;
   };
 
   const setPossibleMoves = (moves: number[]) => {
@@ -155,6 +134,25 @@ export default function Piece({
     return false;
   };
 
+  const setDataFromBoardResponse = (boardResponse: BoardResponse) => {
+    dispatch({
+      type: "setDataFromBoardResponse",
+      payload: {
+        boardResponse,
+        myPlayer: state.myPlayer,
+        opponent: state.opponent,
+      },
+    });
+    dispatch({
+      type: "setTimeFromBoardResponse",
+      payload: {
+        boardResponse,
+        myPlayer: state.myPlayer,
+        opponent: state.opponent,
+      },
+    });
+  };
+
   const handleMove = (move: Move) => {
     const submitMoveRequest: SubmitMoveRequest = {
       gameId: state.gameId,
@@ -170,29 +168,13 @@ export default function Piece({
     });
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
-        dispatch({
-          type: "setDataFromBoardResponse",
-          payload: {
-            boardResponse,
-            myPlayer: state.myPlayer,
-            opponent: state.opponent,
-          },
-        });
-        console.log(boardResponse);
+        setDataFromBoardResponse(boardResponse);
         listenForMove({
           gameId: state.gameId,
           moves: boardResponse.moves,
         })
           .then((res: BoardResponse | undefined) => {
-            if (res === undefined) return;
-            dispatch({
-              type: "setDataFromBoardResponse",
-              payload: {
-                boardResponse,
-                myPlayer: state.myPlayer,
-                opponent: state.opponent,
-              },
-            });
+            if (res) setDataFromBoardResponse(res);
           })
           .catch((err) => {
             throw new Error(err);
@@ -208,8 +190,8 @@ export default function Piece({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderTerminationRequest: () => true,
-      onPanResponderStart(e, gestureState) {
-        const activeField = findActiveValue(positionNumber);
+      onPanResponderStart() {
+        const activeField = findActiveValue();
         if (isPossibleMove(positionNumber)) {
           const move = moveFactory({
             pieces: state.board.position,

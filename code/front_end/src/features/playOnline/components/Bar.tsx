@@ -9,7 +9,6 @@ import {
   PlayOnlineAction,
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
-import Timer from "./Timer";
 
 type Props = {
   state: PlayOnlineState;

@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
-
 import Profile from "../features/playWithFriend/components/Profile";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -9,7 +8,7 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
-import { addFriendFunc, getUser } from "../services/userServices";
+import { addFriendFunc } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";

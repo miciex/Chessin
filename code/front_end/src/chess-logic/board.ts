@@ -1,8 +1,6 @@
-import { HashMap } from "../utils/Types";
 import { Move, getEmptyMove, moveFactory, copyMove } from "./move";
 import { Pieces, Directions } from "./ChessConstants";
 import { FenToIntArray, boardToMap, mapToBoard } from "./helpMethods";
-import { ChessGameResponse } from "../utils/ServicesTypes";
 import { BoardResponse } from "../utils/ServicesTypes";
 
 export type constructorArgs = {

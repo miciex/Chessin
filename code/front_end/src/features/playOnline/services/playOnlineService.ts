@@ -15,7 +15,7 @@ export const listenForMove = async (request: ListenForMoveRequest) => {
         body: JSON.stringify(request),
     }).then((response) => {
         if (response.status === 200) {
-            return response.json() as Promise<BoardResponse>;
+            return response.json() ;
         }else if(response.status === 400){
             response.text().then((data) => {
                 throw new Error(data);

@@ -1,4 +1,3 @@
-import { View, Text } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -12,14 +11,16 @@ type Props = {
     undefined
   >;
   navigationRoute: "PlayOnline" | "PlayBot";
+  params?: any;
 };
 
 export default function StartGameButton({
   navigation,
   navigationRoute,
+  params,
 }: Props) {
   const handlePress = () => {
-    navigation.navigate(navigationRoute);
+    navigation.navigate(navigationRoute, params);
   };
 
   return <BaseButton handlePress={handlePress} text="Play" />;

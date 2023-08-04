@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
-import { Player } from "../../../utils/PlayerUtilities";
-import { Board, GameResults } from "../../../chess-logic/board";
+import { GameResults } from "../../../chess-logic/board";
 import {
   PlayOnlineState,
   PlayOnlineAction,
@@ -30,6 +29,7 @@ export default function PlayerTimer({ state, isMyPlayer, dispatch }: Props) {
       state.gameStarted &&
       state.board.result === GameResults.NONE
     ) {
+      console.log("setTimer");
       timeout = setTimeout(setTimer, 1000);
 
       dispatch({

@@ -27,7 +27,7 @@ type Props = {
   route: RouteProp<RootStackParamList, "Login">;
 };
 
-export default function Login({ route, navigation }: Props) {
+export default function Login({ navigation }: Props) {
   const [email, setEmail] = useState<string>("");
   const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
   const [password, setPassword] = useState<string>("");

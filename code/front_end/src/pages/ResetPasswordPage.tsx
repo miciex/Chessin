@@ -31,7 +31,7 @@ type Props = {
   route: RouteProp<RootStackParamList, "ResetPassword">;
 };
 
-export default function ResetPasswordPage({ navigation, route }: Props) {
+export default function ResetPasswordPage({ navigation }: Props) {
   const [email, setEmail] = useState<string>("");
   const [emailValid, setEmailValid] = useState<boolean>(true);
 

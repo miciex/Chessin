@@ -1,6 +1,6 @@
 import { View, StyleSheet } from "react-native";
 import React from "react";
-import { User } from "../../../context/UserContext";
+import { User } from "../../../utils/PlayerUtilities";
 import FriendToPlayWith from "./FriendToPlayWith";
 
 type Props = {

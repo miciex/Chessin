@@ -1,7 +1,6 @@
-import { View, StyleSheet, Text } from "react-native";
-import React, { useState, useContext } from "react";
+import { View, StyleSheet } from "react-native";
+import React, { useState } from "react";
 import TimeOptionsModal from "./TimeOptionsModal";
-import StartGameButton from "../../../components/StartGameButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import ChooseTimeButton from "./ChooseTimeButton";

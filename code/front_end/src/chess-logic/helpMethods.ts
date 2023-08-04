@@ -1,5 +1,4 @@
 import { Pieces } from "./ChessConstants";
-import { Char } from "../utils/Types";
 import { ALPHABET } from "../utils/Constants";
 
 export const getPieceValue = (piece:number):number=>{

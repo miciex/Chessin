@@ -12,9 +12,15 @@ type Props = {
     StackParamList,
     undefined
   >;
+  params?: any;
 };
 
-export default function Heading({ text, navigation, stringNavigation }: Props) {
+export default function Heading({
+  text,
+  navigation,
+  stringNavigation,
+  params,
+}: Props) {
   let icon;
   if (stringNavigation)
     icon = (
@@ -23,7 +29,10 @@ export default function Heading({ text, navigation, stringNavigation }: Props) {
         size={24}
         color="black"
         onPress={() =>
-          navigation?.navigate(stringNavigation ? stringNavigation : "Home")
+          navigation?.navigate(
+            stringNavigation ? stringNavigation : "Home",
+            params
+          )
         }
       />
     );

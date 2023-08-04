@@ -1,6 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React from "react";
-
+import { View, StyleSheet, ScrollView } from "react-native";
 import { ColorsPallet } from "../utils/Constants";
 import SendInvitation from "../features/playWithFriend/components/SendInvitation";
 import InputField from "../components/InputField";
@@ -9,7 +7,6 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
-import Submit from "../features/login/components/Submit";
 
 const friends = [
   {
@@ -110,12 +107,12 @@ type Props = {
   route: RouteProp<RootStackParamList, "Socials">;
 };
 
-export default function Socials({ route, navigation }: Props) {
+export default function Socials({ navigation }: Props) {
   return (
     <View style={styles.appContainer}>
       <View style={styles.formContainer}>
         <SendInvitation />
-       
+
         <InputField placeholder="Search" />
         <ScrollView>
           <View style={styles.scrollView}>

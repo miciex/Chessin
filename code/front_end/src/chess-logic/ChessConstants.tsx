@@ -1,5 +1,3 @@
-import { countryIsoCodes } from "../features/playOnline";
-
 export type ChessPiecesLetterType = "K" | "Q" | "R" | "B" | "N" | "";
 
 export const Directions: { [key: number]: Array<number> } = {
