@@ -1,7 +1,9 @@
 package com.chessin.model.social;
 
 import com.chessin.model.register.user.User;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +19,6 @@ import java.time.Instant;
 @Entity
 public class FriendInvitation {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @ManyToOne
     private User user;

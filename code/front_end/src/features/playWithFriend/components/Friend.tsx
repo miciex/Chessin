@@ -51,7 +51,7 @@ const Friend = ({ navigation, user }: Props) => {
         }}
       />             
       <Text >
-        <Online /> {user.nameInGame} {user.ranking.classical.toString()}
+        <Online /> {user.nameInGame} {user.ranking.classical? user.ranking.classical.toString():""}
       </Text>
       </Pressable>
       </View>

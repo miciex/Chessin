@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,7 +13,4 @@ public interface ChessGameRepository extends JpaRepository<ChessGame, Long> {
     @Modifying
     @Query(value = "UPDATE ChessGame cg SET cg.gameResult = :gameResult WHERE cg.id = :id")
     void updateGameResult(@Param(value = "id") long id, @Param(value = "gameResult") GameResults gameResult);
-
-    @Query(value = "SELECT cg FROM ChessGame cg WHERE cg.whiteUser.id = :nickname OR cg.blackUser.id = :nickname")
-    List<ChessGame> findAllByWhiteNameInGameOrBlackNameInGame(@Param(value = "nickname") String nickname);
 }

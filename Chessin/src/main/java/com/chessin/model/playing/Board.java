@@ -22,7 +22,6 @@ import static com.chessin.model.utils.Convert.boardToMap;
 @NoArgsConstructor
 @Builder
 public class Board {
-    long gameId;
     ArrayList<Move> moves;
     boolean whiteTurn;
     String whiteEmail;
@@ -42,7 +41,6 @@ public class Board {
     public static Board fromGame(ChessGame game)
     {
         return Board.builder()
-                .gameId(game.getId())
                 .whiteEmail(game.getWhiteUser().getEmail())
                 .blackEmail(game.getBlackUser().getEmail())
                 .moves(new ArrayList<>())

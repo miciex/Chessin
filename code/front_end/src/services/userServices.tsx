@@ -199,6 +199,7 @@ export const handleFriendInvitationFunc = async (request: HandleFriendInvitation
 export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
 
+
   const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
     method: "POST",
     headers: {
@@ -209,12 +210,14 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   .then((response) => {
     
     if (response.status === 200) {
+      
       return response.json() as unknown as Array<responseUser>;
         } else {
       throw new Error("Something went wrong on api server!");
     }
   })
   .catch((error) => {
+    console.log("shit");
     console.error(error);
   });
   return response;

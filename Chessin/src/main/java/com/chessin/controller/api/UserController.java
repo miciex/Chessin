@@ -4,12 +4,9 @@ import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.requests.SetActiveRequest;
-import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.controller.responses.FriendInvitationResponse;
 import com.chessin.controller.responses.LoggedUserResponse;
 import com.chessin.controller.responses.MoveResponse;
-import com.chessin.model.playing.ChessGame;
-import com.chessin.model.playing.ChessGameRepository;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
 import com.chessin.controller.responses.UserResponse;
@@ -33,7 +30,6 @@ public class UserController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final FriendInvitationRepository friendInvitationRepository;
-    private final ChessGameRepository chessGameRepository;
 
     @PostMapping("/findByNickname/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname) {
@@ -98,7 +94,7 @@ public class UserController {
         if (!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 
-        List<FriendInvitation> invitations = friendInvitationRepository.findAllByFriendEmail(email);
+        List<FriendInvitation> invitations = friendInvitationRepository.findAllByUserEmail(email);
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
@@ -179,18 +175,5 @@ public class UserController {
         friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendNickname());
 
         return ResponseEntity.ok().body("Invitation removed.");
-    }
-
-    @PostMapping("/getGames/{nickname}")
-    public ResponseEntity<?> getGames(@PathVariable String nickname)
-    {
-        if(!userRepository.existsByNameInGame(nickname))
-            return ResponseEntity.badRequest().body("User does not exist.");
-
-        List<ChessGameResponse> games = new ArrayList<>();
-
-        chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGame(nickname).stream().map(ChessGameResponse::fromChessGame).forEach(games::add);
-
-        return ResponseEntity.ok().body(games);
     }
 }

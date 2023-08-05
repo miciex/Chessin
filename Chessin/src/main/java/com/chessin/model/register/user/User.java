@@ -7,6 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.awt.*;
+import java.sql.Blob;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,10 +35,10 @@ public class User implements UserDetails {
     private boolean isTwoFactorAuthenticationEnabled;
     @Enumerated(EnumType.STRING)
     private Provider provider;
-//    private int ratingBlitz;
-//    private int ratingBullet;
-//    private int ratingRapid;
-//    private int ratingClassical;
+    private int ratingBlitz;
+    private int ratingBullet;
+    private int ratingRapid;
+    private int ratingClassical;
     private String country;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> friends;
