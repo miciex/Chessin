@@ -58,7 +58,7 @@ public class UserController {
 
         users.stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(responses::add);
 
-        return ResponseEntity.ok().body(users);
+        return ResponseEntity.ok().body(responses);
     }
 
     @PostMapping("/setActive")
