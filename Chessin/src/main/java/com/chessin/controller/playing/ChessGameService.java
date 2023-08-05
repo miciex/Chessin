@@ -171,12 +171,12 @@ public class ChessGameService {
             default -> throw new IllegalStateException("Unexpected value: " + game.getGameType());
         }
 
-        game.setWhiteRating(whiteRating.getRating());
-        game.setBlackRating(blackRating.getRating());
+        game.setWhiteRating(whiteRatingBefore);
+        game.setBlackRating(blackRatingBefore);
         game.setWhiteRatingChange(whiteRating.getRating() - whiteRatingBefore);
         game.setBlackRatingChange(blackRating.getRating() - blackRatingBefore);
-        board.setWhiteRating(whiteRating.getRating());
-        board.setBlackRating(blackRating.getRating());
+        board.setWhiteRating(whiteRatingBefore);
+        board.setBlackRating(blackRatingBefore);
         board.setWhiteRatingChange(whiteRating.getRating() - whiteRatingBefore);
         board.setBlackRatingChange(blackRating.getRating() - blackRatingBefore);
         board.setRated(game.isRated());

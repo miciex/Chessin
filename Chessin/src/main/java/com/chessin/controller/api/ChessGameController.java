@@ -246,6 +246,8 @@ public class ChessGameController {
                 return ResponseEntity.badRequest().body("Illegal move.");
             }
 
+            long timeLeft = board.isWhiteTurn() ? board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) : board.getBlackTime() - Math.abs(board.getLastMoveTime() - now);
+
             board = chessGameService.submitMove(request, board, activeGames.get(request.getGameId()));
 
             if(board.getGameResult() != GameResults.NONE)
@@ -261,7 +263,7 @@ public class ChessGameController {
 
             activeGames.get(request.getGameId()).notifyAll();
 
-            activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
+            activeGames.get(request.getGameId()).wait(timeLeft);
 
             if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
             {
