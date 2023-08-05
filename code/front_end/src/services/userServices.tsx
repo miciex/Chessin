@@ -18,7 +18,6 @@ import { AuthenticationResponse, CodeVerificationRequest , FriendInvitationReque
 import * as SecureStore from "expo-secure-store";
 
 export const storeUser = async (value: User) => {
-  console.log(value + "value")
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
     throw new Error(err);
   });
@@ -251,7 +250,6 @@ export async function getFriendsList  (nameInGame:string){
 
 export const checkInvitations = async () =>{
   const accessToken = await getValueFor("accessToken");
-  console.log(checkInvitationsLink + " acces")
   
   const response = await fetch(checkInvitationsLink,{
     method: "POST",

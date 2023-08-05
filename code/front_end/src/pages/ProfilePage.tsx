@@ -9,9 +9,9 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
-import { addFriendFunc, getUser } from "../services/userServices";
+import { addFriendFunc, getFriendsList, getUser } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
-import { User } from "../utils/PlayerUtilities";
+import { User, responseUserToUser } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { fetchUser } from "../services/userServices";
 
@@ -90,24 +90,31 @@ type Props = {
 
 export default function ProfilePage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
+  const [user2, setUser2] = useState<User>();
   
   const nameInGame = route?.params?.nameInGame;
+ 
   
   useEffect(() => {
-   
     if(nameInGame===undefined){
       getValueFor("user").then((user) => {
       if (user === null) return;
       setUser(JSON.parse(user));
     })} else {
-      fetchUser("", nameInGame).then((user) => {
+      fetchUser(nameInGame).then((user) => {
         if (user === null){
           return;
         } 
         setUser(user);
+        getValueFor("user").then((user) => {
+          if (user === null) return;
+          setUser2(JSON.parse(user));
+        })
       })
     };
   }, [nameInGame]);
+  console.log(nameInGame + " name")
+  console.log(user2?.nameInGame + " user2 nbame")
 
   let component = ended_games.slice(0, 5).map((game) => {
     return (
@@ -127,6 +134,25 @@ export default function ProfilePage({ navigation, route }: Props) {
     addFriendFunc({friendNickname: user ? user.nameInGame : ""}).then((data)=>{
     }).catch(err => {throw new Error(err)})
   }
+
+  const [friends, setFriends] = useState<Array<User>>([])
+
+  const checkNicknameInObjects = (mainObject: Array<User>, targetNickname:string) => {
+    return mainObject.some(obj => obj.nameInGame === targetNickname);
+  }
+
+  const [result, setResult] = useState<boolean>();
+
+  useEffect(()=>{
+    console.log("cos")
+    if(nameInGame)getFriendsList(nameInGame).then((data) =>{ 
+      if(data === undefined) return
+      setFriends(data.map(x => responseUserToUser(x, "")))
+      setResult(checkNicknameInObjects(friends, user2?.nameInGame ? user2?.nameInGame: ""));
+    })
+  }, [nameInGame, user2?.nameInGame])
+
+
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -140,14 +166,17 @@ export default function ProfilePage({ navigation, route }: Props) {
           />
         </View>
 
-        <View style={styles.invite}>
-          <BaseButton
-            handlePress={() => {
-              handleAddFriend
-            }}
-            text="Send Invitation"
-          />
-        </View>
+        {
+            result ? "" : <View style={styles.invite}>
+            <BaseButton
+              handlePress={() => {
+                handleAddFriend
+              }}
+              text="Send Invitation"
+            />
+          </View>
+        }
+        
         <View style={styles.invite}>
           <BaseButton
             handlePress={() => {

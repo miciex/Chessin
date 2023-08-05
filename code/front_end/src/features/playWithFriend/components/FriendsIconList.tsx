@@ -40,12 +40,6 @@ export default function FriendsIconList ({ navigation, nameInGame }: Props){
 
 
 
-
-
-
-
-
-
   const goToFriendsProfile = (
     playerNick: string
 ) => {
@@ -72,6 +66,7 @@ export default function FriendsIconList ({ navigation, nameInGame }: Props){
                  source={{
                    uri: player.country,
                  }}
+                 alt={player.country}
             />
             <Text style={styles.text}>{player.nameInGame}</Text>
           </View></Pressable>
