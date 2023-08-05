@@ -29,10 +29,10 @@ public class UserResponse {
                 .firstname(user.getFirstname())
                 .lastName(user.getLastName())
                 .nameInGame(user.getNameInGame())
-                .ratingBlitz(user.getRatingBlitz())
-                .ratingBullet(user.getRatingBullet())
-                .ratingRapid(user.getRatingRapid())
-                .ratingClassical(user.getRatingClassical())
+//                .ratingBlitz(user.getRatingBlitz())
+//                .ratingBullet(user.getRatingBullet())
+//                .ratingRapid(user.getRatingRapid())
+//                .ratingClassical(user.getRatingClassical())
                 .country(user.getCountry())
                 .build();
     }
@@ -44,10 +44,10 @@ public class UserResponse {
                 .firstname(userResponse.getFirstname())
                 .lastName(userResponse.getLastName())
                 .nameInGame(userResponse.getNameInGame())
-                .ratingBlitz(userResponse.getRatingBlitz())
-                .ratingBullet(userResponse.getRatingBullet())
-                .ratingRapid(userResponse.getRatingRapid())
-                .ratingClassical(userResponse.getRatingClassical())
+//                .ratingBlitz(userResponse.getRatingBlitz())
+//                .ratingBullet(userResponse.getRatingBullet())
+//                .ratingRapid(userResponse.getRatingRapid())
+//                .ratingClassical(userResponse.getRatingClassical())
                 .country(userResponse.getCountry())
                 .build();
     }

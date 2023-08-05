@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.chessin.model.playing.Board.findKing;
-import static com.nimbusds.oauth2.sdk.util.StringUtils.isNumeric;
+//import static com.nimbusds.oauth2.sdk.util.StringUtils.isNumeric;
 import static java.lang.Character.*;
 import static java.lang.Character.toUpperCase;
 
