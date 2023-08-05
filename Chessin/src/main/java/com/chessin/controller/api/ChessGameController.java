@@ -298,4 +298,35 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("This player is not playing any game.");
 
     }
+
+    @PostMapping("/getBoardByUsername/{username}")
+    public ResponseEntity<?> getBoardByUsername(@PathVariable String username)
+    {
+        Optional<Board> board = activeBoards.values().stream().filter(x -> userRepository.findByEmail(x.getBlackEmail()).get().getNameInGame().equals(username) || userRepository.findByEmail(x.getWhiteEmail()).get().getNameInGame().equals(username)).findFirst();
+
+        if(board.isPresent())
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(board.get()));
+        else
+            return ResponseEntity.badRequest().body("This player is not playing any game.");
+
+    }
+
+    @PostMapping("/getBoardByGameId/{gameId}")
+    public ResponseEntity<?> getBoardByGameId(@PathVariable String gameId)
+    {
+        long id;
+        try{
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Wrong game id.");
+        }
+
+        if(activeBoards.containsKey(id))
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
+        else
+            return ResponseEntity.badRequest().body("Game not found.");
+
+    }
 }
