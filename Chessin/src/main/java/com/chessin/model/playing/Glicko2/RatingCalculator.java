@@ -6,7 +6,9 @@
  */
 package com.chessin.model.playing.Glicko2;
 
-import com.chessin.model.playing.Glicko2.Entities.ClassicalRating;
+import com.chessin.model.playing.Glicko2.Entities.Rating;
+import lombok.Data;
+import org.springframework.context.annotation.Bean;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +64,7 @@ public class RatingCalculator {
 	 *
 	 */
 	public void updateRatings(Result result) {
-		for ( ClassicalRating player : Arrays.asList(result.getWinner(), result.getLoser())) {
+		for ( Rating player : Arrays.asList(result.getWinner(), result.getLoser())) {
 				calculateNewRating(player, List.of(result));
 		}
 	}
@@ -74,7 +76,7 @@ public class RatingCalculator {
 	 * @param player
 	 * @param results
 	 */
-	private void calculateNewRating(ClassicalRating player, List<Result> results) {
+	private void calculateNewRating(Rating player, List<Result> results) {
 		double phi = player.getGlicko2RatingDeviation();
 		double sigma = player.getVolatility();
 		double a = Math.log( Math.pow(sigma, 2) );
@@ -172,7 +174,7 @@ public class RatingCalculator {
 	 * @param results
 	 * @return
 	 */
-	private double v(ClassicalRating player, List<Result> results) {
+	private double v(Rating player, List<Result> results) {
 		double v = 0.0;
 		
 		for ( Result result: results ) {
@@ -198,7 +200,7 @@ public class RatingCalculator {
 	 * @param results
 	 * @return delta
 	 */
-	private double delta(ClassicalRating player, List<Result> results) {
+	private double delta(Rating player, List<Result> results) {
 		return v(player, results) * outcomeBasedRating(player, results);
 	}
 	
@@ -210,7 +212,7 @@ public class RatingCalculator {
 	 * @param results
 	 * @return expected rating based on game outcomes
 	 */
-	private double outcomeBasedRating(ClassicalRating player, List<Result> results) {
+	private double outcomeBasedRating(Rating player, List<Result> results) {
 		double outcomeBasedRating = 0;
 		
 		for ( Result result: results ) {

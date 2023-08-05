@@ -28,87 +28,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BulletRating {
+public class BulletRating extends Rating {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	@OneToOne
-	private User userId;
-	private double rating;
-	private double ratingDeviation;
-	private double volatility;
-	
-	/**
-	 * 
-	 * @param userId           An value through which you want to identify the rating (not actually used by the algorithm)
-	 * @param ratingSystem  An instance of the RatingCalculator object
-	 */
+	private User user;
 
-	/**
-	 * Return the average skill value of the player.
-	 * 
-	 * @return double
-	 */
-	public double getRating() {
-		return this.rating;
+	public BulletRating(User user, RatingCalculator ratingSystem) {
+		this.user = user;
+		this.rating = ratingSystem.getDefaultRating();
+		this.ratingDeviation = ratingSystem.getDefaultRatingDeviation();
+		this.volatility = ratingSystem.getDefaultVolatility();
 	}
-
-	public void setRating(double rating) {
-		this.rating = rating;
-	}
-
-	/**
-	 * Return the average skill value of the player scaled down
-	 * to the scale used by the algorithm's internal workings.
-	 * 
-	 * @return double
-	 */
-	public double getGlicko2Rating() {
-		return RatingCalculator.convertRatingToGlicko2Scale(this.rating);
-	}
-
-	public void setGlicko2Rating(double rating) {
-		this.rating = RatingCalculator.convertRatingToOriginalGlickoScale(rating);
-	}
-
-	public double getVolatility() {
-		return volatility;
-	}
-
-	public void setVolatility(double volatility) {
-		this.volatility = volatility;
-	}
-
-	public double getRatingDeviation() {
-		return ratingDeviation;
-	}
-
-	public void setRatingDeviation(double ratingDeviation) {
-		this.ratingDeviation = ratingDeviation;
-	}
-
-	/**
-	 * Return the rating deviation of the player scaled down
-	 * to the scale used by the algorithm's internal workings.
-	 * 
-	 * @return double
-	 */
-	public double getGlicko2RatingDeviation() {
-		return RatingCalculator.convertRatingDeviationToGlicko2Scale( ratingDeviation );
-	}
-
-	/**
-	 * Set the rating deviation, taking in a value in Glicko2 scale.
-	 *
-	 */
-	public void setGlicko2RatingDeviation(double ratingDeviation) {
-		this.ratingDeviation = RatingCalculator.convertRatingDeviationToOriginalGlickoScale( ratingDeviation );
-	}
-	
-	/**
-	 * Returns a formatted rating for inspection
-	 * 
-	 * @return {ratinguserId} / {ratingDeviation} / {volatility} / {numberOfResults}
-	 */
 }

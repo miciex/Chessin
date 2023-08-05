@@ -14,4 +14,5 @@ public class PendingChessGameRequest {
     private int bottomRating;
     private int topRating;
     private int userRating;
+    private boolean isRated;
 }

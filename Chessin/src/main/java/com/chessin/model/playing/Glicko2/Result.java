@@ -6,7 +6,8 @@
  */
 package com.chessin.model.playing.Glicko2;
 
-import com.chessin.model.playing.Glicko2.Entities.ClassicalRating;
+import com.chessin.model.playing.Glicko2.Entities.Rating;
+import com.chessin.model.playing.Glicko2.Entities.Rating;
 
 /**
  * Represents the result of a match between two players.
@@ -19,8 +20,8 @@ public class Result {
 	private static final double POINTS_FOR_DRAW = 0.5;
 	
 	private boolean isDraw = false;
-	private final ClassicalRating winner;
-	private final ClassicalRating loser;
+	private final Rating winner;
+	private final Rating loser;
 	
 	
 	/**
@@ -29,7 +30,7 @@ public class Result {
 	 * @param winner
 	 * @param loser
 	 */
-	public Result(ClassicalRating winner, ClassicalRating loser) {
+	public Result(Rating winner, Rating loser) {
 		if ( ! validPlayers(winner, loser) ) {
 			throw new IllegalArgumentException();
 		}
@@ -46,7 +47,7 @@ public class Result {
 	 * @param player2
 	 * @param isDraw (must be set to "true")
 	 */
-	public Result(ClassicalRating player1, ClassicalRating player2, boolean isDraw) {
+	public Result(Rating player1, Rating player2, boolean isDraw) {
 		if (! isDraw || ! validPlayers(player1, player2) ) {
 			throw new IllegalArgumentException();
 		}
@@ -64,7 +65,7 @@ public class Result {
 	 * @param player2
 	 * @return
 	 */
-	private boolean validPlayers(ClassicalRating player1, ClassicalRating player2) {
+	private boolean validPlayers(Rating player1, Rating player2) {
 		if (player1.equals(player2)) {
 			return false;
 		} else {
@@ -79,7 +80,7 @@ public class Result {
 	 * @param player
 	 * @return boolean (true if player participated in the match)
 	 */
-	public boolean participated(ClassicalRating player) {
+	public boolean participated(Rating player) {
 		if ( winner.equals(player) || loser.equals(player) ) {
 			return true;
 		} else {
@@ -95,7 +96,7 @@ public class Result {
 	 * @return 1 for a win, 0.5 for a draw and 0 for a loss
 	 * @throws IllegalArgumentException
 	 */
-	public double getScore(ClassicalRating player) throws IllegalArgumentException {
+	public double getScore(Rating player) throws IllegalArgumentException {
 		double score;
 		
 		if ( winner.equals(player) ) {
@@ -103,7 +104,7 @@ public class Result {
 		} else if ( loser.equals(player) ) {
 			score = POINTS_FOR_LOSS;			
 		} else {
-			throw new IllegalArgumentException("Player " + player.getUid() + " did not participate in match");
+			throw new IllegalArgumentException("Player did not participate in match");
 		}
 		
 		if ( isDraw ) {
@@ -120,27 +121,27 @@ public class Result {
 	 * @param player
 	 * @return opponent
 	 */
-	public ClassicalRating getOpponent(ClassicalRating player) {
-		ClassicalRating opponent;
+	public Rating getOpponent(Rating player) {
+		Rating opponent;
 		
 		if ( winner.equals(player) ) {
 			opponent = loser;
 		} else if ( loser.equals(player) ) {
 			opponent = winner;			
 		} else {
-			throw new IllegalArgumentException("Player " + player.getUid() + " did not participate in match");
+			throw new IllegalArgumentException("Player did not participate in match");
 		}
 		
 		return opponent;
 	}
 	
 	
-	public ClassicalRating getWinner() {
+	public Rating getWinner() {
 		return this.winner;
 	}
 
 	
-	public ClassicalRating getLoser() {
+	public Rating getLoser() {
 		return this.loser;
 	}
 }

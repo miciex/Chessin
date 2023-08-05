@@ -1,5 +1,8 @@
 package com.chessin.model.utils;
 
+import com.chessin.model.playing.ChessGame;
+import com.chessin.model.playing.GameType;
+
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
 
@@ -60,5 +63,17 @@ public class HelpMethods {
             if(Character.toLowerCase(letter) == Constants.Letters.ALPHABET[i]) return i;
         }
         return -1;
+    }
+
+    public static GameType getGameType(long timeControl)
+    {
+        if(timeControl >= 3600000)
+            return GameType.CLASSICAL;
+        else if(timeControl > 600000)
+            return GameType.RAPID;
+        else if(timeControl >= 180000)
+            return GameType.BLITZ;
+        else
+            return GameType.BULLET;
     }
 }

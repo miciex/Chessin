@@ -44,7 +44,6 @@ public class User implements UserDetails {
     private boolean isOnline;
     private boolean isActivated;
     //pfp
-    //osobna tabela z oczekującymi grami
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

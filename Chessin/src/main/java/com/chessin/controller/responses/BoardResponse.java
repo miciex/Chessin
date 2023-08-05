@@ -2,6 +2,7 @@ package com.chessin.controller.responses;
 
 import com.chessin.model.playing.Board;
 import com.chessin.model.playing.GameResults;
+import com.chessin.model.playing.GameType;
 import com.chessin.model.playing.Move;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,12 @@ public class BoardResponse {
     long whiteTime;
     long blackTime;
     long lastMoveTime;
+    private GameType gameType;
+    private double whiteRating;
+    private double blackRating;
+    private double whiteRatingChange;
+    private double blackRatingChange;
+    private boolean isRated;
 
     public static BoardResponse fromBoard(Board board)
     {
@@ -51,6 +58,12 @@ public class BoardResponse {
                 .whiteTime(board.getWhiteTime())
                 .blackTime(board.getBlackTime())
                 .lastMoveTime(board.getLastMoveTime())
+                .gameType(board.getGameType())
+                .whiteRating(board.getWhiteRating())
+                .blackRating(board.getBlackRating())
+                .whiteRatingChange(board.getWhiteRatingChange())
+                .blackRatingChange(board.getBlackRatingChange())
+                .isRated(board.isRated())
                 .build();
 
         board.getMoves().stream().map(MoveResponse::fromMove).forEach(response.moves::add);

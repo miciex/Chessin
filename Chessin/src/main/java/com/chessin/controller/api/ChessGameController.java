@@ -7,10 +7,15 @@ import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.*;
+import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.BulletRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.ClassicalRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.RapidRatingRepository;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.utils.Constants;
+import com.chessin.model.utils.HelpMethods;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +38,10 @@ public class ChessGameController {
     private final ChessGameService chessGameService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final ClassicalRatingRepository classicalRatingRepository;
+    private final RapidRatingRepository rapidRatingRepository;
+    private final BlitzRatingRepository blitzRatingRepository;
+    private final BulletRatingRepository bulletRatingRepository;
 
     private final ConcurrentHashMap<String, PendingChessGame> pendingGames = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Board> activeBoards = new ConcurrentHashMap<>();
@@ -75,7 +84,9 @@ public class ChessGameController {
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
+                        .gameType(HelpMethods.getGameType(foundGame.getTimeControl()))
                         .startTime(Instant.now().toEpochMilli())
+                        .isRated(foundGame.isRated())
                         .build();
 
                 chessGameRepository.save(game);
@@ -87,7 +98,7 @@ public class ChessGameController {
 
                 pendingGames.get(foundGame.getUser().getEmail()).notifyAll();
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
             }
         }
 
@@ -98,6 +109,7 @@ public class ChessGameController {
                 .bottomRating(request.getBottomRating())
                 .topRating(request.getTopRating())
                 .userRating(request.getUserRating())
+                .isRated(request.isRated())
                 .build();
 
         pendingGames.put(email, pendingChessGame);
@@ -117,7 +129,7 @@ public class ChessGameController {
 
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId())));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId()), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
             }
         }
     }
@@ -195,6 +207,8 @@ public class ChessGameController {
                 board.setGameResult(GameResults.WHITE_TIMEOUT);
                 board.setWhiteTime(0);
                 activeBoards.replace(request.getGameId(), board);
+                if(activeGames.get(request.getGameId()).isRated())
+                    activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
@@ -203,6 +217,8 @@ public class ChessGameController {
                 board.setGameResult(GameResults.BLACK_TIMEOUT);
                 board.setBlackTime(0);
                 activeBoards.replace(request.getGameId(), board);
+                if(activeGames.get(request.getGameId()).isRated())
+                    activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
@@ -235,6 +251,8 @@ public class ChessGameController {
             if(board.getGameResult() != GameResults.NONE)
             {
                 activeBoards.replace(request.getGameId(), board);
+                if(activeGames.get(request.getGameId()).isRated())
+                    activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
@@ -251,6 +269,8 @@ public class ChessGameController {
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
                 chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
+                if(activeGames.get(request.getGameId()).isRated())
+                    chessGameRepository.updateRating(request.getGameId(), endBoard.getWhiteRating(), endBoard.getBlackRating(), endBoard.getWhiteRatingChange(), endBoard.getBlackRatingChange());
                 activeGames.remove(request.getGameId());
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
@@ -272,12 +292,12 @@ public class ChessGameController {
         }
 
         if(activeGames.containsKey(id))
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id)));
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
 
         if(!chessGameRepository.existsById(id))
             return ResponseEntity.badRequest().body("Game not found.");
 
-        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get()));
+        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
     }
 
     @PostMapping("/getGameByUsername/{username}")
@@ -286,7 +306,7 @@ public class ChessGameController {
         Optional<ChessGame> game = activeGames.values().stream().filter(x -> x.getBlackUser().getNameInGame().equals(username) || x.getWhiteUser().getNameInGame().equals(username)).findFirst();
 
         if(game.isPresent())
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get()));
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
         else
             return ResponseEntity.badRequest().body("This player is not playing any game.");
 

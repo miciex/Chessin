@@ -9,6 +9,10 @@ import com.chessin.controller.responses.FriendInvitationResponse;
 import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.ChessGameRepository;
+import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.BulletRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.ClassicalRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.RapidRatingRepository;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
 import com.chessin.controller.responses.UserResponse;
@@ -34,11 +38,15 @@ public class UserController {
     private final JwtService jwtService;
     private final FriendInvitationRepository friendInvitationRepository;
     private final ChessGameRepository chessGameRepository;
+    private final ClassicalRatingRepository classicalRatingRepository;
+    private final RapidRatingRepository rapidRatingRepository;
+    private final BlitzRatingRepository blitzRatingRepository;
+    private final BulletRatingRepository bulletRatingRepository;
 
     @PostMapping("/findByEmail/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname){
         Optional<User> user = userRepository.findByNameInGame(nickname);
-        UserResponse userResponse = UserResponse.fromUser(user.orElseThrow());
+        UserResponse userResponse = UserResponse.fromUser(user.orElseThrow(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository);
         return ResponseEntity.ok().body(userResponse);
     }
 
@@ -48,7 +56,7 @@ public class UserController {
         List<User> users = userRepository.findByNameInGameContaining(nickname);
         List<UserResponse> responses = new ArrayList<>();
 
-        users.stream().map(UserResponse::fromUser).forEach(responses::add);
+        users.stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(responses::add);
 
         return ResponseEntity.ok().body(users);
     }
@@ -107,15 +115,15 @@ public class UserController {
     {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendEmail()))
+        if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
-        friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendEmail());
+        friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendNickname());
 
         if(request.getResponseType() == FriendInvitationResponseType.ACCEPT)
         {
             User user = userRepository.findByEmail(email).get();
-            User friend = userRepository.findByNameInGame(request.getFriendEmail()).get();
+            User friend = userRepository.findByNameInGame(request.getFriendNickname()).get();
 
             user.getFriends().add(friend);
             friend.getFriends().add(user);
@@ -138,7 +146,7 @@ public class UserController {
         List<UserResponse> friends = new ArrayList<>();
 
         for(User friend : user.getFriends())
-            friends.add(UserResponse.fromUser(friend));
+            friends.add(UserResponse.fromUser(friend, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
 
         return ResponseEntity.ok().body(friends);
     }
@@ -186,7 +194,7 @@ public class UserController {
 
         List<ChessGameResponse> games = new ArrayList<>();
 
-        chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGame(nickname).stream().map(ChessGameResponse::fromChessGame).forEach(games::add);
+        chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGame(nickname).stream().map((ChessGame game) -> ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(games::add);
 
         return ResponseEntity.ok().body(games);
     }
