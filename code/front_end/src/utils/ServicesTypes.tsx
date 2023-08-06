@@ -11,6 +11,13 @@ export type RegisterRequest = {
   country: string;
 };
 
+export enum GameType {
+  BULLET = "BULLET",
+  BLITZ = "BLITZ",
+  RAPID = "RAPID",
+  CLASSICAL = "CLASSICAL",
+  CUSTOM = "CUSTOM",
+}
 export type LoginRequest = {
   email: string;
   password: string;
@@ -55,6 +62,12 @@ export type ChessGameResponse = {
   increment: number;
   startBoard: string;
   whiteStarts: boolean;
+  gameType: GameType;
+  whiteRating: number;
+  blackRating: number;
+  whiteRatinChange: number;
+  blackRatingChange: number;
+  isRated: boolean;
 };
 
 export type SubmitMoveRequest = {
@@ -82,6 +95,12 @@ export type BoardResponse = {
   whiteTime: number;
   blackTime: number;
   lastMoveTime: number;
+  gameType: GameType;
+  whiteRating: number;
+  blackRating: number;
+  whiteRatinChange: number;
+  blackRatingChange: number;
+  isRated: boolean;
 };
 
 export type CodeVerificationRequest = {
