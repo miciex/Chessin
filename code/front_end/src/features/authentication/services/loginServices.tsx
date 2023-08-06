@@ -5,6 +5,7 @@ import { save } from "../../../utils/AsyncStoreFunctions";
 import { loggedUserResponse } from "../../../utils/ServicesTypes";
 
 export const fetchandStoreUser = async (email: string) => {
+  console.log("fetching user");
   return SecureStore.getItemAsync("accessToken")
     .then(async (token) => {
       let user: any;
@@ -27,6 +28,7 @@ export const fetchandStoreUser = async (email: string) => {
           }
         })
         .then((data) => {
+          console.log("got user data: ", data);
           console.log("user data: ", email);
           let user: User = loggedUserToUser(data);
           console.log("changed user: ", user);

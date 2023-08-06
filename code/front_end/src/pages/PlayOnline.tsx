@@ -23,6 +23,7 @@ import {
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import {
   cancelSearch,
+  getBoardByGameId,
   getGameByUsername,
   listenForFirstMove,
   listenForMove,
@@ -120,21 +121,25 @@ export default function PlayOnline({ navigation, route }: Props) {
                     type: "setUpGame",
                     payload: { chessGameResponse: data, user },
                   });
-                  handleListnForFirstMove(data.id, myPlayer, opponent)
-                    .then((board: BoardResponse) => {
-                      console.log("set data from board response");
+                  console.log("game id: ", data.id);
+                  getBoardByGameId(data.id).then(
+                    (boardResponse: BoardResponse) => {
                       dispatch({
                         type: "setDataFromBoardResponse",
-                        payload: { boardResponse: board, myPlayer, opponent },
+                        payload: { boardResponse, myPlayer, opponent },
                       });
                       dispatch({
                         type: "setTimeFromBoardResponse",
-                        payload: { boardResponse: board, myPlayer, opponent },
+                        payload: { boardResponse, myPlayer, opponent },
                       });
-                      if (board.gameResult !== GameResults.NONE) return;
+                      if (
+                        boardResponse.gameResult !== GameResults.NONE ||
+                        boardResponse.whiteTurn === (myPlayer.color === "white")
+                      )
+                        return;
                       listenForMove({
                         gameId: data.id,
-                        moves: board.moves,
+                        moves: boardResponse.moves,
                       })
                         .then((board: BoardResponse | undefined) => {
                           if (board === undefined) return;
@@ -158,25 +163,16 @@ export default function PlayOnline({ navigation, route }: Props) {
                         .catch((err) => {
                           throw new Error(err);
                         });
-                    })
-                    .catch((err) => {
-                      throw new Error(err);
-                    });
+                    }
+                  );
                 })
                 .catch((err) => {
                   throw new Error(err);
                 });
-            } else if (response.status === 400) {
-              response
-                .text()
-                .then((data) => {
-                  throw new Error(data);
-                })
-                .catch((error) => {
-                  throw new Error(error);
-                });
             } else {
-              throw new Error("Something went wrong");
+              console.log(response.status);
+              console.log(response.statusText);
+              throw new Error("Something went wrong while searching for game");
             }
           })
           .catch((err) => {

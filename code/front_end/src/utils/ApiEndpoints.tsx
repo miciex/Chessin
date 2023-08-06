@@ -1,4 +1,4 @@
-export const baseLink = "http:/192.168.47.70:8080/api/v1/";
+export const baseLink = "http:/192.168.121.70:8080/api/v1/";
 export const authLink = `${baseLink}auth/`;
 export const registerLink = `${authLink}register`;
 export const authenticateLink = `${authLink}authenticate`;
@@ -25,3 +25,4 @@ export const listenForFirstMoveLink = `${chessGameLink}listenForFirstMove/`;
 export const getGameByUsernameLink = `${chessGameLink}getGameByUsername/`;
 export const listenForMoveLink = `${chessGameLink}listenForMove`;
 export const getUsersByNicknameLink = `${userLink}getUsersByNickname/`;
+export const getBoardbyGameIdLink = `${chessGameLink}getBoardByGameId/`;

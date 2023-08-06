@@ -5,6 +5,7 @@ import {
   listenForFirstMoveLink,
   getGameByUsernameLink,
   listenForMoveLink,
+  getBoardbyGameIdLink,
 } from "../../../utils/ApiEndpoints";
 import { getValueFor } from "../../../utils/AsyncStoreFunctions";
 import {
@@ -13,7 +14,6 @@ import {
   ListenForFirstMoveRequest,
   ChessGameResponse,
   ListenForMoveRequest,
-  BoardResponse,
 } from "../../../utils/ServicesTypes";
 import { searchRatingRange } from "../../../utils/Constants";
 
@@ -41,7 +41,7 @@ export const listenForMove = async (request: ListenForMoveRequest) => {
             throw new Error(error);
           });
       } else {
-        throw new Error("Something went wrong");
+        throw new Error("Something went wrong in listen for move");
       }
     })
     .catch((error) => {
@@ -72,12 +72,15 @@ export const getGameByUsername = async (username: string) => {
             throw new Error(error);
           });
       } else {
-        throw new Error("Something went wrong");
+        console.error("don't know what happened");
+        console.error(response);
+        throw new Error("Something went wrong in get game by username");
       }
     })
     .catch((error) => {
       throw new Error(error);
     });
+
   return response;
 };
 
@@ -106,7 +109,7 @@ export const listenForFirstMove = async (
             throw new Error(error);
           });
       } else {
-        throw new Error("Something went wrong");
+        throw new Error("Something went wrong in listen for first move");
       }
     })
     .catch((error) => {
@@ -138,7 +141,7 @@ export const cancelSearch = async () => {
             throw new Error(error);
           });
       } else {
-        throw new Error("Something went wrong");
+        throw new Error("Something went wrong in cancel search");
       }
     })
     .catch((error) => {
@@ -200,10 +203,30 @@ export const submitMove = async (request: SubmitMoveRequest) => {
             throw new Error(error);
           });
       } else {
-        throw new Error("Something went wrong");
+        throw new Error("Something went wrong in submit move");
       }
     })
     .catch((error) => {
       throw new Error(error);
     });
+};
+
+export const getBoardByGameId = async (gameId: number) => {
+  console.log("getting board");
+
+  const accessToken = await getValueFor("accessToken");
+  try {
+    const response = await fetch(`${getBoardbyGameIdLink}${gameId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.json();
+  } catch (err) {
+    console.log("gameId: ", gameId);
+    console.error(err);
+    throw new Error("Something went wrong in getting board by game id!");
+  }
 };

@@ -33,10 +33,10 @@ public class User implements UserDetails {
     private boolean isTwoFactorAuthenticationEnabled;
     @Enumerated(EnumType.STRING)
     private Provider provider;
-//    private int ratingBlitz;
-//    private int ratingBullet;
-//    private int ratingRapid;
-//    private int ratingClassical;
+    private int ratingBlitz;
+    private int ratingBullet;
+    private int ratingRapid;
+    private int ratingClassical;
     private String country;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> friends;

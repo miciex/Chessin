@@ -60,7 +60,7 @@ public class ChessGameController {
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
         {
-            return ResponseEntity.badRequest().body("User is already playing a game.");
+            return ResponseEntity.accepted().body("User is already playing a game.");
         }
 
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));

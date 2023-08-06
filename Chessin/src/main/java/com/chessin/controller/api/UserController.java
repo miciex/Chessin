@@ -4,9 +4,7 @@ import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.requests.SetActiveRequest;
-import com.chessin.controller.responses.ChessGameResponse;
-import com.chessin.controller.responses.FriendInvitationResponse;
-import com.chessin.controller.responses.MoveResponse;
+import com.chessin.controller.responses.*;
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.ChessGameRepository;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
@@ -15,7 +13,6 @@ import com.chessin.model.playing.Glicko2.Repositories.ClassicalRatingRepository;
 import com.chessin.model.playing.Glicko2.Repositories.RapidRatingRepository;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
-import com.chessin.controller.responses.UserResponse;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.social.FriendInvitation;
 import com.chessin.model.social.FriendInvitationRepository;
@@ -197,5 +194,15 @@ public class UserController {
         chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGame(nickname).stream().map((ChessGame game) -> ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(games::add);
 
         return ResponseEntity.ok().body(games);
+    }
+
+    @PostMapping("/findUserByToken")
+    public ResponseEntity<?> findUserByToken(HttpServletRequest servlet) {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isEmpty())
+            return ResponseEntity.badRequest().body("User not found.");
+        LoggedUserResponse userResponse = LoggedUserResponse.fromUser(user.orElseThrow());
+        return ResponseEntity.ok().body(userResponse);
     }
 }

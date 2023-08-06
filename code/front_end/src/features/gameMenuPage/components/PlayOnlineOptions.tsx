@@ -140,7 +140,9 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
   };
 
   const handlePlayOnline = () => {
+    console.log("user: ", user);
     if (!user) return;
+    console.log("navigating");
     navigation.navigate("PlayOnline", {
       request: setPendingGameRequest(
         gameTempo.totalTime,

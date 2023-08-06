@@ -1,9 +1,18 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
-import {responseUserToUser, User} from "../utils/PlayerUtilities";
-import {getValueFor, save} from "../utils/AsyncStoreFunctions";
-import {addFriend, findByNicknameLink, refreshTokenLink, setActive,} from "../utils/ApiEndpoints";
-import {fetchandStoreUser} from "../features/authentication/services/loginServices";
-import {AuthenticationResponse, CodeVerificationRequest, FriendInvitationRequest,} from "../utils/ServicesTypes";
+import { responseUserToUser, User } from "../utils/PlayerUtilities";
+import { getValueFor, save } from "../utils/AsyncStoreFunctions";
+import {
+  addFriend,
+  findByNicknameLink,
+  refreshTokenLink,
+  setActive,
+} from "../utils/ApiEndpoints";
+import { fetchandStoreUser } from "../features/authentication/services/loginServices";
+import {
+  AuthenticationResponse,
+  CodeVerificationRequest,
+  FriendInvitationRequest,
+} from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
 
 // getting data
@@ -34,7 +43,7 @@ export const fetchUser = async (email: string, Nickname: string) => {
       } else if (response.status === 401) {
         throw new Error("Unauthorized");
       } else {
-        throw new Error("Something went wrong");
+        throw new Error("Something went wrong while fetching user");
       }
     })
     .then((data) => {
@@ -140,17 +149,17 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
     },
     body: JSON.stringify(request),
   })
-      .then((response) => {
-        if (response.status === 200) {
-          console.log("send request");
-          return response.text();
-        } else {
-          throw new Error("Something went wrong on api server!");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    .then((response) => {
+      if (response.status === 200) {
+        console.log("send request");
+        return response.text();
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 export const logoutUser = async () => {
