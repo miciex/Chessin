@@ -42,6 +42,7 @@ export type PendingChessGameRequest = {
   bottomRating: number;
   topRating: number;
   userRating: number;
+  isRated: boolean;
 };
 
 export type ChessGameResponse = {
