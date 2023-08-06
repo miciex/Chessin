@@ -6,6 +6,11 @@ import java.util.HashMap;
 
 public class Constants {
 
+    public static class Rating
+    {
+        public static final int DEFAULT_RATING = 1000;
+    }
+
     public static class Application
     {
         public static final int gameSearchTime = 1000 * 60 * 60;

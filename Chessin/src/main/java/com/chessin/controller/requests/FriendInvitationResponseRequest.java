@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FriendInvitationResponseRequest {
-    private String friendEmail;
+    private String friendNickname;
     private FriendInvitationResponseType responseType;
 }

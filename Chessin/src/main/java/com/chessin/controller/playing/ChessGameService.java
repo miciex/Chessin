@@ -4,33 +4,44 @@ import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.playing.*;
+import com.chessin.model.playing.Glicko2.Entities.*;
+import com.chessin.model.playing.Glicko2.RatingCalculator;
+import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.BulletRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.ClassicalRatingRepository;
+import com.chessin.model.playing.Glicko2.Repositories.RapidRatingRepository;
+import com.chessin.model.playing.Glicko2.Result;
 import com.chessin.model.utils.Convert;
 import com.chessin.model.utils.HelpMethods;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.context.TenantIdentifierMismatchException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ChessGameService {
     private final ChessGameRepository chessGameRepository;
     private final MoveRepository moveRepository;
+    private final ClassicalRatingRepository classicalRatingRepository;
+    private final RapidRatingRepository rapidRatingRepository;
+    private final BlitzRatingRepository blitzRatingRepository;
+    private final BulletRatingRepository bulletRatingRepository;
+    private final RatingCalculator ratingCalculator = new RatingCalculator();
 
-    public PendingChessGame searchNewGame(PendingChessGameRequest request, ArrayList<PendingChessGame> pendingGames) {
+    public PendingChessGame searchNewGame(PendingChessGameRequest request, ArrayList<PendingChessGame> pendingGames){
         List<PendingChessGame> matchingGames = pendingGames.stream()
-                .filter(game -> game.getTimeControl() == request.getTimeControl()
-                        && game.getIncrement() == request.getIncrement())
+                .filter(game -> game.getTimeControl() == request.getTimeControl() && game.getIncrement() == request.getIncrement())
                 .toList();
 
-        for (PendingChessGame game : matchingGames) {
-            if (game.getBottomRating() <= request.getUserRating() && game.getTopRating() >= request.getUserRating()) {
+        for(PendingChessGame game : matchingGames){
+            if(game.getBottomRating() <= request.getUserRating() && game.getTopRating() >= request.getUserRating() && game.isRated() == request.isRated()){
                 return game;
             }
         }
@@ -38,55 +49,44 @@ public class ChessGameService {
         return null;
     }
 
-    public boolean validateMoves(List<MoveResponse> moves, Board board) {
+    public boolean validateMoves(List<MoveResponse> moves, Board board){
         ArrayList<MoveResponse> movesToCheck = new ArrayList<>();
 
         board.getMoves().stream().map(MoveResponse::fromMove).forEach(movesToCheck::add);
 
-        if (moves.size() != movesToCheck.size())
+        if(moves.size() != movesToCheck.size())
             return false;
 
-        for (int i = 0; i < moves.size(); i++) {
-            if (!moves.get(i).equals(movesToCheck.get(i)))
+        for(int i = 0; i < moves.size(); i++){
+            if(!moves.get(i).equals(movesToCheck.get(i)))
                 return false;
         }
 
         return true;
     }
 
-    public Board calculateTime(Board board, ChessGame game) {
+    public Board calculateTime(Board board)
+    {
         long now = Instant.now().toEpochMilli();
 
-        if (board.isWhiteTurn()) {
-            Optional<Long> time = board.getLastMoveTimeForColor(true, true);
-            long time2 = time.map(aLong -> aLong - Math.abs(board.getLastMoveTime() - now) + game.getIncrement()).orElseGet(game::getTimeControl);
-            board.setWhiteTime(time2);
-        }
-        else {
-            Optional<Long> time = board.getLastMoveTimeForColor(false, true);
-            long time2 = time.map(aLong -> aLong - Math.abs(board.getLastMoveTime() - now) + game.getIncrement()).orElseGet(game::getTimeControl);
-            board.setBlackTime(time2);
-        }
+        if(board.isWhiteTurn())
+            board.setWhiteTime(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now));
+        else
+            board.setBlackTime(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now));
 
         return board;
     }
 
-    public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game) {
-        Move move = new Move(game, board.getPosition(), request.getStartField(), request.getEndField(),
-                request.getPromotePiece());
+    public Board submitMove(SubmitMoveRequest request, Board board, ChessGame game){
+        Move move = new Move(game, board.getPosition(), request.getStartField(), request.getEndField(), request.getPromotePiece());
 
         long now = Instant.now().toEpochMilli();
-        long diff = Math.abs(board.getLastMoveTime() - now);
-        long timeControl = game.getTimeControl();
-        if (board.isWhiteTurn()) {
-            Optional<Long> time = board.getLastMoveTimeForColor(true, game.isWhiteStarts());
-            long time2 = time.map(aLong -> aLong - diff + game.getIncrement()).orElse(board.getMoves().size() == 0 ? timeControl + game.getIncrement() : timeControl - diff + game.getIncrement());
-            board.setWhiteTime(time2);
+        if(!board.isWhiteTurn()) {
+            board.setWhiteTime(board.getLastMoveTimeForColor(true, game.isWhiteStarts()).orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
             move.setRemainingTime(board.getWhiteTime());
-        } else {
-            Optional<Long> time = board.getLastMoveTimeForColor(false, game.isWhiteStarts());
-            long time2 = time.map(aLong -> aLong - diff + game.getIncrement()).orElse(board.getMoves().size() == 0 ? timeControl + game.getIncrement() : timeControl - diff + game.getIncrement());
-            board.setBlackTime(time2);
+        }
+        else {
+            board.setBlackTime(board.getLastMoveTimeForColor(false, game.isWhiteStarts()).orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
             move.setRemainingTime(board.getBlackTime());
         }
 
@@ -100,6 +100,86 @@ public class ChessGameService {
         board.setLastMoveTime(now);
 
         moveRepository.save(move);
+
+        return board;
+    }
+
+    @Transactional
+    public Board updateRatings(ChessGame game, Board board)
+    {
+        Rating whiteRating, blackRating;
+
+        switch (game.getGameType()) {
+            case CLASSICAL -> {
+                whiteRating = classicalRatingRepository.findByUser(game.getWhiteUser()).orElse(new ClassicalRating(game.getWhiteUser(), ratingCalculator));
+                blackRating = classicalRatingRepository.findByUser(game.getBlackUser()).orElse(new ClassicalRating(game.getBlackUser(), ratingCalculator));
+            }
+            case RAPID -> {
+                whiteRating = rapidRatingRepository.findByUser(game.getWhiteUser()).orElse(new RapidRating(game.getWhiteUser(), ratingCalculator));
+                blackRating = rapidRatingRepository.findByUser(game.getBlackUser()).orElse(new RapidRating(game.getBlackUser(), ratingCalculator));
+            }
+            case BLITZ -> {
+                whiteRating = blitzRatingRepository.findByUser(game.getWhiteUser()).orElse(new BlitzRating(game.getWhiteUser(), ratingCalculator));
+                blackRating = blitzRatingRepository.findByUser(game.getBlackUser()).orElse(new BlitzRating(game.getBlackUser(), ratingCalculator));
+            }
+            case BULLET -> {
+                whiteRating = bulletRatingRepository.findByUser(game.getWhiteUser()).orElse(new BulletRating(game.getWhiteUser(), ratingCalculator));
+                blackRating = bulletRatingRepository.findByUser(game.getBlackUser()).orElse(new BulletRating(game.getBlackUser(), ratingCalculator));
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + game.getGameType());
+        }
+
+        double whiteRatingBefore = whiteRating.getRating(), blackRatingBefore = blackRating.getRating();
+
+        if(board.getGameResult() == GameResults.MATE)
+        {
+            if(board.isWhiteTurn())
+                ratingCalculator.updateRatings(new Result(blackRating, whiteRating));
+            else
+                ratingCalculator.updateRatings(new Result(whiteRating, blackRating));
+        }
+        else if(Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_TIMEOUT).contains(game.getGameResult()))
+        {
+            ratingCalculator.updateRatings(new Result(whiteRating, blackRating));
+        }
+        else if(Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_TIMEOUT).contains(game.getGameResult()))
+        {
+            ratingCalculator.updateRatings(new Result(blackRating, whiteRating));
+        }
+        else if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.DRAW_50_MOVE_RULE, GameResults.INSUFFICIENT_MATERIAL, GameResults.STALEMATE).contains(game.getGameResult()))
+        {
+            ratingCalculator.updateRatings(new Result(whiteRating, blackRating, true));
+        }
+
+        switch (game.getGameType()) {
+            case CLASSICAL -> {
+                classicalRatingRepository.save((ClassicalRating) whiteRating);
+                classicalRatingRepository.save((ClassicalRating) blackRating);
+            }
+            case RAPID -> {
+                rapidRatingRepository.save((RapidRating) whiteRating);
+                rapidRatingRepository.save((RapidRating) blackRating);
+            }
+            case BLITZ -> {
+                blitzRatingRepository.save((BlitzRating) whiteRating);
+                blitzRatingRepository.save((BlitzRating) blackRating);
+            }
+            case BULLET -> {
+                bulletRatingRepository.save((BulletRating) whiteRating);
+                bulletRatingRepository.save((BulletRating) blackRating);
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + game.getGameType());
+        }
+
+        game.setWhiteRating(whiteRatingBefore);
+        game.setBlackRating(blackRatingBefore);
+        game.setWhiteRatingChange(whiteRating.getRating() - whiteRatingBefore);
+        game.setBlackRatingChange(blackRating.getRating() - blackRatingBefore);
+        board.setWhiteRating(whiteRatingBefore);
+        board.setBlackRating(blackRatingBefore);
+        board.setWhiteRatingChange(whiteRating.getRating() - whiteRatingBefore);
+        board.setBlackRatingChange(blackRating.getRating() - blackRatingBefore);
+        board.setRated(game.isRated());
 
         return board;
     }

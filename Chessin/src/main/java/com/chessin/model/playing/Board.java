@@ -22,6 +22,7 @@ import static com.chessin.model.utils.Convert.boardToMap;
 @NoArgsConstructor
 @Builder
 public class Board {
+    long gameId;
     ArrayList<Move> moves;
     boolean whiteTurn;
     String whiteEmail;
@@ -37,10 +38,17 @@ public class Board {
     long whiteTime;
     long blackTime;
     long lastMoveTime;
+    private GameType gameType;
+    private double whiteRating;
+    private double blackRating;
+    private double whiteRatingChange;
+    private double blackRatingChange;
+    private boolean isRated;
 
     public static Board fromGame(ChessGame game)
     {
         return Board.builder()
+                .gameId(game.getId())
                 .whiteEmail(game.getWhiteUser().getEmail())
                 .blackEmail(game.getBlackUser().getEmail())
                 .moves(new ArrayList<>())
@@ -56,6 +64,11 @@ public class Board {
                 .whiteTime(game.getTimeControl())
                 .blackTime(game.getTimeControl())
                 .lastMoveTime(game.getStartTime())
+                .gameType(game.getGameType())
+                .whiteRating(game.getWhiteRating())
+                .blackRating(game.getBlackRating())
+                .whiteRatingChange(game.getWhiteRatingChange())
+                .blackRatingChange(game.getBlackRatingChange())
                 .build();
     }
 

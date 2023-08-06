@@ -14,4 +14,6 @@ public interface FriendInvitationRepository extends JpaRepository<FriendInvitati
     @Modifying
     void deleteByUserEmailAndFriendNameInGame(String userEmail, String friendNickname);
     boolean existsByUserEmailAndFriendNameInGame(String userEmail, String friendNickname);
+
+    List<FriendInvitation> findAllByFriendEmail(String email);
 }
