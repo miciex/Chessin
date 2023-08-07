@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet } from "react-native";
-import React, { useState, useContext } from "react";
+import { View, StyleSheet } from "react-native";
 import BotOption from "./BotOption";
 import BotStrengthOptionsBar from "./BotStrengthOptionsBar";
-import { botType, BotTypeContext } from "../context/BotTypeContext";
+import { botType } from "../context/BotTypeContext";
 import { strengthLevelType } from "../context/BotStrengthContext";
 import StartGameButton from "../../../components/StartGameButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -37,8 +36,6 @@ export default function BotGameOptions({
   handleChooseBotType,
   navigation,
 }: Props) {
-  const currentBotType = useContext(BotTypeContext);
-
   const strengthLevels = (
     level: Array<strengthLevelType>,
     botGameType: botType

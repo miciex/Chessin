@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { FontAwesome } from "@expo/vector-icons";
+import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { countryToIsoCode } from "..";
 import CountryFlag from "react-native-country-flag";
 import { ColorsPallet } from "../../../utils/Constants";
@@ -9,8 +9,7 @@ import {
   PlayOnlineAction,
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
-import Timer from "./Timer";
-
+import { GameResults } from "../../../chess-logic/board";
 type Props = {
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
@@ -19,13 +18,34 @@ type Props = {
 
 export default function Bar({ state, dispatch, isMyPlayer }: Props) {
   const player = isMyPlayer ? state.myPlayer : state.opponent;
+  const isPlayerWhite = player.color === "white";
+  const ratingChange = Math.round(
+    state.board[isPlayerWhite ? "whiteRatingChange" : "blackRatingChange"]
+  );
+  const rating = Math.round(
+    state.board[isPlayerWhite ? "whiteRating" : "blackRating"]
+  );
+
+  const getRatingChangeColor = () => {
+    if (ratingChange > 0) return "green";
+    if (ratingChange < 0) return "red";
+    return "gray";
+  };
 
   return (
     <View style={styles.appContainer}>
       <View style={styles.textContainer}>
         <FontAwesome name="user-circle" size={32} color="black" />
         <Text style={styles.text}>{player ? player.firstname : ""}</Text>
-        <Text style={styles.text}>{player ? player.highestRanking : ""}</Text>
+        <Text style={styles.text}>{rating}</Text>
+        {state.board.result !== GameResults.NONE && (
+          <>
+            <Entypo name="plus" size={24} />
+            <Text style={[styles.text, styles[getRatingChangeColor()]]}>
+              {ratingChange}
+            </Text>
+          </>
+        )}
       </View>
       <View style={styles.iconsContainer}>
         <View style={styles.timerContainer}>
@@ -76,5 +96,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     height: "100%",
+  },
+  green: {
+    color: "green",
+  },
+  gray: {
+    color: "gray",
+  },
+  red: {
+    color: "red",
   },
 });

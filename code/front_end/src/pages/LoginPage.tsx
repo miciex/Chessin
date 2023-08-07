@@ -27,7 +27,7 @@ type Props = {
   route: RouteProp<RootStackParamList, "Login">;
 };
 
-export default function Login({ route, navigation }: Props) {
+export default function Login({ navigation }: Props) {
   const [email, setEmail] = useState<string>("");
   const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
   const [password, setPassword] = useState<string>("");
@@ -80,7 +80,8 @@ export default function Login({ route, navigation }: Props) {
         if (!responseData) {
           return false;
         }
-        setUserDataFromResponse(responseData, { email });
+        console.log("got authenticationResponse");
+        setUserDataFromResponse(responseData);
         return true;
       })
       .then((userSet: boolean) => {
@@ -96,7 +97,7 @@ export default function Login({ route, navigation }: Props) {
       response
         .json()
         .then((data) => {
-          setUserDataFromResponse(data, { email });
+          setUserDataFromResponse(data);
         })
         .then(() => {
           navigation.navigate("Home");

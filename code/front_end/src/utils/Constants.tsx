@@ -1,5 +1,3 @@
-import { PendingChessGameRequest } from "./ServicesTypes";
-
 export const ColorsPallet = {
   lighter: "#ece0d1",
   light: "#dbc1ac",

@@ -1,18 +1,18 @@
-import React, { useRef, useState } from "react";
-import { Animated, Dimensions, PanResponder, View } from "react-native";
+import React, { useRef } from "react";
+import { Animated, Dimensions, PanResponder } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
   PlayOnlineAction,
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
-import { possibleMovesAfterCheck } from "../../../chess-logic/board";
-import { Move, moveFactory } from "../../../chess-logic/move";
 import {
-  BoardResponse,
-  ListenForMoveRequest,
-  SubmitMoveRequest,
-} from "../../../utils/ServicesTypes";
+  GameResults,
+  possibleMovesAfterCheck,
+} from "../../../chess-logic/board";
+import { Move, moveFactory } from "../../../chess-logic/move";
+import { BoardResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { listenForMove, submitMove } from "../services/playOnlineService";
+import { updateUserRating } from "../../../services/userServices";
 
 const yellow = "rgba(255, 255, 0, 0.5)";
 type pos = { x: number; y: number };
@@ -85,15 +85,13 @@ export default function Piece({
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const panCut = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
-  // const [possibleMoves, setPossibleMoves] = useState<number[]>([]);
-
   const resetActiveValues = () => {
     for (let i = 0; i < 64; i++) {
       activeValues.current[i].setValue(0);
     }
   };
 
-  const findActiveValue = (id: number): number => {
+  const findActiveValue = (): number => {
     for (let i = 0; i < 64; i++) {
       if (Number(JSON.stringify(activeValues.current[i])) === 1) {
         return i;
@@ -112,25 +110,10 @@ export default function Piece({
     }
   };
 
-  const isPieceActive = (id: number): boolean => {
-    if (Number(JSON.stringify(activeValues.current[id])) === 1) return true;
-    return false;
-  };
-
   const resetPossibleMoves = () => {
     for (let i = 0; i < 64; i++) {
       possibleMoves.current[i].setValue(0);
     }
-  };
-
-  const findPossibleMoves = (id: number): number[] => {
-    const moves: number[] = [];
-    for (let i = 0; i < 64; i++) {
-      if (Number(JSON.stringify(possibleMoves.current[i])) === 1) {
-        moves.push(i);
-      }
-    }
-    return moves;
   };
 
   const setPossibleMoves = (moves: number[]) => {
@@ -172,30 +155,14 @@ export default function Piece({
       .then((boardResponse: BoardResponse) => {
         dispatch({
           type: "setDataFromBoardResponse",
-          payload: {
-            boardResponse,
-            myPlayer: state.myPlayer,
-            opponent: state.opponent,
-          },
+          payload: { boardResponse },
         });
         listenForMove({
           gameId: state.gameId,
           moves: boardResponse.moves,
-        })
-          .then((res: BoardResponse | undefined) => {
-            if (res === undefined) return;
-            dispatch({
-              type: "setDataFromBoardResponse",
-              payload: {
-                boardResponse,
-                myPlayer: state.myPlayer,
-                opponent: state.opponent,
-              },
-            });
-          })
-          .catch((err) => {
-            throw new Error(err);
-          });
+        }).catch((err) => {
+          throw new Error(err);
+        });
       })
       .catch((err) => {
         throw new Error(err);
@@ -207,8 +174,8 @@ export default function Piece({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderTerminationRequest: () => true,
-      onPanResponderStart(e, gestureState) {
-        const activeField = findActiveValue(positionNumber);
+      onPanResponderStart() {
+        const activeField = findActiveValue();
         if (isPossibleMove(positionNumber)) {
           const move = moveFactory({
             pieces: state.board.position,
@@ -230,29 +197,27 @@ export default function Piece({
           setPossibleMoves(possibleMoves);
         }
       },
-      onPanResponderMove(e, gestureState) {
+      onPanResponderMove(_, gestureState) {
         pan.setValue({ x: gestureState.dx, y: gestureState.dy });
         panCut.setValue({
           x: Math.round(gestureState.dx / SIZE) * SIZE,
           y: Math.round(gestureState.dy / SIZE) * SIZE,
         });
       },
-      onPanResponderRelease: (e, gestureState) => {
-        if (
-          isPossibleMove(
-            Math.round((position.x + gestureState.dx) / SIZE) +
-              Math.round((position.y + gestureState.dy) / SIZE) * 8
-          )
-        ) {
+      onPanResponderRelease: (_, gestureState) => {
+        const endField =
+          Math.round((position.x + gestureState.dx) / SIZE) +
+          Math.round((position.y + gestureState.dy) / SIZE) * 8;
+        if (isPossibleMove(endField)) {
           const move = moveFactory({
             pieces: state.board.position,
             startField: positionNumber,
-            endField:
-              Math.round((position.x + gestureState.dx) / SIZE) +
-              Math.round((position.y + gestureState.dy) / SIZE) * 8,
+            endField,
           });
+          console.log();
           handleMove(move);
           resetPossibleMoves();
+          setValueActive(endField);
         }
 
         Animated.spring(pan, {

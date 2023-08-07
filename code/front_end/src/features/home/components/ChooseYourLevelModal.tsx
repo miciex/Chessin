@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet, Modal, Pressable } from 'react-native'
-import React, {useState} from 'react'
-import { ColorsPallet } from '../../../utils/Constants'
+import { View, Text, StyleSheet, Modal, Pressable } from "react-native";
+import { ColorsPallet } from "../../../utils/Constants";
 
-import { Entypo } from '@expo/vector-icons'
+import { Entypo } from "@expo/vector-icons";
 
 type Props = {
   toggleGear: Function;
@@ -16,28 +15,60 @@ export default function ChooseYourLevelModal({toggleGear,setLevel}: Props) {
   const levelsNum = [0, 800, 1500, 2000,3000]
 
   return (
-    <Modal  transparent={true}>
-      <View style={{width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.6)"}}>
-      <View style={styles.container}>
-        <View style={styles.modalHeader}>
-        <Text style={styles.headerText}>Choose Your Level</Text>
-          <View style={styles.closeModalButtonContainer}>
-            <View style={styles.closeModalButtonInnerContainer}>
-              <Pressable
-                style={styles.closeModalButton}
-                android_ripple={{
-                  color: ColorsPallet.lighter,
-                  borderless: false,
-                }}
-                onPress={()=>{
-                  toggleGear();
-                }}
-              >
-                <Entypo name="cross" size={40} color="black" />
-              </Pressable>
+    <Modal transparent={true}>
+      <View
+        style={{
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0,0,0,0.6)",
+        }}
+      >
+        <View style={styles.container}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.headerText}>Choose Your Level</Text>
+            <View style={styles.closeModalButtonContainer}>
+              <View style={styles.closeModalButtonInnerContainer}>
+                <Pressable
+                  style={styles.closeModalButton}
+                  android_ripple={{
+                    color: ColorsPallet.lighter,
+                    borderless: false,
+                  }}
+                  onPress={() => {
+                    toggleGear();
+                  }}
+                >
+                  <Entypo name="cross" size={40} color="black" />
+                </Pressable>
+              </View>
             </View>
           </View>
-         
+          <View style={styles.contentContainer}>
+            {levels.map((level) => (
+              <View style={styles.record}>
+                <Pressable
+                  android_ripple={{
+                    color: ColorsPallet.darker,
+                    borderless: false,
+                  }}
+                  onPress={() => {
+                    toggleGear();
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: 16,
+                  }}
+                >
+                  <Text style={{ textAlign: "center", fontSize: 18 }}>
+                    {level}
+                  </Text>
+                </Pressable>
+              </View>
+            ))}
+          </View>
         </View>
         <View style={styles.contentContainer} >
         {levels.map((level, index) => (
@@ -53,13 +84,11 @@ export default function ChooseYourLevelModal({toggleGear,setLevel}: Props) {
           ))}
         </View>
       </View>
-      </View>
     </Modal>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-    
   container: {
     width: "100%",
     height: "100%",
@@ -114,6 +143,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderRadius: 8,
     flexDirection: "row",
-    backgroundColor: ColorsPallet.baseColor
-  }
-})
+    backgroundColor: ColorsPallet.baseColor,
+  },
+});

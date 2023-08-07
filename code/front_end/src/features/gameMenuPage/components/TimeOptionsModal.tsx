@@ -1,12 +1,10 @@
 import { View, StyleSheet, Modal, Text, Pressable } from "react-native";
 import React from "react";
 import PlayOnlineBar from "./PlayOnlineBar";
-import {
-  GameLengthTypeContextType,
-  LengthType,
-} from "../context/GameLengthContext";
+import { LengthType } from "../context/GameLengthContext";
 import { ColorsPallet } from "../../../utils/Constants";
 import { Entypo } from "@expo/vector-icons";
+import { GameType } from "../../../chess-logic/board";
 
 export const millis = 1000;
 
@@ -14,17 +12,17 @@ const bulletGameLengths: Array<LengthType> = [
   {
     increment: 0,
     totalTime: 60 * millis,
-    lengthType: GameLengthTypeContextType.BULLET,
+    gameType: GameType.BULLET,
   },
   {
     increment: 1 * millis,
     totalTime: 60 * millis,
-    lengthType: GameLengthTypeContextType.BULLET,
+    gameType: GameType.BULLET,
   },
   {
     increment: 1 * millis,
     totalTime: 120 * millis,
-    lengthType: GameLengthTypeContextType.BULLET,
+    gameType: GameType.BULLET,
   },
 ];
 
@@ -32,17 +30,17 @@ const blitzGameLengths: Array<LengthType> = [
   {
     increment: 0,
     totalTime: 180 * millis,
-    lengthType: GameLengthTypeContextType.BLITZ,
+    gameType: GameType.BLITZ,
   },
   {
     increment: 2 * millis,
     totalTime: 180 * millis,
-    lengthType: GameLengthTypeContextType.BLITZ,
+    gameType: GameType.BLITZ,
   },
   {
     increment: 0,
     totalTime: 300 * millis,
-    lengthType: GameLengthTypeContextType.BLITZ,
+    gameType: GameType.BLITZ,
   },
 ];
 
@@ -50,17 +48,17 @@ const rapidGameLengths: Array<LengthType> = [
   {
     increment: 0,
     totalTime: 600 * millis,
-    lengthType: GameLengthTypeContextType.RAPID,
+    gameType: GameType.RAPID,
   },
   {
     increment: 10 * millis,
     totalTime: 600 * millis,
-    lengthType: GameLengthTypeContextType.RAPID,
+    gameType: GameType.RAPID,
   },
   {
     increment: 15 * millis,
     totalTime: 900 * millis,
-    lengthType: GameLengthTypeContextType.RAPID,
+    gameType: GameType.RAPID,
   },
 ];
 
@@ -79,12 +77,13 @@ export default function TimeOptionsModal({
   handleCloseModal,
   handleGameTempoChange,
 }: Props) {
-  const convertArraysToElements = (lengthTypesArray: Array<LengthType>) => (
+  const convertArraysToElements = (gameTypesArray: Array<LengthType>) => (
     <View style={styles.playOnlineBarContainer}>
       <PlayOnlineBar
-        elementsInfo={lengthTypesArray}
+        elementsInfo={gameTypesArray}
         handleCloseModal={handleCloseModal}
         handleGameTempoChange={handleGameTempoChange}
+        key={`${gameTypesArray[0].gameType}`}
       />
     </View>
   );

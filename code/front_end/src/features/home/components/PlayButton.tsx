@@ -1,10 +1,6 @@
-import { Text, Pressable, StyleSheet } from "react-native";
-import React from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
-import { ColorsPallet } from "../../../utils/Constants";
 import BaseButton from "../../../components/BaseButton";
-
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,

@@ -1,23 +1,18 @@
 import { View, StyleSheet } from "react-native";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useReducer } from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
 import PlayerBar from "../features/playOnline/components/PlayerBar";
-import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../chess-logic/ChessConstants";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { BotPlayer } from "../features/playOnline";
 import BotBar from "../features/play-with-bot/components/BotBar";
-import { Board } from "../chess-logic/board";
-import { Player } from "../utils/PlayerUtilities";
-import { getUser } from "../services/userServices";
-import { getValueFor } from "../utils/AsyncStoreFunctions";
-
+import {
+  reducer,
+  initialState,
+} from "../features/play-with-bot/reducer/PlayWithBotReducer";
+import OnlineBoard from "../features/playOnline/components/Board";
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,
@@ -27,66 +22,10 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayBot">;
 };
 
-const initialChessBoard: Board = getInitialChessBoard();
-
-export default function PlayBot({ navigation, route }: Props) {
-  // const [gameRecord, setGameRecord] = useState<Move[]>([]);
-  const [chessBoard, setChessBoard] = useState<Board>(initialChessBoard);
-  const [opponent, setOpponent] = useState<BotPlayer | null>(null);
-  const [myPlayer, setMyPlayer] = useState<Player | null>(null);
-  const [opponentClockInfo, setOpponentClockInfo] = useState<
-    Date | undefined
-  >();
-  const [myClockInfo, setMyClockInfo] = useState<Date>();
-  useEffect(() => {
-    const isOpponentWhite = Math.random() > 0.5;
-    setOpponent({
-      user: {
-        name: "Stockfish",
-        iconName: "fish",
-        ranking: 1500,
-      },
-      color: isOpponentWhite ? "white" : "black",
-    });
-    getValueFor("user").then((user) => {
-      if (user === null) return;
-      setMyPlayer({
-        ...JSON.parse(user),
-        color: isOpponentWhite ? "black" : "white",
-      });
-    });
-  }, []);
-
+export default function PlayBot({ navigation }: Props) {
   return (
     <View style={styles.appContainer}>
-      <View style={styles.contentContainer}>
-        <View style={styles.gameRecordContainer}>
-          <GameRecord moves={sampleMoves} />
-        </View>
-        <View style={styles.mainContentContainer}>
-          <View style={styles.playerBarContainer}>
-            {opponent?.color === "black" ? (
-              <BotBar player={opponent} />
-            ) : (
-              <PlayerBar player={myPlayer} />
-            )}
-          </View>
-          <View style={styles.boardContainer}>
-            <PlayOnlineChessBoard
-              board={chessBoard}
-              setBoard={setChessBoard}
-              playersColor={myPlayer?.color ? myPlayer.color : "spectator"}
-            />
-          </View>
-          <View style={styles.playerBarContainer}>
-            {opponent?.color !== "black" ? (
-              <BotBar player={opponent} />
-            ) : (
-              <PlayerBar player={myPlayer} />
-            )}
-          </View>
-        </View>
-      </View>
+      <View style={styles.contentContainer}></View>
       <Footer navigation={navigation} />
     </View>
   );

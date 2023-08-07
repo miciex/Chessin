@@ -1,35 +1,29 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useState, useReducer, useEffect } from "react";
-import { Board, BoardResponseToBoard, playMove } from "../chess-logic/board";
+import { GameResults } from "../chess-logic/board";
 import {
   Player,
   User,
-  getBasePlayer,
   responseUserToPlayer,
   userToPlayer,
 } from "../utils/PlayerUtilities";
-import PlayOnlineOptions from "../features/gameMenuPage/components/PlayOnlineOptions";
 import TestBoard from "../features/playOnline/components/Board";
-import PlayerBar from "../features/playOnline/components/PlayerBar";
-import { Move } from "../chess-logic/move";
-import { getInitialChessBoard } from "../features/playOnline";
 import Bar from "../features/playOnline/components/Bar";
 import PlayOnlineBar from "../features/playOnline/components/PlayOnlineBar";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StackParamList } from "../utils/Constants";
 import { RootStackParamList } from "../../Routing";
 import SettingsGameModal from "../features/gameMenuPage/components/SettingsGameModal";
 import WaitingForGame from "../features/playOnline/components/WaitingForGame";
-import WaitingScreen from "../features/playOnline/components/WaitingScreen";
 import GameFinishedOverlay from "../features/playOnline/components/GameFinishedOverlay";
 import {
-  initialState,
+  getInitialState,
   reducer,
 } from "../features/playOnline/reducers/PlayOnlineReducer";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import {
   cancelSearch,
+  getBoardByGameId,
   getGameByUsername,
   listenForFirstMove,
   listenForMove,
@@ -50,7 +44,10 @@ type Props = {
 export default function PlayOnline({ navigation, route }: Props) {
   const { request } = route.params;
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(
+    reducer,
+    getInitialState(request.isRated, request.gameType)
+  );
   const [showSettings, setShowSettings] = useState(false);
 
   const toggleSettings = () => {
@@ -84,24 +81,45 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .then((data: ChessGameResponse) => {
                   dispatch({
                     type: "setUpGame",
-                    payload: { chessGameResponse: data, user },
+                    payload: {
+                      chessGameResponse: data,
+                      nameInGame: request.nameInGame,
+                    },
                   });
-                  handleListnForFirstMove(
-                    data.id,
-                    data.whiteUser.nameInGame === user.nameInGame
-                      ? {
+                  const isMyPlayerWhite =
+                    data.whiteUser.nameInGame === user.nameInGame;
+                  const myColor = isMyPlayerWhite ? "white" : "black";
+                  const opponentColor = isMyPlayerWhite ? "black" : "white";
+                  getBoardByGameId(data.id).then(
+                    (boardResponse: BoardResponse) => {
+                      dispatch({
+                        type: "setDataFromBoardResponse",
+                        payload: { boardResponse },
+                      });
+
+                      if (
+                        boardResponse.gameResult !== GameResults.NONE ||
+                        boardResponse.whiteTurn ===
+                          (state.myPlayer.color === "white")
+                      )
+                        return;
+                      listenForMove({
+                        gameId: data.id,
+                        moves: boardResponse.moves,
+                      });
+                      handleListnForFirstMove(
+                        data.id,
+                        {
                           ...user,
-                          color: "white",
-                          timeLeft: new Date(request.timeControl),
-                        }
-                      : {
-                          ...user,
-                          color: "black",
+                          color: myColor,
                           timeLeft: new Date(request.timeControl),
                         },
-                    data.whiteUser.nameInGame === user.nameInGame
-                      ? responseUserToPlayer(data.blackUser, "black")
-                      : responseUserToPlayer(data.whiteUser, "white")
+                        responseUserToPlayer(
+                          data[`${opponentColor}User`],
+                          opponentColor
+                        )
+                      );
+                    }
                   );
                 })
                 .catch((err) => {
@@ -110,114 +128,54 @@ export default function PlayOnline({ navigation, route }: Props) {
             } else if (response.status === 202) {
               getGameByUsername(user.nameInGame)
                 .then((data: ChessGameResponse | undefined) => {
-                  if (data === undefined) return;
+                  if (!data) return;
+                  const isMyPlayerWhite =
+                    data.whiteUser.nameInGame === user.nameInGame;
+                  const myColor = isMyPlayerWhite ? "white" : "black";
                   dispatch({
                     type: "setUpGame",
-                    payload: { chessGameResponse: data, user },
+                    payload: {
+                      chessGameResponse: data,
+                      nameInGame: request.nameInGame,
+                    },
                   });
-                  handleListnForFirstMove(
-                    data.id,
-                    data.whiteUser.nameInGame === user.nameInGame
-                      ? {
-                          ...user,
-                          color: "white",
-                          timeLeft: new Date(request.timeControl),
-                        }
-                      : {
-                          ...user,
-                          color: "black",
-                          timeLeft: new Date(request.timeControl),
-                        },
-                    data.whiteUser.nameInGame === user.nameInGame
-                      ? responseUserToPlayer(data.blackUser, "black")
-                      : responseUserToPlayer(data.whiteUser, "white")
-                  )
-                    .then((board: BoardResponse) => {
-                      const myPlayer: Player =
-                        data.whiteUser.nameInGame === user.nameInGame
-                          ? {
-                              ...user,
-                              color: "white",
-                              timeLeft: new Date(request.timeControl),
-                            }
-                          : {
-                              ...user,
-                              color: "black",
-                              timeLeft: new Date(request.timeControl),
-                            };
-                      const opponent =
-                        data.whiteUser.nameInGame === user.nameInGame
-                          ? responseUserToPlayer(data.blackUser, "black")
-                          : responseUserToPlayer(data.whiteUser, "white");
+                  getBoardByGameId(data.id).then(
+                    (boardResponse: BoardResponse) => {
                       dispatch({
                         type: "setDataFromBoardResponse",
-                        payload: { boardResponse: board, myPlayer, opponent },
+                        payload: { boardResponse },
                       });
-                      dispatch({
-                        type: "setTimeFromBoardResponse",
-                        payload: { boardResponse: board, myPlayer, opponent },
-                      });
+                      if (
+                        boardResponse.gameResult !== GameResults.NONE ||
+                        boardResponse.whiteTurn === (myColor === "white")
+                      )
+                        return;
                       listenForMove({
                         gameId: data.id,
-                        moves: board.moves,
+                        moves: boardResponse.moves,
                       })
                         .then((board: BoardResponse | undefined) => {
                           if (board === undefined) return;
-                          const myPlayer: Player =
-                            data.whiteUser.nameInGame === user.nameInGame
-                              ? {
-                                  ...user,
-                                  color: "white",
-                                  timeLeft: new Date(request.timeControl),
-                                }
-                              : {
-                                  ...user,
-                                  color: "black",
-                                  timeLeft: new Date(request.timeControl),
-                                };
-                          const opponent =
-                            data.whiteUser.nameInGame === user.nameInGame
-                              ? responseUserToPlayer(data.blackUser, "black")
-                              : responseUserToPlayer(data.whiteUser, "white");
                           dispatch({
                             type: "setDataFromBoardResponse",
                             payload: {
                               boardResponse: board,
-                              myPlayer,
-                              opponent,
-                            },
-                          });
-                          dispatch({
-                            type: "setTimeFromBoardResponse",
-                            payload: {
-                              boardResponse: board,
-                              myPlayer,
-                              opponent,
                             },
                           });
                         })
                         .catch((err) => {
                           throw new Error(err);
                         });
-                    })
-                    .catch((err) => {
-                      throw new Error(err);
-                    });
+                    }
+                  );
                 })
                 .catch((err) => {
                   throw new Error(err);
                 });
-            } else if (response.status === 400) {
-              response
-                .text()
-                .then((data) => {
-                  throw new Error(data);
-                })
-                .catch((error) => {
-                  throw new Error(error);
-                });
             } else {
-              throw new Error("Something went wrong");
+              console.log(response.status);
+              console.log(response.statusText);
+              throw new Error("Something went wrong while searching for game");
             }
           })
           .catch((err) => {
@@ -242,17 +200,17 @@ export default function PlayOnline({ navigation, route }: Props) {
     myPlayer: Player,
     opponent: Player
   ) => {
-    return await listenForFirstMove({ gameId })
-      .then((res: BoardResponse) => {
-        dispatch({
-          type: "listenForFirstMove",
-          payload: { boardResponse: res, myPlayer, opponent },
-        });
-        return res;
-      })
-      .catch((err) => {
-        throw new Error(err);
+    try {
+      const res = await listenForFirstMove({ gameId });
+      dispatch({
+        type: "listenForFirstMove",
+        payload: { boardResponse: res, myPlayer, opponent },
       });
+      return res;
+    } catch (err) {
+      if (typeof err === "string") throw new Error(err);
+      throw new Error("Unknown error");
+    }
   };
 
   return (
@@ -279,6 +237,7 @@ export default function PlayOnline({ navigation, route }: Props) {
           state={state}
           dispatch={dispatch}
           navigation={navigation}
+          searchGame={searchNewGame}
         />
       </View>
       <Footer navigation={navigation} />

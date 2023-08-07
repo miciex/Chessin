@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, Modal, Pressable } from "react-native";
-import React, { useState } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 
 import { Entypo } from "@expo/vector-icons";

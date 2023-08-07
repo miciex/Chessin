@@ -23,7 +23,6 @@ export default function PlayTypeButtons({ handleSetType }: Props) {
         <View style={styles.buttonContainer}>
           <PlayTypeButton
             text="Play Online"
-            active={active}
             handlePress={handleSetType}
           ></PlayTypeButton>
         </View>
@@ -38,7 +37,6 @@ export default function PlayTypeButtons({ handleSetType }: Props) {
         <View style={styles.buttonContainer}>
           <PlayTypeButton
             text="Play With Bot"
-            active={active}
             handlePress={handleSetType}
           ></PlayTypeButton>
         </View>

@@ -19,11 +19,12 @@ type Props = {
   >;
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
+  searchGame: () => void;
 };
 export default function GameFinishedOverlay({
   state,
-  dispatch,
   navigation,
+  searchGame,
 }: Props) {
   const getText = (): string => {
     switch (state.board.result) {
@@ -56,10 +57,6 @@ export default function GameFinishedOverlay({
 
   const winnerText = getText();
 
-  const searchForGame = () => {
-    dispatch({ type: "setGameFinished", payload: false });
-  };
-
   return state.board.result !== GameResults.NONE ? (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
@@ -69,7 +66,7 @@ export default function GameFinishedOverlay({
         </View>
         <View style={styles.contentContainer}>
           <View style={styles.buttonContainer}>
-            <BaseButton text="Play again" handlePress={searchForGame} />
+            <BaseButton text="Play again" handlePress={searchGame} />
             <BaseButton
               text="Go to Menu"
               handlePress={() => {

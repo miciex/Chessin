@@ -18,7 +18,6 @@ import { GameLengthTypeContextType } from "../features/gameMenuPage/context/Game
 import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
 import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
 import { User } from "../utils/PlayerUtilities";
-import { getUser } from "../services/userServices";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
@@ -30,7 +29,7 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayWithFriendsMenu">;
 };
 
-export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
+export default function PlayWithFriendsMenuPage({ navigation }: Props) {
   const [user, setUser] = useState<User>();
 
   const user2 = route.params.userArg;

@@ -1,21 +1,14 @@
 import { createContext } from "react";
+import { GameType } from "../../../chess-logic/board";
 
 export type LengthType = {
   increment: number;
   totalTime: number;
-  lengthType: GameLengthTypeContextType;
+  gameType: GameType;
 };
-
-export enum GameLengthTypeContextType {
-  BULLET = "bullet",
-  BLITZ = "blitz",
-  RAPID = "rapid",
-  CLASSICAL = "classical",
-  CUSTOM = "custom",
-}
 
 export const GameLengthTypeContext = createContext<LengthType>({
   increment: 0,
   totalTime: 600,
-  lengthType: GameLengthTypeContextType.RAPID,
+  gameType: GameType.RAPID,
 });

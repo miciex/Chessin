@@ -1,4 +1,11 @@
-import { Board, boardFactory } from "../../chess-logic/board";
+import { FontAwesome5 } from "@expo/vector-icons";
+import {
+  Board,
+  GameType,
+  OnlineBoardType,
+  boardFactory,
+  onlineBoardFactory,
+} from "../../chess-logic/board";
 import { StartingPositions } from "../../chess-logic/ChessConstants";
 
 export type FieldInfo = {
@@ -9,7 +16,7 @@ export type FieldInfo = {
 export type Bot = {
   name: string;
   ranking: number;
-  iconName: any; //keyof typeof FontAwesome5.glyphMap;
+  iconName: keyof typeof FontAwesome5.glyphMap;
 };
 
 export type BotPlayer = {
@@ -17,10 +24,30 @@ export type BotPlayer = {
   color: string;
 };
 
+export const getBaseBotPlayer = (): BotPlayer => ({
+  user: {
+    name: "fish",
+    ranking: 1500,
+    iconName: "",
+  },
+  color: "#333",
+});
 export type countryIsoCodesType = (typeof countryIsoCodes)[number];
 
 export const getInitialChessBoard = (): Board => {
   return boardFactory({
+    fenString: StartingPositions.BASE_POSITION,
+    whiteToMove: true,
+  });
+};
+
+export const getInitialOnlineBoard = (
+  isRated: boolean,
+  gameType: GameType
+): OnlineBoardType => {
+  return onlineBoardFactory({
+    isRated,
+    gameType,
     fenString: StartingPositions.BASE_POSITION,
     whiteToMove: true,
   });

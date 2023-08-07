@@ -1,14 +1,12 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  GameLengthTypeContextType,
-  LengthType,
-} from "../context/GameLengthContext";
+import { LengthType } from "../context/GameLengthContext";
+import { GameType } from "../../../chess-logic/board";
 
 export const gameLengthTypeContextTypeToIconName = (tempo: LengthType) => {
-  switch (tempo.lengthType) {
-    case GameLengthTypeContextType.BULLET:
+  switch (tempo.gameType) {
+    case GameType.BULLET:
       return <MaterialCommunityIcons name="bullet" size={24} color="black" />;
-    case GameLengthTypeContextType.BLITZ:
+    case GameType.BLITZ:
       return (
         <MaterialCommunityIcons
           name="lightning-bolt"
@@ -16,7 +14,7 @@ export const gameLengthTypeContextTypeToIconName = (tempo: LengthType) => {
           color="rgb(235, 203, 47)"
         />
       );
-    case GameLengthTypeContextType.RAPID:
+    case GameType.RAPID:
       return (
         <MaterialCommunityIcons
           name="clock-time-eight"

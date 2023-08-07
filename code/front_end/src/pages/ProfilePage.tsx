@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
-
 import Profile from "../features/playWithFriend/components/Profile";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -89,7 +88,7 @@ type Props = {
 };
 
 export default function ProfilePage({ navigation, route }: Props) {
-  const [user, setUser] = useState<User>({firstname: "", lastname:"",email:"",nameInGame:"",country:"",ranking:{classical:0,blitz:0,bullet:0,rapid:0},highestRanking:0});
+  const [user, setUser] = useState<User>({firstname: "", lastname:"",email:"",nameInGame:"",country:"",ranking:{CLASSICAL:0,BLITZ:0,BULLET:0,RAPID:0},highestRanking:0});
   const [user2, setUser2] = useState<User>();
   const [ifMyAccount, setIfMyAccount] = useState<boolean>();
   

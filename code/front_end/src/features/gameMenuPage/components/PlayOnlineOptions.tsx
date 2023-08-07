@@ -1,20 +1,17 @@
-import { View, StyleSheet, Text } from "react-native";
-import React, { useState, useContext } from "react";
+import { View, StyleSheet } from "react-native";
+import React, { useState } from "react";
 import TimeOptionsModal from "./TimeOptionsModal";
-import StartGameButton from "../../../components/StartGameButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import ChooseTimeButton from "./ChooseTimeButton";
 import ChooseFriendsToPlayWith from "./ChooseFriendsToPlayWith";
 import { User } from "../../../utils/PlayerUtilities";
-import {
-  LengthType,
-  GameLengthTypeContextType,
-} from "../context/GameLengthContext";
+import { LengthType } from "../context/GameLengthContext";
 import { chosenFriendContext } from "../context/ChosenFriendContext";
 import BaseButton from "../../../components/BaseButton";
 import { setPendingGameRequest } from "../../playOnline/services/playOnlineService";
 import { getRanking } from "../../../utils/PlayerUtilities";
+import { GameType } from "../../../chess-logic/board";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -32,7 +29,7 @@ const friends: Array<User> = [
     nameInGame: "hello",
     email: "maciej@gmail.com",
     country: "Poland",
-    ranking: { blitz: 1500, bullet: 1500, rapid: 1500, classical: 1500 },
+    ranking: { BLITZ: 1500, BULLET: 1500, RAPID: 1500, CLASSICAL: 1500 },
     highestRanking: 1500,
     online: true,
   },
@@ -41,13 +38,8 @@ const friends: Array<User> = [
     lastname: "Burek",
     email: "wojtek@gmail.com",
     country: "pl",
-    ranking: {
-      blitz: 3500,
-      bullet: 3500,
-      rapid: 3500,
-      classical: 3500,
-    },
-    highestRanking: 3500,
+    ranking: { BLITZ: 1500, BULLET: 1500, RAPID: 1500, CLASSICAL: 1500 },
+    highestRanking: 1500,
     online: true,
     nameInGame: "wojtek",
   },
@@ -57,12 +49,7 @@ const friends: Array<User> = [
     nameInGame: "lelo",
     email: "sławek@gmail.com",
     country: "pl",
-    ranking: {
-      blitz: 1500,
-      bullet: 1500,
-      rapid: 1500,
-      classical: 1500,
-    },
+    ranking: { BLITZ: 1500, BULLET: 1500, RAPID: 1500, CLASSICAL: 1500 },
     highestRanking: 1500,
     online: true,
   },
@@ -70,12 +57,7 @@ const friends: Array<User> = [
     firstname: "Paweł",
     email: "paweł@gmail.com",
     country: "pl",
-    ranking: {
-      blitz: 1500,
-      bullet: 1500,
-      rapid: 1500,
-      classical: 1500,
-    },
+    ranking: { BLITZ: 1500, BULLET: 1500, RAPID: 1500, CLASSICAL: 1500 },
     highestRanking: 1500,
     online: true,
     nameInGame: "pawel",
@@ -85,12 +67,7 @@ const friends: Array<User> = [
     firstname: "Szymon",
     email: "szymon@gmail.com",
     country: "pl",
-    ranking: {
-      blitz: 1500,
-      bullet: 1500,
-      rapid: 1500,
-      classical: 1500,
-    },
+    ranking: { BLITZ: 1500, BULLET: 1500, RAPID: 1500, CLASSICAL: 1500 },
     highestRanking: 1500,
     online: true,
     nameInGame: "szymon",
@@ -100,12 +77,7 @@ const friends: Array<User> = [
     firstname: "Strzała",
     email: "strzała@gmail.com",
     country: "pl",
-    ranking: {
-      blitz: 1500,
-      bullet: 1500,
-      rapid: 1500,
-      classical: 1500,
-    },
+    ranking: { BLITZ: 1500, BULLET: 1500, RAPID: 1500, CLASSICAL: 1500 },
     highestRanking: 1500,
     online: true,
     nameInGame: "strzała",
@@ -116,7 +88,7 @@ const friends: Array<User> = [
 export default function PlayOnlineOptions({ navigation, user }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [gameTempo, setGameTempo] = useState<LengthType>({
-    lengthType: GameLengthTypeContextType.BLITZ,
+    gameType: GameType.BLITZ,
     totalTime: 3 * 60 * 1000,
     increment: 0,
   });
@@ -141,12 +113,16 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
   };
 
   const handlePlayOnline = () => {
+    console.log("user: ", user);
     if (!user) return;
+    console.log("navigating");
     navigation.navigate("PlayOnline", {
       request: setPendingGameRequest(
         gameTempo.totalTime,
         gameTempo.increment,
-        getRanking(gameTempo.lengthType, user)
+        getRanking(gameTempo.gameType, user),
+        user.nameInGame,
+        gameTempo.gameType
       ),
     });
   };

@@ -12,9 +12,15 @@ type Props = {
     StackParamList,
     undefined
   >;
+  params?: any;
 };
 
-export default function Heading({ text, navigation, stringNavigation }: Props) {
+export default function Heading({
+  text,
+  navigation,
+  stringNavigation,
+  params,
+}: Props) {
   let icon;
  
   if (stringNavigation)

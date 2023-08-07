@@ -1,21 +1,31 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
 import { User, responseUser } from "../utils/PlayerUtilities";
-import { getValueFor } from "../utils/AsyncStoreFunctions";
-import { responseUserToUser } from "../utils/PlayerUtilities";
 import {
-  refreshTokenLink,
-  findByNicknameLink,
-  setActive,
   friendInvitation,
   findUsersByNickname,
-  addFriendLink,
   getFriends,
   checkInvitationsLink
 } from "../utils/ApiEndpoints";
-import { save } from "../utils/AsyncStoreFunctions";
+import { CodeVerificationRequest , HandleFriendInvitation, HandleSearchBarSocials} from "../utils/ServicesTypes";
+import {
+  getHighestRanking,
+  responseUserToUser,
+} from "../utils/PlayerUtilities";
+import { getValueFor, save } from "../utils/AsyncStoreFunctions";
+import {
+  addFriendLink,
+  findByNicknameLink,
+  refreshTokenLink,
+  setActive,
+} from "../utils/ApiEndpoints";
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
-import { AuthenticationResponse, CodeVerificationRequest , FriendInvitationRequest, HandleFriendInvitation, HandleSearchBarSocials} from "../utils/ServicesTypes";
+import {
+  AuthenticationResponse,
+  FriendInvitationRequest,
+} from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
+import { Rankings } from "../utils/PlayerUtilities";
+import { GameType } from "../chess-logic/board";
 
 export const storeUser = async (value: User) => {
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
@@ -52,7 +62,7 @@ export const fetchUser = async ( Nickname: string, email?: string) => {
       } else if (response.status === 401) {
         throw new Error("Unauthorized");
       } else {
-        throw new Error("Something went wrong");
+        throw new Error("Something went wrong while fetching user");
       }
     })
     .then((data) => {
@@ -108,7 +118,7 @@ export const setUserActive = async (active: boolean) => {
 export const resetAccessToken = async () => {
   await AsynStorage.removeItem("accessToken");
   const refreshToken = await getValueFor("refreshToken");
-
+  if (refreshToken === null) return;
   fetch(refreshTokenLink, {
     body: JSON.stringify({
       refreshToken: refreshToken,
@@ -134,8 +144,7 @@ export const resetAccessToken = async () => {
 };
 
 export const setUserDataFromResponse = async (
-  responseData: AuthenticationResponse,
-  codeVerificationRequest: CodeVerificationRequest | { email: string }
+  responseData: AuthenticationResponse
 ) => {
   await save("refreshToken", responseData.refreshToken).catch((error) => {
     throw new Error(error);
@@ -143,7 +152,7 @@ export const setUserDataFromResponse = async (
   await save("accessToken", responseData.accessToken).catch((error) => {
     throw new Error(error);
   });
-  fetchandStoreUser(codeVerificationRequest.email).catch((error) => {
+  fetchandStoreUser().catch((error) => {
     throw new Error(error);
   });
 };
@@ -293,4 +302,14 @@ export const logoutUser = async () => {
     .catch((err) => {
       throw new Error(err);
     });
+};
+
+export const updateUserRating = async (rating: number, gameType: GameType) => {
+  const userJSON = await getValueFor("user");
+  if (!userJSON)
+    throw new Error("Couldn't update user rating, because user isn't stored");
+  let user: User = await JSON.parse(userJSON);
+  user.ranking[gameType] = rating;
+  user.highestRanking = getHighestRanking(user.ranking);
+  save("user", JSON.stringify(user));
 };

@@ -1,11 +1,10 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import { ColorsPallet } from "../../../utils/Constants";
-import BaseCustomContentButton from "../../../components/BaseCustomContentButton";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { LengthType } from "../context/GameLengthContext";
 import { lengthTypeToText } from "../services/HelpFunctions";
 import { gameLengthTypeContextTypeToIconName } from "../services/HelpFunctions";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { LengthType } from "../context/GameLengthContext";
 
 type Props = {
   handleOpenModal: () => void;

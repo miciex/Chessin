@@ -1,6 +1,6 @@
 import { responseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
-import { GameResults } from "../chess-logic/board";
+import { GameResults, GameType } from "../chess-logic/board";
 
 export type RegisterRequest = {
   firstname: string;
@@ -42,6 +42,9 @@ export type PendingChessGameRequest = {
   bottomRating: number;
   topRating: number;
   userRating: number;
+  isRated: boolean;
+  gameType: GameType;
+  nameInGame: string;
 };
 
 export type ChessGameResponse = {
@@ -54,6 +57,12 @@ export type ChessGameResponse = {
   increment: number;
   startBoard: string;
   whiteStarts: boolean;
+  gameType: GameType;
+  whiteRating: number;
+  blackRating: number;
+  whiteRatinChange: number;
+  blackRatingChange: number;
+  isRated: boolean;
 };
 
 export type SubmitMoveRequest = {
@@ -81,6 +90,12 @@ export type BoardResponse = {
   whiteTime: number;
   blackTime: number;
   lastMoveTime: number;
+  gameType: GameType;
+  whiteRating: number;
+  blackRating: number;
+  whiteRatingChange: number;
+  blackRatingChange: number;
+  isRated: boolean;
 };
 
 export type CodeVerificationRequest = {

@@ -1,6 +1,6 @@
-import { countryIsoCodes } from "../features/playOnline";
-
 export type ChessPiecesLetterType = "K" | "Q" | "R" | "B" | "N" | "";
+
+export const baseRating = 400;
 
 export const Directions: { [key: number]: Array<number> } = {
   1: [1, -1, 8, -8, 7, -7, 9, -9],

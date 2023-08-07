@@ -1,6 +1,9 @@
 import { View, StyleSheet } from "react-native";
 import React from "react";
-import { PlayOnlineState, PlayOnlineAction } from "../../../pages/PlayOnline";
+import {
+  PlayOnlineAction,
+  PlayOnlineState,
+} from "../reducers/PlayOnlineReducer";
 import { FontAwesome } from "@expo/vector-icons";
 
 type Props = {
@@ -9,11 +12,7 @@ type Props = {
   toggleSettings: () => void;
 };
 
-export default function PlayOnlineBar({
-  state,
-  dispatch,
-  toggleSettings,
-}: Props) {
+export default function PlayOnlineBar({ toggleSettings }: Props) {
   return (
     <View style={styles.gameOptionsContainer}>
       <FontAwesome name="flag-o" size={34} color="black" onPress={() => {}} />

@@ -1,11 +1,7 @@
 import { View, StyleSheet, Text } from "react-native";
 import React from "react";
 import PlayOnlineElement from "./PlayOnlineElement";
-import {
-  LengthType,
-  GameLengthTypeContextType,
-} from "../context/GameLengthContext";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LengthType } from "../context/GameLengthContext";
 import { gameLengthTypeContextTypeToIconName } from "../services/HelpFunctions";
 
 type Props = {
@@ -35,7 +31,7 @@ export default function PlayOnlineBar({
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <Text>{elementsInfo[0].lengthType.toString()}</Text>
+        <Text>{elementsInfo[0].gameType.toString()}</Text>
         {icon}
       </View>
       <View style={styles.contentContainer}>{content}</View>

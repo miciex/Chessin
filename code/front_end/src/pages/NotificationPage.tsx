@@ -6,8 +6,6 @@ import { ColorsPallet } from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
-import Submit from "../features/login/components/Submit";
-import Footer from "../components/Footer";
 import Heading from "../components/Heading";
 import Invitation from "../features/socials/components/Invitation";
 import Notify from "../features/socials/components/Notify";
@@ -15,16 +13,66 @@ import { checkInvitations } from "../services/userServices";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
 
 const ended_games = [
-  { date: "01.10.2022", playerNick: "Pusznik", rank: 1500, lastGameResult: "win" },
-  { date: "01.10.2022", playerNick: "MaciekNieBij", rank: 1500, lastGameResult: "win" },
-  { date: "01.10.2022", playerNick: "Slaweczuk", rank: 1500, lastGameResult: "win" },
-  { date: "01.10.2022", playerNick: "Strzała", rank: 1500, lastGameResult: "lose" },
-  { date: "01.10.2022", playerNick: "Bestia", rank: 1500, lastGameResult: "win" },
-  { date: "01.10.2022", playerNick: "Sharku", rank: 1000, lastGameResult: "lose" },
-  { date: "01.10.2022", playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
-  { date: "01.10.2022", playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
-  { date: "01.10.2022", playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
-  { date: "01.10.2022", playerNick: "Zocho", rank: 1300, lastGameResult: "draw" },
+  {
+    date: "01.10.2022",
+    playerNick: "Pusznik",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "MaciekNieBij",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Slaweczuk",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Strzała",
+    rank: 1500,
+    lastGameResult: "lose",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Bestia",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Sharku",
+    rank: 1000,
+    lastGameResult: "lose",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
 ];
 
 type Props = {
@@ -61,7 +109,6 @@ export default function Notification({ route, navigation }: Props) {
          
         </View>
       </ScrollView>
-    
     </View>
   );
 }

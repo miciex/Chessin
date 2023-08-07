@@ -1,11 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import BaseCustomContentButton from "../../../components/BaseCustomContentButton";
-import {
-  LengthType,
-  GameLengthTypeContextType,
-} from "../context/GameLengthContext";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LengthType } from "../context/GameLengthContext";
 import { ColorsPallet } from "../../../utils/Constants";
 import { lengthTypeToText } from "../services/HelpFunctions";
 

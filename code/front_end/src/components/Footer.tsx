@@ -2,10 +2,8 @@ import { View, Pressable, StyleSheet } from "react-native";
 import React from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { ColorsPallet } from "../utils/Constants";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
-import { RouteProp } from "@react-navigation/native";
 import { StackParamList } from "../utils/Constants";
 
 type Props = {

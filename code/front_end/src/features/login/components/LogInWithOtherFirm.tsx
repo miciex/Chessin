@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 

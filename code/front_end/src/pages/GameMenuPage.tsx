@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
@@ -37,7 +37,7 @@ type Props = {
   route: RouteProp<RootStackParamList, "GameMenu">;
 };
 
-export default function GameMenu({ route, navigation }: Props) {
+export default function GameMenu({ navigation }: Props) {
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (!user) return;
@@ -60,9 +60,6 @@ export default function GameMenu({ route, navigation }: Props) {
     setGameBotType(botType);
   };
 
-  const setColor = (colorType: PlayColorsContextType) => {
-    setChosenColor(colorType);
-  };
   return (
     <PlayColorsContext.Provider value={chosenColor}>
       <botStrengthLevelContextType.Provider value={gameBotStrength}>

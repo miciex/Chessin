@@ -1,10 +1,9 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React, { useContext } from "react";
-import { User } from "../../../context/UserContext";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { ColorsPallet } from "../../../utils/Constants";
 import { chosenFriendContext } from "../context/ChosenFriendContext";
-
+import { User } from "../../../utils/PlayerUtilities";
 type Props = {
   friend: User;
   handleChooseFriend: (friend: User) => void;
@@ -33,7 +32,7 @@ export default function FriendToPlayWith({
           onPress={handleOnPress}
         >
           <FontAwesome5 name="user" size={72} color="black" />
-          <Text style={styles.textStyle}>{friend.name}</Text>
+          <Text style={styles.textStyle}>{friend.nameInGame}</Text>
         </Pressable>
       </View>
     </View>

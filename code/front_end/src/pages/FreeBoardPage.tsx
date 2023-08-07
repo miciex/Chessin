@@ -1,19 +1,17 @@
-import { View, StyleSheet, ScrollView } from "react-native";
-import React, { useState, useContext, useEffect } from "react";
+import { View, StyleSheet } from "react-native";
+import React, { useReducer } from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import PlayOnlineChessBoard from "../features/playOnline/components/PlayOnlineChessBoard";
-import { FieldInfo, getInitialChessBoard } from "../features/playOnline";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../chess-logic/ChessConstants";
-import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import PiecesBar from "../features/free-board/components/PiecesBar";
 import FunctionsBar from "../features/free-board/components/FunctionsBar";
-import { Board } from "../chess-logic/board";
-import { User } from "../utils/PlayerUtilities";
-import { getValueFor } from "../utils/AsyncStoreFunctions";
+import OnlineBoard from "../features/playOnline/components/Board";
+import {
+  reducer,
+  initialState,
+} from "../features/playOnline/reducers/PlayOnlineReducer";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -24,24 +22,8 @@ type Props = {
   route: RouteProp<RootStackParamList, "FreeBoard">;
 };
 
-const initialChessBoard: Board = getInitialChessBoard();
-
-export default function FreeBoard({ navigation, route }: Props) {
-  const [user, setUser] = useState<User>();
-
-  useEffect(() => {
-    getValueFor("user").then((user) => {
-      if (user === null) return;
-      setUser(JSON.parse(user));
-    });
-  }, []);
-
-  const [chessBoard, setChessBoard] = useState<Board>(initialChessBoard);
-  const [whoseTurn, setWhoseTurn] = useState<"white" | "black" | null>(null);
-
-  const analyzisContent = sampleMoves.map((move, index) => (
-    <StringMoveToText move={move} key={index} />
-  ));
+export default function FreeBoard({ navigation }: Props) {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
     <View style={styles.appContainer}>
@@ -49,11 +31,7 @@ export default function FreeBoard({ navigation, route }: Props) {
         <View style={styles.mainContentContainer}>
           <PiecesBar barColor="white" />
           <View style={styles.boardContainer}>
-            <PlayOnlineChessBoard
-              board={chessBoard}
-              setBoard={setChessBoard}
-              playersColor={"spectator"}
-            />
+            <OnlineBoard state={state} dispatch={dispatch} />
           </View>
           <PiecesBar barColor="black" />
           <FunctionsBar />

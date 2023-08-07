@@ -1,10 +1,7 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React, { useMemo } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { ColorsPallet } from "../../../utils/Constants";
 import GameRecordMove from "./GameRecordMove";
-import { Move } from "../../../chess-logic/move";
 import { moveToChessNotation } from "../../../chess-logic/convertion";
-import { Board } from "../../../chess-logic/board";
 import {
   PlayOnlineAction,
   PlayOnlineState,

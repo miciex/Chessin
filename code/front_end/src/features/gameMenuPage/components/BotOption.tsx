@@ -13,12 +13,15 @@ type Props = {
 export default function BotOption({ setBotType, name }: Props) {
   const botTypeContext = React.useContext(BotTypeContext);
 
-  const handeSetChessinBot = () => {
-    setBotType("ChessinBot");
-  };
-
-  const handeSetStockFish = () => {
-    setBotType("Stockfish");
+  const handlePress = () => {
+    switch (name) {
+      case "fish":
+        setBotType("Stockfish");
+        break;
+      case "robot":
+        setBotType("ChessinBot");
+        break;
+    }
   };
 
   return (
@@ -32,7 +35,7 @@ export default function BotOption({ setBotType, name }: Props) {
         }
       >
         <BaseCustomContentButton
-          handlePress={handeSetStockFish}
+          handlePress={handlePress}
           content={<FontAwesome5 name={name} size={24} color="black" />}
         />
       </View>

@@ -1,7 +1,6 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React from "react";
 import PlayTypeButtons from "./PlayTypeButtons";
-import StartGameButton from "../../../components/StartGameButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import { StackParamList } from "../../../utils/Constants";
@@ -16,7 +15,7 @@ type Props = {
   handleSetType: (gameType: playType) => void;
 };
 
-export default function BottomButtons({ navigation, handleSetType }: Props) {
+export default function BottomButtons({ handleSetType }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.typeButtonsContainer}>

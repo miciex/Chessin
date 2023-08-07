@@ -16,7 +16,6 @@ const timeEndDate = new Date(0);
 
 export default function Timer({
   info,
-  gameFinished,
   gameStarted,
   board,
   player,
