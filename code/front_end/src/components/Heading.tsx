@@ -6,7 +6,7 @@ import { RootStackParamList } from "../../Routing";
 import { AntDesign } from "@expo/vector-icons";
 type Props = {
   text: String;
-  stringNavigation?: StackParamList;
+  stringNavigation?: Function;
   navigation?: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
@@ -16,6 +16,7 @@ type Props = {
 
 export default function Heading({ text, navigation, stringNavigation }: Props) {
   let icon;
+ 
   if (stringNavigation)
     icon = (
       <AntDesign
@@ -23,7 +24,8 @@ export default function Heading({ text, navigation, stringNavigation }: Props) {
         size={24}
         color="black"
         onPress={() =>
-          navigation?.navigate(stringNavigation ? stringNavigation : "Home")
+         
+          stringNavigation()
         }
       />
     );

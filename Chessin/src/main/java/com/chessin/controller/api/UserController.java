@@ -45,7 +45,7 @@ public class UserController {
 
         users.stream().map(UserResponse::fromUser).forEach(responses::add);
 
-        return ResponseEntity.ok().body(users);
+        return ResponseEntity.ok().body(responses);
     }
 
     @PostMapping("/findUserByToken")

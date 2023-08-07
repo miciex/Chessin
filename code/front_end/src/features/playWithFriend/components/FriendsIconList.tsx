@@ -43,9 +43,9 @@ export default function FriendsIconList ({ navigation, nameInGame }: Props){
   const goToFriendsProfile = (
     playerNick: string
 ) => {
-    navigation.navigate("ProfilePage", {
-      nameInGame: playerNick,
-    });
+  navigation.navigate("ProfilePage", {
+    nameInGame: playerNick,
+  });
   };
  
   return (
@@ -64,13 +64,16 @@ export default function FriendsIconList ({ navigation, nameInGame }: Props){
               <Image
                  style={styles.imageIcon}
                  source={{
-                   uri: player.country,
+                   uri: "https://images.squarespace-cdn.com/content/v1/5d025635e9e6f00001d604a6/1561427252699-2EMQCKUQ1J49MYTDGQ47/http-%253A%253Awww.comedycentral.com.au%253Asouth-park%253Avideos%253Athe-worst-of-eric-cartman-casa-bonita-clips.jpg?format=500w",
                  }}
                  alt={player.country}
             />
             <Text style={styles.text}>{player.nameInGame}</Text>
           </View></Pressable>
         })}
+        {
+            friends.length>0? "": <View style={{paddingTop: "30%"}}><Text  style={{color:  ColorsPallet.baseColor, fontSize: 20}}>No Friends Yet</Text></View>
+        }
       </View>
       </ScrollView>
     </View>

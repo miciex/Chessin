@@ -23,6 +23,8 @@ import { setUserActive, resetAccessToken } from "./src/services/userServices";
 import { NameInGame, PendingChessGameRequest } from "./src/utils/ServicesTypes";
 import ResetPasswordPage from "./src/pages/ResetPasswordPage";
 import PlayOnline from "./src/pages/PlayOnline";
+import Friends from "./src/pages/Friends";
+import { User } from "./src/utils/PlayerUtilities";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -34,11 +36,16 @@ export type RootStackParamList = {
   PlayOnline: {
     request: PendingChessGameRequest;
   };
-  PlayWithFriendsMenu: {};
+  PlayWithFriendsMenu: {
+    userArg: User
+  };
   ProfilePage: {
     nameInGame: string 
     
   } | undefined;
+  Friends: {
+    nameInGame: string;
+  }
   Register: undefined;
   Socials: undefined;
   AnalyzeGame: undefined;
@@ -170,6 +177,14 @@ const Routing = () => {
         <Stack.Screen
           name="Socials"
           component={Socials}
+          options={({ navigation }) => ({
+            headerStyle: styles.header,
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
+        />
+        <Stack.Screen
+          name="Friends"
+          component={Friends}
           options={({ navigation }) => ({
             headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,

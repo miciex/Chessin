@@ -33,6 +33,8 @@ type Props = {
 export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
 
+  const user2 = route.params.userArg;
+
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (user === null) return;
@@ -64,7 +66,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   const [isEnabled, setIsEnabled] = useState(true);
 
   return (
-    <View>
+    <View style={{ width: "100%", height: "100%"}}>
       <PlayColorsContext.Provider value={chosenColor}>
         <View style={styles.appContainer}>
           {timerModalOpen ? (
@@ -77,7 +79,14 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
               <View style={styles.profileBox}>
                 <Profile
                   nick={user ? user.nameInGame : ""}
-                  rank={user ? user.highestRanking : 0}
+                  
+                  rank={user ? user.ranking : {
+                    bullet: 0,
+                    blitz: 0,
+                    rapid: 0,
+                    classical: 0,
+                }}
+                country={user? user.country : "POland"}
                 />
                 <View style={{ width: 400, height: 130 }}>
                   <ChooseTimeButton

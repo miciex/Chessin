@@ -6,13 +6,14 @@ import { Entypo } from '@expo/vector-icons'
 
 type Props = {
   toggleGear: Function;
-  gearModalOn: boolean;
+  setLevel: Function;
 }
 
-export default function ChooseYourLevelModal({toggleGear}: Props) {
+export default function ChooseYourLevelModal({toggleGear,setLevel}: Props) {
 
 
   const levels = ["Noob", "Intermediate", "Boss", "GothamChess","Wojtek Lvl"]
+  const levelsNum = [0, 800, 1500, 2000,3000]
 
   return (
     <Modal  transparent={true}>
@@ -45,9 +46,10 @@ export default function ChooseYourLevelModal({toggleGear}: Props) {
                 color: ColorsPallet.darker,
                 borderless: false,
               }} onPress={()=>{
+                setLevel(levelsNum[index])
                 toggleGear();
               }} style={{width: "100%", height: "100%",  justifyContent: "center",alignItems: "center", borderRadius: 16}} >
-                <Text style={{textAlign: "center", fontSize: 18}}>{level}</Text></Pressable></View>
+                <Text style={{textAlign: "center", fontSize: 18}}>{level} {levelsNum[index]}</Text></Pressable></View>
           ))}
         </View>
       </View>

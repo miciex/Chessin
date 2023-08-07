@@ -59,7 +59,7 @@ export const fetchUser = async ( Nickname: string, email?: string) => {
       return responseUserToUser(data, email ? email : "");
     })
     .catch((err) => {
-      return {country: "none", firstname: "doesnt exist", lastname: "doesnt exist", email: "doesnt exist", nameInGame: "doesnt exist", highestRanking: 0, ranking: {blitz: 0, bullet: 0, rapid: 0, classical: 0}};
+      return {country: "none", firstname: "doesntt exist", lastname: "doesnt exist", email: "doesnt exist", nameInGame: "doesnt exist", highestRanking: 0, ranking: {blitz: 0, bullet: 0, rapid: 0, classical: 0}};
       throw new Error(err);
       
     });

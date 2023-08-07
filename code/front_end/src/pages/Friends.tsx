@@ -9,45 +9,49 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
-import { handleSearchBarSocials, setUserDataFromResponse } from "../services/userServices";
+import { getFriendsList, handleSearchBarSocials, setUserDataFromResponse } from "../services/userServices";
 import { HandleSearchBarSocials } from "../utils/ServicesTypes";
 import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
 import { User } from "../utils/PlayerUtilities";
+import Heading from "../components/Heading";
 
 
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,
-    "Socials",
+    "Friends",
     undefined
   >;
-  route: RouteProp<RootStackParamList, "Socials">;
+  route: RouteProp<RootStackParamList, "Friends">;
 };
 
 
 
-export default function Socials({ route, navigation }: Props) {
+export default function Friends({ route, navigation }: Props) {
 
-  const [users, setUsers] = useState<Array<User>>([])
-  const [searchValue, setSearchValue] = useState<HandleSearchBarSocials>({searchNickname: "a"})
   
-  useEffect(()=>{
-    if(searchValue.searchNickname)handleSearchBarSocials(searchValue).then((data) =>{ 
-      if(data === undefined) return
-      setUsers(data.map(x => responseUserToUser(x, "")))
-    })
-  }, [searchValue])
+  const [friends, setFriends] = useState<Array<User>>([])
 
+  const nameInGame = route?.params?.nameInGame;
+ 
+  useEffect(()=>{
+    console.log(nameInGame)
+    if(nameInGame)getFriendsList(nameInGame).then((data) =>{ 
+      if(data === undefined) return
+      setFriends(data.map(x => responseUserToUser(x, "")))
+      
+    })
+  }, [nameInGame])
   
   return (
     
     <View style={styles.appContainer}>
+        <Heading text={"Friends"}/>
       <View style={styles.formContainer}>
-       
-        <InputField placeholder="Search" onChange={e=>{setSearchValue({searchNickname: e})}} />
         <ScrollView>
+        
           <View style={styles.scrollView}>
-            {users.map((gracz) => (
+            {friends.map((gracz) => (
               
               <Friend
                   user={gracz}
@@ -55,6 +59,9 @@ export default function Socials({ route, navigation }: Props) {
               />
               
             ))}
+            {
+            friends.length>0? "": <View style={{paddingTop: "30%"}}><Text  style={{color:  ColorsPallet.baseColor, fontSize: 20}}>No Friends Yet</Text></View>
+        }
           </View>
         </ScrollView>
       </View>

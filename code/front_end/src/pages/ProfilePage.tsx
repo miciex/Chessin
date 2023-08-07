@@ -89,32 +89,43 @@ type Props = {
 };
 
 export default function ProfilePage({ navigation, route }: Props) {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User>({firstname: "", lastname:"",email:"",nameInGame:"",country:"",ranking:{classical:0,blitz:0,bullet:0,rapid:0},highestRanking:0});
   const [user2, setUser2] = useState<User>();
+  const [ifMyAccount, setIfMyAccount] = useState<boolean>();
   
   const nameInGame = route?.params?.nameInGame;
- 
+  const goToFriendsMenu = () => {
+    navigation.navigate("Friends", {nameInGame:(user2?.nameInGame ? user2?.nameInGame : user?.nameInGame  )});
+  };
+
+useEffect(()=>{
+  getValueFor("user").then((data) => {
+    if (data === null) return;
+    setUser(JSON.parse(data));
+  })
+}, [])
   
   useEffect(() => {
-    if(nameInGame===undefined){
-      getValueFor("user").then((user) => {
-      if (user === null) return;
-      setUser(JSON.parse(user));
-    })} else {
+    if(user.nameInGame==nameInGame || nameInGame===undefined){
+      setIfMyAccount(true)
+      setUser2(undefined)
+    }
+     else{
+      setIfMyAccount(false)
+     } 
+     console.log()
+    if(!(user.nameInGame==nameInGame || nameInGame===undefined)&&nameInGame){
+    
       fetchUser(nameInGame).then((user) => {
         if (user === null){
           return;
         } 
-        setUser(user);
-        getValueFor("user").then((user) => {
-          if (user === null) return;
-          setUser2(JSON.parse(user));
-        })
+        setUser2(user);
       })
     };
-  }, [nameInGame]);
-  console.log(nameInGame + " name")
-  console.log(user2?.nameInGame + " user2 nbame")
+    
+  }, [nameInGame, user]);
+  
 
   let component = ended_games.slice(0, 5).map((game) => {
     return (
@@ -126,12 +137,17 @@ export default function ProfilePage({ navigation, route }: Props) {
       />
     );
   });
-  const goToFriendsMenu = () => {
-    navigation.navigate("PlayWithFriendsMenu", {});
+
+  const playWithFriend = () => {
+    navigation.navigate("PlayWithFriendsMenu", {userArg: user2? user2: user});
+  };
+
+  const toOldGames = () => {
+    navigation.navigate("LastGame");
   };
 
   const handleAddFriend = ( ) => {
-    addFriendFunc({friendNickname: user ? user.nameInGame : ""}).then((data)=>{
+    addFriendFunc({friendNickname: user2 ? user2.nameInGame : ""}).then((data)=>{
     }).catch(err => {throw new Error(err)})
   }
 
@@ -141,16 +157,14 @@ export default function ProfilePage({ navigation, route }: Props) {
     return mainObject.some(obj => obj.nameInGame === targetNickname);
   }
 
-  const [result, setResult] = useState<boolean>();
-
   useEffect(()=>{
-    console.log("cos")
     if(nameInGame)getFriendsList(nameInGame).then((data) =>{ 
       if(data === undefined) return
       setFriends(data.map(x => responseUserToUser(x, "")))
-      setResult(checkNicknameInObjects(friends, user2?.nameInGame ? user2?.nameInGame: ""));
     })
-  }, [nameInGame, user2?.nameInGame])
+   
+     
+  }, [nameInGame, user?.nameInGame])
 
 
   return (
@@ -158,16 +172,16 @@ export default function ProfilePage({ navigation, route }: Props) {
       <View style={styles.container}>
         <View style={styles.profile}>
           <Profile
-            nick={user ? user.nameInGame : "Doesnt exist"}
-            rank={user ? user.ranking : {blitz: 0, bullet: 0, rapid: 0, classical: 0}}
-            active={user ? user.online : false}
-            playing={user ? user.playing : false}
-            country={user ? user.country : "Poland"}
+            nick={user2 ?user2.nameInGame : user.nameInGame }
+            rank={user2 ? user2.ranking : user.ranking}
+            active={user2 ? user2.online : user.online}
+            playing={user2 ? user2.playing : user.playing}
+            country={user2 ? user2.country : user.country}
           />
         </View>
 
         {
-            result ? "" : <View style={styles.invite}>
+            ifMyAccount || checkNicknameInObjects(friends, user?.nameInGame ? user?.nameInGame: "")? "" : <View style={styles.invite}>
             <BaseButton
               handlePress={() => {
                 handleAddFriend
@@ -177,24 +191,25 @@ export default function ProfilePage({ navigation, route }: Props) {
           </View>
         }
         
-        <View style={styles.invite}>
+        {ifMyAccount?  "" : <View style={styles.invite}> 
           <BaseButton
             handlePress={() => {
-              goToFriendsMenu();
+              playWithFriend();
             }}
             text="Play Game"
           />
-        </View>
+        </View> }
         <Heading
           text={"Friends"}
           navigation={navigation}
-          stringNavigation={"Socials"}
+          stringNavigation={goToFriendsMenu}
+
         />
-        <FriendsIconList navigation={navigation} nameInGame={user ? user.nameInGame : ""}/>
+        <FriendsIconList navigation={navigation} nameInGame={user2 ? user2.nameInGame : user.nameInGame}/>
         <Heading
           text={"Old Games"}
           navigation={navigation}
-          stringNavigation={"LastGame"}
+          stringNavigation={toOldGames}
         />
         <View style={{ width: "85%" }}>{component}</View>
       </View>

@@ -16,6 +16,7 @@ export type StackParamList =
   | "LastGame"
   | "Login"
   | "PlayBot"
+  | "Friends"
   | "PlayOnline"
   | "PlayWithFriendsMenu"
   | "ProfilePage"
