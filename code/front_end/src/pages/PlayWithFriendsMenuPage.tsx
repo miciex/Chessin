@@ -78,15 +78,15 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
             <View style={styles.contentContainer}>
               <View style={styles.profileBox}>
                 <Profile
-                  nick={user ? user.nameInGame : ""}
+                  nick={user2 ? user2.nameInGame : ""}
                   
-                  rank={user ? user.ranking : {
+                  rank={user2 ? user2.ranking : {
                     bullet: 0,
                     blitz: 0,
                     rapid: 0,
                     classical: 0,
                 }}
-                country={user? user.country : "POland"}
+                country={user2? user2.country : "POland"}
                 />
                 <View style={{ width: 400, height: 130 }}>
                   <ChooseTimeButton
