@@ -14,11 +14,12 @@ import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColo
 import BaseCustomContentButton from "../components/BaseCustomContentButton";
 import { PlayColorsContext } from "../features/gameMenuPage/context/PlayColorContext";
 import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButton";
-import { GameLengthTypeContextType } from "../features/gameMenuPage/context/GameLengthContext";
+import { GameLengthTypeContext } from "../features/gameMenuPage/context/GameLengthContext";
 import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
 import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
+import { GameType } from "../chess-logic/board";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -29,7 +30,7 @@ type Props = {
   route: RouteProp<RootStackParamList, "PlayWithFriendsMenu">;
 };
 
-export default function PlayWithFriendsMenuPage({ navigation }: Props) {
+export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
 
   const user2 = route.params.userArg;
@@ -52,7 +53,7 @@ export default function PlayWithFriendsMenuPage({ navigation }: Props) {
   };
 
   const [gameTempo, setGameTempo] = useState<LengthType>({
-    lengthType: GameLengthTypeContextType.BLITZ,
+    gameType: GameType.BLITZ,
     totalTime: 180,
     increment: 0,
   });
@@ -80,10 +81,10 @@ export default function PlayWithFriendsMenuPage({ navigation }: Props) {
                   nick={user2 ? user2.nameInGame : ""}
                   
                   rank={user2 ? user2.ranking : {
-                    bullet: 0,
-                    blitz: 0,
-                    rapid: 0,
-                    classical: 0,
+                    BULLET: 0,
+                    BLITZ: 0,
+                    RAPID: 0,
+                    CLASSICAL: 0,
                 }}
                 country={user2? user2.country : "POland"}
                 />

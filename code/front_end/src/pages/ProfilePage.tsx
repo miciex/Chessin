@@ -102,6 +102,7 @@ useEffect(()=>{
     if (data === null) return;
     setUser(JSON.parse(data));
   })
+  
 }, [])
   
   useEffect(() => {

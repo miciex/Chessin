@@ -31,7 +31,7 @@ const Friend = ({ navigation, user }: Props) => {
   };
 
   const goToFriendsMenu = () => {
-    navigation.navigate("PlayWithFriendsMenu", {nameInGame:user.nameInGame});
+    navigation.navigate("PlayWithFriendsMenu", {userArg:user});
   };
   const goToFriendsProfile = () => {
     navigation.navigate("ProfilePage", {nameInGame:user.nameInGame});
@@ -51,7 +51,7 @@ const Friend = ({ navigation, user }: Props) => {
         }}
       />             
       <Text >
-        <Online /> {user.nameInGame} {user.ranking.classical? user.ranking.classical.toString():""}
+        <Online /> {user.nameInGame} {user.ranking.CLASSICAL? user.ranking.CLASSICAL.toString():""}
       </Text>
       </Pressable>
       </View>

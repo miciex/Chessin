@@ -31,9 +31,9 @@ export default function Profile({nick, rank, active, playing, avatar, country}:P
       </View>
       <View style={styles.right}>
         <Text style={[styles.text, styles.name]}>{nick}</Text>
-        <Text style={[styles.text, styles.rank]}>Bullet {rank.bullet.toString()}</Text>
-        <Text style={[styles.text, styles.rank]}>Rapid {rank.rapid.toString()}</Text>
-        <Text style={[styles.text, styles.rank]}>Blitz {rank.blitz.toString()}</Text>
+        <Text style={[styles.text, styles.rank]}>Bullet {rank.BULLET.toString()}</Text>
+        <Text style={[styles.text, styles.rank]}>Rapid {rank.RAPID.toString()}</Text>
+        <Text style={[styles.text, styles.rank]}>Blitz {rank.BLITZ.toString()}</Text>
       </View>
     </View>
   )
