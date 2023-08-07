@@ -81,7 +81,7 @@ export default function Login({ navigation }: Props) {
           return false;
         }
         console.log("got authenticationResponse");
-        setUserDataFromResponse(responseData, { email });
+        setUserDataFromResponse(responseData);
         return true;
       })
       .then((userSet: boolean) => {
@@ -97,7 +97,7 @@ export default function Login({ navigation }: Props) {
       response
         .json()
         .then((data) => {
-          setUserDataFromResponse(data, { email });
+          setUserDataFromResponse(data);
         })
         .then(() => {
           navigation.navigate("Home");

@@ -31,7 +31,7 @@ export default function PlayOnlineBar({
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <Text>{elementsInfo[0].lengthType.toString()}</Text>
+        <Text>{elementsInfo[0].gameType.toString()}</Text>
         {icon}
       </View>
       <View style={styles.contentContainer}>{content}</View>

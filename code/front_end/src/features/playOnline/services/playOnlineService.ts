@@ -16,6 +16,7 @@ import {
   ListenForMoveRequest,
 } from "../../../utils/ServicesTypes";
 import { searchRatingRange } from "../../../utils/Constants";
+import { GameType } from "../../../chess-logic/board";
 
 export const listenForMove = async (request: ListenForMoveRequest) => {
   const accessToken = await getValueFor("accessToken");
@@ -168,7 +169,9 @@ export const searchForGame = async (request: PendingChessGameRequest) => {
 export const setPendingGameRequest = (
   timeControl: number,
   increment: number,
-  userRating: number
+  userRating: number,
+  nameInGame: string,
+  gameType: GameType
 ): PendingChessGameRequest => {
   return {
     timeControl: timeControl,
@@ -177,6 +180,8 @@ export const setPendingGameRequest = (
     topRating: userRating + searchRatingRange,
     bottomRating: userRating - searchRatingRange,
     isRated: true,
+    nameInGame,
+    gameType,
   };
 };
 

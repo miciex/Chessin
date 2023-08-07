@@ -5,10 +5,14 @@ import {
   PlayOnlineAction,
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
-import { possibleMovesAfterCheck } from "../../../chess-logic/board";
+import {
+  GameResults,
+  possibleMovesAfterCheck,
+} from "../../../chess-logic/board";
 import { Move, moveFactory } from "../../../chess-logic/move";
 import { BoardResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { listenForMove, submitMove } from "../services/playOnlineService";
+import { updateUserRating } from "../../../services/userServices";
 
 const yellow = "rgba(255, 255, 0, 0.5)";
 type pos = { x: number; y: number };
@@ -134,25 +138,6 @@ export default function Piece({
     return false;
   };
 
-  const setDataFromBoardResponse = (boardResponse: BoardResponse) => {
-    dispatch({
-      type: "setDataFromBoardResponse",
-      payload: {
-        boardResponse,
-        myPlayer: state.myPlayer,
-        opponent: state.opponent,
-      },
-    });
-    dispatch({
-      type: "setTimeFromBoardResponse",
-      payload: {
-        boardResponse,
-        myPlayer: state.myPlayer,
-        opponent: state.opponent,
-      },
-    });
-  };
-
   const handleMove = (move: Move) => {
     const submitMoveRequest: SubmitMoveRequest = {
       gameId: state.gameId,
@@ -168,17 +153,16 @@ export default function Piece({
     });
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
-        setDataFromBoardResponse(boardResponse);
+        dispatch({
+          type: "setDataFromBoardResponse",
+          payload: { boardResponse },
+        });
         listenForMove({
           gameId: state.gameId,
           moves: boardResponse.moves,
-        })
-          .then((res: BoardResponse | undefined) => {
-            if (res) setDataFromBoardResponse(res);
-          })
-          .catch((err) => {
-            throw new Error(err);
-          });
+        }).catch((err) => {
+          throw new Error(err);
+        });
       })
       .catch((err) => {
         throw new Error(err);
@@ -213,29 +197,27 @@ export default function Piece({
           setPossibleMoves(possibleMoves);
         }
       },
-      onPanResponderMove(e, gestureState) {
+      onPanResponderMove(_, gestureState) {
         pan.setValue({ x: gestureState.dx, y: gestureState.dy });
         panCut.setValue({
           x: Math.round(gestureState.dx / SIZE) * SIZE,
           y: Math.round(gestureState.dy / SIZE) * SIZE,
         });
       },
-      onPanResponderRelease: (e, gestureState) => {
-        if (
-          isPossibleMove(
-            Math.round((position.x + gestureState.dx) / SIZE) +
-              Math.round((position.y + gestureState.dy) / SIZE) * 8
-          )
-        ) {
+      onPanResponderRelease: (_, gestureState) => {
+        const endField =
+          Math.round((position.x + gestureState.dx) / SIZE) +
+          Math.round((position.y + gestureState.dy) / SIZE) * 8;
+        if (isPossibleMove(endField)) {
           const move = moveFactory({
             pieces: state.board.position,
             startField: positionNumber,
-            endField:
-              Math.round((position.x + gestureState.dx) / SIZE) +
-              Math.round((position.y + gestureState.dy) / SIZE) * 8,
+            endField,
           });
+          console.log();
           handleMove(move);
           resetPossibleMoves();
+          setValueActive(endField);
         }
 
         Animated.spring(pan, {

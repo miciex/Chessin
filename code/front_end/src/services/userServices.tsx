@@ -1,5 +1,8 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
-import { responseUserToUser, User } from "../utils/PlayerUtilities";
+import {
+  getHighestRanking,
+  responseUserToUser,
+} from "../utils/PlayerUtilities";
 import { getValueFor, save } from "../utils/AsyncStoreFunctions";
 import {
   addFriend,
@@ -10,10 +13,12 @@ import {
 import { fetchandStoreUser } from "../features/authentication/services/loginServices";
 import {
   AuthenticationResponse,
-  CodeVerificationRequest,
   FriendInvitationRequest,
 } from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
+import { Rankings } from "../utils/PlayerUtilities";
+import { User } from "../utils/PlayerUtilities";
+import { GameType } from "../chess-logic/board";
 
 // getting data
 export const getUser = async () => {
@@ -97,7 +102,7 @@ export const setUserActive = async (active: boolean) => {
 export const resetAccessToken = async () => {
   await AsynStorage.removeItem("accessToken");
   const refreshToken = await getValueFor("refreshToken");
-
+  if (refreshToken === null) return;
   fetch(refreshTokenLink, {
     body: JSON.stringify({
       refreshToken: refreshToken,
@@ -123,8 +128,7 @@ export const resetAccessToken = async () => {
 };
 
 export const setUserDataFromResponse = async (
-  responseData: AuthenticationResponse,
-  codeVerificationRequest: CodeVerificationRequest | { email: string }
+  responseData: AuthenticationResponse
 ) => {
   await save("refreshToken", responseData.refreshToken).catch((error) => {
     throw new Error(error);
@@ -132,7 +136,7 @@ export const setUserDataFromResponse = async (
   await save("accessToken", responseData.accessToken).catch((error) => {
     throw new Error(error);
   });
-  fetchandStoreUser(codeVerificationRequest.email).catch((error) => {
+  fetchandStoreUser().catch((error) => {
     throw new Error(error);
   });
 };
@@ -174,4 +178,14 @@ export const logoutUser = async () => {
     .catch((err) => {
       throw new Error(err);
     });
+};
+
+export const updateUserRating = async (rating: number, gameType: GameType) => {
+  const userJSON = await getValueFor("user");
+  if (!userJSON)
+    throw new Error("Couldn't update user rating, because user isn't stored");
+  let user: User = await JSON.parse(userJSON);
+  user.ranking[gameType] = rating;
+  user.highestRanking = getHighestRanking(user.ranking);
+  save("user", JSON.stringify(user));
 };

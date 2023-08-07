@@ -1,6 +1,7 @@
 import {
-  Board,
-  BoardResponseToBoard,
+  BoardResponseToOnlineBoard,
+  GameType,
+  OnlineBoardType,
   playMove,
 } from "../../../chess-logic/board";
 import {
@@ -10,12 +11,12 @@ import {
   responseUserToPlayer,
 } from "../../../utils/PlayerUtilities";
 import { Move } from "../../../chess-logic/move";
-import { getInitialChessBoard } from "..";
+import { getInitialOnlineBoard } from "..";
 import { BoardResponse, ChessGameResponse } from "../../../utils/ServicesTypes";
 import { cancelSearch } from "../services/playOnlineService";
 
 export type PlayOnlineState = {
-  board: Board;
+  board: OnlineBoardType;
   myPlayer: Player;
   opponent: Player;
   gameFinished: boolean;
@@ -28,7 +29,7 @@ export type PlayOnlineState = {
 export type PlayOnlineAction =
   | {
       type: "setBoard";
-      payload: Board;
+      payload: OnlineBoardType;
     }
   | {
       type: "setMyPlayer";
@@ -68,7 +69,10 @@ export type PlayOnlineAction =
     }
   | {
       type: "reset";
-      payload: null;
+      payload: null | {
+        isRated: boolean;
+        gameType: GameType;
+      };
     }
   | {
       type: "playMove";
@@ -94,21 +98,11 @@ export type PlayOnlineAction =
       type: "setDataFromBoardResponse";
       payload: {
         boardResponse: BoardResponse;
-        myPlayer: Player;
-        opponent: Player;
-      };
-    }
-  | {
-      type: "setTimeFromBoardResponse";
-      payload: {
-        boardResponse: BoardResponse;
-        myPlayer: Player;
-        opponent: Player;
       };
     }
   | {
       type: "setUpGame";
-      payload: { chessGameResponse: ChessGameResponse; user: User };
+      payload: { chessGameResponse: ChessGameResponse; nameInGame: string };
     }
   | {
       type: "listenForFirstMove";
@@ -119,9 +113,12 @@ export type PlayOnlineAction =
       };
     };
 
-export const getInitialState = (): PlayOnlineState => {
+export const getInitialState = (
+  isRated: boolean,
+  gameType: GameType
+): PlayOnlineState => {
   return {
-    board: getInitialChessBoard(),
+    board: getInitialOnlineBoard(isRated, gameType),
     myPlayer: getBasePlayer(),
     opponent: getBasePlayer(),
     gameFinished: false,
@@ -132,7 +129,11 @@ export const getInitialState = (): PlayOnlineState => {
   };
 };
 
-export const initialState: PlayOnlineState = getInitialState();
+export const initialState: PlayOnlineState = getInitialState(
+  true,
+  GameType.BLITZ
+);
+
 export function reducer(
   state: PlayOnlineState,
   action: PlayOnlineAction
@@ -165,11 +166,13 @@ export function reducer(
     case "setCurrentPosition":
       return { ...state, currentPosition: action.payload };
     case "reset":
-      return getInitialState();
+      return action.payload
+        ? getInitialState(action.payload.isRated, action.payload.gameType)
+        : initialState;
     case "playMove":
       return {
         ...state,
-        board: playMove(action.payload, state.board),
+        board: { ...state.board, ...playMove(action.payload, state.board) },
         currentPosition: state.currentPosition + 1,
         gameStarted: true,
       };
@@ -197,14 +200,7 @@ export function reducer(
       console.log(action.payload.boardResponse.moves);
       return {
         ...state,
-        board: BoardResponseToBoard(action.payload.boardResponse),
-        myPlayer: action.payload.myPlayer,
-        opponent: action.payload.opponent,
-        currentPosition: action.payload.boardResponse.moves.length - 1,
-      };
-    case "setTimeFromBoardResponse":
-      return {
-        ...state,
+        board: BoardResponseToOnlineBoard(action.payload.boardResponse),
         myPlayer: {
           ...state.myPlayer,
           timeLeft: new Date(
@@ -221,32 +217,14 @@ export function reducer(
               : action.payload.boardResponse.blackTime
           ),
         },
+        currentPosition: action.payload.boardResponse.moves.length - 1,
       };
     case "setUpGame":
-      if (
-        action.payload.chessGameResponse.blackUser === null ||
-        action.payload.chessGameResponse.whiteUser === null
-      ) {
-        cancelSearch()
-          .then(() => console.log("search cancelled"))
-          .catch((err) => {
-            throw new Error(err);
-          });
-        return {
-          ...state,
-          searchingGame: false,
-          gameStarted: false,
-          gameFinished: false,
-          board: getInitialChessBoard(),
-          myPlayer: getBasePlayer(),
-          opponent: getBasePlayer(),
-          gameId: -1,
-          currentPosition: 0,
-        };
-      }
       const isMyPlayerWhite =
         action.payload.chessGameResponse.whiteUser.nameInGame ===
-        action.payload.user.nameInGame;
+        action.payload.nameInGame;
+      const myColor = isMyPlayerWhite ? "white" : "black";
+      const opponentColor = isMyPlayerWhite ? "black" : "white";
       const chessGameResponse = action.payload.chessGameResponse;
       return {
         ...state,
@@ -254,27 +232,20 @@ export function reducer(
         gameId: action.payload.chessGameResponse.id,
         opponent: {
           ...responseUserToPlayer(
-            isMyPlayerWhite
-              ? chessGameResponse.blackUser
-              : chessGameResponse.whiteUser,
-            isMyPlayerWhite ? "black" : "white"
+            chessGameResponse[`${opponentColor}User`],
+            opponentColor
           ),
           timeLeft: new Date(action.payload.chessGameResponse.timeControl),
         },
         myPlayer: {
-          ...responseUserToPlayer(
-            isMyPlayerWhite
-              ? chessGameResponse.whiteUser
-              : chessGameResponse.blackUser,
-            isMyPlayerWhite ? "white" : "black"
-          ),
+          ...responseUserToPlayer(chessGameResponse[`${myColor}User`], myColor),
           timeLeft: new Date(chessGameResponse.timeControl),
         },
       };
     case "listenForFirstMove":
       return {
         ...state,
-        board: BoardResponseToBoard(action.payload.boardResponse),
+        board: BoardResponseToOnlineBoard(action.payload.boardResponse),
         myPlayer: {
           ...action.payload.myPlayer,
           timeLeft: new Date(

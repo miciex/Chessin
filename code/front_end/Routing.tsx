@@ -22,6 +22,7 @@ import { setUserActive, resetAccessToken } from "./src/services/userServices";
 import { PendingChessGameRequest } from "./src/utils/ServicesTypes";
 import ResetPasswordPage from "./src/pages/ResetPasswordPage";
 import PlayOnline from "./src/pages/PlayOnline";
+import { fetchandStoreUser } from "./src/features/authentication/services/loginServices";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -55,7 +56,13 @@ const Routing = () => {
   }, [netInfo.isConnected]);
 
   useEffect(() => {
-    resetAccessToken();
+    resetAccessToken()
+      .then(() => {
+        fetchandStoreUser();
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
     const resetToken = setInterval(() => {
       resetAccessToken().catch((err) => {
         throw new Error(err);

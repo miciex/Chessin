@@ -1,5 +1,5 @@
 import { Move, getEmptyMove, moveFactory, copyMove } from "./move";
-import { Pieces, Directions } from "./ChessConstants";
+import { Pieces, Directions, baseRating } from "./ChessConstants";
 import { FenToIntArray, boardToMap, mapToBoard } from "./helpMethods";
 import { BoardResponse } from "../utils/ServicesTypes";
 
@@ -9,6 +9,15 @@ export type constructorArgs = {
   availableCastles?: Array<number>;
   moves?: Array<Move>;
   board?: Board;
+};
+
+export type OnlineBoardConstructorArgs = constructorArgs & {
+  gameType: GameType;
+  whiteRating?: number;
+  blackRating?: number;
+  whiteRatingChange?: number;
+  blackRatingChange?: number;
+  isRated: boolean;
 };
 
 export const enum GameResults {
@@ -25,6 +34,13 @@ export const enum GameResults {
   DRAW_AGREEMENT = "DRAW_AGREEMENT",
 }
 
+export enum GameType {
+  CLASSICAL = "CLASSICAL",
+  BLITZ = "BLITZ",
+  BULLET = "BULLET",
+  RAPID = "RAPID",
+}
+
 export type Board = {
   position: { [key: number]: number };
   whiteToMove: boolean;
@@ -36,6 +52,15 @@ export type Board = {
   movesTo50MoveRule: number;
   movedPieces: number[];
   result: GameResults;
+};
+
+export type OnlineBoardType = Board & {
+  gameType: GameType;
+  whiteRating: number;
+  blackRating: number;
+  whiteRatingChange: number;
+  blackRatingChange: number;
+  isRated: boolean;
 };
 
 export const BoardResponseToBoard = (boardResponse: BoardResponse): Board => {
@@ -51,6 +76,30 @@ export const BoardResponseToBoard = (boardResponse: BoardResponse): Board => {
     movesTo50MoveRule: boardResponse.movesTo50MoveRule,
     movedPieces: boardResponse.movedPieces,
     result: boardResponse.gameResult,
+  };
+};
+
+export const BoardResponseToOnlineBoard = (
+  boardResponse: BoardResponse
+): OnlineBoardType => {
+  const moves = boardResponse.moves.map((move) => moveFactory(move));
+  return {
+    fen: boardResponse.startBoard,
+    visualBoard: boardResponse.visualBoard,
+    position: boardResponse.position,
+    whiteToMove: boardResponse.whiteTurn,
+    availableCastles: boardResponse.availableCastles,
+    moves: moves,
+    positions: boardResponse.positions,
+    movesTo50MoveRule: boardResponse.movesTo50MoveRule,
+    movedPieces: boardResponse.movedPieces,
+    result: boardResponse.gameResult,
+    gameType: boardResponse.gameType,
+    whiteRating: boardResponse.whiteRating,
+    blackRating: boardResponse.blackRating,
+    blackRatingChange: boardResponse.blackRatingChange,
+    whiteRatingChange: boardResponse.whiteRatingChange,
+    isRated: boardResponse.isRated,
   };
 };
 
@@ -83,6 +132,33 @@ export const boardFactory = ({
     movesTo50MoveRule: board ? board.movesTo50MoveRule : 0,
     movedPieces: resetMovedPieces(position),
     result: board ? board.result : GameResults.NONE,
+  };
+};
+
+export const onlineBoardFactory = ({
+  fenString,
+  whiteToMove,
+  availableCastles,
+  moves,
+  board,
+  gameType,
+  isRated,
+  whiteRating,
+  whiteRatingChange,
+  blackRating,
+  blackRatingChange,
+}: OnlineBoardConstructorArgs): OnlineBoardType => {
+  const brd = board
+    ? board
+    : boardFactory({ fenString, whiteToMove, availableCastles, moves, board });
+  return {
+    ...brd,
+    gameType,
+    isRated,
+    whiteRating: whiteRating !== undefined ? whiteRating : baseRating,
+    whiteRatingChange: whiteRatingChange ? whiteRatingChange : 0,
+    blackRatingChange: blackRatingChange ? blackRatingChange : 0,
+    blackRating: blackRating ? blackRating : baseRating,
   };
 };
 

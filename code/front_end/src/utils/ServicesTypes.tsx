@@ -1,6 +1,6 @@
 import { responseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
-import { GameResults } from "../chess-logic/board";
+import { GameResults, GameType } from "../chess-logic/board";
 
 export type RegisterRequest = {
   firstname: string;
@@ -11,13 +11,6 @@ export type RegisterRequest = {
   country: string;
 };
 
-export enum GameType {
-  BULLET = "BULLET",
-  BLITZ = "BLITZ",
-  RAPID = "RAPID",
-  CLASSICAL = "CLASSICAL",
-  CUSTOM = "CUSTOM",
-}
 export type LoginRequest = {
   email: string;
   password: string;
@@ -50,6 +43,8 @@ export type PendingChessGameRequest = {
   topRating: number;
   userRating: number;
   isRated: boolean;
+  gameType: GameType;
+  nameInGame: string;
 };
 
 export type ChessGameResponse = {
@@ -98,7 +93,7 @@ export type BoardResponse = {
   gameType: GameType;
   whiteRating: number;
   blackRating: number;
-  whiteRatinChange: number;
+  whiteRatingChange: number;
   blackRatingChange: number;
   isRated: boolean;
 };

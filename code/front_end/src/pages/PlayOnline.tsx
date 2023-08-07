@@ -44,7 +44,10 @@ type Props = {
 export default function PlayOnline({ navigation, route }: Props) {
   const { request } = route.params;
 
-  const [state, dispatch] = useReducer(reducer, getInitialState());
+  const [state, dispatch] = useReducer(
+    reducer,
+    getInitialState(request.isRated, request.gameType)
+  );
   const [showSettings, setShowSettings] = useState(false);
 
   const toggleSettings = () => {
@@ -78,23 +81,45 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .then((data: ChessGameResponse) => {
                   dispatch({
                     type: "setUpGame",
-                    payload: { chessGameResponse: data, user },
+                    payload: {
+                      chessGameResponse: data,
+                      nameInGame: request.nameInGame,
+                    },
                   });
                   const isMyPlayerWhite =
                     data.whiteUser.nameInGame === user.nameInGame;
                   const myColor = isMyPlayerWhite ? "white" : "black";
                   const opponentColor = isMyPlayerWhite ? "black" : "white";
-                  handleListnForFirstMove(
-                    data.id,
-                    {
-                      ...user,
-                      color: myColor,
-                      timeLeft: new Date(request.timeControl),
-                    },
-                    responseUserToPlayer(
-                      data[`${opponentColor}User`],
-                      opponentColor
-                    )
+                  getBoardByGameId(data.id).then(
+                    (boardResponse: BoardResponse) => {
+                      dispatch({
+                        type: "setDataFromBoardResponse",
+                        payload: { boardResponse },
+                      });
+
+                      if (
+                        boardResponse.gameResult !== GameResults.NONE ||
+                        boardResponse.whiteTurn ===
+                          (state.myPlayer.color === "white")
+                      )
+                        return;
+                      listenForMove({
+                        gameId: data.id,
+                        moves: boardResponse.moves,
+                      });
+                      handleListnForFirstMove(
+                        data.id,
+                        {
+                          ...user,
+                          color: myColor,
+                          timeLeft: new Date(request.timeControl),
+                        },
+                        responseUserToPlayer(
+                          data[`${opponentColor}User`],
+                          opponentColor
+                        )
+                      );
+                    }
                   );
                 })
                 .catch((err) => {
@@ -107,34 +132,22 @@ export default function PlayOnline({ navigation, route }: Props) {
                   const isMyPlayerWhite =
                     data.whiteUser.nameInGame === user.nameInGame;
                   const myColor = isMyPlayerWhite ? "white" : "black";
-                  const opponentColor = isMyPlayerWhite ? "black" : "white";
-                  const myPlayer: Player = {
-                    ...user,
-                    color: myColor,
-                    timeLeft: new Date(request.timeControl),
-                  };
-                  const opponent: Player = responseUserToPlayer(
-                    data[`${opponentColor}User`],
-                    opponentColor
-                  );
                   dispatch({
                     type: "setUpGame",
-                    payload: { chessGameResponse: data, user },
+                    payload: {
+                      chessGameResponse: data,
+                      nameInGame: request.nameInGame,
+                    },
                   });
-                  console.log("game id: ", data.id);
                   getBoardByGameId(data.id).then(
                     (boardResponse: BoardResponse) => {
                       dispatch({
                         type: "setDataFromBoardResponse",
-                        payload: { boardResponse, myPlayer, opponent },
-                      });
-                      dispatch({
-                        type: "setTimeFromBoardResponse",
-                        payload: { boardResponse, myPlayer, opponent },
+                        payload: { boardResponse },
                       });
                       if (
                         boardResponse.gameResult !== GameResults.NONE ||
-                        boardResponse.whiteTurn === (myPlayer.color === "white")
+                        boardResponse.whiteTurn === (myColor === "white")
                       )
                         return;
                       listenForMove({
@@ -147,16 +160,6 @@ export default function PlayOnline({ navigation, route }: Props) {
                             type: "setDataFromBoardResponse",
                             payload: {
                               boardResponse: board,
-                              myPlayer,
-                              opponent,
-                            },
-                          });
-                          dispatch({
-                            type: "setTimeFromBoardResponse",
-                            payload: {
-                              boardResponse: board,
-                              myPlayer,
-                              opponent,
                             },
                           });
                         })
