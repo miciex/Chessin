@@ -43,7 +43,7 @@ public class UserController {
     private final BlitzRatingRepository blitzRatingRepository;
     private final BulletRatingRepository bulletRatingRepository;
 
-    @PostMapping("/findByEmail/{nickname}")
+    @PostMapping("/findByNickname/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname){
         Optional<User> user = userRepository.findByNameInGame(nickname);
         UserResponse userResponse = UserResponse.fromUser(user.orElseThrow(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository);
@@ -100,7 +100,7 @@ public class UserController {
         if(!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 
-        List<FriendInvitation> invitations = friendInvitationRepository.findAllByFriendEmail(email);
+        List<FriendInvitation> invitations = friendInvitationRepository.findAllByUser(userRepository.findByEmail(email).get());
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
@@ -138,7 +138,7 @@ public class UserController {
     @PostMapping("/getFriends/{nickname}")
     public ResponseEntity<?> getFriends(@PathVariable String nickname)
     {
-        if(!userRepository.existsByEmail(nickname))
+        if(!userRepository.existsByNameInGame(nickname))
             return ResponseEntity.badRequest().body("User does not exist");
 
         User user = userRepository.findByNameInGame(nickname).get();
