@@ -95,19 +95,16 @@ const HomePage = ({ navigation }: Props) => {
   }, []);
 
   const [levelModal, setLevelModal] = useState(false);
-  const [levelOfPlayer, setLevel] = useState(800)
+  const [levelOfPlayer, setLevel] = useState(800);
 
   const toggleLevel = () => {
     setLevelModal(!levelModal);
-    
   };
 
   return (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
         <ScrollView>
-          
-          
           {levelModal ? (
             <>
               <ChooseYourLevelModal
@@ -119,15 +116,15 @@ const HomePage = ({ navigation }: Props) => {
           ) : null}
           <View style={{ width: "100%", alignItems: "center" }}>
             <Text>Your ELO Level: {levelOfPlayer}</Text>
-          <View style={styles.oldGamesButton}>
+            <View style={styles.oldGamesButton}>
               <BaseButton
                 handlePress={() => {
-                  setLevelModal(!levelModal)}
-                }
+                  setLevelModal(!levelModal);
+                }}
                 text="Choose Your Level"
               />
             </View>
-            <TopButtons navigation={navigation} user={user}/>
+            <TopButtons navigation={navigation} user={user} />
             <View style={styles.oldGamesButton}>
               <BaseButton
                 handlePress={() => {
@@ -136,7 +133,6 @@ const HomePage = ({ navigation }: Props) => {
                 text="Old Games"
               />
             </View>
-
 
             {ended_games.map((gracz, index) => (
               <View style={{ width: "90%" }}>

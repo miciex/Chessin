@@ -55,9 +55,12 @@ export default function GameFinishedOverlay({
     }
   };
 
+  const showOverlay =
+    state.board.result !== GameResults.NONE && state.searchingGame === false;
+
   const winnerText = getText();
 
-  return state.board.result !== GameResults.NONE ? (
+  return showOverlay ? (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
         <View style={styles.textContainer}>
