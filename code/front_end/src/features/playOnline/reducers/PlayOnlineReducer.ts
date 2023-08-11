@@ -197,7 +197,6 @@ export function reducer(
         },
       };
     case "setDataFromBoardResponse":
-      console.log(action.payload.boardResponse.moves);
       return {
         ...state,
         board: BoardResponseToOnlineBoard(action.payload.boardResponse),

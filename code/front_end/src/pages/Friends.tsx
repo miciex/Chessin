@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
 import { ColorsPallet } from "../utils/Constants";
 import InputField from "../components/InputField";
@@ -9,12 +9,15 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
-import { getFriendsList, handleSearchBarSocials, setUserDataFromResponse } from "../services/userServices";
+import {
+  getFriendsList,
+  handleSearchBarSocials,
+  setUserDataFromResponse,
+} from "../services/userServices";
 import { HandleSearchBarSocials } from "../utils/ServicesTypes";
 import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
 import { User } from "../utils/PlayerUtilities";
 import Heading from "../components/Heading";
-
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -25,43 +28,37 @@ type Props = {
   route: RouteProp<RootStackParamList, "Friends">;
 };
 
-
-
 export default function Friends({ route, navigation }: Props) {
-
-  
-  const [friends, setFriends] = useState<Array<User>>([])
+  const [friends, setFriends] = useState<Array<User>>([]);
 
   const nameInGame = route?.params?.nameInGame;
- 
-  useEffect(()=>{
-    console.log(nameInGame)
-    if(nameInGame)getFriendsList(nameInGame).then((data) =>{ 
-      if(data === undefined) return
-      setFriends(data.map(x => responseUserToUser(x, "")))
-      
-    })
-  }, [nameInGame])
-  
+
+  useEffect(() => {
+    if (nameInGame)
+      getFriendsList(nameInGame).then((data) => {
+        if (data === undefined) return;
+        setFriends(data.map((x) => responseUserToUser(x, "")));
+      });
+  }, [nameInGame]);
+
   return (
-    
     <View style={styles.appContainer}>
-        <Heading text={"Friends"}/>
+      <Heading text={"Friends"} />
       <View style={styles.formContainer}>
         <ScrollView>
-        
           <View style={styles.scrollView}>
             {friends.map((gracz) => (
-              
-              <Friend
-                  user={gracz}
-                  navigation={navigation}
-              />
-              
+              <Friend user={gracz} navigation={navigation} />
             ))}
-            {
-            friends.length>0? "": <View style={{paddingTop: "30%"}}><Text  style={{color:  ColorsPallet.baseColor, fontSize: 20}}>No Friends Yet</Text></View>
-        }
+            {friends.length > 0 ? (
+              ""
+            ) : (
+              <View style={{ paddingTop: "30%" }}>
+                <Text style={{ color: ColorsPallet.baseColor, fontSize: 20 }}>
+                  No Friends Yet
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </View>

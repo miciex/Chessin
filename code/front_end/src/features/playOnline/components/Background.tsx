@@ -7,17 +7,21 @@ const BLACK = "#222222";
 
 interface RowProps {
   row: number;
+  rotateBoard: boolean;
 }
 
 interface SquareProps {
   row: number;
   col: number;
+  rotateBoard: boolean;
 }
 
-const Square = ({ row, col }: SquareProps) => {
+const Square = ({ row, col, rotateBoard }: SquareProps) => {
   const SIZE = Dimensions.get("window").width / 8;
   const backgroundColor = (row + col) % 2 === 0 ? WHITE : BLACK;
   const color = (row + col) % 2 === 0 ? BLACK : WHITE;
+  const colText = rotateBoard ? 7 - col : col;
+  const rowText = !rotateBoard ? 8 - row : row + 1;
   return (
     <View
       style={{
@@ -29,7 +33,7 @@ const Square = ({ row, col }: SquareProps) => {
       }}
     >
       <Text style={{ color, fontWeight: "500", opacity: col === 0 ? 1 : 0 }}>
-        {8 - row}
+        {rowText}
       </Text>
       <Text
         style={{
@@ -39,27 +43,31 @@ const Square = ({ row, col }: SquareProps) => {
           opacity: row === 7 ? 1 : 0,
         }}
       >
-        {String.fromCharCode("a".charCodeAt(0) + col)}
+        {String.fromCharCode("a".charCodeAt(0) + colText)}
       </Text>
     </View>
   );
 };
 
-const Row = ({ row }: RowProps) => {
+const Row = ({ row, rotateBoard }: RowProps) => {
   return (
     <View style={{ flex: 1, flexDirection: "row" }}>
       {new Array(8).fill(0).map((_, i) => (
-        <Square key={i} row={row} col={i} />
+        <Square key={i} row={row} col={i} rotateBoard={rotateBoard} />
       ))}
     </View>
   );
 };
 
-export default function Background() {
+type Props = {
+  rotateBoard: boolean;
+};
+
+export default function Background({ rotateBoard }: Props) {
   return (
     <View style={{ flex: 1, position: "absolute" }}>
       {new Array(8).fill(0).map((_, i) => (
-        <Row key={i} row={i} />
+        <Row key={i} row={i} rotateBoard={rotateBoard} />
       ))}
     </View>
   );

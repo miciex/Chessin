@@ -4,6 +4,9 @@ export const ColorsPallet = {
   baseColor: "#967259",
   dark: "#634832",
   darker: "#38220f",
+  gray: "#bbbbbb",
+  green: "#00ff00",
+  red: "#ff0000",
 };
 
 export type StackParamList =

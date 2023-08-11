@@ -7,7 +7,6 @@ import {
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
 
-//TODO: change moves to array of Move type
 type Props = {
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
@@ -16,7 +15,6 @@ export default function GameRecord({
   state: { board, currentPosition },
   dispatch,
 }: Props) {
-  //TODO: convert moves to string array
   const movesContent = board.moves.map((move, index) => {
     return (
       <GameRecordMove
@@ -41,7 +39,7 @@ export default function GameRecord({
 const styles = StyleSheet.create({
   appContainer: {
     width: "100%",
-    height: "100%",
+    height: 24,
     backgroundColor: ColorsPallet.dark,
     justifyContent: "center",
   },

@@ -31,6 +31,7 @@ import {
 } from "../features/playOnline/services/playOnlineService";
 import { RouteProp } from "@react-navigation/native";
 import { BoardResponse, ChessGameResponse } from "../utils/ServicesTypes";
+import GameRecord from "../features/playOnline/components/GameRecord";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -49,9 +50,14 @@ export default function PlayOnline({ navigation, route }: Props) {
     getInitialState(request.isRated, request.gameType)
   );
   const [showSettings, setShowSettings] = useState(false);
+  const [rotateBoard, setRotateBoard] = useState(false);
 
   const toggleSettings = () => {
     setShowSettings((prev) => !prev);
+  };
+
+  const toggleRotateBoard = () => {
+    setRotateBoard((prev) => !prev);
   };
 
   useEffect(() => {
@@ -61,6 +67,11 @@ export default function PlayOnline({ navigation, route }: Props) {
       unMount();
     };
   }, []);
+
+  const setRotateBoardAfterFoundGame = (isMyPlayerWhite: boolean) => {
+    if (isMyPlayerWhite) setRotateBoard(false);
+    else setRotateBoard(true);
+  };
 
   const searchNewGame = () => {
     dispatch({ type: "setSearchingGame", payload: true });
@@ -90,6 +101,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                     data.whiteUser.nameInGame === user.nameInGame;
                   const myColor = isMyPlayerWhite ? "white" : "black";
                   const opponentColor = isMyPlayerWhite ? "black" : "white";
+                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
                   getBoardByGameId(data.id).then(
                     (boardResponse: BoardResponse) => {
                       dispatch({
@@ -132,6 +144,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                   const isMyPlayerWhite =
                     data.whiteUser.nameInGame === user.nameInGame;
                   const myColor = isMyPlayerWhite ? "white" : "black";
+                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
                   dispatch({
                     type: "setUpGame",
                     payload: {
@@ -215,6 +228,7 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
+      <GameRecord state={state} dispatch={dispatch} />
       <SettingsGameModal
         toggleGear={toggleSettings}
         gearModalOn={showSettings}
@@ -224,15 +238,28 @@ export default function PlayOnline({ navigation, route }: Props) {
         {state.searchingGame || state.myPlayer.color === null ? (
           <WaitingForGame />
         ) : null}
-        <Bar state={state} dispatch={dispatch} isMyPlayer={false} />
-        <TestBoard state={state} dispatch={dispatch} />
+        <Bar
+          state={state}
+          dispatch={dispatch}
+          isMyPlayer={false === !rotateBoard}
+        />
+        <TestBoard
+          state={state}
+          dispatch={dispatch}
+          rotateBoard={rotateBoard}
+        />
         <PlayOnlineBar
           state={state}
           dispatch={dispatch}
           toggleSettings={toggleSettings}
+          toggleRotateBoard={toggleRotateBoard}
         />
 
-        <Bar state={state} dispatch={dispatch} isMyPlayer={true} />
+        <Bar
+          state={state}
+          dispatch={dispatch}
+          isMyPlayer={true === !rotateBoard}
+        />
         <GameFinishedOverlay
           state={state}
           dispatch={dispatch}

@@ -70,6 +70,8 @@ type Props = {
   activeValues: React.MutableRefObject<Animated.Value[]>;
   possibleMoves: React.MutableRefObject<Animated.Value[]>;
   positionNumber: number;
+  resetActiveValues: () => void;
+  resetPossibleMoves: () => void;
 };
 
 export default function Piece({
@@ -80,16 +82,15 @@ export default function Piece({
   activeValues,
   possibleMoves,
   positionNumber,
+  resetActiveValues,
+  resetPossibleMoves,
 }: Props) {
   // const translate = new Animated.ValueXY({ x: position.x, y: position.y });
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const panCut = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
-  const resetActiveValues = () => {
-    for (let i = 0; i < 64; i++) {
-      activeValues.current[i].setValue(0);
-    }
-  };
+  const isMyTurn =
+    (state.myPlayer.color === "white") === state.board.whiteToMove;
 
   const findActiveValue = (): number => {
     for (let i = 0; i < 64; i++) {
@@ -107,12 +108,6 @@ export default function Piece({
       } else {
         activeValues.current[i].setValue(0);
       }
-    }
-  };
-
-  const resetPossibleMoves = () => {
-    for (let i = 0; i < 64; i++) {
-      possibleMoves.current[i].setValue(0);
     }
   };
 
@@ -153,6 +148,7 @@ export default function Piece({
     });
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
+        if (boardResponse === null) return;
         dispatch({
           type: "setDataFromBoardResponse",
           payload: { boardResponse },
@@ -176,7 +172,7 @@ export default function Piece({
       onPanResponderTerminationRequest: () => true,
       onPanResponderStart() {
         const activeField = findActiveValue();
-        if (isPossibleMove(positionNumber)) {
+        if (isPossibleMove(positionNumber) && isMyTurn) {
           const move = moveFactory({
             pieces: state.board.position,
             startField: activeField,
@@ -208,13 +204,12 @@ export default function Piece({
         const endField =
           Math.round((position.x + gestureState.dx) / SIZE) +
           Math.round((position.y + gestureState.dy) / SIZE) * 8;
-        if (isPossibleMove(endField)) {
+        if (isPossibleMove(endField) && isMyTurn) {
           const move = moveFactory({
             pieces: state.board.position,
             startField: positionNumber,
             endField,
           });
-          console.log();
           handleMove(move);
           resetPossibleMoves();
           setValueActive(endField);

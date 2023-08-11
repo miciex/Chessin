@@ -217,7 +217,6 @@ export const submitMove = async (request: SubmitMoveRequest) => {
 };
 
 export const getBoardByGameId = async (gameId: number) => {
-  console.log("getting board");
 
   const accessToken = await getValueFor("accessToken");
   try {
@@ -230,7 +229,6 @@ export const getBoardByGameId = async (gameId: number) => {
     });
     return response.json();
   } catch (err) {
-    console.log("gameId: ", gameId);
     console.error(err);
     throw new Error("Something went wrong in getting board by game id!");
   }

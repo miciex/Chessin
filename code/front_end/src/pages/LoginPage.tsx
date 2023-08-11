@@ -80,7 +80,6 @@ export default function Login({ navigation }: Props) {
         if (!responseData) {
           return false;
         }
-        console.log("got authenticationResponse");
         setUserDataFromResponse(responseData);
         return true;
       })

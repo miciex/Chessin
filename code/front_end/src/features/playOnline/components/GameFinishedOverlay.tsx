@@ -87,9 +87,9 @@ export default function GameFinishedOverlay({
 const styles = StyleSheet.create({
   outerContainer: {
     width: "100%",
-    height: "100%",
+    height: "72.5%",
     position: "absolute",
-    top: 0,
+    top: 50,
     zIndex: 1,
     justifyContent: "center",
     alignItems: "center",

@@ -1,4 +1,4 @@
-export const baseLink = "http://146.59.19.209:8080/Chessin/api/v1/";
+export const baseLink = "http://192.168.1.128:8080/api/v1/";
 export const authLink = `${baseLink}auth/`;
 export const registerLink = `${authLink}register`;
 export const authenticateLink = `${authLink}authenticate`;

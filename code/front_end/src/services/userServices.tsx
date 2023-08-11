@@ -4,9 +4,13 @@ import {
   friendInvitation,
   findUsersByNickname,
   getFriends,
-  checkInvitationsLink
+  checkInvitationsLink,
 } from "../utils/ApiEndpoints";
-import { CodeVerificationRequest , HandleFriendInvitation, HandleSearchBarSocials} from "../utils/ServicesTypes";
+import {
+  CodeVerificationRequest,
+  HandleFriendInvitation,
+  HandleSearchBarSocials,
+} from "../utils/ServicesTypes";
 import {
   getHighestRanking,
   responseUserToUser,
@@ -46,7 +50,7 @@ export const getUser = async () => {
     });
 };
 
-export const fetchUser = async ( Nickname: string, email?: string) => {
+export const fetchUser = async (Nickname: string, email?: string) => {
   const token = await SecureStore.getItemAsync("accessToken");
   const user: any = await fetch(`${findByNicknameLink}${Nickname}`, {
     method: "POST",
@@ -69,9 +73,16 @@ export const fetchUser = async ( Nickname: string, email?: string) => {
       return responseUserToUser(data, email ? email : "");
     })
     .catch((err) => {
-      return {country: "none", firstname: "doesntt exist", lastname: "doesnt exist", email: "doesnt exist", nameInGame: "doesnt exist", highestRanking: 0, ranking: {blitz: 0, bullet: 0, rapid: 0, classical: 0}};
+      return {
+        country: "none",
+        firstname: "doesntt exist",
+        lastname: "doesnt exist",
+        email: "doesnt exist",
+        nameInGame: "doesnt exist",
+        highestRanking: 0,
+        ranking: { blitz: 0, bullet: 0, rapid: 0, classical: 0 },
+      };
       throw new Error(err);
-      
     });
 
   return user;
@@ -167,21 +178,22 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
     },
     body: JSON.stringify(request),
   })
-  .then((response) => {
-    if (response.status === 200) {
-      return response.text();
-    } else {
-      throw new Error("Something went wrong on api server!");
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+    .then((response) => {
+      if (response.status === 200) {
+        return response.text();
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   return response;
-}
+};
 
-
-export const handleFriendInvitationFunc = async (request: HandleFriendInvitation) =>{
+export const handleFriendInvitationFunc = async (
+  request: HandleFriendInvitation
+) => {
   const accessToken = await getValueFor("accessToken");
   const response = await fetch(friendInvitation, {
     method: "POST",
@@ -189,106 +201,101 @@ export const handleFriendInvitationFunc = async (request: HandleFriendInvitation
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify(request)
+    body: JSON.stringify(request),
   })
-  .then((response) => {
-    if (response.status === 200) {
-      return response.text();
-    } else {
-      throw new Error("Something went wrong on api server!");
+    .then((response) => {
+      if (response.status === 200) {
+        return response.text();
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  return response;
+};
+
+export async function handleSearchBarSocials(request: HandleSearchBarSocials) {
+  const accessToken = await getValueFor("accessToken");
+
+  const response = await fetch(
+    `${findUsersByNickname}${request.searchNickname}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
     }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+  )
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json() as unknown as Array<responseUser>;
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   return response;
 }
 
-
-export async function handleSearchBarSocials (request: HandleSearchBarSocials){
+export async function getFriendsList(nameInGame: string) {
   const accessToken = await getValueFor("accessToken");
-
-
-  const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
+  const response = await fetch(`${getFriends}${nameInGame}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
-    }
+    },
   })
-  .then((response) => {
-    
-    if (response.status === 200) {
-      
-      return response.json() as unknown as Array<responseUser>;
-        } else {
-      throw new Error("Something went wrong on api server!");
-    }
-  })
-  .catch((error) => {
-    console.log("shit");
-    console.error(error);
-  });
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json() as unknown as Array<responseUser>;
+      } else if (response.status === 400) {
+        throw new Error("Bad request");
+      } else if (response.status === 401) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      console.log("eror");
+      console.error(error);
+    });
   return response;
 }
 
-
-export async function getFriendsList  (nameInGame:string){
+export const checkInvitations = async () => {
   const accessToken = await getValueFor("accessToken");
-  const response = await fetch(`${getFriends}${nameInGame}`,{
+
+  const response = await fetch(checkInvitationsLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
-    }
-  }).then((response) => {
-    if (response.status === 200) {
-      return response.json() as unknown as Array<responseUser>;
-        } else if (response.status === 400) {
-          throw new Error("Bad request");
-        } else if (response.status === 401) {
-          throw new Error("Unauthorized");
-        } else {
-          throw new Error("Something went wrong");
-        }
+    },
   })
-  .catch((error) => {
-    console.log("eror")
-    console.error(error);
-  });
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json() as unknown as Array<responseUser>;
+      } else if (response.status === 400) {
+        throw new Error("Bad request");
+      } else if (response.status === 401) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+
   return response;
-}
-
-
-export const checkInvitations = async () =>{
-  const accessToken = await getValueFor("accessToken");
-  
-  const response = await fetch(checkInvitationsLink,{
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    }
-  }).then((response) => {
-    if (response.status === 200) {
-    
-      return response.json() as unknown as Array<responseUser>;
-        } else if (response.status === 400) {
-          throw new Error("Bad request");
-        } else if (response.status === 401) {
-          throw new Error("Unauthorized");
-        } else {
-          throw new Error("Something went wrong");
-        }
-  })
-  .catch((error) => {
-
-    throw new Error(error);
-  });
-  
-  return response;
-}
-
+};
 
 export const logoutUser = async () => {
   Promise.all([
