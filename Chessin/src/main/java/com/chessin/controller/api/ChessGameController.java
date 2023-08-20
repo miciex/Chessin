@@ -51,12 +51,12 @@ public class ChessGameController {
     @PostMapping("/searchNewGame")
     public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request, HttpServletRequest servlet) throws InterruptedException {
 
-//        if(pendingGames.containsKey(request.getEmail()))
-//        {
-//            return ResponseEntity.badRequest().body("User is already searching for a game.");
-//        }
-
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(pendingGames.containsKey(email))
+        {
+            return ResponseEntity.badRequest().body("User is already searching for a game.");
+        }
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
         {
@@ -186,6 +186,17 @@ public class ChessGameController {
         synchronized(activeGames.get(id))
         {
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
+
+            if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().size() == 0)
+            {
+                Board endBoard = activeBoards.get(id);
+                endBoard.setGameResult(GameResults.ABANDONED);
+                activeBoards.remove(id);
+                activeGames.remove(id);
+                chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
+            }
+
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
         }
     }

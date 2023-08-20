@@ -100,7 +100,7 @@ public class UserController {
         if(!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 
-        List<FriendInvitation> invitations = friendInvitationRepository.findAllByUser(userRepository.findByEmail(email).get());
+        List<FriendInvitation> invitations = friendInvitationRepository.findAllByFriend(userRepository.findByEmail(email).get());
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
@@ -118,7 +118,7 @@ public class UserController {
         if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
-        friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendNickname());
+        friendInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
 
         if(request.getResponseType() == FriendInvitationResponseType.ACCEPT)
         {

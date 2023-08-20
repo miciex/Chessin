@@ -16,10 +16,10 @@ public class LoggedUserResponse {
     private String firstname;
     private String lastName;
     private String nameInGame;
-    private int ratingBlitz;
-    private int ratingBullet;
-    private int ratingRapid;
-    private int ratingClassical;
+//    private int ratingBlitz;
+//    private int ratingBullet;
+//    private int ratingRapid;
+//    private int ratingClassical;
     private String country;
     private String email;
 
@@ -30,10 +30,10 @@ public class LoggedUserResponse {
                 .firstname(user.getFirstname())
                 .lastName(user.getLastName())
                 .nameInGame(user.getNameInGame())
-                .ratingBlitz(user.getRatingBlitz())
-                .ratingBullet(user.getRatingBullet())
-                .ratingRapid(user.getRatingRapid())
-                .ratingClassical(user.getRatingClassical())
+//                .ratingBlitz(user.getRatingBlitz())
+//                .ratingBullet(user.getRatingBullet())
+//                .ratingRapid(user.getRatingRapid())
+//                .ratingClassical(user.getRatingClassical())
                 .country(user.getCountry())
                 .email(user.getEmail())
                 .build();
@@ -46,10 +46,10 @@ public class LoggedUserResponse {
                 .firstname(userResponse.getFirstname())
                 .lastName(userResponse.getLastName())
                 .nameInGame(userResponse.getNameInGame())
-                .ratingBlitz(userResponse.getRatingBlitz())
-                .ratingBullet(userResponse.getRatingBullet())
-                .ratingRapid(userResponse.getRatingRapid())
-                .ratingClassical(userResponse.getRatingClassical())
+//                .ratingBlitz(userResponse.getRatingBlitz())
+//                .ratingBullet(userResponse.getRatingBullet())
+//                .ratingRapid(userResponse.getRatingRapid())
+//                .ratingClassical(userResponse.getRatingClassical())
                 .country(userResponse.getCountry())
                 .email(userResponse.getEmail())
                 .build();
