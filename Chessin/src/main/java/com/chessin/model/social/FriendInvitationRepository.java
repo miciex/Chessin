@@ -23,4 +23,6 @@ public interface FriendInvitationRepository extends JpaRepository<FriendInvitati
 
     boolean existsByUserEmailAndFriendNameInGame(String userEmail, String friendNickname);
 
+    boolean existsByFriendEmailAndUserNameInGame(String friendEmail, String userNameInGame);
+
 }

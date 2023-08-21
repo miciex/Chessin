@@ -21,6 +21,7 @@ import com.chessin.model.social.FriendInvitation;
 import com.chessin.model.social.FriendInvitationRepository;
 import com.chessin.model.social.FriendInvitationResponseType;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -111,11 +112,12 @@ public class UserController {
     }
 
     @PostMapping("/respondToInvitation")
+    @Transactional
     public ResponseEntity<?> respondToInvitation(@RequestBody FriendInvitationResponseRequest request, HttpServletRequest servlet)
     {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
+        if(!friendInvitationRepository.existsByFriendEmailAndUserNameInGame(email, request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
         friendInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
