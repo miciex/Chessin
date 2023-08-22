@@ -109,16 +109,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                         payload: { boardResponse },
                       });
 
-                      if (
-                        boardResponse.gameResult !== GameResults.NONE ||
-                        boardResponse.whiteTurn ===
-                          (state.myPlayer.color === "white")
-                      )
-                        return;
-                      listenForMove({
-                        gameId: data.id,
-                        moves: boardResponse.moves,
-                      });
+                      if (boardResponse.gameResult !== GameResults.NONE) return;
                       handleListnForFirstMove(
                         data.id,
                         {
@@ -130,7 +121,9 @@ export default function PlayOnline({ navigation, route }: Props) {
                           data[`${opponentColor}User`],
                           opponentColor
                         )
-                      );
+                      ).catch((err) => {
+                        throw new Error(err);
+                      });
                     }
                   );
                 })

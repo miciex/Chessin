@@ -50,6 +50,8 @@ export default function GameFinishedOverlay({
         return state.board.whiteToMove
           ? "Black won by mate"
           : "White won by mate";
+      case GameResults.ABANDONED:
+        return "Game abandoned";
       default:
         return "Unknown result";
     }
