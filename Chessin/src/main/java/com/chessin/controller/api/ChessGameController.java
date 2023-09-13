@@ -1,6 +1,7 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
+import com.chessin.controller.requests.GameInvitationRequest;
 import com.chessin.controller.requests.ListenForMoveRequest;
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
@@ -355,4 +356,13 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Game not found.");
 
     }
+
+    @PostMapping("/inviteFriend")
+    public ResponseEntity<?> inviteFriend(@RequestBody GameInvitationRequest request, HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+
+    }
+
 }
