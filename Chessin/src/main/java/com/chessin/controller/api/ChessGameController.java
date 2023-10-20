@@ -392,7 +392,32 @@ public class ChessGameController {
             }
             else
             {
+                int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
+                int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
 
+                List<User> players = Arrays.asList(userRepository.findByEmail(friendEmail).get(), userRepository.findByEmail(email).get());
+
+                ChessGame game = ChessGame.builder()
+                        .startBoard(Constants.Boards.classicBoard)
+                        .whiteStarts(true)
+                        .whiteUser(players.get(whitePlayerIndex))
+                        .blackUser(players.get(blackPlayerIndex))
+                        .availableCastles(new int[]{0, 0, 0, 0})
+                        .timeControl(request.getTimeControl())
+                        .increment(request.getIncrement())
+                        .gameType(HelpMethods.getGameType(request.getTimeControl()))
+                        .startTime(Instant.now().toEpochMilli())
+                        .isRated(request.isRated())
+                        .build();
+
+                chessGameRepository.save(game);
+
+                pendingInvitations.remove(email);
+
+                activeBoards.put(game.getId(), Board.fromGame(game));
+                activeGames.put(game.getId(), game);
+
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
             }
         }
 
