@@ -169,6 +169,20 @@ export default function Login({ navigation }: Props) {
                 navigation.navigate("ResetPassword");
               }}
               color={ColorsPallet.light}
+            />{" "}
+            <BaseButton
+              text="Reset your password"
+              handlePress={() => {
+                navigation.navigate("ResetPassword");
+              }}
+              color={ColorsPallet.light}
+            />{" "}
+            <BaseButton
+              text="Reset your password"
+              handlePress={() => {
+                navigation.navigate("ResetPassword");
+              }}
+              color={ColorsPallet.light}
             />
           </View>
           <View style={styles.authLinkButton}>

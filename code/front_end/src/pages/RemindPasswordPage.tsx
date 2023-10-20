@@ -1,16 +1,8 @@
 import { View, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
+import { remindPassword } from "../services/AuthenticationServices";
+import { PasswordRemindRequest } from "../utils/ServicesTypes";
 import {
-  twoFaEnabled,
-  changePassword,
-  remindPassword,
-} from "../services/AuthenticationServices";
-import {
-  PasswordRemindRequest,
-  TwoFactorAuthenticationResponse,
-} from "../utils/ServicesTypes";
-import {
-  notValidEmailMessage,
   notValidPasswordMessage,
   notValidPasswordRepeatMessage,
   emailRegex,
@@ -37,7 +29,7 @@ type Props = {
   route: RouteProp<RootStackParamList, "ResetPassword">;
 };
 
-export default function ResetPasswordPage({ navigation }: Props) {
+export default function RemindPasswordPage({ navigation }: Props) {
   const handleNotLoggedUser = () => {
     navigation.navigate("Login");
   };
@@ -75,7 +67,12 @@ export default function ResetPasswordPage({ navigation }: Props) {
     return emailRegex.test(email);
   };
 
+  const isInputValid = () => {
+    return validateEmail() && validateNewPassword() && validateRepeatPassword();
+  };
+
   const handleReminidPassword = async () => {
+    if (!isInputValid()) return;
     const request: PasswordRemindRequest = {
       email,
       newPassword,

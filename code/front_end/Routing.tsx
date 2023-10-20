@@ -19,12 +19,13 @@ import AnalyzeGame from "./src/pages/AnalyzeGamePage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { setUserActive, resetAccessToken } from "./src/services/userServices";
-import { NameInGame, PendingChessGameRequest } from "./src/utils/ServicesTypes";
+import { PendingChessGameRequest } from "./src/utils/ServicesTypes";
 import ResetPasswordPage from "./src/pages/ResetPasswordPage";
 import PlayOnline from "./src/pages/PlayOnline";
 import Friends from "./src/pages/Friends";
 import { User } from "./src/utils/PlayerUtilities";
 import { fetchandStoreUser } from "./src/features/authentication/services/loginServices";
+import { remindPassword } from "./src/services/AuthenticationServices";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -37,20 +38,22 @@ export type RootStackParamList = {
     request: PendingChessGameRequest;
   };
   PlayWithFriendsMenu: {
-    userArg: User
+    userArg: User;
   };
-  ProfilePage: {
-    nameInGame: string 
-    
-  } | undefined;
+  ProfilePage:
+    | {
+        nameInGame: string;
+      }
+    | undefined;
   Friends: {
     nameInGame: string;
-  }
+  };
   Register: undefined;
   Socials: undefined;
   AnalyzeGame: undefined;
   Notification: undefined;
   ResetPassword: undefined;
+  ReminidPassword: undefined;
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
@@ -201,6 +204,22 @@ const Routing = () => {
           component={AnalyzeGame}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPasswordPage}
+          options={({ navigation }) => ({
+            headerStyle: styles.header,
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
+        />
+        <Stack.Screen
+          name="ReminidPassword"
+          component={}
+          options={({ navigation }) => ({
+            headerStyle: styles.header,
+            headerTitle: () => <Header navigation={navigation} />,
+          })}
+        />{" "}
         <Stack.Screen
           name="ResetPassword"
           component={ResetPasswordPage}
