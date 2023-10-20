@@ -1,6 +1,5 @@
 package com.chessin.controller.requests;
 
-import com.chessin.model.social.FriendInvitationResponseType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FriendInvitationResponseRequest {
+public class FriendInvitationRequest {
     private String friendNickname;
-    private FriendInvitationResponseType responseType;
 }

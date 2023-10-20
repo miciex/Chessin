@@ -19,7 +19,7 @@ public class FriendInvitationResponse {
     public static FriendInvitationResponse fromFriendInvitation(FriendInvitation friendInvitation){
         return FriendInvitationResponse
                 .builder()
-                .nameInGame(friendInvitation.getUser().getNameInGame())
+                .nameInGame(friendInvitation.getFriend().getNameInGame())
                 .date(Date.from(friendInvitation.getDate()))
                 .build();
     }

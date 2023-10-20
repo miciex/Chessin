@@ -4,8 +4,7 @@ import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.FriendInvitationRequest;
 import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.requests.SetActiveRequest;
-import com.chessin.controller.responses.ChessGameResponse;
-import com.chessin.controller.responses.FriendInvitationResponse;
+import com.chessin.controller.responses.*;
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.ChessGameRepository;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
@@ -14,13 +13,11 @@ import com.chessin.model.playing.Glicko2.Repositories.ClassicalRatingRepository;
 import com.chessin.model.playing.Glicko2.Repositories.RapidRatingRepository;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.User;
-import com.chessin.controller.responses.UserResponse;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.social.FriendInvitation;
 import com.chessin.model.social.FriendInvitationRepository;
-import com.chessin.model.playing.InvitationResponseType;
+import com.chessin.model.social.FriendInvitationResponseType;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +40,7 @@ public class UserController {
     private final BlitzRatingRepository blitzRatingRepository;
     private final BulletRatingRepository bulletRatingRepository;
 
-    @PostMapping("/findByNickname/{nickname}")
+    @PostMapping("/findByEmail/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname){
         Optional<User> user = userRepository.findByNameInGame(nickname);
         UserResponse userResponse = UserResponse.fromUser(user.orElseThrow(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository);
@@ -100,7 +97,7 @@ public class UserController {
         if(!friendInvitationRepository.existsByUserEmail(email))
             return ResponseEntity.badRequest().body("No invitations");
 
-        List<FriendInvitation> invitations = friendInvitationRepository.findAllByFriend(userRepository.findByEmail(email).get());
+        List<FriendInvitation> invitations = friendInvitationRepository.findAllByFriendEmail(email);
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
@@ -111,17 +108,16 @@ public class UserController {
     }
 
     @PostMapping("/respondToInvitation")
-    @Transactional
     public ResponseEntity<?> respondToInvitation(@RequestBody FriendInvitationResponseRequest request, HttpServletRequest servlet)
     {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByFriendEmailAndUserNameInGame(email, request.getFriendNickname()))
+        if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
             return ResponseEntity.badRequest().body("Invitation does not exist.");
 
-        friendInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
+        friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendNickname());
 
-        if(request.getResponseType() == InvitationResponseType.ACCEPT)
+        if(request.getResponseType() == FriendInvitationResponseType.ACCEPT)
         {
             User user = userRepository.findByEmail(email).get();
             User friend = userRepository.findByNameInGame(request.getFriendNickname()).get();
@@ -139,7 +135,7 @@ public class UserController {
     @PostMapping("/getFriends/{nickname}")
     public ResponseEntity<?> getFriends(@PathVariable String nickname)
     {
-        if(!userRepository.existsByNameInGame(nickname))
+        if(!userRepository.existsByEmail(nickname))
             return ResponseEntity.badRequest().body("User does not exist");
 
         User user = userRepository.findByNameInGame(nickname).get();
@@ -198,5 +194,15 @@ public class UserController {
         chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGame(nickname).stream().map((ChessGame game) -> ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(games::add);
 
         return ResponseEntity.ok().body(games);
+    }
+
+    @PostMapping("/findUserByToken")
+    public ResponseEntity<?> findUserByToken(HttpServletRequest servlet) {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isEmpty())
+            return ResponseEntity.badRequest().body("User not found.");
+        LoggedUserResponse userResponse = LoggedUserResponse.fromUser(user.orElseThrow());
+        return ResponseEntity.ok().body(userResponse);
     }
 }

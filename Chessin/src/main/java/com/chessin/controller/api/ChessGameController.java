@@ -1,7 +1,9 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
-import com.chessin.controller.requests.*;
+import com.chessin.controller.requests.ListenForMoveRequest;
+import com.chessin.controller.requests.PendingChessGameRequest;
+import com.chessin.controller.requests.SubmitMoveRequest;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.*;
@@ -44,22 +46,21 @@ public class ChessGameController {
     private final ConcurrentHashMap<String, PendingChessGame> pendingGames = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Board> activeBoards = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, ChessGame> activeGames = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, GameInvitation> pendingInvitations = new ConcurrentHashMap<>();
 
     @Transactional
     @PostMapping("/searchNewGame")
     public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request, HttpServletRequest servlet) throws InterruptedException {
 
-        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+//        if(pendingGames.containsKey(request.getEmail()))
+//        {
+//            return ResponseEntity.badRequest().body("User is already searching for a game.");
+//        }
 
-        if(pendingGames.containsKey(email))
-        {
-            return ResponseEntity.badRequest().body("User is already searching for a game.");
-        }
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
         {
-            return ResponseEntity.badRequest().body("User is already playing a game.");
+            return ResponseEntity.accepted().body("User is already playing a game.");
         }
 
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
@@ -185,17 +186,6 @@ public class ChessGameController {
         synchronized(activeGames.get(id))
         {
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
-
-            if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().size() == 0)
-            {
-                Board endBoard = activeBoards.get(id);
-                endBoard.setGameResult(GameResults.ABANDONED);
-                activeBoards.remove(id);
-                activeGames.remove(id);
-                chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
-                return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
-            }
-
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
         }
     }
@@ -354,66 +344,4 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Game not found.");
 
     }
-
-    @PostMapping("/inviteFriend")
-    public ResponseEntity<?> inviteFriend(@RequestBody GameInvitationRequest request, HttpServletRequest servlet) throws InterruptedException {
-        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
-
-        String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
-
-        if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
-        {
-            return ResponseEntity.badRequest().body("User is already playing a game.");
-        }
-
-        if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(friendEmail) || game.getBlackUser().getEmail().equals(friendEmail)))
-        {
-            return ResponseEntity.badRequest().body("Friend is already playing a game.");
-        }
-
-        GameInvitation pendingInvitation = GameInvitation.builder()
-                .user(userRepository.findByEmail(email).get())
-                .friend(userRepository.findByEmail(friendEmail).get())
-                .date(Instant.now())
-                .timeControl(request.getTimeControl())
-                .increment(request.getIncrement())
-                .isRated(request.isRated())
-                .build();
-
-        pendingInvitations.put(email, pendingInvitation);
-
-        synchronized(pendingInvitations.get(email))
-        {
-            pendingInvitations.get(email).wait(Constants.Application.gameSearchTime);
-
-            if(pendingInvitations.get(email).getFriend() == null)
-            {
-                return ResponseEntity.badRequest().body("Friend didn't accept your request");
-            }
-            else
-            {
-
-            }
-        }
-
-    }
-
-    @PostMapping("/respondToGameInvitation")
-    public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet)
-    {
-        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
-
-//        if(!gameInvitationRepository.existsByFriendEmailAndUserNameInGame(email, request.getFriendNickname()))
-//            return ResponseEntity.badRequest().body("You have not been invited by this player.");
-
-        if(request.getResponseType() == InvitationResponseType.ACCEPT)
-        {
-
-        }
-
-//        gameInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
-
-        return ResponseEntity.ok().body("Invitation responded.");
-    }
-
 }
