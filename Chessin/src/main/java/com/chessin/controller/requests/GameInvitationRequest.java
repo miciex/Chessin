@@ -11,4 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GameInvitationRequest {
     private String friendNickname;
+    private int timeControl;
+    private int increment;
+    private boolean isRated;
 }

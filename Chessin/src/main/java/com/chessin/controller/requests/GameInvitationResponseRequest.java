@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FriendInvitationResponseRequest {
+public class GameInvitationResponseRequest {
     private String friendNickname;
     private InvitationResponseType responseType;
 }

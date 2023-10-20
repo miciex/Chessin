@@ -6,7 +6,6 @@ import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.requests.SetActiveRequest;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.controller.responses.FriendInvitationResponse;
-import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.ChessGameRepository;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
@@ -19,7 +18,7 @@ import com.chessin.controller.responses.UserResponse;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.social.FriendInvitation;
 import com.chessin.model.social.FriendInvitationRepository;
-import com.chessin.model.social.FriendInvitationResponseType;
+import com.chessin.model.playing.InvitationResponseType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -122,7 +121,7 @@ public class UserController {
 
         friendInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
 
-        if(request.getResponseType() == FriendInvitationResponseType.ACCEPT)
+        if(request.getResponseType() == InvitationResponseType.ACCEPT)
         {
             User user = userRepository.findByEmail(email).get();
             User friend = userRepository.findByNameInGame(request.getFriendNickname()).get();

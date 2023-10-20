@@ -1,10 +1,7 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
-import com.chessin.controller.requests.GameInvitationRequest;
-import com.chessin.controller.requests.ListenForMoveRequest;
-import com.chessin.controller.requests.PendingChessGameRequest;
-import com.chessin.controller.requests.SubmitMoveRequest;
+import com.chessin.controller.requests.*;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.model.playing.*;
@@ -43,6 +40,7 @@ public class ChessGameController {
     private final RapidRatingRepository rapidRatingRepository;
     private final BlitzRatingRepository blitzRatingRepository;
     private final BulletRatingRepository bulletRatingRepository;
+    private final GameInvitationRepository gameInvitationRepository;
 
     private final ConcurrentHashMap<String, PendingChessGame> pendingGames = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Board> activeBoards = new ConcurrentHashMap<>();
@@ -362,7 +360,47 @@ public class ChessGameController {
     {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
+        String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
 
+        if(gameInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
+            return ResponseEntity.badRequest().body("You have already invited this player.");
+
+        if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
+        {
+            return ResponseEntity.badRequest().body("User is already playing a game.");
+        }
+
+        if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(friendEmail) || game.getBlackUser().getEmail().equals(friendEmail)))
+        {
+            return ResponseEntity.badRequest().body("Friend is already playing a game.");
+        }
+
+        gameInvitationRepository.save(GameInvitation.builder()
+                .user(userRepository.findByEmail(email).get())
+                .friend(userRepository.findByNameInGame(request.getFriendNickname()).get())
+                .date(Instant.now())
+                .timeControl(request.getTimeControl())
+                .increment(request.getIncrement())
+                .isRated(request.isRated())
+                .build());
+    }
+
+    @PostMapping("/respondToGameInvitation")
+    public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(!gameInvitationRepository.existsByFriendEmailAndUserNameInGame(email, request.getFriendNickname()))
+            return ResponseEntity.badRequest().body("You have not been invited by this player.");
+
+        if(request.getResponseType() == InvitationResponseType.ACCEPT)
+        {
+
+        }
+
+        gameInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
+
+        return ResponseEntity.ok().body("Invitation responded.");
     }
 
 }

@@ -24,4 +24,7 @@ public class GameInvitation {
     @ManyToOne
     private User friend;
     Instant date;
+    private int timeControl;
+    private int increment;
+    private boolean isRated;
 }
