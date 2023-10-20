@@ -14,14 +14,8 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class GameInvitation {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-    @ManyToOne
     private User user;
-    @ManyToOne
     private User friend;
     Instant date;
     private int timeControl;
