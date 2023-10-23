@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/register/AuthenticationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/register/AuthenticationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/PasswordRemindRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/PasswordRemindRequest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,11 +27,6 @@
         <option name="useMavenConfig" value="true" />
       </MavenGeneralSettings>
     </option>
-    <option name="importingSettings">
-      <MavenImportingSettings>
-        <option name="workspaceImportEnabled" value="true" />
-      </MavenImportingSettings>
-    </option>
   </component>
   <component name="ProjectId" id="2QVczJ3H3ZsjWa8IxSa91ltlzBz" />
   <component name="ProjectViewState">
@@ -45,6 +42,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "PABi",
     "last_opened_file_path": "C:/Users/wojte/Desktop/Chessin_BE/Chessin",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
