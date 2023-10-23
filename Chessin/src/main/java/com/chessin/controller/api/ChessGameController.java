@@ -211,6 +211,33 @@ public class ChessGameController {
             String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
             Board board = activeBoards.get(request.getGameId());
+
+            if(request.isDoesResign())
+            {
+                if(board.getWhiteEmail().equals(email))
+                {
+                    board.setGameResult(GameResults.WHITE_RESIGN);
+                    activeBoards.replace(request.getGameId(), board);
+                    if(activeGames.get(request.getGameId()).isRated())
+                        activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
+                    activeGames.get(request.getGameId()).notifyAll();
+                    return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+                }
+                else if(board.getBlackEmail().equals(email))
+                {
+                    board.setGameResult(GameResults.BLACK_RESIGN);
+                    activeBoards.replace(request.getGameId(), board);
+                    if(activeGames.get(request.getGameId()).isRated())
+                        activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
+                    activeGames.get(request.getGameId()).notifyAll();
+                    return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+                }
+                else
+                {
+                    return ResponseEntity.badRequest().body("You are not playing this game.");
+                }
+            }
+
             long now = Instant.now().toEpochMilli();
             if(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
             {
@@ -448,5 +475,4 @@ public class ChessGameController {
 
         return ResponseEntity.ok().body("Invitation responded.");
     }
-
 }
