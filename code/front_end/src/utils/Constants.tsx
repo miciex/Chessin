@@ -24,7 +24,8 @@ export type StackParamList =
   | "Register"
   | "Socials"
   | "Notification"
-  | "ResetPassword";
+  | "ResetPassword"
+  |"RemindPassword";
 
 export const emailRegex: RegExp = new RegExp(
   /^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/
@@ -38,7 +39,7 @@ export const passwordRegex: RegExp = new RegExp(
 
 export const notValidEmailMessage: string = "Email is not valid.";
 export const notValidPasswordMessage: string =
-  "Password must contain at least 10 characters, one letter uppercase letter, one lowercase letter, one number and one special character.";
+  "Password must contain at least 12 characters, one letter uppercase letter, one lowercase letter, one number and one special character.";
 export const notValidPasswordRepeatMessage: string =
   "Passwords are not the same.";
 export const notValidNameMessage: string =

@@ -148,6 +148,7 @@ export default function Register({ navigation }: Props) {
       country: country.Name,
     })
       .then((response) => {
+        console.log(response.status);
         if (response.status === 200) {
           navigation.navigate("Home");
         } else if (response.status === 202) {
@@ -159,6 +160,21 @@ export default function Register({ navigation }: Props) {
       .catch((error) => {
         throw new Error(error);
       });
+  };
+
+  const handleVerifyCodeResponse = async (response: Response) => {
+    if (response.status === 200) {
+          navigation.navigate("Home")
+    } else if (response.status === 400) {
+      response
+        .text()
+        .then((data) => {
+          throw new Error(data);
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    }
   };
 
   return showAuthCode ? (
@@ -175,6 +191,7 @@ export default function Register({ navigation }: Props) {
         nameInGame: nick,
         country: country?.Name,
       }}
+      handleVerifyCodeResponse={handleVerifyCodeResponse}
     />
   ) : (
     <View style={styles.appContainer}>

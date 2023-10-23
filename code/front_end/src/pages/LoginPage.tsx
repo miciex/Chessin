@@ -169,22 +169,18 @@ export default function Login({ navigation }: Props) {
                 navigation.navigate("ResetPassword");
               }}
               color={ColorsPallet.light}
-            />{" "}
-            <BaseButton
-              text="Reset your password"
+            />
+            
+          </View>
+          <View style={styles.authLinkButton}>
+          <BaseButton
+              text="Remind password"
               handlePress={() => {
-                navigation.navigate("ResetPassword");
-              }}
-              color={ColorsPallet.light}
-            />{" "}
-            <BaseButton
-              text="Reset your password"
-              handlePress={() => {
-                navigation.navigate("ResetPassword");
+                navigation.navigate("RemindPassword");
               }}
               color={ColorsPallet.light}
             />
-          </View>
+            </View>
           <View style={styles.authLinkButton}>
             <BaseButton
               text="Register"
@@ -223,7 +219,7 @@ const styles = StyleSheet.create({
   },
   authLinksContainer: {
     width: "100%",
-    height: 70,
+    height: 105,
     gap: 8,
     alignItems: "center",
     justifyContent: "center",

@@ -392,7 +392,7 @@ public class ChessGameController {
             }
             else
             {
-
+                return ResponseEntity.ok("Friend accepted your request.");
             }
         }
 

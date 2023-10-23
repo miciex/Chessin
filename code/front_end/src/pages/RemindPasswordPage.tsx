@@ -23,36 +23,34 @@ import { User } from "../utils/PlayerUtilities";
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,
-    "ResetPassword",
+    "RemindPassword",
     undefined
   >;
-  route: RouteProp<RootStackParamList, "ResetPassword">;
+  route: RouteProp<RootStackParamList, "RemindPassword">;
 };
 
 export default function RemindPasswordPage({ navigation }: Props) {
-  const handleNotLoggedUser = () => {
-    navigation.navigate("Login");
-  };
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
-  const getUserEmail = async () => {
+  const handleLoggedUser = async () => {
     const userString = await getValueFor("user");
     if (userString === null) {
-      handleNotLoggedUser();
       return;
     }
     const user = JSON.parse(userString) as User;
     if (!user || !user.email) {
-      handleNotLoggedUser();
       return;
     }
     setEmail(user.email);
+    setLoggedIn(true);
   };
 
   useEffect(() => {
-    getUserEmail();
+    handleLoggedUser();
   }, []);
 
   const [email, setEmail] = useState<string>("");
+  const [emailValid, setEmailValid] = useState<boolean>(true);
 
   const [newPassword, setNewPassword] = useState<string>("");
   const [newPasswordValid, setNewPasswordValid] = useState<boolean>(true);
@@ -67,16 +65,20 @@ export default function RemindPasswordPage({ navigation }: Props) {
     return emailRegex.test(email);
   };
 
+  const setIsEmailValid = (): void => {
+    setEmailValid(validateEmail());
+  };
+
   const isInputValid = () => {
     return validateEmail() && validateNewPassword() && validateRepeatPassword();
   };
 
-  const handleReminidPassword = async () => {
+  const handleRemindPassword = async () => {
     if (!isInputValid()) return;
     const request: PasswordRemindRequest = {
       email,
-      newPassword,
     };
+
     remindPassword(request)
       .then((response) => {
         if (response.status === 202) {
@@ -138,44 +140,74 @@ export default function RemindPasswordPage({ navigation }: Props) {
     setShowCodeModal(false);
   };
 
-  return showCodeModal ? (
-    <AuthCodeModal
-      hideModal={hideModal}
-      navigation={navigation}
-      request={{
-        newPassword: newPassword,
-        email: email,
-        verificationCode: "",
-        verificationType: VerificationType.REMIND_PASSWORD,
-      }}
-      handleVerifyCodeResponse={handleVerifyCodeResponse}
-    />
-  ) : (
-    <View style={styles.container}>
-      <View style={styles.contentContainer}>
-        <AuthInput
-          placeholder="New password"
-          value={newPassword}
-          onChange={setNewPassword}
-          isValid={newPasswordValid}
-          notValidText={notValidPasswordMessage}
-          onSubmitEditing={setIsNewPasswordValid}
-        ></AuthInput>
-        <AuthInput
-          placeholder="Repeat password"
-          value={repeatNewPassword}
-          onChange={setRepeatNewPassword}
-          isValid={repeatNewPasswordValid}
-          notValidText={notValidPasswordRepeatMessage}
-          onSubmitEditing={setIsRepeatNewPasswordValid}
-        ></AuthInput>
-        <View style={styles.submitButton}>
-          <BaseButton text="Submit" handlePress={handleReminidPassword} />
-        </View>
-      </View>
+  const showModal = (): void => {
+    setShowCodeModal(true);
+  };
 
-      <Footer navigation={navigation} />
-    </View>
+  const handleSubmit = (): void => {
+    if (!loggedIn) {
+      handleRemindPassword();
+    } else showModal();
+  };
+
+  const getModal = () => {
+    return showCodeModal ? (
+      <AuthCodeModal
+        hideModal={hideModal}
+        navigation={navigation}
+        request={{
+          newPassword: newPassword,
+          email: email,
+          verificationCode: "",
+          verificationType: VerificationType.REMIND_PASSWORD,
+        }}
+        handleVerifyCodeResponse={handleVerifyCodeResponse}
+      />
+    ) : null;
+  };
+
+  const modal = getModal();
+
+  return (
+   modal !== null ? modal : (
+      <View style={styles.container}>
+        <View style={styles.contentContainer}>
+          <AuthInput
+            placeholder="Email"
+            value={email}
+            onChange={setEmail}
+            isValid={emailValid}
+            notValidText="Email is not valid"
+            onSubmitEditing={setIsEmailValid}
+          />
+          {loggedIn ? (
+            <>
+              <AuthInput
+                placeholder="New password"
+                value={newPassword}
+                onChange={setNewPassword}
+                isValid={newPasswordValid}
+                notValidText={notValidPasswordMessage}
+                onSubmitEditing={setIsNewPasswordValid}
+              ></AuthInput>
+              <AuthInput
+                placeholder="Repeat password"
+                value={repeatNewPassword}
+                onChange={setRepeatNewPassword}
+                isValid={repeatNewPasswordValid}
+                notValidText={notValidPasswordRepeatMessage}
+                onSubmitEditing={setIsRepeatNewPasswordValid}
+              ></AuthInput>
+            </>
+          ) : null}
+          <View style={styles.submitButton}>
+            <BaseButton text="Submit" handlePress={handleSubmit} />
+          </View>
+        </View>
+
+        <Footer navigation={navigation} />
+      </View>
+    )
   );
 }
 

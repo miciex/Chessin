@@ -299,9 +299,9 @@ export const checkInvitations = async () => {
 
 export const logoutUser = async () => {
   Promise.all([
-    save("refreshToken", undefined),
-    save("accessToken", undefined),
-    save("user", undefined),
+    save("refreshToken", ""),
+    save("accessToken", ""),
+    save("user", ""),
   ])
     .then(() => {
       console.log("logged out succesfully");

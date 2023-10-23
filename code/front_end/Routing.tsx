@@ -26,6 +26,7 @@ import Friends from "./src/pages/Friends";
 import { User } from "./src/utils/PlayerUtilities";
 import { fetchandStoreUser } from "./src/features/authentication/services/loginServices";
 import { remindPassword } from "./src/services/AuthenticationServices";
+import RemindPasswordPage from "./src/pages/RemindPasswordPage";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -53,7 +54,7 @@ export type RootStackParamList = {
   AnalyzeGame: undefined;
   Notification: undefined;
   ResetPassword: undefined;
-  ReminidPassword: undefined;
+  RemindPassword: undefined;
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
@@ -213,16 +214,8 @@ const Routing = () => {
           })}
         />
         <Stack.Screen
-          name="ReminidPassword"
-          component={}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />{" "}
-        <Stack.Screen
-          name="ResetPassword"
-          component={ResetPasswordPage}
+          name="RemindPassword"
+          component={RemindPasswordPage}
           options={({ navigation }) => ({
             headerStyle: styles.header,
             headerTitle: () => <Header navigation={navigation} />,

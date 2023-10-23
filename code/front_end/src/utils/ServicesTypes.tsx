@@ -147,7 +147,6 @@ export type PasswordChangeRequest = {
 
 export type PasswordRemindRequest = {
   email: string;
-  newPassword: string;
 };
 
 export type TwoFactorAuthenticationEnabledRequest = {

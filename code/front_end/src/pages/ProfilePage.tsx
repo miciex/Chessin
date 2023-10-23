@@ -8,7 +8,7 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
-import { addFriendFunc, getFriendsList, getUser } from "../services/userServices";
+import { addFriendFunc, getFriendsList, getUser, logoutUser } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
@@ -181,7 +181,7 @@ useEffect(()=>{
         </View>
 
         {
-            ifMyAccount || checkNicknameInObjects(friends, user?.nameInGame ? user?.nameInGame: "")? "" : <View style={styles.invite}>
+            ifMyAccount || checkNicknameInObjects(friends, user?.nameInGame ? user?.nameInGame: "")? <BaseButton handlePress={logoutUser} text="Log out" style={styles.logout}/> : <View style={styles.invite}>
             <BaseButton
               handlePress={() => {
                 handleAddFriend
@@ -232,4 +232,9 @@ const styles = StyleSheet.create({
     height: 55,
     margin: 3,
   },
+  logout: {
+    width: "90%",
+    height: 55,
+    margin: 3,
+  }
 });
