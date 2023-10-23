@@ -6,8 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/register/AuthenticationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/register/AuthenticationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/PasswordRemindRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/PasswordRemindRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/GameInvitationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/GameInvitationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/SubmitMoveRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/SubmitMoveRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/GameInvitation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/GameInvitation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/model/register/user/Requests/SetOnlineRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/SetOnlineRequest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

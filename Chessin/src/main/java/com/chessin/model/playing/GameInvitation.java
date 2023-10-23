@@ -15,10 +15,11 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameInvitation {
+    private long id;
     private User user;
     private User friend;
     Instant date;
-    private int timeControl;
-    private int increment;
+    private long timeControl;
+    private long increment;
     private boolean isRated;
 }
