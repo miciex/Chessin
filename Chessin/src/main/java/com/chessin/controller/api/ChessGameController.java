@@ -419,9 +419,9 @@ public class ChessGameController {
             }
             else
             {
-                pendingInvitations.remove(email);
+                pendingInvitations.get(email).wait(Constants.Application.timeout);
 
-                pendingInvitations.get(friendEmail).wait(Constants.Application.timeout);
+                pendingInvitations.remove(email);
 
                 return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingInvitation.getId()), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
             }
@@ -432,13 +432,16 @@ public class ChessGameController {
     @PostMapping("/respondToGameInvitation")
     public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+        String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
 
 //        if(!gameInvitationRepository.existsByFriendEmailAndUserNameInGame(email, request.getFriendNickname()))
 //            return ResponseEntity.badRequest().body("You have not been invited by this player.");
 
+        if(!pendingInvitations.containsKey(friendEmail))
+            return ResponseEntity.badRequest().body("You have not been invited by this player.");
+
         if(request.getResponseType() == InvitationResponseType.ACCEPT)
         {
-            String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
             pendingInvitations.get(friendEmail).setFriend(userRepository.findByEmail(email).get());
 
             int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
@@ -471,7 +474,9 @@ public class ChessGameController {
             return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
         }
 
-//        gameInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
+        pendingInvitations.get(friendEmail).notifyAll();
+
+        pendingInvitations.remove(friendEmail);
 
         return ResponseEntity.ok().body("Invitation responded.");
     }
