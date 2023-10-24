@@ -18,7 +18,7 @@ import com.chessin.controller.responses.UserResponse;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.social.FriendInvitation;
 import com.chessin.model.social.FriendInvitationRepository;
-import com.chessin.model.playing.InvitationResponseType;
+import com.chessin.model.playing.ResponseType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -121,7 +121,7 @@ public class UserController {
 
         friendInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
 
-        if(request.getResponseType() == InvitationResponseType.ACCEPT)
+        if(request.getResponseType() == ResponseType.ACCEPT)
         {
             User user = userRepository.findByEmail(email).get();
             User friend = userRepository.findByNameInGame(request.getFriendNickname()).get();

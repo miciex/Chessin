@@ -44,6 +44,8 @@ public class Board {
     private double whiteRatingChange;
     private double blackRatingChange;
     private boolean isRated;
+    private boolean whiteOffersDraw;
+    private boolean blackOffersDraw;
 
     public static Board fromGame(ChessGame game)
     {

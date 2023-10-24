@@ -335,7 +335,34 @@ public class ChessGameController {
         {
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
 
-            if(activeBoards.get(id).getGameResult() != GameResults.NONE)
+            return ResponseEntity.ok().body("Opponent has request draw.");
+        }
+    }
+
+    @PostMapping("/offerDraw/{gameId}")
+    public ResponseEntity<?> offerDraw(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        long id;
+
+        try {
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Invalid game id.");
+        }
+
+        //check if this email is playing the game
+        if(!activeBoards.get(id).getWhiteEmail().equals(email) && !activeBoards.get(id).getBlackEmail().equals(email))
+            return ResponseEntity.badRequest().body("You are not playing this game.");
+
+        synchronized(activeGames.get(id))
+        {
+            activeGames.get(id).notifyAll();
+            activeGames.get(id).wait(Constants.Application.waitForMoveTime);
+
+            if(activeGames.get(id).getGameResult() == GameResults.DRAW_AGREEMENT)
             {
                 Board endBoard = activeBoards.get(id);
                 activeBoards.remove(id);
@@ -346,8 +373,19 @@ public class ChessGameController {
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
 
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
+            return ResponseEntity.ok().body("Opponent has not accepted draw.");
         }
+    }
+
+    @PostMapping("/respondToDrawOffer")
+    public ResponseEntity<?> respondToDrawOffer(@RequestBody RespondToDrawOfferRequest request, HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+
+        //check if this email is playing the game
+        if(!activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && !activeBoards.get(request.getGameId()).getBlackEmail().equals(email))
+            return ResponseEntity.badRequest().body("You are not playing this game.");
     }
 
     @PostMapping("/getGame/{gameId}")
@@ -468,7 +506,7 @@ public class ChessGameController {
         if(!pendingInvitations.containsKey(friendEmail))
             return ResponseEntity.badRequest().body("You have not been invited by this player.");
 
-        if(request.getResponseType() == InvitationResponseType.ACCEPT)
+        if(request.getResponseType() == ResponseType.ACCEPT)
         {
             pendingInvitations.get(friendEmail).setFriend(userRepository.findByEmail(email).get());
 
