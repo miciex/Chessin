@@ -99,9 +99,12 @@ export default function ProfilePage({ navigation, route }: Props) {
 
 useEffect(()=>{
   getValueFor("user").then((data) => {
+    console.log("get value for user data: "+data)
     if (data === null) return;
     setUser(JSON.parse(data));
-  })
+  }).catch((err) => {
+    throw new Error(err);
+  });
   
 }, [])
   
@@ -113,15 +116,18 @@ useEffect(()=>{
      else{
       setIfMyAccount(false)
      } 
-     console.log()
     if(!(user.nameInGame==nameInGame || nameInGame===undefined)&&nameInGame){
     
       fetchUser(nameInGame).then((user) => {
         if (user === null){
           return;
         } 
+        console.log("changing the value of user: "+user)
         setUser2(user);
-      })
+      }).catch((err) => {
+        console.log("failed to fetch user");
+        throw new Error(err);
+      });
     };
     
   }, [nameInGame, user]);

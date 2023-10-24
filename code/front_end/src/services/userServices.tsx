@@ -75,14 +75,13 @@ export const fetchUser = async (Nickname: string, email?: string) => {
     .catch((err) => {
       return {
         country: "none",
-        firstname: "doesntt exist",
+        firstname: "doesnt exist",
         lastname: "doesnt exist",
         email: "doesnt exist",
         nameInGame: "doesnt exist",
         highestRanking: 0,
         ranking: { blitz: 0, bullet: 0, rapid: 0, classical: 0 },
       };
-      throw new Error(err);
     });
 
   return user;
@@ -141,7 +140,9 @@ export const resetAccessToken = async () => {
   })
     .then((response) => {
       if (response.status === 200) {
-        return response.json();
+        return response.json().catch((err) => {
+          throw new Error(err);
+        });
       } else {
         throw new Error("Something went wrong on api server!");
       }
@@ -180,7 +181,9 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
   })
     .then((response) => {
       if (response.status === 200) {
-        return response.text();
+        return response.text().catch((error) => {
+          throw new Error(error);
+        });
       } else {
         throw new Error("Something went wrong on api server!");
       }
@@ -231,7 +234,9 @@ export async function handleSearchBarSocials(request: HandleSearchBarSocials) {
   )
     .then((response) => {
       if (response.status === 200) {
-        return response.json() as unknown as Array<responseUser>;
+        return response.json().catch((error) => {
+          throw new Error(error);
+        }) as unknown as Array<responseUser>;
       } else {
         throw new Error("Something went wrong on api server!");
       }
@@ -253,7 +258,9 @@ export async function getFriendsList(nameInGame: string) {
   })
     .then((response) => {
       if (response.status === 200) {
-        return response.json() as unknown as Array<responseUser>;
+        return response.json().catch((error) => {
+          throw new Error(error);
+        }) as unknown as Array<responseUser>;
       } else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {
@@ -281,7 +288,9 @@ export const checkInvitations = async () => {
   })
     .then((response) => {
       if (response.status === 200) {
-        return response.json() as unknown as Array<responseUser>;
+        return response.json().catch((error) => {
+          throw new Error(error);
+        }) as unknown as Array<responseUser>;
       } else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {

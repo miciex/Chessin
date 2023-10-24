@@ -179,8 +179,8 @@ export default function PlayOnline({ navigation, route }: Props) {
                   throw new Error(err);
                 });
             } else {
-              console.log(response.status);
-              console.log(response.statusText);
+              // console.log(response.status);
+              // console.log(response.statusText);
               throw new Error("Something went wrong while searching for game");
             }
           })

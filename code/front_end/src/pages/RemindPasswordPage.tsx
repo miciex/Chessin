@@ -34,13 +34,14 @@ export default function RemindPasswordPage({ navigation }: Props) {
 
   const handleLoggedUser = async () => {
     const userString = await getValueFor("user");
-    if (userString === null) {
+    if (!userString) {
       return;
     }
     const user = JSON.parse(userString) as User;
     if (!user || !user.email) {
       return;
     }
+    console.log(user)
     setEmail(user.email);
     setLoggedIn(true);
   };
@@ -167,7 +168,7 @@ export default function RemindPasswordPage({ navigation }: Props) {
   };
 
   const modal = getModal();
-
+  console.log(loggedIn)
   return (
    modal !== null ? modal : (
       <View style={styles.container}>
