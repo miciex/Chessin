@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class FriendInvitationResponseRequest {
-    private String friendNickname;
+@NoArgsConstructor
+public class RespondToDrawOfferRequest {
+    private long gameId;
     private ResponseType responseType;
 }

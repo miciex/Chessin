@@ -1,4 +1,4 @@
-package com.chessin.model.register.user.Requests;
+package com.chessin.controller.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

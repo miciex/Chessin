@@ -1,5 +1,5 @@
 package com.chessin.model.playing;
 
-public enum InvitationResponseType {
+public enum ResponseType {
     ACCEPT, DECLINE
 }

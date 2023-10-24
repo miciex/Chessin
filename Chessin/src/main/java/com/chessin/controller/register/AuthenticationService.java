@@ -262,9 +262,6 @@ public class AuthenticationService {
     {
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
-        if(passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
-            return ResponseEntity.badRequest().body("New password cannot be the same as the old one.");
-
         sendVerificationCode(user);
 
         return ResponseEntity.accepted().body("Verification code sent to your email address.");
