@@ -377,16 +377,16 @@ public class ChessGameController {
         }
     }
 
-    @PostMapping("/respondToDrawOffer")
-    public ResponseEntity<?> respondToDrawOffer(@RequestBody RespondToDrawOfferRequest request, HttpServletRequest servlet)
-    {
-        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
-
-
-        //check if this email is playing the game
-        if(!activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && !activeBoards.get(request.getGameId()).getBlackEmail().equals(email))
-            return ResponseEntity.badRequest().body("You are not playing this game.");
-    }
+//    @PostMapping("/respondToDrawOffer")
+//    public ResponseEntity<?> respondToDrawOffer(@RequestBody RespondToDrawOfferRequest request, HttpServletRequest servlet)
+//    {
+//        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+//
+//
+//        //check if this email is playing the game
+//        if(!activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && !activeBoards.get(request.getGameId()).getBlackEmail().equals(email))
+//            return ResponseEntity.badRequest().body("You are not playing this game.");
+//    }
 
     @PostMapping("/getGame/{gameId}")
     public ResponseEntity<?> getGame(@PathVariable("gameId") String gameId)

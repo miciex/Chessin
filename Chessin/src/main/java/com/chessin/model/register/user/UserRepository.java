@@ -1,6 +1,7 @@
 package com.chessin.model.register.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByNameInGame(String nameInGame);
     Optional<User> findByNameInGame(String nameInGame);
     List<User> findByNameInGameContaining(String nickname);
+
+    @Modifying
+    @Query(value = "UPDATE User cg SET cg.password = :password WHERE cg.email = :email")
+    void updatePasswordByEmail(String email, String password);
 }

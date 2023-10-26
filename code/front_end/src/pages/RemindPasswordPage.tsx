@@ -41,7 +41,6 @@ export default function RemindPasswordPage({ navigation }: Props) {
     if (!user || !user.email) {
       return;
     }
-    console.log(user)
     setEmail(user.email);
     setLoggedIn(true);
   };
@@ -75,15 +74,15 @@ export default function RemindPasswordPage({ navigation }: Props) {
   };
 
   const handleRemindPassword = async () => {
-    if (!isInputValid()) return;
+    if (!validateEmail()) return;
     const request: PasswordRemindRequest = {
       email,
     };
-
+    console.log("handling remind password request")
     remindPassword(request)
       .then((response) => {
         if (response.status === 202) {
-          setShowCodeModal(true);
+          setLoggedIn(true);
         } else if (response.status === 200) {
           navigation.navigate("Home");
         } else if (response.status === 400) {
@@ -146,9 +145,12 @@ export default function RemindPasswordPage({ navigation }: Props) {
   };
 
   const handleSubmit = (): void => {
-    if (!loggedIn) {
-      handleRemindPassword();
-    } else showModal();
+    if(!isInputValid()) return;
+    handleRemindPassword().then(() => {
+      showModal();}).catch((err) => {
+        throw new Error(err);
+      });
+    
   };
 
   const getModal = () => {
@@ -181,7 +183,6 @@ export default function RemindPasswordPage({ navigation }: Props) {
             notValidText="Email is not valid"
             onSubmitEditing={setIsEmailValid}
           />
-          {loggedIn ? (
             <>
               <AuthInput
                 placeholder="New password"
@@ -200,7 +201,6 @@ export default function RemindPasswordPage({ navigation }: Props) {
                 onSubmitEditing={setIsRepeatNewPasswordValid}
               ></AuthInput>
             </>
-          ) : null}
           <View style={styles.submitButton}>
             <BaseButton text="Submit" handlePress={handleSubmit} />
           </View>

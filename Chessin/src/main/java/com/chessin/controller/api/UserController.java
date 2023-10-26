@@ -199,4 +199,17 @@ public class UserController {
 
         return ResponseEntity.ok().body(games);
     }
+
+    @PostMapping("/findUserByToken")
+    public ResponseEntity<?> findUserByToken(HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(!userRepository.existsByEmail(email))
+            return ResponseEntity.badRequest().body("User does not exist.");
+
+        User user = userRepository.findByEmail(email).get();
+
+        return ResponseEntity.ok().body(UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+    }
 }
