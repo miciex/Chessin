@@ -27,9 +27,13 @@ type Props = {
     undefined
   >;
   route: RouteProp<RootStackParamList, "RemindPassword">;
+  setUserNotAuthenticated: () => void;
 };
 
-export default function RemindPasswordPage({ navigation }: Props) {
+export default function RemindPasswordPage({
+  navigation,
+  setUserNotAuthenticated,
+}: Props) {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
   const handleLoggedUser = async () => {
@@ -79,7 +83,7 @@ export default function RemindPasswordPage({ navigation }: Props) {
       email,
       newPassword,
     };
-    console.log("handling remind password request")
+    console.log("handling remind password request");
     remindPassword(request)
       .then((response) => {
         if (response.status === 202) {
@@ -105,8 +109,14 @@ export default function RemindPasswordPage({ navigation }: Props) {
   const handleVerifyCodeResponse = async (response: Response) => {
     //TODO: logoutUser
     if (response.status === 200) {
-          logoutUser();
+      logoutUser()
+        .then(() => {
+          setUserNotAuthenticated();
           navigation.navigate("Home");
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
     } else if (response.status === 400) {
       throw new Error("Invalid code");
     } else {
@@ -139,12 +149,14 @@ export default function RemindPasswordPage({ navigation }: Props) {
   };
 
   const handleSubmit = (): void => {
-    if(!isInputValid()) return;
-    handleRemindPassword().then(() => {
-      showModal();}).catch((err) => {
+    if (!isInputValid()) return;
+    handleRemindPassword()
+      .then(() => {
+        showModal();
+      })
+      .catch((err) => {
         throw new Error(err);
       });
-    
   };
 
   const getModal = () => {
@@ -164,45 +176,45 @@ export default function RemindPasswordPage({ navigation }: Props) {
   };
 
   const modal = getModal();
-  console.log(loggedIn)
-  return (
-   modal !== null ? modal : (
-      <View style={styles.container}>
-        <View style={styles.contentContainer}>
+  console.log(loggedIn);
+  return modal !== null ? (
+    modal
+  ) : (
+    <View style={styles.container}>
+      <View style={styles.contentContainer}>
+        <AuthInput
+          placeholder="Email"
+          value={email}
+          onChange={setEmail}
+          isValid={emailValid}
+          notValidText="Email is not valid"
+          onSubmitEditing={setIsEmailValid}
+        />
+        <>
           <AuthInput
-            placeholder="Email"
-            value={email}
-            onChange={setEmail}
-            isValid={emailValid}
-            notValidText="Email is not valid"
-            onSubmitEditing={setIsEmailValid}
-          />
-            <>
-              <AuthInput
-                placeholder="New password"
-                value={newPassword}
-                onChange={setNewPassword}
-                isValid={newPasswordValid}
-                notValidText={notValidPasswordMessage}
-                onSubmitEditing={setIsNewPasswordValid}
-              ></AuthInput>
-              <AuthInput
-                placeholder="Repeat password"
-                value={repeatNewPassword}
-                onChange={setRepeatNewPassword}
-                isValid={repeatNewPasswordValid}
-                notValidText={notValidPasswordRepeatMessage}
-                onSubmitEditing={setIsRepeatNewPasswordValid}
-              ></AuthInput>
-            </>
-          <View style={styles.submitButton}>
-            <BaseButton text="Submit" handlePress={handleSubmit} />
-          </View>
+            placeholder="New password"
+            value={newPassword}
+            onChange={setNewPassword}
+            isValid={newPasswordValid}
+            notValidText={notValidPasswordMessage}
+            onSubmitEditing={setIsNewPasswordValid}
+          ></AuthInput>
+          <AuthInput
+            placeholder="Repeat password"
+            value={repeatNewPassword}
+            onChange={setRepeatNewPassword}
+            isValid={repeatNewPasswordValid}
+            notValidText={notValidPasswordRepeatMessage}
+            onSubmitEditing={setIsRepeatNewPasswordValid}
+          ></AuthInput>
+        </>
+        <View style={styles.submitButton}>
+          <BaseButton text="Submit" handlePress={handleSubmit} />
         </View>
-
-        <Footer navigation={navigation} />
       </View>
-    )
+
+      <Footer navigation={navigation} />
+    </View>
   );
 }
 

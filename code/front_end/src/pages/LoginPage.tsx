@@ -25,9 +25,10 @@ import BaseButton from "../components/BaseButton";
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
   route: RouteProp<RootStackParamList, "Login">;
+  setUserAuthenticated: ()=>void;
 };
 
-export default function Login({ navigation }: Props) {
+export default function Login({ navigation, setUserAuthenticated }: Props) {
   const [email, setEmail] = useState<string>("");
   const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
   const [password, setPassword] = useState<string>("");
@@ -99,6 +100,7 @@ export default function Login({ navigation }: Props) {
           setUserDataFromResponse(data);
         })
         .then(() => {
+          setUserAuthenticated();
           navigation.navigate("Home");
         })
         .catch((err) => {
@@ -155,12 +157,6 @@ export default function Login({ navigation }: Props) {
 
           <Submit onSubmit={onSubmit} />
         </View>
-
-        <View style={styles.logosContainer}>
-          <LogInWithOtherFirm brand="google" />
-          <LogInWithOtherFirm brand="facebook" />
-          <LogInWithOtherFirm brand="apple" />
-        </View>
         <View style={styles.authLinksContainer}>
           <View style={styles.authLinkButton}>
             <BaseButton
@@ -192,7 +188,7 @@ export default function Login({ navigation }: Props) {
           </View>
         </View>
       </View>
-      <Footer navigation={navigation} />
+      {/* <Footer navigation={navigation} /> */}
     </View>
   );
 }

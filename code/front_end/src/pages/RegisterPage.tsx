@@ -267,13 +267,8 @@ export default function Register({ navigation }: Props) {
           </View>
         </ScrollView>
         <Submit onSubmit={onSubmit} />
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          <LogInWithOtherFirm brand="google" />
-          <LogInWithOtherFirm brand="facebook" />
-          <LogInWithOtherFirm brand="apple" />
-        </View>
       </View>
-      <Footer navigation={navigation} />
+      {/* <Footer navigation={navigation} /> */}
     </View>
   );
 }

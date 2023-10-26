@@ -11,8 +11,6 @@ import BaseButton from "../components/BaseButton";
 import {
   addFriendFunc,
   getFriendsList,
-  getUser,
-  logoutUser,
 } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
@@ -91,9 +89,10 @@ type Props = {
   >;
 
   route: RouteProp<RootStackParamList, "ProfilePage">;
+  setUserNotAuthenticated: ()=>void;
 };
 
-export default function ProfilePage({ navigation, route }: Props) {
+export default function ProfilePage({ navigation, route, setUserNotAuthenticated }: Props) {
   const [user, setUser] = useState<User>({
     firstname: "",
     lastname: "",
@@ -215,7 +214,7 @@ export default function ProfilePage({ navigation, route }: Props) {
           friends,
           user?.nameInGame ? user?.nameInGame : ""
         ) ? (
-          <LogoutButton navigation={navigation} />
+          <LogoutButton navigation={navigation} setUserNotAuthenticated={setUserNotAuthenticated}/>
         ) : (
           <View style={styles.invite}>
             <BaseButton

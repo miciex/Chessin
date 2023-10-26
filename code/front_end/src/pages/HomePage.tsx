@@ -88,8 +88,10 @@ const HomePage = ({ navigation }: Props) => {
     getValueFor("user")
       .then((user) => {
         if (user) setUser(JSON.parse(user));
+        else navigation.navigate("UserNotAuthenticated");
       })
       .catch((error) => {
+        navigation.navigate("UserNotAuthenticated");
         throw new Error(error);
       });
   }, []);

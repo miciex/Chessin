@@ -14,9 +14,10 @@ type Props = {
     StackParamList,
     undefined
   >;
+  setUserNotAuthenticated: ()=>void;
 }
 
-export default function LogoutButton({ navigation}:Props) {
+export default function LogoutButton({ navigation, setUserNotAuthenticated}:Props) {
   const [showVerification, setShowVerification] = useState(false);
 
   const toggleShowVerification = () => {
@@ -24,8 +25,11 @@ export default function LogoutButton({ navigation}:Props) {
   };
 
   const handleLogout = () => {
+    
+    logoutUser().then(() => {setUserNotAuthenticated()}).catch((err) => {
+      throw new Error(err);
+    });
     navigation.navigate("Home")
-    logoutUser();
   }
 
   return (

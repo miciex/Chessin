@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "./src/pages/HomePage";
@@ -27,6 +27,8 @@ import { User } from "./src/utils/PlayerUtilities";
 import { fetchandStoreUser } from "./src/features/authentication/services/loginServices";
 import { remindPassword } from "./src/services/AuthenticationServices";
 import RemindPasswordPage from "./src/pages/RemindPasswordPage";
+import UserNotAuthenticatedPage from "./src/pages/UserNotAuthenticatedPage";
+import { UserLoggedInContext } from "./src/features/context/userloggedInContext";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -55,6 +57,7 @@ export type RootStackParamList = {
   Notification: undefined;
   ResetPassword: undefined;
   RemindPassword: undefined;
+  UserNotAuthenticated: undefined;
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
@@ -62,6 +65,16 @@ const refreshTokenInterval = 1000 * 60 * 14;
 const Routing = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
   const netInfo = useNetInfo();
+
+  const [authenticated, setAuthenticated] = useState<boolean>(false);
+
+  const setUserAuthenticated = () => {
+    setAuthenticated(true);
+  };
+
+  const setUserNotAuthenticated = () => {
+    setAuthenticated(false);
+  };
 
   useEffect(() => {
     setUserActive(netInfo.isConnected ? true : false).catch((err) => {
@@ -88,141 +101,173 @@ const Routing = () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={HomePage}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="GameMenu"
-          component={GameMenu}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="FreeBoard"
-          children={(
-            props: NativeStackScreenProps<RootStackParamList, "FreeBoard">
-          ) => <FreeBoard {...props} />}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="LastGame"
-          component={LastGame}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="Login"
-          children={(
-            props: NativeStackScreenProps<RootStackParamList, "Login">
-          ) => <Login {...props} />}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="PlayBot"
-          component={PlayBot}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="PlayOnline"
-          component={PlayOnline}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="PlayWithFriendsMenu"
-          component={PlayWithFriendsMenu}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="ProfilePage"
-          component={ProfilePage}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="Notification"
-          component={NotificationPage}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="Register"
-          children={(
-            props: NativeStackScreenProps<RootStackParamList, "Register">
-          ) => <Register {...props} />}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="Socials"
-          component={Socials}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="Friends"
-          component={Friends}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="AnalyzeGame"
-          component={AnalyzeGame}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="ResetPassword"
-          component={ResetPasswordPage}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="RemindPassword"
-          component={RemindPasswordPage}
-          options={({ navigation }) => ({
-            headerStyle: styles.header,
-            headerTitle: () => <Header navigation={navigation} />,
-          })}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserLoggedInContext.Provider value={authenticated}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen
+            name="Home"
+            component={HomePage}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="GameMenu"
+            component={GameMenu}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="FreeBoard"
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "FreeBoard">
+            ) => <FreeBoard {...props} />}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="LastGame"
+            component={LastGame}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="Login"
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "Login">
+            ) => (
+              <Login {...props} setUserAuthenticated={setUserAuthenticated} />
+            )}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="PlayBot"
+            component={PlayBot}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="PlayOnline"
+            component={PlayOnline}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="PlayWithFriendsMenu"
+            component={PlayWithFriendsMenu}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="ProfilePage"
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "ProfilePage">
+            ) => (
+              <ProfilePage
+                {...props}
+                setUserNotAuthenticated={setUserNotAuthenticated}
+              />
+            )}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="Notification"
+            component={NotificationPage}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="Register"
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "Register">
+            ) => <Register {...props} />}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="Socials"
+            component={Socials}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="Friends"
+            component={Friends}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="AnalyzeGame"
+            component={AnalyzeGame}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ResetPassword"
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "ResetPassword">
+            ) => (
+              <ResetPasswordPage
+                {...props}
+                setUserNotAuthenticated={setUserNotAuthenticated}
+              />
+            )}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="RemindPassword"
+            children={(
+              props: NativeStackScreenProps<
+                RootStackParamList,
+                "RemindPassword"
+              >
+            ) => (
+              <RemindPasswordPage
+                {...props}
+                setUserNotAuthenticated={setUserNotAuthenticated}
+              />
+            )}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <Header navigation={navigation} />,
+            })}
+          />
+          <Stack.Screen
+            name="UserNotAuthenticated"
+            component={UserNotAuthenticatedPage}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserLoggedInContext.Provider>
   );
 };
 
