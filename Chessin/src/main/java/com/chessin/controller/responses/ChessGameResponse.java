@@ -40,8 +40,8 @@ public class ChessGameResponse {
     public static ChessGameResponse fromChessGame(ChessGame game, ClassicalRatingRepository classicalRatingRepository, RapidRatingRepository rapidRatingRepository, BlitzRatingRepository blitzRatingRepository, BulletRatingRepository bulletRatingRepository){
         ChessGameResponse response = ChessGameResponse.builder()
                 .id(game.getId())
-                .whiteUser(UserResponse.fromUser(game.getWhiteUser(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository))
-                .blackUser(UserResponse.fromUser(game.getBlackUser(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository))
+                .whiteUser(UserResponse.fromUser(game.getWhiteUser(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false))
+                .blackUser(UserResponse.fromUser(game.getBlackUser(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false))
                 .moves(new ArrayList<>())
                 .availableCastles(game.getAvailableCastles())
                 .timeControl(game.getTimeControl())

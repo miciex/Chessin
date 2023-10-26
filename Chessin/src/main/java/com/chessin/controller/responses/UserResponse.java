@@ -30,8 +30,9 @@ public class UserResponse {
     private double ratingRapid;
     private double ratingClassical;
     private String country;
+    private String email;
 
-    public static UserResponse fromUser(User user, ClassicalRatingRepository classicalRatingRepository, RapidRatingRepository rapidRatingRepository, BlitzRatingRepository blitzRatingRepository, BulletRatingRepository bulletRatingRepository){
+    public static UserResponse fromUser(User user, ClassicalRatingRepository classicalRatingRepository, RapidRatingRepository rapidRatingRepository, BlitzRatingRepository blitzRatingRepository, BulletRatingRepository bulletRatingRepository, boolean returnEmail){
         return UserResponse.builder()
                 .id(user.getId())
                 .firstname(user.getFirstname())
@@ -42,6 +43,7 @@ public class UserResponse {
                 .ratingRapid(rapidRatingRepository.findByUser(user).orElse(new RapidRating(user, new RatingCalculator())).getRating())
                 .ratingBlitz(blitzRatingRepository.findByUser(user).orElse(new BlitzRating(user, new RatingCalculator())).getRating())
                 .ratingBullet(bulletRatingRepository.findByUser(user).orElse(new BulletRating(user, new RatingCalculator())).getRating())
+                .email(returnEmail ? user.getEmail() : null)
                 .build();
     }
 

@@ -74,9 +74,10 @@ export default function RemindPasswordPage({ navigation }: Props) {
   };
 
   const handleRemindPassword = async () => {
-    if (!validateEmail()) return;
+    if (!isInputValid()) return;
     const request: PasswordRemindRequest = {
       email,
+      newPassword,
     };
     console.log("handling remind password request")
     remindPassword(request)
@@ -104,15 +105,8 @@ export default function RemindPasswordPage({ navigation }: Props) {
   const handleVerifyCodeResponse = async (response: Response) => {
     //TODO: logoutUser
     if (response.status === 200) {
-      return await response
-        .text()
-        .then(() => {
           logoutUser();
           navigation.navigate("Home");
-        })
-        .catch((err: any) => {
-          throw new Error(err);
-        });
     } else if (response.status === 400) {
       throw new Error("Invalid code");
     } else {

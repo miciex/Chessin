@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PasswordRemindRequest {
     private String email;
+    private String newPassword;
 }

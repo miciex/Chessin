@@ -12,6 +12,7 @@ import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -162,19 +163,8 @@ public class AuthenticationService {
                 .build());
     }
 
-    public ResponseEntity<?> finishChangingPassword(CodeVerificationRequest request)
-    {
-        if(request.getVerificationType() != VerificationType.REMIND_PASSWORD)
-        {
-            try
-            {
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-            } catch(AuthenticationException e){
-                return ResponseEntity.badRequest().body("Password incorrect.");
-            }
-        }
-
+    @Transactional
+    public ResponseEntity<?> finishRemindingPassword(CodeVerificationRequest request){
         if(!verificationCodeRepository.existsByCode(request.getVerificationCode()))
             return ResponseEntity.badRequest().body("Code is incorrect.");
 
@@ -196,6 +186,20 @@ public class AuthenticationService {
         userRepository.updatePasswordByEmail(user.getEmail(), passwordEncoder.encode(request.getNewPassword()));
 
         return ResponseEntity.ok("Password changed successfully.");
+    }
+
+    @Transactional
+    public ResponseEntity<?> finishChangingPassword(CodeVerificationRequest request)
+    {
+        try
+        {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        } catch(AuthenticationException e){
+            return ResponseEntity.badRequest().body("Password incorrect.");
+        }
+
+        return finishRemindingPassword(request);
     }
 
     @Transactional
@@ -260,6 +264,9 @@ public class AuthenticationService {
     public ResponseEntity<?> remindPassword(PasswordRemindRequest request)
     {
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+
+        if(passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
+            return ResponseEntity.badRequest().body("New password cannot be the same as the old one.");
 
         sendVerificationCode(user);
 

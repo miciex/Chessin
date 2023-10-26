@@ -46,7 +46,7 @@ public class UserController {
     @PostMapping("/findByNickname/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname){
         Optional<User> user = userRepository.findByNameInGame(nickname);
-        UserResponse userResponse = UserResponse.fromUser(user.orElseThrow(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository);
+        UserResponse userResponse = UserResponse.fromUser(user.orElseThrow(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false);
         return ResponseEntity.ok().body(userResponse);
     }
 
@@ -56,7 +56,7 @@ public class UserController {
         List<User> users = userRepository.findByNameInGameContaining(nickname);
         List<UserResponse> responses = new ArrayList<>();
 
-        users.stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(responses::add);
+        users.stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(responses::add);
 
         return ResponseEntity.ok().body(responses);
     }
@@ -147,7 +147,7 @@ public class UserController {
         List<UserResponse> friends = new ArrayList<>();
 
         for(User friend : user.getFriends())
-            friends.add(UserResponse.fromUser(friend, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+            friends.add(UserResponse.fromUser(friend, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false));
 
         return ResponseEntity.ok().body(friends);
     }
@@ -210,6 +210,6 @@ public class UserController {
 
         User user = userRepository.findByEmail(email).get();
 
-        return ResponseEntity.ok().body(UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+        return ResponseEntity.ok().body(UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, true));
     }
 }

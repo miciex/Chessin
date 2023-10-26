@@ -54,7 +54,8 @@ public class AuthenticationController {
 
         return switch (request.getVerificationType()) {
             case AUTHENTICATE -> service.finishAuthentication(request);
-            case CHANGE_PASSWORD, REMIND_PASSWORD -> service.finishChangingPassword(request);
+            case CHANGE_PASSWORD -> service.finishChangingPassword(request);
+            case REMIND_PASSWORD -> service.finishRemindingPassword(request);
             case REGISTER -> service.activateAccount(request);
             default -> ResponseEntity.badRequest().body("Invalid verification type.");
         };
@@ -79,7 +80,7 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body("Email does not exist in the database.");
         }
 
-        return service.remindPassword(request);
+         return service.remindPassword(request);
     }
 
     @PostMapping("/2faEnabled")
