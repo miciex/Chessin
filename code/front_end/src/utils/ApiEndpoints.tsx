@@ -10,7 +10,6 @@ export const twofaEnabledLink = `${authLink}2faEnabled`;
 export const userLink = `${baseLink}user/`;
 export const findByNicknameLink = `${userLink}findByNickname/`;
 export const setActive = `${userLink}setActive`;
-
 export const checkInvitationsLink = `${userLink}checkInvitations`;
 export const respondtoInvitationLink = `${userLink}respondToInvitation`;
 export const removeFriendLink = `${userLink}removeFriend`;
