@@ -151,7 +151,7 @@ export default function Register({ navigation }: Props) {
       .then((response) => {
         console.log("response status: "+response.status);
         if (response.status === 200) {
-          navigation.navigate("Home");
+          navigation.navigate("UserNotAuthenticated");
         } else if (response.status === 202) {
           setShowAuthCode(true);
         } else if (response.status === 400) {

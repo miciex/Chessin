@@ -114,7 +114,7 @@ const Routing = () => {
   return (
     <UserLoggedInContext.Provider value={authenticated}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName={ authenticated ? "Home" : "UserNotAuthenticated"}>
           <Stack.Screen
             name="Home"
             component={HomePage}

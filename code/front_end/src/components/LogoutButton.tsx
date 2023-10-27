@@ -9,15 +9,18 @@ import { RootStackParamList } from "../../Routing";
 import { StackParamList } from "../utils/Constants";
 
 type Props = {
-    navigation: NativeStackNavigationProp<
+  navigation: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
     undefined
   >;
-  setUserNotAuthenticated: ()=>void;
-}
+  setUserNotAuthenticated: () => void;
+};
 
-export default function LogoutButton({ navigation, setUserNotAuthenticated}:Props) {
+export default function LogoutButton({
+  navigation,
+  setUserNotAuthenticated,
+}: Props) {
   const [showVerification, setShowVerification] = useState(false);
 
   const toggleShowVerification = () => {
@@ -25,16 +28,18 @@ export default function LogoutButton({ navigation, setUserNotAuthenticated}:Prop
   };
 
   const handleLogout = () => {
-    
-    logoutUser().then(() => {setUserNotAuthenticated()}).catch((err) => {
-      throw new Error(err);
-    });
-    navigation.navigate("Home")
-  }
+    logoutUser()
+      .then(() => {
+        setUserNotAuthenticated();
+        navigation.navigate("UserNotAuthenticated");
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
 
   return (
     <View style={styles.container}>
-      
       {showVerification ? (
         <View style={styles.confirmLogoutContainer}>
           <BaseButton
@@ -43,15 +48,21 @@ export default function LogoutButton({ navigation, setUserNotAuthenticated}:Prop
             style={styles.confirmLogout}
             fontColor={ColorsPallet.green}
           />
-          <BaseButton handlePress={toggleShowVerification} text="Reject" style={styles.confirmLogout}
-          fontColor={ColorsPallet.red}/>
+          <BaseButton
+            handlePress={toggleShowVerification}
+            text="Reject"
+            style={styles.confirmLogout}
+            fontColor={ColorsPallet.red}
+          />
         </View>
-      ):<BaseButton
-      handlePress={toggleShowVerification}
-      text="Log out"
-      style={styles.logout}
-      fontColor={ColorsPallet.red}
-    />}
+      ) : (
+        <BaseButton
+          handlePress={toggleShowVerification}
+          text="Log out"
+          style={styles.logout}
+          fontColor={ColorsPallet.red}
+        />
+      )}
     </View>
   );
 }

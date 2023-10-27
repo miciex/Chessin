@@ -103,7 +103,7 @@ export default function ResetPasswordPage({
         if (response.status === 202) {
           setShowCodeModal(true);
         } else if (response.status === 200) {
-          navigation.navigate("Home");
+          navigation.navigate("UserNotAuthenticated");
         } else if (response.status === 400) {
           response
             .text()

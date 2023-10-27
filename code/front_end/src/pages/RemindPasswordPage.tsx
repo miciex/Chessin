@@ -88,9 +88,7 @@ export default function RemindPasswordPage({
       .then((response) => {
         if (response.status === 202) {
           setLoggedIn(true);
-        } else if (response.status === 200) {
-          navigation.navigate("Home");
-        } else if (response.status === 400) {
+        }  else if (response.status === 400) {
           response
             .text()
             .then((data) => {
@@ -112,7 +110,7 @@ export default function RemindPasswordPage({
       logoutUser()
         .then(() => {
           setUserNotAuthenticated();
-          navigation.navigate("Home");
+          navigation.navigate("UserNotAuthenticated");
         })
         .catch((err) => {
           throw new Error(err);
