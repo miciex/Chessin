@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,7 +25,7 @@ public class ChessGameResponse {
     private long id;
     private UserResponse whiteUser;
     private UserResponse blackUser;
-    private ArrayList<MoveResponse> moves;
+    private List<MoveResponse> moves;
     private int[] availableCastles;
     private long timeControl;
     private long increment;
@@ -58,6 +59,8 @@ public class ChessGameResponse {
 
         if(game.getMoves() != null)
             game.getMoves().stream().map(MoveResponse::fromMove).forEach(response.moves::add);
+        else
+            response.moves = new ArrayList<>();
 
         return response;
     }

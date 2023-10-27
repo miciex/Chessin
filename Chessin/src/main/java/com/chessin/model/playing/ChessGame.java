@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -22,8 +23,7 @@ public class ChessGame {
     @ManyToOne(fetch = FetchType.EAGER)
     private User blackUser;
     @OneToMany(mappedBy = "chessGame", fetch = FetchType.EAGER)
-    private ArrayList<Move> moves;
-    //eventually change to 4 columns
+    private List<Move> moves;
     private int[] availableCastles;
     private long timeControl;
     private long increment;
