@@ -29,6 +29,9 @@ import { remindPassword } from "./src/services/AuthenticationServices";
 import RemindPasswordPage from "./src/pages/RemindPasswordPage";
 import UserNotAuthenticatedPage from "./src/pages/UserNotAuthenticatedPage";
 import { UserLoggedInContext } from "./src/features/context/userloggedInContext";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { StackParamList } from "./src/utils/Constants";
+import NotAuthenticatedHeader from "./src/components/NotAuthenticatedHeader";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -100,6 +103,14 @@ const Routing = () => {
     };
   }, []);
 
+  const getHeader = (navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    StackParamList,
+    undefined
+  >) => {
+    return authenticated ? <Header navigation={navigation}/> : <NotAuthenticatedHeader/>
+  }
+
   return (
     <UserLoggedInContext.Provider value={authenticated}>
       <NavigationContainer>
@@ -109,7 +120,7 @@ const Routing = () => {
             component={HomePage}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -117,7 +128,7 @@ const Routing = () => {
             component={GameMenu}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -127,7 +138,7 @@ const Routing = () => {
             ) => <FreeBoard {...props} />}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -135,7 +146,7 @@ const Routing = () => {
             component={LastGame}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -147,7 +158,7 @@ const Routing = () => {
             )}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -155,7 +166,7 @@ const Routing = () => {
             component={PlayBot}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -163,7 +174,7 @@ const Routing = () => {
             component={PlayOnline}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -171,7 +182,7 @@ const Routing = () => {
             component={PlayWithFriendsMenu}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -186,7 +197,7 @@ const Routing = () => {
             )}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -194,7 +205,7 @@ const Routing = () => {
             component={NotificationPage}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -204,7 +215,7 @@ const Routing = () => {
             ) => <Register {...props} />}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation)
             })}
           />
           <Stack.Screen
@@ -212,7 +223,7 @@ const Routing = () => {
             component={Socials}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -220,7 +231,7 @@ const Routing = () => {
             component={Friends}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -240,7 +251,7 @@ const Routing = () => {
             )}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -258,12 +269,16 @@ const Routing = () => {
             )}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <Header navigation={navigation} />,
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
             name="UserNotAuthenticated"
             component={UserNotAuthenticatedPage}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <NotAuthenticatedHeader/>,
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>

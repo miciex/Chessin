@@ -38,7 +38,7 @@ export default function AnalyzeGame({ navigation }: Props) {
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.boardContainer}>
-            <PlayOnlineBoard state={state} dispatch={dispatch} />
+            <PlayOnlineBoard state={state} dispatch={dispatch} rotateBoard={false}/>
           </View>
         </View>
         <ScrollView
