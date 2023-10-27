@@ -22,6 +22,7 @@ public class MoveResponse {
     int movesTo50MoveRule;
     int[] availableCastles;
     long remainingTime;
+    int[] position;
 
     public static MoveResponse fromMove(Move move)
     {
@@ -35,6 +36,7 @@ public class MoveResponse {
                 .movesTo50MoveRule(move.getMovesTo50MoveRule())
                 .availableCastles(move.getAvailableCastles())
                 .remainingTime(move.getRemainingTime())
+                .position(move.getPosition())
                 .build();
     }
 }
