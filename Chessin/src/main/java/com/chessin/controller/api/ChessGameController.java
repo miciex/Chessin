@@ -179,17 +179,18 @@ public class ChessGameController {
         if(!activeBoards.containsKey(id))
             return ResponseEntity.badRequest().body("Game not found.");
 
-        if(activeBoards.get(id).getMoves().size() > 0)
+        if(!activeBoards.get(id).getMoves().isEmpty())
             return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id))));
 
         synchronized(activeGames.get(id))
         {
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
 
-            if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().size() == 0)
+            if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty())
             {
                 Board endBoard = activeBoards.get(id);
                 endBoard.setGameResult(GameResults.ABANDONED);
+                chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
                 activeBoards.remove(id);
                 activeGames.remove(id);
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
@@ -216,6 +217,7 @@ public class ChessGameController {
                 if(board.getWhiteEmail().equals(email))
                 {
                     board.setGameResult(GameResults.WHITE_RESIGN);
+                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.WHITE_RESIGN);
                     activeBoards.replace(request.getGameId(), board);
                     if(activeGames.get(request.getGameId()).isRated())
                         activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
@@ -225,6 +227,7 @@ public class ChessGameController {
                 else if(board.getBlackEmail().equals(email))
                 {
                     board.setGameResult(GameResults.BLACK_RESIGN);
+                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.BLACK_RESIGN);
                     activeBoards.replace(request.getGameId(), board);
                     if(activeGames.get(request.getGameId()).isRated())
                         activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
@@ -241,6 +244,7 @@ public class ChessGameController {
             if(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
             {
                 board.setGameResult(GameResults.WHITE_TIMEOUT);
+                chessGameRepository.updateGameResult(request.getGameId(), GameResults.WHITE_TIMEOUT);
                 board.setWhiteTime(0);
                 activeBoards.replace(request.getGameId(), board);
                 if(activeGames.get(request.getGameId()).isRated())
@@ -251,6 +255,7 @@ public class ChessGameController {
             else if(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
             {
                 board.setGameResult(GameResults.BLACK_TIMEOUT);
+                chessGameRepository.updateGameResult(request.getGameId(), GameResults.BLACK_TIMEOUT);
                 board.setBlackTime(0);
                 activeBoards.replace(request.getGameId(), board);
                 if(activeGames.get(request.getGameId()).isRated())
@@ -305,6 +310,7 @@ public class ChessGameController {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
+                chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
                 if(activeGames.get(request.getGameId()).isRated())
                     endBoard = chessGameService.updateRatings(activeGames.get(request.getGameId()), endBoard);
                 activeGames.remove(request.getGameId());
@@ -370,6 +376,7 @@ public class ChessGameController {
                 Board endBoard = activeBoards.get(id);
                 activeBoards.remove(id);
                 activeGames.get(id).setGameResult(endBoard.getGameResult());
+                chessGameRepository.updateGameResult(id, endBoard.getGameResult());
                 if(activeGames.get(id).isRated())
                     activeBoards.replace(id, chessGameService.updateRatings(activeGames.get(id), activeBoards.get(id)));
                 activeGames.remove(id);
@@ -396,6 +403,7 @@ public class ChessGameController {
         if(request.getResponseType() == ResponseType.ACCEPT)
         {
             activeBoards.get(request.getGameId()).setGameResult(GameResults.DRAW_AGREEMENT);
+            chessGameRepository.updateGameResult(request.getGameId(), GameResults.DRAW_AGREEMENT);
             activeGames.get(request.getGameId()).notifyAll();
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }

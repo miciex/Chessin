@@ -153,20 +153,20 @@ public class ChessGameService {
 
         switch (game.getGameType()) {
             case CLASSICAL -> {
-                classicalRatingRepository.save((ClassicalRating) whiteRating);
-                classicalRatingRepository.save((ClassicalRating) blackRating);
+                classicalRatingRepository.saveAndFlush((ClassicalRating) whiteRating);
+                classicalRatingRepository.saveAndFlush((ClassicalRating) blackRating);
             }
             case RAPID -> {
-                rapidRatingRepository.save((RapidRating) whiteRating);
-                rapidRatingRepository.save((RapidRating) blackRating);
+                rapidRatingRepository.saveAndFlush((RapidRating) whiteRating);
+                rapidRatingRepository.saveAndFlush((RapidRating) blackRating);
             }
             case BLITZ -> {
-                blitzRatingRepository.save((BlitzRating) whiteRating);
-                blitzRatingRepository.save((BlitzRating) blackRating);
+                blitzRatingRepository.saveAndFlush((BlitzRating) whiteRating);
+                blitzRatingRepository.saveAndFlush((BlitzRating) blackRating);
             }
             case BULLET -> {
-                bulletRatingRepository.save((BulletRating) whiteRating);
-                bulletRatingRepository.save((BulletRating) blackRating);
+                bulletRatingRepository.saveAndFlush((BulletRating) whiteRating);
+                bulletRatingRepository.saveAndFlush((BulletRating) blackRating);
             }
             default -> throw new IllegalStateException("Unexpected value: " + game.getGameType());
         }
@@ -180,6 +180,8 @@ public class ChessGameService {
         board.setWhiteRatingChange(whiteRating.getRating() - whiteRatingBefore);
         board.setBlackRatingChange(blackRating.getRating() - blackRatingBefore);
         board.setRated(game.isRated());
+
+        chessGameRepository.updateRating(game.getId(), whiteRatingBefore, blackRatingBefore, board.getWhiteRatingChange(), board.getBlackRatingChange());
 
         return board;
     }
