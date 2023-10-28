@@ -33,6 +33,7 @@ public class Move {
     int movesTo50MoveRule;
     int[] availableCastles;
     long remainingTime;
+    @Column(length = 512)
     int[] position;
 
     public Move(ChessGame game, HashMap<Integer, Integer> pieces, int startField, int endField, int promotePiece){
