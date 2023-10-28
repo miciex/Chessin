@@ -17,6 +17,8 @@ import { User, responseUserToUser } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { fetchUser } from "../services/userServices";
 import LogoutButton from "../components/LogoutButton";
+import { getGameHistory } from "../services/chessGameService";
+import { ChessGameResponse } from "../utils/ServicesTypes";
 
 const ended_games = [
   {
@@ -93,46 +95,54 @@ type Props = {
 };
 
 export default function ProfilePage({ navigation, route, setUserNotAuthenticated }: Props) {
-  const [user, setUser] = useState<User>({
-    firstname: "",
-    lastname: "",
-    email: "",
-    nameInGame: "",
-    country: "",
-    ranking: { CLASSICAL: 0, BLITZ: 0, BULLET: 0, RAPID: 0 },
-    highestRanking: 0,
-  });
+  const [user, setUser] = useState<User>();
+  const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
   const [user2, setUser2] = useState<User>();
   const [ifMyAccount, setIfMyAccount] = useState<boolean>();
 
   const nameInGame = route?.params?.nameInGame;
   const goToFriendsMenu = () => {
     navigation.navigate("Friends", {
-      nameInGame: user2?.nameInGame ? user2?.nameInGame : user?.nameInGame,
+      nameInGame: user2?.nameInGame ? user2?.nameInGame : user ? user?.nameInGame : "",
     });
   };
 
   useEffect(() => {
     getValueFor("user")
-      .then((data) => {
-        console.log("get value for user data: " + data);
-        if (data === null) return;
-        setUser(JSON.parse(data));
+      .then((user) => {
+        if (!user) return navigation.navigate("UserNotAuthenticated");
+        let parsedUser: User = JSON.parse(user);
+        if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
+        setUser(parsedUser);
+        getGameHistory(user2 ? user2.nameInGame : parsedUser.nameInGame).then((response) => {
+          if (response.status === 200) {
+            response
+              .json()
+              .then((data: ChessGameResponse[]) => {
+                setUserGames(data);
+              })
+              .catch((error) => {
+                console.error(error);
+                throw new Error("Couldn't load game history");
+              });
+          } else throw new Error("Couldn't load game history");
+        });
       })
-      .catch((err) => {
-        throw new Error(err);
+      .catch((error) => {
+        navigation.navigate("UserNotAuthenticated");
+        throw new Error(error);
       });
   }, []);
 
   useEffect(() => {
-    if (user.nameInGame == nameInGame || nameInGame === undefined) {
+    if (user &&(user.nameInGame == nameInGame) || nameInGame === undefined) {
       setIfMyAccount(true);
       setUser2(undefined);
     } else {
       setIfMyAccount(false);
     }
     if (
-      !(user.nameInGame == nameInGame || nameInGame === undefined) &&
+      !(user&&(user.nameInGame == nameInGame) || nameInGame === undefined) &&
       nameInGame
     ) {
       fetchUser(nameInGame)
@@ -150,20 +160,27 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
     }
   }, [nameInGame, user]);
 
-  let component = ended_games.slice(0, 5).map((game) => {
-    return (
+  let component = userGames.slice(0, 5).map((game) => (
+    <View style={{ width: "90%" }}>
       <EndedGame
-        nick={game.playerNick}
-        date={game.date}
-        rank={game.rank}
+        nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
+        rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
+        result={"win"}
         navigation={navigation}
+        key={`${game.id}${user?.nameInGame}`}
+        date={"2023.10.27"}
+        gameId={game.id}
       />
-    );
-  });
+    </View>
+  ))
 
   const playWithFriend = () => {
+    let userArg: User;
+    if(user2) userArg = user2
+    else if(user) userArg = user
+    else return;
     navigation.navigate("PlayWithFriendsMenu", {
-      userArg: user2 ? user2 : user,
+      userArg: userArg,
     });
   };
 
@@ -201,11 +218,11 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
       <View style={styles.container}>
         <View style={styles.profile}>
           <Profile
-            nick={user2 ? user2.nameInGame : user.nameInGame}
-            rank={user2 ? user2.ranking : user.ranking}
-            active={user2 ? user2.online : user.online}
-            playing={user2 ? user2.playing : user.playing}
-            country={user2 ? user2.country : user.country}
+            nick={user2 ? user2.nameInGame : user ?user.nameInGame : ""}
+            rank={user2 ? user2.ranking : (user  ? user.ranking: undefined )}
+            active={user2 ? user2.online : user ? user.online : false}
+            playing={user2 ? user2.playing : user ? user.playing : false}
+            country={user2 ? user2.country : user ? user.country :""}
           />
         </View>
 
@@ -245,7 +262,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
         />
         <FriendsIconList
           navigation={navigation}
-          nameInGame={user2 ? user2.nameInGame : user.nameInGame}
+          nameInGame={user2 ? user2.nameInGame : user ? user.nameInGame: ""}
         />
         <Heading
           text={"Old Games"}

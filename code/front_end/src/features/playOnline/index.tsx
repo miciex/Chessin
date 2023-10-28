@@ -6,7 +6,7 @@ import {
   boardFactory,
   onlineBoardFactory,
 } from "../../chess-logic/board";
-import { StartingPositions } from "../../chess-logic/ChessConstants";
+import { StartingPositions } from "../../chess-logic/ChessConstants"; ;
 
 export type FieldInfo = {
   piece: number;

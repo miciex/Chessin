@@ -11,6 +11,8 @@ import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import ChooseYourLevelModal from "../features/home/components/ChooseYourLevelModal";
+import { ChessGameResponse } from "../utils/ServicesTypes";
+import { getGameHistory } from "../services/chessGameService";
 
 //przykladowe stary gry
 const ended_games = [
@@ -83,12 +85,31 @@ type Props = {
 
 const HomePage = ({ navigation }: Props) => {
   const [user, setUser] = useState<User>();
+  const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
 
   useEffect(() => {
     getValueFor("user")
       .then((user) => {
-        if (user) setUser(JSON.parse(user));
-        else navigation.navigate("UserNotAuthenticated");
+        if (!user) return navigation.navigate("UserNotAuthenticated");
+        let parsedUser: User = JSON.parse(user);
+        if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
+        setUser(parsedUser);
+        console.log("User: " + parsedUser.nameInGame);
+        getGameHistory(parsedUser.nameInGame).then((response) => {
+          console.log("Got response")
+          console.log(response.status);
+          if (response.status === 200) {
+            response
+              .json()
+              .then((data: ChessGameResponse[]) => {
+                setUserGames(data);
+              })
+              .catch((error) => {
+                console.error(error);
+                throw new Error("Couldn't load game history");
+              });
+          } else throw new Error("Couldn't load game history");
+        });
       })
       .catch((error) => {
         navigation.navigate("UserNotAuthenticated");
@@ -136,15 +157,16 @@ const HomePage = ({ navigation }: Props) => {
               />
             </View>
 
-            {ended_games.map((gracz, index) => (
+            {userGames.map((game) => (
               <View style={{ width: "90%" }}>
                 <EndedGame
-                  nick={gracz.playerNick}
-                  rank={gracz.rank}
-                  result={gracz.lastGameResult}
+                  nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
+                  rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
+                  result={"win"}
                   navigation={navigation}
-                  key={index}
-                  date={gracz.date}
+                  key={`${game.id}${user?.nameInGame}`}
+                  date={"2023.10.27"}
+                  gameId={game.id}
                 />
               </View>
             ))}

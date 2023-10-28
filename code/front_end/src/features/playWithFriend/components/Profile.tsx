@@ -5,7 +5,7 @@ import { Rankings } from '../../../utils/PlayerUtilities';
 
 type Props = {
     nick: string;
-    rank: Rankings;
+    rank?: Rankings;
     active?: boolean;
     playing?: boolean;
     avatar?: string
@@ -31,9 +31,11 @@ export default function Profile({nick, rank, active, playing, avatar, country}:P
       </View>
       <View style={styles.right}>
         <Text style={[styles.text, styles.name]}>{nick}</Text>
+        {rank&&(<>
         <Text style={[styles.text, styles.rank]}>Bullet {rank.BULLET.toString()}</Text>
         <Text style={[styles.text, styles.rank]}>Rapid {rank.RAPID.toString()}</Text>
-        <Text style={[styles.text, styles.rank]}>Blitz {rank.BLITZ.toString()}</Text>
+        <Text style={[styles.text, styles.rank]}>Blitz {rank.BLITZ.toString()}</Text></>)
+}
       </View>
     </View>
   )

@@ -5,7 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/responses/ChessGameResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/responses/ChessGameResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/ChessGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/ChessGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/ChessGameRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/ChessGameRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/Routing.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/Routing.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/pages/UserNotAuthenticatedPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/pages/UserNotAuthenticatedPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +112,7 @@
       <workItem from="1691432550562" duration="20000" />
       <workItem from="1698095118802" duration="1925000" />
       <workItem from="1698252619040" duration="2926000" />
-      <workItem from="1698337340087" duration="5623000" />
+      <workItem from="1698337340087" duration="18793000" />
     </task>
     <servers />
   </component>
@@ -131,14 +138,14 @@
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/AuthenticationController.java</url>
-          <line>48</line>
-          <option name="timeStamp" value="11" />
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/UserController.java</url>
+          <line>199</line>
+          <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/AuthenticationController.java</url>
-          <line>56</line>
-          <option name="timeStamp" value="12" />
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/UserController.java</url>
+          <line>197</line>
+          <option name="timeStamp" value="39" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

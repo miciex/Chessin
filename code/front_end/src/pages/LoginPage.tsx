@@ -60,6 +60,7 @@ export default function Login({ navigation, setUserAuthenticated }: Props) {
     login({ email, password })
       .then((response) => {
         if (response.status === 200) {
+          navigation.navigate("Home");
           return response.json();
         } else if (response.status === 202) {
           setShowAuthCode(true);
@@ -101,6 +102,8 @@ export default function Login({ navigation, setUserAuthenticated }: Props) {
         })
         .then(() => {
           setUserAuthenticated();
+          
+        }).then(()=>{
           navigation.navigate("Home");
         })
         .catch((err) => {

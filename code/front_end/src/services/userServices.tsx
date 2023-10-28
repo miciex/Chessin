@@ -5,6 +5,7 @@ import {
   findUsersByNickname,
   getFriends,
   checkInvitationsLink,
+  getGameHistoryLink,
 } from "../utils/ApiEndpoints";
 import {
   CodeVerificationRequest,
@@ -329,3 +330,4 @@ export const updateUserRating = async (rating: number, gameType: GameType) => {
   user.highestRanking = getHighestRanking(user.ranking);
   save("user", JSON.stringify(user));
 };
+

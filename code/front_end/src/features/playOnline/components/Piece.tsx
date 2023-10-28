@@ -72,6 +72,7 @@ type Props = {
   positionNumber: number;
   resetActiveValues: () => void;
   resetPossibleMoves: () => void;
+  ableToMove: boolean;
 };
 
 export default function Piece({
@@ -84,6 +85,7 @@ export default function Piece({
   positionNumber,
   resetActiveValues,
   resetPossibleMoves,
+  ableToMove
 }: Props) {
   // const translate = new Animated.ValueXY({ x: position.x, y: position.y });
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
@@ -178,7 +180,8 @@ export default function Piece({
             startField: activeField,
             endField: positionNumber,
           });
-          handleMove(move);
+          if(ableToMove)
+            handleMove(move);
 
           resetActiveValues();
           resetPossibleMoves();
@@ -210,7 +213,10 @@ export default function Piece({
             startField: positionNumber,
             endField,
           });
-          handleMove(move);
+          
+          if(ableToMove)
+            handleMove(move);
+
           resetPossibleMoves();
           setValueActive(endField);
         }

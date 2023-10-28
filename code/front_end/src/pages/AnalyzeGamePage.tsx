@@ -13,6 +13,9 @@ import {
   reducer,
   initialState,
 } from "../features/playOnline/reducers/PlayOnlineReducer";
+import GameRecordMove from "../features/playOnline/components/GameRecordMove";
+import { moveToChessNotation } from "../chess-logic/convertion";
+import Board from "../features/playOnline/components/Board";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -26,10 +29,19 @@ type Props = {
 export default function AnalyzeGame({ navigation }: Props) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const analyzisContent = sampleMoves.map((move, index) => (
-    <StringMoveToText move={move} key={index} />
-  ));
-
+  const movesContent = state.board.moves.map((move, index) => {
+    return (
+      <GameRecordMove
+        move={moveToChessNotation(state.board, move)}
+        key={index}
+        handlePress={() => {
+          dispatch({ type: "setCurrentPosition", payload: index });
+        }}
+        currentPosition={state.currentPosition}
+        id={index}
+      />
+    );
+  });
   return (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
@@ -38,14 +50,14 @@ export default function AnalyzeGame({ navigation }: Props) {
         </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.boardContainer}>
-            <PlayOnlineBoard state={state} dispatch={dispatch} rotateBoard={false}/>
+            <Board state={state} dispatch={dispatch} rotateBoard={false} ableToMove={false}/>
           </View>
         </View>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          <View style={styles.analyzisContainer}>{analyzisContent}</View>
+          <View style={styles.analyzisContainer}>{movesContent}</View>
         </ScrollView>
       </View>
       <Footer navigation={navigation} />

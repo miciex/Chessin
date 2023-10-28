@@ -1,6 +1,6 @@
 import { View, Dimensions, StyleSheet, Animated } from "react-native";
 import Piece from "./Piece";
-import Background from "./Background";
+import Background from "../../../components/Background";
 import React, { useRef, useEffect, useMemo } from "react";
 import {
   PlayOnlineAction,
@@ -11,11 +11,12 @@ type Props = {
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
   rotateBoard: boolean;
+  ableToMove: boolean;
 };
 
 const SIZE = Dimensions.get("window").width / 8;
 
-export default function TestBoard({ state, dispatch, rotateBoard }: Props) {
+export default function Board({ state, dispatch, rotateBoard, ableToMove }: Props) {
   const activeValues = useRef<Animated.Value[]>([]);
   const possibleMoves = useRef<Animated.Value[]>([]);
 
@@ -59,6 +60,7 @@ export default function TestBoard({ state, dispatch, rotateBoard }: Props) {
           positionNumber={position}
           resetActiveValues={resetActiveValues}
           resetPossibleMoves={resetPossibleMoves}
+          ableToMove={ableToMove}
         />
       );
     });

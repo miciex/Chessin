@@ -32,6 +32,7 @@ import { UserLoggedInContext } from "./src/features/context/userloggedInContext"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "./src/utils/Constants";
 import NotAuthenticatedHeader from "./src/components/NotAuthenticatedHeader";
+import { getValueFor, save } from "./src/utils/AsyncStoreFunctions";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -56,7 +57,7 @@ export type RootStackParamList = {
   };
   Register: undefined;
   Socials: undefined;
-  AnalyzeGame: undefined;
+  AnalyzeGame: { gameId: number };
   Notification: undefined;
   ResetPassword: undefined;
   RemindPassword: undefined;
@@ -88,7 +89,9 @@ const Routing = () => {
   useEffect(() => {
     resetAccessToken()
       .then(() => {
-        fetchandStoreUser();
+        fetchandStoreUser().then(()=>{
+          setUserAuthenticated();
+        });
       })
       .catch((err) => {
         throw new Error(err);
@@ -100,27 +103,37 @@ const Routing = () => {
     }, refreshTokenInterval);
     return () => {
       clearInterval(resetToken);
+      save("user", "");
     };
   }, []);
 
-  const getHeader = (navigation: NativeStackNavigationProp<
-    RootStackParamList,
-    StackParamList,
-    undefined
-  >) => {
-    return authenticated ? <Header navigation={navigation}/> : <NotAuthenticatedHeader/>
-  }
+  const getHeader = (
+    navigation: NativeStackNavigationProp<
+      RootStackParamList,
+      StackParamList,
+      undefined
+    >
+  ) => {
+    return authenticated ? (
+      <Header navigation={navigation} />
+    ) : (
+      <NotAuthenticatedHeader />
+    );
+  };
 
   return (
     <UserLoggedInContext.Provider value={authenticated}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName={ authenticated ? "Home" : "UserNotAuthenticated"}>
+        <Stack.Navigator
+          initialRouteName={authenticated ? "Home" : "UserNotAuthenticated"}
+        >
           <Stack.Screen
             name="Home"
             component={HomePage}
             options={({ navigation }) => ({
               headerStyle: styles.header,
               headerTitle: () => getHeader(navigation),
+              headerBackVisible: false
             })}
           />
           <Stack.Screen
@@ -215,7 +228,7 @@ const Routing = () => {
             ) => <Register {...props} />}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => getHeader(navigation)
+              headerTitle: () => getHeader(navigation),
             })}
           />
           <Stack.Screen
@@ -277,7 +290,9 @@ const Routing = () => {
             component={UserNotAuthenticatedPage}
             options={({ navigation }) => ({
               headerStyle: styles.header,
-              headerTitle: () => <NotAuthenticatedHeader/>,
+              headerTitle: () => <NotAuthenticatedHeader />,
+              headerBackVisible: false,
+              headerLeft: ()=> null
             })}
           />
         </Stack.Navigator>

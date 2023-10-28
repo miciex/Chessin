@@ -547,11 +547,5 @@ public class ChessGameController {
         return ResponseEntity.ok().body("Invitation responded.");
     }
 
-    @PostMapping("/getGameHistory/{username}")
-    public ResponseEntity<?> getGameHistory(@PathVariable String username)
-    {
-        List<ChessGame> games = chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGame(username).;
 
-        return ResponseEntity.ok().body(games);
-    }
 }

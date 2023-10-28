@@ -28,4 +28,4 @@ export const findUsersByNickname = `${userLink}findUsersByNickname/`;
 export const getFriends = `${userLink}getFriends/`;
 export const getUsersByNicknameLink = `${userLink}getUsersByNickname/`;
 export const getBoardbyGameIdLink = `${chessGameLink}getBoardByGameId/`;
-export const getGameHistory = `${chessGameLink}/getGameHistory/`;
+export const getGameHistoryLink = `${userLink}getGames/`;

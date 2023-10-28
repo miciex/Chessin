@@ -20,6 +20,6 @@ public interface ChessGameRepository extends JpaRepository<ChessGame, Long> {
     void updateRating(@Param(value = "id") long id, @Param(value = "whiteRating") double whiteRating, @Param(value = "blackRating") double blackRating,
                       @Param(value="whiteRatingChange") double whiteRatingChange, @Param(value="blackRatingChange") double blackRatingChange);
 
-    @Query(value = "SELECT cg FROM ChessGame cg WHERE cg.whiteUser.id = :nickname OR cg.blackUser.id = :nickname")
+    @Query(value = "SELECT cg FROM ChessGame cg WHERE cg.whiteUser.nameInGame = :nickname OR cg.blackUser.nameInGame = :nickname")
     List<ChessGame> findAllByWhiteNameInGameOrBlackNameInGame(@Param(value = "nickname") String nickname);
 }

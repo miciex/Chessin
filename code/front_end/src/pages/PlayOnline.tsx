@@ -240,6 +240,7 @@ export default function PlayOnline({ navigation, route }: Props) {
           state={state}
           dispatch={dispatch}
           rotateBoard={rotateBoard}
+          ableToMove={true}
         />
         <PlayOnlineBar
           state={state}

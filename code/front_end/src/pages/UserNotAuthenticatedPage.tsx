@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, {useContext} from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import BaseButton from "../components/BaseButton";
 import { ColorsPallet } from "../utils/Constants";
+import { UserLoggedInContext } from "../features/context/userloggedInContext";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -14,6 +15,15 @@ type Props = {
 };
 
 export default function UserNotAuthenticatedPage({ navigation }: Props) {
+
+  const userLoggedIn = useContext(UserLoggedInContext);
+
+  if(userLoggedIn) {
+    navigation.navigate("Home");
+  }
+
+  
+
   return (
     <View style={styles.mainContainer}>
         <Text style={styles.text}>You are not logged in</Text>
