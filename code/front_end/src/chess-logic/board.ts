@@ -84,6 +84,7 @@ export const BoardResponseToOnlineBoard = (
   boardResponse: BoardResponse
 ): OnlineBoardType => {
   const moves = boardResponse.moves.map((move) => moveFactory(move));
+  
   return {
     fen: boardResponse.startBoard,
     visualBoard: boardResponse.visualBoard,

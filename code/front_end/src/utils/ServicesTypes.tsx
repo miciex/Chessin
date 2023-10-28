@@ -71,7 +71,7 @@ export type SubmitMoveRequest = {
   startField: number;
   endField: number;
   promotePiece: number;
-  isDrawOffered: boolean;
+  doesResign: boolean;
 };
 
 export type BoardResponse = {
@@ -168,3 +168,13 @@ export type loggedUserResponse = {
   ratingClassical: number;
   country: string;
 };
+
+export enum ResponseType {
+  ACCEPT = "ACCEPT",
+  DECLINE = "DECLINE",
+}
+
+export type RespondToDrawOfferRequest ={
+  gameId: number;
+  responseType: ResponseType;
+}

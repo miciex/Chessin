@@ -61,6 +61,7 @@ export default function Board({ state, dispatch, rotateBoard, ableToMove }: Prop
           resetActiveValues={resetActiveValues}
           resetPossibleMoves={resetPossibleMoves}
           ableToMove={ableToMove}
+          rotateBoard={rotateBoard}
         />
       );
     });

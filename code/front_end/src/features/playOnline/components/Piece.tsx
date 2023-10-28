@@ -73,6 +73,7 @@ type Props = {
   resetActiveValues: () => void;
   resetPossibleMoves: () => void;
   ableToMove: boolean;
+  rotateBoard: boolean;
 };
 
 export default function Piece({
@@ -85,7 +86,8 @@ export default function Piece({
   positionNumber,
   resetActiveValues,
   resetPossibleMoves,
-  ableToMove
+  ableToMove,
+  rotateBoard,
 }: Props) {
   // const translate = new Animated.ValueXY({ x: position.x, y: position.y });
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
@@ -142,15 +144,17 @@ export default function Piece({
       startField: move.startField,
       endField: move.endField,
       promotePiece: move.promotePiece,
-      isDrawOffered: false,
+      doesResign: false,
     };
+    console.log("submitMoveRequest");
+    console.log(submitMoveRequest);
     dispatch({
       type: "playMove",
       payload: move,
     });
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
-        if (boardResponse === null) return;
+        if (!boardResponse) return;
         dispatch({
           type: "setDataFromBoardResponse",
           payload: { boardResponse },
@@ -175,13 +179,15 @@ export default function Piece({
       onPanResponderStart() {
         const activeField = findActiveValue();
         if (isPossibleMove(positionNumber) && isMyTurn) {
+          console.log("board rotated: " + rotateBoard)
+          console.log("activeField: " + activeField)
+          console.log("positionNumber: " + positionNumber)
           const move = moveFactory({
             pieces: state.board.position,
-            startField: activeField,
-            endField: positionNumber,
+            startField: rotateBoard ? 63 -activeField: activeField,
+            endField: rotateBoard ? 63 - positionNumber : positionNumber,
           });
-          if(ableToMove)
-            handleMove(move);
+          if (ableToMove) handleMove(move);
 
           resetActiveValues();
           resetPossibleMoves();
@@ -210,12 +216,11 @@ export default function Piece({
         if (isPossibleMove(endField) && isMyTurn) {
           const move = moveFactory({
             pieces: state.board.position,
-            startField: positionNumber,
-            endField,
+            startField: rotateBoard ? 63-positionNumber: positionNumber,
+            endField: rotateBoard ? 63 - endField : endField,
           });
-          
-          if(ableToMove)
-            handleMove(move);
+
+          if (ableToMove) handleMove(move);
 
           resetPossibleMoves();
           setValueActive(endField);
