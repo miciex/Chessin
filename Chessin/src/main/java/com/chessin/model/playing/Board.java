@@ -283,7 +283,7 @@ public class Board {
         return false;
     }
 
-    private  boolean isPawnAttackingTarget(int targetSquare, boolean isTargetWhite){
+    private boolean isPawnAttackingTarget(int targetSquare, boolean isTargetWhite){
         ArrayList<Integer> directions = getPieceDirections(Pawn);
         int checkingPosition,m = isTargetWhite ? -1 : 1;
         for(int i = 2; i<directions.size(); i++){
@@ -429,7 +429,7 @@ public class Board {
         return checkingRow < 8 && checkingRow >= 0 && checkingColumn < 8 && checkingColumn >= 0;
     }
 
-    public  void movePiece(Move move) {
+    public void movePiece(Move move) {
         if (move.getMovedPiece() % 8 == King && Math.abs(move.getStartField() - move.getEndField()) == 2) {
             //Changing rooks placement in castling
             position.put((move.getStartField() / 8) * 8 + move.getStartField() % 8 + (move.getEndField() - move.getStartField()) / 2, position.get((move.getStartField() / 8) * 8 + ((move.getEndField() % 8) / 4) * 7));

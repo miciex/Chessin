@@ -353,7 +353,6 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("Invalid game id.");
         }
 
-        //check if this email is playing the game
         if(!activeBoards.get(id).getWhiteEmail().equals(email) && !activeBoards.get(id).getBlackEmail().equals(email))
             return ResponseEntity.badRequest().body("You are not playing this game.");
 
@@ -546,6 +545,4 @@ public class ChessGameController {
 
         return ResponseEntity.ok().body("Invitation responded.");
     }
-
-
 }

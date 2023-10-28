@@ -2,11 +2,24 @@ package com.chessin.model.utils;
 
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.GameType;
+import jakarta.persistence.criteria.CriteriaBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
 
 public class HelpMethods {
+    public static int[] getPositionFromHashmap(HashMap<Integer, Integer> pieces)
+    {
+        int[] position = new int[64];
+        for(Map.Entry<Integer, Integer> entry : pieces.entrySet())
+        {
+            position[entry.getKey()] = entry.getValue();
+        }
+        return position;
+    }
     public static int CharPieceToInt(Character p){
         return switch (toLowerCase(p)) {
             case 'q' -> Constants.Pieces.Queen + addPieceColorValue(p);

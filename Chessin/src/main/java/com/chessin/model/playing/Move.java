@@ -1,6 +1,7 @@
 package com.chessin.model.playing;
 
 import com.chessin.model.utils.Constants;
+import com.chessin.model.utils.HelpMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ public class Move {
     int movesTo50MoveRule;
     int[] availableCastles;
     long remainingTime;
+    int[] position;
 
     public Move(ChessGame game, HashMap<Integer, Integer> pieces, int startField, int endField, int promotePiece){
         this.chessGame = game;
@@ -40,6 +42,7 @@ public class Move {
         this.takenPiece = calcTakenPiece(pieces);
         this.takenPieceField = calcTakenPieceField(pieces);
         this.promotePiece = promotePiece;
+        this.position = HelpMethods.getPositionFromHashmap(pieces);
     }
 
     public Move(HashMap<Integer, Integer> pieces, int startField, int endField){
@@ -48,6 +51,7 @@ public class Move {
         this.movedPiece = pieces.get(startField);
         this.takenPiece = calcTakenPiece(pieces);
         this.takenPieceField = calcTakenPieceField(pieces);
+        this.position = HelpMethods.getPositionFromHashmap(pieces);
     }
 
     private int calcTakenPiece(HashMap<Integer, Integer> pieces){

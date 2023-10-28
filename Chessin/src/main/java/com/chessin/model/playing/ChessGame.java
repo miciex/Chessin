@@ -24,7 +24,6 @@ public class ChessGame {
     private User blackUser;
     @OneToMany(mappedBy = "chessGame", fetch = FetchType.EAGER)
     private List<Move> moves;
-    //eventually change to 4 columns
     private int[] availableCastles;
     private long timeControl;
     private long increment;

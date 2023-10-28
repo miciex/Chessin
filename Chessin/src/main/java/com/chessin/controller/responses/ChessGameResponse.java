@@ -59,6 +59,8 @@ public class ChessGameResponse {
 
         if(game.getMoves() != null)
             game.getMoves().stream().map(MoveResponse::fromMove).forEach(response.moves::add);
+        else
+            response.moves = new ArrayList<>();
 
         return response;
     }

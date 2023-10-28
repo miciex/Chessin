@@ -1,5 +1,7 @@
 package com.chessin.model.playing;
 
+import com.chessin.model.register.user.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
