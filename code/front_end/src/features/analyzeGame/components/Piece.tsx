@@ -2,14 +2,6 @@ import React, { useRef } from "react";
 import { Animated, Dimensions, PanResponder } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AnalyzeGameAction, AnalyzeGameState } from "../reducers/AnalyzeGameReducer";
-import {
-  GameResults,
-  possibleMovesAfterCheck,
-} from "../../../chess-logic/board";
-import { Move, moveFactory } from "../../../chess-logic/move";
-import { BoardResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
-import { updateUserRating } from "../../../services/userServices";
-import { mapToBoard } from "../../../chess-logic/helpMethods";
 
 const yellow = "rgba(255, 255, 0, 0.5)";
 type pos = { x: number; y: number };

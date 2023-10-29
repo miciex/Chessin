@@ -68,6 +68,7 @@ export default function Board({ state, dispatch, rotateBoard, ableToMove }: Prop
   }, [
     state.currentPosition,
     rotateBoard,
+    state
   ]);
 
   return activeValues.current.length > 0 ? (

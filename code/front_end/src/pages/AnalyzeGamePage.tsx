@@ -120,8 +120,8 @@ const styles = StyleSheet.create({
     width: "90%",
     flexDirection: "row",
     flexWrap: "wrap",
-    alignContent: "stretch",
-    rowGap: 4,
+    gap: 4,
+    backgroundColor: ColorsPallet.darker,
   },
   scrollView: {
     width: "100%",

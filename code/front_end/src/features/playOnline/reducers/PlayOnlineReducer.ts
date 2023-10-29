@@ -215,7 +215,7 @@ export function reducer(
               : action.payload.boardResponse.blackTime
           ),
         },
-        currentPosition: action.payload.boardResponse.moves.length - 1,
+        currentPosition: action.payload.boardResponse.moves.length > 0 ? action.payload.boardResponse.moves.length - 1 : 0,
       };
     case "setUpGame":
       const isMyPlayerWhite =

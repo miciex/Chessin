@@ -32,6 +32,7 @@ import {
 import { RouteProp } from "@react-navigation/native";
 import { BoardResponse, ChessGameResponse } from "../utils/ServicesTypes";
 import GameRecord from "../features/playOnline/components/GameRecord";
+import { ColorsPallet } from "../utils/Constants";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -225,12 +226,15 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.gameRecordContainer}>
       <GameRecord
         moves={state.board.moves}
         positions={state.board.positions}
         currentPosition={state.currentPosition}
         setCurrentPosition={setCurrentPosition}
       />
+    </View>
+      
       <SettingsGameModal
         toggleGear={toggleSettings}
         gearModalOn={showSettings}
@@ -286,4 +290,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-evenly",
   },
+  gameRecordContainer:{
+    width: "100%",
+    height: 24,
+    justifyContent: "center",
+    backgroundColor: ColorsPallet.dark,
+  }
 });

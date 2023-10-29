@@ -34,7 +34,7 @@ export default function GameRecordMove({
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    height: "100%",
+    height: 24,
     width: 50,
     justifyContent: "center",
     alignItems: "center",

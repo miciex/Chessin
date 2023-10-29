@@ -35,17 +35,8 @@ export default function GameRecord({
   });
 
   return (
-    <View style={styles.appContainer}>
-      <ScrollView horizontal={true}>{movesContent}</ScrollView>
-    </View>
+      <>{movesContent}</>
   );
 }
 
-const styles = StyleSheet.create({
-  appContainer: {
-    width: "100%",
-    height: 24,
-    backgroundColor: ColorsPallet.dark,
-    justifyContent: "center",
-  },
-});
+

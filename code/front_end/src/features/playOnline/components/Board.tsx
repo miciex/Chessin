@@ -17,7 +17,12 @@ type Props = {
 
 const SIZE = Dimensions.get("window").width / 8;
 
-export default function Board({ state, dispatch, rotateBoard, ableToMove }: Props) {
+export default function Board({
+  state,
+  dispatch,
+  rotateBoard,
+  ableToMove,
+}: Props) {
   const activeValues = useRef<Animated.Value[]>([]);
   const possibleMoves = useRef<Animated.Value[]>([]);
 
@@ -45,7 +50,15 @@ export default function Board({ state, dispatch, rotateBoard, ableToMove }: Prop
   const pieces = useMemo<JSX.Element[]>(() => {
     resetActiveValues();
     resetPossibleMoves();
-    let brd = mapToBoard(state.board.positions[state.currentPosition]).map((piece, i) => {
+    console.log("Current positions: ");
+    console.log(state.currentPosition);
+    let position =
+      (state.board.positions.length === 0 ||
+      state.currentPosition >= state.board.positions.length ||
+      state.currentPosition < 0)
+        ? state.board.visualBoard
+        : mapToBoard(state.board.positions[state.currentPosition]);
+    let brd = position.map((piece, i) => {
       const y = rotateBoard ? 7 - Math.floor(i / 8) : Math.floor(i / 8);
       const x = rotateBoard ? 7 - (i % 8) : i % 8;
       const position = rotateBoard ? 63 - i : i;
