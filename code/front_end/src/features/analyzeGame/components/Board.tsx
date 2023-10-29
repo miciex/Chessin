@@ -2,15 +2,12 @@ import { View, Dimensions, StyleSheet, Animated } from "react-native";
 import Piece from "./Piece";
 import Background from "../../../components/Background";
 import React, { useRef, useEffect, useMemo } from "react";
-import {
-  PlayOnlineAction,
-  PlayOnlineState,
-} from "../reducers/PlayOnlineReducer";
+import { AnalyzeGameAction, AnalyzeGameState} from "../reducers/AnalyzeGameReducer";
 import { mapToBoard } from "../../../chess-logic/helpMethods";
 
 type Props = {
-  state: PlayOnlineState;
-  dispatch: React.Dispatch<PlayOnlineAction>;
+  state: AnalyzeGameState;
+  dispatch: React.Dispatch<AnalyzeGameAction>;
   rotateBoard: boolean;
   ableToMove: boolean;
 };
@@ -45,7 +42,8 @@ export default function Board({ state, dispatch, rotateBoard, ableToMove }: Prop
   const pieces = useMemo<JSX.Element[]>(() => {
     resetActiveValues();
     resetPossibleMoves();
-    let brd = mapToBoard(state.board.positions[state.currentPosition]).map((piece, i) => {
+    if(state.positions.length === 0) return [];
+    let brd = mapToBoard(state.positions[state.currentPosition]).map((piece, i) => {
       const y = rotateBoard ? 7 - Math.floor(i / 8) : Math.floor(i / 8);
       const x = rotateBoard ? 7 - (i % 8) : i % 8;
       const position = rotateBoard ? 63 - i : i;
@@ -68,10 +66,7 @@ export default function Board({ state, dispatch, rotateBoard, ableToMove }: Prop
     });
     return brd;
   }, [
-    state.board,
     state.currentPosition,
-    state.searchingGame,
-    state.board.visualBoard,
     rotateBoard,
   ]);
 

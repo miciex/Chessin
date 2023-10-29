@@ -6,22 +6,27 @@ import {
   PlayOnlineAction,
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
+import { Move } from "../../../chess-logic/move";
 
 type Props = {
-  state: PlayOnlineState;
-  dispatch: React.Dispatch<PlayOnlineAction>;
+  moves: Move[];
+  setCurrentPosition: (position: number) => void;
+  positions: Array<{[key:number]:number}>;
+  currentPosition: number;
 };
 export default function GameRecord({
-  state: { board, currentPosition },
-  dispatch,
+  moves,
+  setCurrentPosition,
+  positions,
+  currentPosition
 }: Props) {
-  const movesContent = board.moves.map((move, index) => {
+  const movesContent = moves.map((move, index) => {
     return (
       <GameRecordMove
-        move={moveToChessNotation(board, move)}
+        move={moveToChessNotation(positions[index], move)}
         key={index}
         handlePress={() => {
-          dispatch({ type: "setCurrentPosition", payload: index });
+          setCurrentPosition(index);
         }}
         currentPosition={currentPosition}
         id={index}

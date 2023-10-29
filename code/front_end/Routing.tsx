@@ -129,7 +129,11 @@ const Routing = () => {
         >
           <Stack.Screen
             name="Home"
-            component={HomePage}
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "Home">
+            ) => (
+              <HomePage {...props} setUserAuthenticated={setUserAuthenticated} />
+            )}
             options={({ navigation }) => ({
               headerStyle: styles.header,
               headerTitle: () => getHeader(navigation),
@@ -164,11 +168,7 @@ const Routing = () => {
           />
           <Stack.Screen
             name="Login"
-            children={(
-              props: NativeStackScreenProps<RootStackParamList, "Login">
-            ) => (
-              <Login {...props} setUserAuthenticated={setUserAuthenticated} />
-            )}
+            component={Login}
             options={({ navigation }) => ({
               headerStyle: styles.header,
               headerTitle: () => getHeader(navigation),

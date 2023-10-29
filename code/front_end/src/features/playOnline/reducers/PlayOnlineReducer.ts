@@ -13,7 +13,6 @@ import {
 import { Move } from "../../../chess-logic/move";
 import { getInitialOnlineBoard } from "..";
 import { BoardResponse, ChessGameResponse } from "../../../utils/ServicesTypes";
-import { cancelSearch } from "../services/playOnlineService";
 
 export type PlayOnlineState = {
   board: OnlineBoardType;

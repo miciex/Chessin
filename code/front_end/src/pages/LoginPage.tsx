@@ -25,10 +25,9 @@ import BaseButton from "../components/BaseButton";
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login", undefined>;
   route: RouteProp<RootStackParamList, "Login">;
-  setUserAuthenticated: ()=>void;
 };
 
-export default function Login({ navigation, setUserAuthenticated }: Props) {
+export default function Login({ navigation }: Props) {
   const [email, setEmail] = useState<string>("");
   const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
   const [password, setPassword] = useState<string>("");
@@ -99,10 +98,6 @@ export default function Login({ navigation, setUserAuthenticated }: Props) {
         .json()
         .then((data) => {
           setUserDataFromResponse(data);
-        })
-        .then(() => {
-          setUserAuthenticated();
-          
         }).then(()=>{
           navigation.navigate("Home");
         })

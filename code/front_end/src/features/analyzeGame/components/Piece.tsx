@@ -1,18 +1,15 @@
 import React, { useRef } from "react";
 import { Animated, Dimensions, PanResponder } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import {
-  PlayOnlineAction,
-  PlayOnlineState,
-} from "../reducers/PlayOnlineReducer";
+import { AnalyzeGameAction, AnalyzeGameState } from "../reducers/AnalyzeGameReducer";
 import {
   GameResults,
   possibleMovesAfterCheck,
 } from "../../../chess-logic/board";
 import { Move, moveFactory } from "../../../chess-logic/move";
 import { BoardResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
-import { listenForMove, submitMove } from "../services/playOnlineService";
 import { updateUserRating } from "../../../services/userServices";
+import { mapToBoard } from "../../../chess-logic/helpMethods";
 
 const yellow = "rgba(255, 255, 0, 0.5)";
 type pos = { x: number; y: number };
@@ -65,8 +62,8 @@ const convertToIcon = (piece: Number) => {
 type Props = {
   id: number;
   position: pos;
-  state: PlayOnlineState;
-  dispatch: React.Dispatch<PlayOnlineAction>;
+  state: AnalyzeGameState;
+  dispatch: React.Dispatch<AnalyzeGameAction>;
   activeValues: React.MutableRefObject<Animated.Value[]>;
   possibleMoves: React.MutableRefObject<Animated.Value[]>;
   positionNumber: number;
@@ -93,9 +90,6 @@ export default function Piece({
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const panCut = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
-  const isMyTurn =
-    (state.myPlayer.color === "white") === state.board.whiteToMove;
-
   const findActiveValue = (): number => {
     for (let i = 0; i < 64; i++) {
       if (Number(JSON.stringify(activeValues.current[i])) === 1) {
@@ -115,61 +109,13 @@ export default function Piece({
     }
   };
 
-  const setPossibleMoves = (moves: number[]) => {
-    if (
-      (state.myPlayer.color === "white" && id > 16) ||
-      (state.myPlayer.color === "black" && id < 16) ||
-      id === 0
-    )
-      resetPossibleMoves();
-    else
-      for (let i = 0; i < 64; i++) {
-        if (moves.includes(i)) {
-          possibleMoves.current[i].setValue(1);
-        } else {
-          possibleMoves.current[i].setValue(0);
-        }
-      }
-  };
 
   const isPossibleMove = (id: number): boolean => {
     if (Number(JSON.stringify(possibleMoves.current[id])) === 1) return true;
     return false;
   };
 
-  const handleMove = (move: Move) => {
-    const submitMoveRequest: SubmitMoveRequest = {
-      gameId: state.gameId,
-      movedPiece: move.movedPiece,
-      startField: move.startField,
-      endField: move.endField,
-      promotePiece: move.promotePiece,
-      doesResign: false,
-    };
-    console.log("submitMoveRequest");
-    console.log(submitMoveRequest);
-    dispatch({
-      type: "playMove",
-      payload: move,
-    });
-    submitMove(submitMoveRequest)
-      .then((boardResponse: BoardResponse) => {
-        if (!boardResponse) return;
-        dispatch({
-          type: "setDataFromBoardResponse",
-          payload: { boardResponse },
-        });
-        listenForMove({
-          gameId: state.gameId,
-          moves: boardResponse.moves,
-        }).catch((err) => {
-          throw new Error(err);
-        });
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
-  };
+ 
 
   const panResponder = useRef(
     PanResponder.create({
@@ -177,28 +123,14 @@ export default function Piece({
       onMoveShouldSetPanResponder: () => true,
       onPanResponderTerminationRequest: () => true,
       onPanResponderStart() {
-        const activeField = findActiveValue();
-        if (isPossibleMove(positionNumber) && isMyTurn) {
-          if (ableToMove){
-          const move = moveFactory({
-            pieces: state.board.position,
-            startField: rotateBoard ? 63 -activeField: activeField,
-            endField: rotateBoard ? 63 - positionNumber : positionNumber,
-          });
-           handleMove(move);
-        }
+        if (isPossibleMove(positionNumber) ) {
 
           resetActiveValues();
           resetPossibleMoves();
 
           panCut.setValue({ x: 0, y: 0 });
         } else if (id !== 0) {
-          const possibleMoves = possibleMovesAfterCheck(
-            positionNumber,
-            state.board
-          );
           setValueActive(positionNumber);
-          setPossibleMoves(possibleMoves);
         }
       },
       onPanResponderMove(_, gestureState) {
@@ -209,24 +141,6 @@ export default function Piece({
         });
       },
       onPanResponderRelease: (_, gestureState) => {
-        const endField =
-          Math.round((position.x + gestureState.dx) / SIZE) +
-          Math.round((position.y + gestureState.dy) / SIZE) * 8;
-        if (isPossibleMove(endField) && isMyTurn) {
-          if (ableToMove){
-          const move = moveFactory({
-            pieces: state.board.position,
-            startField: rotateBoard ? 63 - positionNumber: positionNumber,
-            endField: rotateBoard ? 63 - endField : endField,
-          });
-
-          handleMove(move);
-          resetPossibleMoves();
-          setValueActive(endField);
-        }else 
-
-          resetPossibleMoves();
-        }
 
         Animated.spring(pan, {
           toValue: { x: 0, y: 0 },

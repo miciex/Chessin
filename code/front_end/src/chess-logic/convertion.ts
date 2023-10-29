@@ -1,11 +1,11 @@
 import { Move } from "./move"
 import { Board,canMoveToSquare } from "./board"
 import { Pieces } from "./ChessConstants";
-import { intToCharPiece, fieldNumberToChessNotation } from "./helpMethods";
+import { intToCharPiece, fieldNumberToChessNotation, mapToBoard } from "./helpMethods";
 import { ALPHABET } from "../utils/Constants";
 
 
-export const moveToChessNotation = (board: Board, move:Move) => {
+export const moveToChessNotation = (position: {[key:number]: number}, move:Move) => {
     let note:string = "";
     if (move.movedPiece == Pieces.KING && move.endField - move.startField == 2) {
         note = "O-O";
@@ -14,7 +14,7 @@ export const moveToChessNotation = (board: Board, move:Move) => {
     } else if (move.movedPiece % 8 != 2) {
         note += (intToCharPiece(move.movedPiece)).toUpperCase();
     } else if (move.movedPiece == Pieces.PAWN) {
-        for (let [key, value] of Object.entries(board.position)) {
+        for (let [key, value] of Object.entries(position)) {
             if (value != Pieces.PAWN && move.takenPiece == 0) continue;
             note += ALPHABET[move.startField % 8];
             break;
@@ -22,7 +22,7 @@ export const moveToChessNotation = (board: Board, move:Move) => {
     }
 
     if (move.movedPiece % 8 != Pieces.PAWN && move.movedPiece % 8 != Pieces.KING) {
-        const fromWhereCouldMove:Array<number> = canMoveToSquare(move.startField, move.movedPiece, board.visualBoard,move.movedPiece);
+        const fromWhereCouldMove:Array<number> = canMoveToSquare(move.startField, move.movedPiece, mapToBoard(position),move.movedPiece);
         if (fromWhereCouldMove.length > 1) {
             let row:boolean = false;
             let col:boolean = false;

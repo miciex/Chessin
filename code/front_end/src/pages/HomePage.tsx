@@ -81,6 +81,7 @@ const ended_games = [
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home", undefined>;
   route: RouteProp<RootStackParamList, "Home">;
+  setUserAuthenticated: ()=>void;
 };
 
 const HomePage = ({ navigation }: Props) => {

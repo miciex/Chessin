@@ -219,9 +219,18 @@ export default function PlayOnline({ navigation, route }: Props) {
     }
   };
 
+  const setCurrentPosition = (position: number) => {
+    dispatch({ type: "setCurrentPosition", payload: position });
+  };
+
   return (
     <View style={styles.container}>
-      <GameRecord state={state} dispatch={dispatch} />
+      <GameRecord
+        moves={state.board.moves}
+        positions={state.board.positions}
+        currentPosition={state.currentPosition}
+        setCurrentPosition={setCurrentPosition}
+      />
       <SettingsGameModal
         toggleGear={toggleSettings}
         gearModalOn={showSettings}

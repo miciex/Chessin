@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import BaseButton from "../components/BaseButton";
 import { ColorsPallet } from "../utils/Constants";
 import { UserLoggedInContext } from "../features/context/userloggedInContext";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -16,11 +17,15 @@ type Props = {
 
 export default function UserNotAuthenticatedPage({ navigation }: Props) {
 
-  const userLoggedIn = useContext(UserLoggedInContext);
 
-  if(userLoggedIn) {
-    navigation.navigate("Home");
-  }
+  useEffect(()=>{
+    getValueFor("user").then((value)=>{
+      if(value){
+        navigation.navigate("Home");
+      }});
+    },[]);
+
+  
 
   
 

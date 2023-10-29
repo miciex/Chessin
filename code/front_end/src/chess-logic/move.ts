@@ -123,3 +123,16 @@ const calcTakenPieceField = (
     return startField + (endField % 8) - (startField % 8);
   return endField;
 };
+
+export const moveResponseToMove = (moveResponse: MoveResponse): Move => {
+  return {
+    movedPiece: moveResponse.movedPiece,
+    startField: moveResponse.startField,
+    endField: moveResponse.endField,
+    takenPiece: moveResponse.takenPiece,
+    promotePiece: moveResponse.promotePiece,
+    continuations: [],
+    gaveCheck: moveResponse.gaveCheck,
+    takenPieceField: moveResponse.takenPieceField,
+  };
+}
