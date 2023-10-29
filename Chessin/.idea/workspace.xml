@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/Move.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/Move.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,6 +114,10 @@
       <workItem from="1698506540543" duration="371000" />
       <workItem from="1698506969482" duration="276000" />
       <workItem from="1698507250996" duration="5761000" />
+      <workItem from="1698520014538" duration="2032000" />
+      <workItem from="1698587712017" duration="101000" />
+      <workItem from="1698587864651" duration="394000" />
+      <workItem from="1698588652914" duration="1016000" />
     </task>
     <servers />
   </component>
