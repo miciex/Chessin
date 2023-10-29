@@ -16,7 +16,7 @@ import { RootStackParamList } from "../../../../Routing";
 type Props = {
   date: String;
   nick: string;
-  rank: Number;
+  rank: number;
   result?: string;
   navigation: NativeStackNavigationProp<
     RootStackParamList,
@@ -64,7 +64,7 @@ const EndedGame = ({ nick, rank, result, date, navigation, gameId }: Props) => {
         }}
       />   
         <Text>
-          {nick} {rank.toString()}
+          {nick} {Math.floor(rank)}
         </Text>
       </Pressable>
       </View>
