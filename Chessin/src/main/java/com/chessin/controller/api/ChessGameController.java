@@ -179,17 +179,18 @@ public class ChessGameController {
         if(!activeBoards.containsKey(id))
             return ResponseEntity.badRequest().body("Game not found.");
 
-        if(activeBoards.get(id).getMoves().size() > 0)
+        if(!activeBoards.get(id).getMoves().isEmpty())
             return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id))));
 
         synchronized(activeGames.get(id))
         {
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
 
-            if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().size() == 0)
+            if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty())
             {
                 Board endBoard = activeBoards.get(id);
                 endBoard.setGameResult(GameResults.ABANDONED);
+                chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
                 activeBoards.remove(id);
                 activeGames.remove(id);
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
@@ -216,6 +217,7 @@ public class ChessGameController {
                 if(board.getWhiteEmail().equals(email))
                 {
                     board.setGameResult(GameResults.WHITE_RESIGN);
+                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.WHITE_RESIGN);
                     activeBoards.replace(request.getGameId(), board);
                     if(activeGames.get(request.getGameId()).isRated())
                         activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
@@ -225,6 +227,7 @@ public class ChessGameController {
                 else if(board.getBlackEmail().equals(email))
                 {
                     board.setGameResult(GameResults.BLACK_RESIGN);
+                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.BLACK_RESIGN);
                     activeBoards.replace(request.getGameId(), board);
                     if(activeGames.get(request.getGameId()).isRated())
                         activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
@@ -241,6 +244,7 @@ public class ChessGameController {
             if(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
             {
                 board.setGameResult(GameResults.WHITE_TIMEOUT);
+                chessGameRepository.updateGameResult(request.getGameId(), GameResults.WHITE_TIMEOUT);
                 board.setWhiteTime(0);
                 activeBoards.replace(request.getGameId(), board);
                 if(activeGames.get(request.getGameId()).isRated())
@@ -251,6 +255,7 @@ public class ChessGameController {
             else if(board.getBlackTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
             {
                 board.setGameResult(GameResults.BLACK_TIMEOUT);
+                chessGameRepository.updateGameResult(request.getGameId(), GameResults.BLACK_TIMEOUT);
                 board.setBlackTime(0);
                 activeBoards.replace(request.getGameId(), board);
                 if(activeGames.get(request.getGameId()).isRated())
@@ -286,16 +291,15 @@ public class ChessGameController {
 
             board = chessGameService.submitMove(request, board, activeGames.get(request.getGameId()));
 
+            activeBoards.replace(request.getGameId(), board);
+
             if(board.getGameResult() != GameResults.NONE)
             {
-                activeBoards.replace(request.getGameId(), board);
                 if(activeGames.get(request.getGameId()).isRated())
                     activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
                 activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
-
-            activeBoards.replace(request.getGameId(), board);
 
             activeGames.get(request.getGameId()).notifyAll();
 
@@ -306,8 +310,9 @@ public class ChessGameController {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
+                chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
                 if(activeGames.get(request.getGameId()).isRated())
-                    chessGameService.updateRatings(activeGames.get(request.getGameId()), endBoard);
+                    endBoard = chessGameService.updateRatings(activeGames.get(request.getGameId()), endBoard);
                 activeGames.remove(request.getGameId());
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
@@ -358,6 +363,11 @@ public class ChessGameController {
 
         synchronized(activeGames.get(id))
         {
+            if(activeBoards.get(id).getWhiteEmail().equals(email))
+                activeBoards.get(id).setWhiteOffersDraw(true);
+            else
+                activeBoards.get(id).setBlackOffersDraw(true);
+
             activeGames.get(id).notifyAll();
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
 
@@ -366,26 +376,45 @@ public class ChessGameController {
                 Board endBoard = activeBoards.get(id);
                 activeBoards.remove(id);
                 activeGames.get(id).setGameResult(endBoard.getGameResult());
+                chessGameRepository.updateGameResult(id, endBoard.getGameResult());
                 if(activeGames.get(id).isRated())
-                    chessGameService.updateRatings(activeGames.get(id), endBoard);
+                    activeBoards.replace(id, chessGameService.updateRatings(activeGames.get(id), activeBoards.get(id)));
                 activeGames.remove(id);
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
-
-            return ResponseEntity.ok().body("Opponent has not accepted draw.");
+            else
+                return ResponseEntity.ok().body("Opponent has not accepted draw.");
         }
     }
 
-//    @PostMapping("/respondToDrawOffer")
-//    public ResponseEntity<?> respondToDrawOffer(@RequestBody RespondToDrawOfferRequest request, HttpServletRequest servlet)
-//    {
-//        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
-//
-//
-//        //check if this email is playing the game
-//        if(!activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && !activeBoards.get(request.getGameId()).getBlackEmail().equals(email))
-//            return ResponseEntity.badRequest().body("You are not playing this game.");
-//    }
+    @PostMapping("/respondToDrawOffer")
+    public ResponseEntity<?> respondToDrawOffer(@RequestBody RespondToDrawOfferRequest request, HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(!activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && !activeBoards.get(request.getGameId()).getBlackEmail().equals(email))
+            return ResponseEntity.badRequest().body("You are not playing this game.");
+
+        if(activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && activeBoards.get(request.getGameId()).isWhiteOffersDraw())
+            return ResponseEntity.badRequest().body("You cannot respond to your own draw offer.");
+        else if(activeBoards.get(request.getGameId()).getBlackEmail().equals(email) && activeBoards.get(request.getGameId()).isBlackOffersDraw())
+            return ResponseEntity.badRequest().body("You cannot respond to your own draw offer.");
+
+        if(request.getResponseType() == ResponseType.ACCEPT)
+        {
+            activeBoards.get(request.getGameId()).setGameResult(GameResults.DRAW_AGREEMENT);
+            chessGameRepository.updateGameResult(request.getGameId(), GameResults.DRAW_AGREEMENT);
+            activeGames.get(request.getGameId()).notifyAll();
+            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
+        }
+        else
+        {
+            activeBoards.get(request.getGameId()).setWhiteOffersDraw(false);
+            activeBoards.get(request.getGameId()).setBlackOffersDraw(false);
+            activeGames.get(request.getGameId()).notifyAll();
+            return ResponseEntity.ok().body("Draw offer declined.");
+        }
+    }
 
     @PostMapping("/getGame/{gameId}")
     public ResponseEntity<?> getGame(@PathVariable("gameId") String gameId)

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Primary;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -32,6 +33,7 @@ public class Move {
     int movesTo50MoveRule;
     int[] availableCastles;
     long remainingTime;
+    @Column(length = 512)
     int[] position;
 
     public Move(ChessGame game, HashMap<Integer, Integer> pieces, int startField, int endField, int promotePiece){
