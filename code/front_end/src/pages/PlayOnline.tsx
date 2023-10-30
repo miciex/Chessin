@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useReducer, useEffect } from "react";
 import { GameResults } from "../chess-logic/board";
 import {
@@ -227,12 +227,14 @@ export default function PlayOnline({ navigation, route }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.gameRecordContainer}>
+        <ScrollView horizontal={true} >
       <GameRecord
         moves={state.board.moves}
         positions={state.board.positions}
         currentPosition={state.currentPosition}
         setCurrentPosition={setCurrentPosition}
       />
+      </ScrollView>
     </View>
       
       <SettingsGameModal

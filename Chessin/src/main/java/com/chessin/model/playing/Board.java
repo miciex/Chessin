@@ -554,38 +554,12 @@ public class Board {
         return moves.size() > 0 ? moves.get(moves.size()-1) : new Move();
     }
 
-    public Optional<Long> getLastMoveTimeForColor(boolean white, boolean whiteStarts)
+    public Optional<Long> getLastMoveTimeForColor()
     {
-        if(moves.size() == 0 || moves.size() == 1 && (whiteStarts && !white || !whiteStarts && white))
+        if(moves.size() == 0 || moves.size()==1)
             return Optional.empty();
 
-        if(whiteStarts)
-        {
-            if(white)
-            {
-                return moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-2).getRemainingTime())
-                        : Optional.of(moves.get(moves.size()-1).getRemainingTime());
-            }
-            else
-            {
-                Optional<Long> time = moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-1).getRemainingTime())
-                        : Optional.of(moves.get(moves.size()-2).getRemainingTime());
-                return time;
-            }
-        }
-        else
-        {
-            if(white)
-            {
-                return moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-1).getRemainingTime())
-                        : Optional.of(moves.get(moves.size()-2).getRemainingTime());
-            }
-            else
-            {
-                return moves.size() % 2 == 0 ? Optional.of(moves.get(moves.size()-2).getRemainingTime())
-                        : Optional.of(moves.get(moves.size()-1).getRemainingTime());
-            }
-        }
+        return Optional.of(moves.get(moves.size()-2).getRemainingTime());
     }
 
     public void removeLastMove(){ if(moves.size()>0) moves.remove(moves.size()-1);}

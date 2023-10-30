@@ -4,10 +4,7 @@ import com.chessin.model.utils.Constants;
 import com.chessin.model.utils.HelpMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.context.annotation.Primary;
 
 import java.util.HashMap;
@@ -54,6 +51,10 @@ public class Move {
         this.takenPiece = calcTakenPiece(pieces);
         this.takenPieceField = calcTakenPieceField(pieces);
         this.position = HelpMethods.getPositionFromHashmap(pieces);
+    }
+
+    public void setPosition(HashMap<Integer, Integer> position){
+        this.position = HelpMethods.getPositionFromHashmap(position);
     }
 
     private int calcTakenPiece(HashMap<Integer, Integer> pieces){

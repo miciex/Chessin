@@ -81,13 +81,18 @@ public class ChessGameService {
         Move move = new Move(game, board.getPosition(), request.getStartField(), request.getEndField(), request.getPromotePiece());
 
         long now = Instant.now().toEpochMilli();
-        if(!board.isWhiteTurn()) {
-            board.setWhiteTime(board.getLastMoveTimeForColor(true, game.isWhiteStarts()).orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
-            move.setRemainingTime(board.getWhiteTime());
+        if(board.getMoves().size()>0) {
+            if (board.isWhiteTurn()) {
+                board.setWhiteTime(board.getLastMoveTimeForColor().orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+                move.setRemainingTime(board.getWhiteTime());
+            } else {
+                board.setBlackTime(board.getLastMoveTimeForColor().orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
+                move.setRemainingTime(board.getBlackTime());
+            }
         }
-        else {
-            board.setBlackTime(board.getLastMoveTimeForColor(false, game.isWhiteStarts()).orElse(game.getTimeControl()) - Math.abs(board.getLastMoveTime() - now) + game.getIncrement());
-            move.setRemainingTime(board.getBlackTime());
+        else
+        {
+            move.setRemainingTime(game.getTimeControl() + game.getIncrement());
         }
 
         board.makeMove(move);
@@ -96,6 +101,7 @@ public class ChessGameService {
         board.setGameResult(board.checkGameResult());
         board.setVisualBoard(Convert.mapToBoard(board.getPosition()));
         move.setAvailableCastles(board.getAvailableCastles());
+        move.setPosition(board.getPosition());
 
         board.setLastMoveTime(now);
 

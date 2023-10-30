@@ -37,6 +37,7 @@ public class ChessGameResponse {
     private double whiteRatingChange;
     private double blackRatingChange;
     private boolean isRated;
+    private long startTime;
 
     public static ChessGameResponse fromChessGame(ChessGame game, ClassicalRatingRepository classicalRatingRepository, RapidRatingRepository rapidRatingRepository, BlitzRatingRepository blitzRatingRepository, BulletRatingRepository bulletRatingRepository){
         ChessGameResponse response = ChessGameResponse.builder()
@@ -55,6 +56,7 @@ public class ChessGameResponse {
                 .whiteRatingChange(game.getWhiteRatingChange())
                 .blackRatingChange(game.getBlackRatingChange())
                 .isRated(game.isRated())
+                .startTime(game.getStartTime())
                 .build();
 
         if(game.getMoves() != null)

@@ -311,8 +311,8 @@ public class ChessGameController {
                 activeBoards.remove(request.getGameId());
                 activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
                 chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
-                if(activeGames.get(request.getGameId()).isRated())
-                    endBoard = chessGameService.updateRatings(activeGames.get(request.getGameId()), endBoard);
+//                if(activeGames.get(request.getGameId()).isRated())
+//                    endBoard = chessGameService.updateRatings(activeGames.get(request.getGameId()), endBoard);
                 activeGames.remove(request.getGameId());
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
