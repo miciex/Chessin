@@ -249,7 +249,7 @@ export default function PlayOnline({ navigation, route }: Props) {
         <Bar
           state={state}
           dispatch={dispatch}
-          isMyPlayer={false === !rotateBoard}
+          rotateBoard={!rotateBoard}
         />
         <TestBoard
           state={state}
@@ -267,7 +267,7 @@ export default function PlayOnline({ navigation, route }: Props) {
         <Bar
           state={state}
           dispatch={dispatch}
-          isMyPlayer={true === !rotateBoard}
+          rotateBoard={rotateBoard}
         />
         <GameFinishedOverlay
           state={state}
