@@ -344,6 +344,7 @@ public class ChessGameController {
         }
     }
 
+    @Transactional
     @PostMapping("/offerDraw/{gameId}")
     public ResponseEntity<?> offerDraw(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -371,14 +372,13 @@ public class ChessGameController {
             activeGames.get(id).notifyAll();
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
 
-            if(activeGames.get(id).getGameResult() == GameResults.DRAW_AGREEMENT)
+            if(activeBoards.get(id).getGameResult() != GameResults.NONE)
             {
                 Board endBoard = activeBoards.get(id);
                 activeBoards.remove(id);
-                activeGames.get(id).setGameResult(endBoard.getGameResult());
-                chessGameRepository.updateGameResult(id, endBoard.getGameResult());
+                chessGameRepository.updateGameResult(id, GameResults.DRAW_AGREEMENT);
                 if(activeGames.get(id).isRated())
-                    activeBoards.replace(id, chessGameService.updateRatings(activeGames.get(id), activeBoards.get(id)));
+                    activeBoards.replace(id, chessGameService.updateRatings(activeGames.get(id), endBoard));
                 activeGames.remove(id);
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
@@ -387,6 +387,7 @@ public class ChessGameController {
         }
     }
 
+    @Transactional
     @PostMapping("/respondToDrawOffer")
     public ResponseEntity<?> respondToDrawOffer(@RequestBody RespondToDrawOfferRequest request, HttpServletRequest servlet)
     {
@@ -400,19 +401,23 @@ public class ChessGameController {
         else if(activeBoards.get(request.getGameId()).getBlackEmail().equals(email) && activeBoards.get(request.getGameId()).isBlackOffersDraw())
             return ResponseEntity.badRequest().body("You cannot respond to your own draw offer.");
 
-        if(request.getResponseType() == ResponseType.ACCEPT)
+        synchronized(activeGames.get(request.getGameId()))
         {
-            activeBoards.get(request.getGameId()).setGameResult(GameResults.DRAW_AGREEMENT);
-            chessGameRepository.updateGameResult(request.getGameId(), GameResults.DRAW_AGREEMENT);
-            activeGames.get(request.getGameId()).notifyAll();
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
-        }
-        else
-        {
-            activeBoards.get(request.getGameId()).setWhiteOffersDraw(false);
-            activeBoards.get(request.getGameId()).setBlackOffersDraw(false);
-            activeGames.get(request.getGameId()).notifyAll();
-            return ResponseEntity.ok().body("Draw offer declined.");
+            if(request.getResponseType() == ResponseType.ACCEPT)
+            {
+                activeGames.get(request.getGameId()).setGameResult(GameResults.DRAW_AGREEMENT);
+                activeBoards.get(request.getGameId()).setGameResult(GameResults.DRAW_AGREEMENT);
+                //chessGameRepository.updateGameResult(request.getGameId(), GameResults.DRAW_AGREEMENT);
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
+            }
+            else
+            {
+                activeBoards.get(request.getGameId()).setWhiteOffersDraw(false);
+                activeBoards.get(request.getGameId()).setBlackOffersDraw(false);
+                activeGames.get(request.getGameId()).notifyAll();
+                return ResponseEntity.ok().body("Draw offer declined.");
+            }
         }
     }
 
