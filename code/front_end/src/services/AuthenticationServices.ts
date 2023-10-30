@@ -70,15 +70,13 @@ export const changePassword = async (
 export const remindPassword = async (
   remindPasswordRequest: PasswordRemindRequest
 ) => {
-  return await fetch(remindPasswordLink, {
+  return fetch(remindPasswordLink, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(remindPasswordRequest),
-  }).catch((err) => {
-    throw new Error(err);
-  });
+  })
 };
 
 export const twoFaEnabled = async (

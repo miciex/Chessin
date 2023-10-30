@@ -1,5 +1,5 @@
 import { View, StyleSheet, ScrollView } from "react-native";
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
@@ -12,7 +12,12 @@ import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import {
   reducer,
   initialState,
-} from "../features/playOnline/reducers/PlayOnlineReducer";
+} from "../features/analyzeGame/reducers/AnalyzeGameReducer";
+import GameRecordMove from "../features/playOnline/components/GameRecordMove";
+import { moveToChessNotation } from "../chess-logic/convertion";
+import Board from "../features/analyzeGame/components/Board";
+import { getGameById } from "../services/chessGameService";
+import { ChessGameResponse } from "../utils/ServicesTypes";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -23,29 +28,64 @@ type Props = {
   route: RouteProp<RootStackParamList, "AnalyzeGame">;
 };
 
-export default function AnalyzeGame({ navigation }: Props) {
+export default function AnalyzeGame({ navigation, route }: Props) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const analyzisContent = sampleMoves.map((move, index) => (
-    <StringMoveToText move={move} key={index} />
-  ));
+  useEffect(() => {
+    getGameById(String(route.params.gameId))
+      .then((response) => {
+        if (response.status === 200) {
+          response.json().then((chessGameResponse: ChessGameResponse) => {
+            dispatch({
+              type: "setDataFromChessGameResponse",
+              payload: chessGameResponse,
+            });
+          });
+        } else if (response.status === 400) {
+          response
+            .text()
+            .then((error) => {
+              throw new Error(error);
+            })
+            .catch((error) => {
+              throw new Error(error);
+            });
+        } else throw new Error("Something went wrong");
+      })
+      .catch((error) => {
+        throw new Error("Something went wrong");
+      });
+  }, []);
+
+  const changeCurrentPosition = (position: number) => {
+    dispatch({ type: "setCurrentPosition", payload: position });
+  };
 
   return (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
-        <View style={styles.gameRecordContainer}>
-          <GameRecord state={state} dispatch={dispatch} />
-        </View>
         <View style={styles.mainContentContainer}>
           <View style={styles.boardContainer}>
-            <PlayOnlineBoard state={state} dispatch={dispatch} />
+            <Board
+              state={state}
+              dispatch={dispatch}
+              rotateBoard={false}
+              ableToMove={false}
+            />
           </View>
         </View>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={{ alignItems: "center" }}
         >
-          <View style={styles.analyzisContainer}>{analyzisContent}</View>
+          <View style={styles.analyzisContainer}>
+            <GameRecord
+              moves={state.moves}
+              positions={state.positions}
+              currentPosition={state.currentPosition}
+              setCurrentPosition={changeCurrentPosition}
+            />
+          </View>
         </ScrollView>
       </View>
       <Footer navigation={navigation} />
@@ -80,8 +120,8 @@ const styles = StyleSheet.create({
     width: "90%",
     flexDirection: "row",
     flexWrap: "wrap",
-    alignContent: "stretch",
-    rowGap: 4,
+    gap: 4,
+    backgroundColor: ColorsPallet.darker,
   },
   scrollView: {
     width: "100%",

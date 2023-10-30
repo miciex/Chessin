@@ -14,6 +14,9 @@ import { User, responseUserToUser } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { fetchUser } from "../services/userServices";
 import { FriendInvitationResponseType } from "../utils/ServicesTypes";
+import LogoutButton from "../components/LogoutButton";
+import { getGameHistory } from "../services/chessGameService";
+import { ChessGameResponse } from "../utils/ServicesTypes";
 
 const ended_games = [
   {
@@ -86,71 +89,110 @@ type Props = {
   >;
 
   route: RouteProp<RootStackParamList, "ProfilePage">;
+  setUserNotAuthenticated: ()=>void;
 };
 
-export default function ProfilePage({ navigation, route }: Props) {
-  const [user, setUser] = useState<User>({firstname: "", lastname:"",email:"",nameInGame:"",country:"",ranking:{CLASSICAL:0,BLITZ:0,BULLET:0,RAPID:0},highestRanking:0});
+export default function ProfilePage({ navigation, route, setUserNotAuthenticated }: Props) {
+  const [user, setUser] = useState<User>();
+  const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
   const [user2, setUser2] = useState<User>();
   const [ifMyAccount, setIfMyAccount] = useState<boolean>();
-  
+
   const nameInGame = route?.params?.nameInGame;
   const goToFriendsMenu = () => {
-    navigation.navigate("Friends", {nameInGame:(user2?.nameInGame ? user2?.nameInGame : user?.nameInGame  )});
+    navigation.navigate("Friends", {
+      nameInGame: user2?.nameInGame ? user2?.nameInGame : user ? user?.nameInGame : "",
+    });
   };
 
-useEffect(()=>{
-  getValueFor("user").then((data) => {
-    if (data === null) return;
-    setUser(JSON.parse(data));
-  })
-  
-}, [])
-  
   useEffect(() => {
-    if(user.nameInGame==nameInGame || nameInGame===undefined){
-      setIfMyAccount(true)
-      setUser2(undefined)
-    }
-     else{
-      setIfMyAccount(false)
-     } 
-     console.log()
-    if(!(user.nameInGame==nameInGame || nameInGame===undefined)&&nameInGame){
-    
-      fetchUser(nameInGame).then((user) => {
-        if (user === null){
-          return;
-        } 
-        setUser2(user);
+    getValueFor("user")
+      .then((user) => {
+        if (!user) return navigation.navigate("UserNotAuthenticated");
+        let parsedUser: User = JSON.parse(user);
+        if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
+        setUser(parsedUser);
+        getGameHistory(user2 ? user2.nameInGame : parsedUser.nameInGame).then((response) => {
+          if (response.status === 200) {
+            response
+              .json()
+              .then((data: ChessGameResponse[]) => {
+                setUserGames(data);
+              })
+              .catch((error) => {
+                console.error(error);
+                throw new Error("Couldn't load game history");
+              });
+          } else throw new Error("Couldn't load game history");
+        });
       })
-    };
-    
-  }, [nameInGame, user]);
-  
+      .catch((error) => {
+        navigation.navigate("UserNotAuthenticated");
+        throw new Error(error);
+      });
+  }, []);
 
-  let component = ended_games.slice(0, 5).map((game) => {
-    return (
+  useEffect(() => {
+    if (user &&(user.nameInGame == nameInGame) || nameInGame === undefined) {
+      setIfMyAccount(true);
+      setUser2(undefined);
+    } else {
+      setIfMyAccount(false);
+    }
+    if (
+      !(user&&(user.nameInGame == nameInGame) || nameInGame === undefined) &&
+      nameInGame
+    ) {
+      fetchUser(nameInGame)
+        .then((user) => {
+          if (user === null) {
+            return;
+          }
+          console.log("changing the value of user: " + user);
+          setUser2(user);
+        })
+        .catch((err) => {
+          console.log("failed to fetch user");
+          throw new Error(err);
+        });
+    }
+  }, [nameInGame, user]);
+
+  let component = userGames.slice(0, 5).map((game) => (
+    <View style={{ width: "90%" }}>
       <EndedGame
-        nick={game.playerNick}
-        date={game.date}
-        rank={game.rank}
+        nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
+        rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
+        result={"win"}
         navigation={navigation}
+        key={`${game.id}${user?.nameInGame}`}
+        date={"2023.10.27"}
+        gameId={game.id}
       />
-    );
-  });
+    </View>
+  ))
 
   const playWithFriend = () => {
-    navigation.navigate("PlayWithFriendsMenu", {userArg: user2? user2: user});
+    let userArg: User;
+    if(user2) userArg = user2
+    else if(user) userArg = user
+    else return;
+    navigation.navigate("PlayWithFriendsMenu", {
+      userArg: userArg,
+    });
   };
 
   const toOldGames = () => {
     navigation.navigate("LastGame");
   };
 
-  const handleAddFriend = ( ) => {
-    addFriendFunc({friendNickname: user2 ? user2.nameInGame : ""}).then((data)=>{
-    }).catch(err => {throw new Error(err)})
-  }
+  const handleAddFriend = () => {
+    addFriendFunc({ friendNickname: user2 ? user2.nameInGame : "" })
+      .then((data) => {})
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
 
   const [friends, setFriends] = useState<Array<User>>([])
   const [invitations, setInvitations] = useState<Array<User>>([])
@@ -173,26 +215,38 @@ useEffect(()=>{
      
   }, [nameInGame, user?.nameInGame])
 
+  useEffect(() => {
+    if (nameInGame)
+      getFriendsList(nameInGame).then((data) => {
+        if (data === undefined) return;
+        setFriends(data.map((x) => responseUserToUser(x, "")));
+      });
+  }, [nameInGame, user?.nameInGame]);
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.profile}>
           <Profile
-            nick={user2 ?user2.nameInGame : user.nameInGame }
-            rank={user2 ? user2.ranking : user.ranking}
-            active={user2 ? user2.online : user.online}
-            playing={user2 ? user2.playing : user.playing}
-            country={user2 ? user2.country : user.country}
+            nick={user2 ? user2.nameInGame : user ?user.nameInGame : ""}
+            rank={user2 ? user2.ranking : (user  ? user.ranking: undefined )}
+            active={user2 ? user2.online : user ? user.online : false}
+            playing={user2 ? user2.playing : user ? user.playing : false}
+            country={user2 ? user2.country : user ? user.country :""}
           />
         </View>
 
-        {
-            ifMyAccount || checkNicknameInObjects(friends, user?.nameInGame ? user?.nameInGame: "") || checkNicknameInObjects(invitations, user2?.nameInGame ? user2.nameInGame: "")? "" : <View style={styles.invite}>
+        {ifMyAccount ||
+        checkNicknameInObjects(
+          friends,
+          user?.nameInGame ? user?.nameInGame : ""
+        ) ? (
+          <LogoutButton navigation={navigation} setUserNotAuthenticated={setUserNotAuthenticated}/>
+        ) : (
+          <View style={styles.invite}>
             <BaseButton
               handlePress={() => {
-                
-                handleAddFriend()
+                handleAddFriend;
               }}
               text="Send invitation"
             />
@@ -223,9 +277,11 @@ useEffect(()=>{
           text={"Friends"}
           navigation={navigation}
           stringNavigation={goToFriendsMenu}
-
         />
-        <FriendsIconList navigation={navigation} nameInGame={user2 ? user2.nameInGame : user.nameInGame}/>
+        <FriendsIconList
+          navigation={navigation}
+          nameInGame={user2 ? user2.nameInGame : user ? user.nameInGame: ""}
+        />
         <Heading
           text={"Old Games"}
           navigation={navigation}

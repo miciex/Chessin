@@ -10,12 +10,22 @@ type Props = {
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
   toggleSettings: () => void;
+  toggleRotateBoard: () => void;
 };
 
-export default function PlayOnlineBar({ toggleSettings }: Props) {
+export default function PlayOnlineBar({
+  toggleSettings,
+  toggleRotateBoard,
+}: Props) {
   return (
     <View style={styles.gameOptionsContainer}>
       <FontAwesome name="flag-o" size={34} color="black" onPress={() => {}} />
+      <FontAwesome
+        name="retweet"
+        size={24}
+        color="black"
+        onPress={toggleRotateBoard}
+      />
       <FontAwesome
         name="gear"
         size={34}

@@ -29,9 +29,13 @@ type Props = {
     undefined
   >;
   route: RouteProp<RootStackParamList, "ResetPassword">;
+  setUserNotAuthenticated: () => void;
 };
 
-export default function ResetPasswordPage({ navigation }: Props) {
+export default function ResetPasswordPage({
+  navigation,
+  setUserNotAuthenticated,
+}: Props) {
   const [email, setEmail] = useState<string>("");
   const [emailValid, setEmailValid] = useState<boolean>(true);
 
@@ -61,7 +65,13 @@ export default function ResetPasswordPage({ navigation }: Props) {
     twoFaEnabled({ email })
       .then((response) => {
         if (response.status === 200) {
-          logoutUser();
+          logoutUser()
+            .then(() => {
+              setUserNotAuthenticated();
+            })
+            .catch((err) => {
+              throw new Error(err);
+            });
           return response.text() as unknown as TwoFactorAuthenticationResponse;
         } else if (response.status === 400) {
           response
@@ -93,7 +103,7 @@ export default function ResetPasswordPage({ navigation }: Props) {
         if (response.status === 202) {
           setShowCodeModal(true);
         } else if (response.status === 200) {
-          navigation.navigate("Home");
+          navigation.navigate("UserNotAuthenticated");
         } else if (response.status === 400) {
           response
             .text()

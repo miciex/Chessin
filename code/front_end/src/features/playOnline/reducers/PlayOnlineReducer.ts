@@ -13,7 +13,6 @@ import {
 import { Move } from "../../../chess-logic/move";
 import { getInitialOnlineBoard } from "..";
 import { BoardResponse, ChessGameResponse } from "../../../utils/ServicesTypes";
-import { cancelSearch } from "../services/playOnlineService";
 
 export type PlayOnlineState = {
   board: OnlineBoardType;
@@ -197,7 +196,6 @@ export function reducer(
         },
       };
     case "setDataFromBoardResponse":
-      console.log(action.payload.boardResponse.moves);
       return {
         ...state,
         board: BoardResponseToOnlineBoard(action.payload.boardResponse),
@@ -217,7 +215,7 @@ export function reducer(
               : action.payload.boardResponse.blackTime
           ),
         },
-        currentPosition: action.payload.boardResponse.moves.length - 1,
+        currentPosition: action.payload.boardResponse.moves.length > 0 ? action.payload.boardResponse.moves.length - 1 : 0,
       };
     case "setUpGame":
       const isMyPlayerWhite =

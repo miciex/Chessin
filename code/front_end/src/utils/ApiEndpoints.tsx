@@ -1,4 +1,4 @@
-export const baseLink = "http:/192.168.10.136:8080/api/v1/";
+export const baseLink = "http://192.168.141.70:8080/api/v1/";
 export const authLink = `${baseLink}auth/`;
 export const registerLink = `${authLink}register`;
 export const authenticateLink = `${authLink}authenticate`;
@@ -10,7 +10,6 @@ export const twofaEnabledLink = `${authLink}2faEnabled`;
 export const userLink = `${baseLink}user/`;
 export const findByNicknameLink = `${userLink}findByNickname/`;
 export const setActive = `${userLink}setActive`;
-
 export const checkInvitationsLink = `${userLink}checkInvitations`;
 export const respondtoInvitationLink = `${userLink}respondToInvitation`;
 export const removeFriendLink = `${userLink}removeFriend`;
@@ -30,3 +29,5 @@ export const findUsersByNickname = `${userLink}findUsersByNickname/`;
 export const getFriends = `${userLink}getFriends/`;
 export const getUsersByNicknameLink = `${userLink}getUsersByNickname/`;
 export const getBoardbyGameIdLink = `${chessGameLink}getBoardByGameId/`;
+export const getGameHistoryLink = `${userLink}getGames/`;
+export const getGameByIdLink = `${chessGameLink}getGame/`

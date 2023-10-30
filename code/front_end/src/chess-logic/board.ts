@@ -32,6 +32,7 @@ export const enum GameResults {
   WHITE_TIMEOUT = "WHITE_TIMEOUT",
   BLACK_TIMEOUT = "BLACK_TIMEOUT",
   DRAW_AGREEMENT = "DRAW_AGREEMENT",
+  ABANDONED = "ABANDONED",
 }
 
 export enum GameType {
@@ -83,6 +84,7 @@ export const BoardResponseToOnlineBoard = (
   boardResponse: BoardResponse
 ): OnlineBoardType => {
   const moves = boardResponse.moves.map((move) => moveFactory(move));
+  
   return {
     fen: boardResponse.startBoard,
     visualBoard: boardResponse.visualBoard,

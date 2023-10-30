@@ -70,6 +70,10 @@ type Props = {
   activeValues: React.MutableRefObject<Animated.Value[]>;
   possibleMoves: React.MutableRefObject<Animated.Value[]>;
   positionNumber: number;
+  resetActiveValues: () => void;
+  resetPossibleMoves: () => void;
+  ableToMove: boolean;
+  rotateBoard: boolean;
 };
 
 export default function Piece({
@@ -80,16 +84,17 @@ export default function Piece({
   activeValues,
   possibleMoves,
   positionNumber,
+  resetActiveValues,
+  resetPossibleMoves,
+  ableToMove,
+  rotateBoard,
 }: Props) {
   // const translate = new Animated.ValueXY({ x: position.x, y: position.y });
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const panCut = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
-  const resetActiveValues = () => {
-    for (let i = 0; i < 64; i++) {
-      activeValues.current[i].setValue(0);
-    }
-  };
+  const isMyTurn =
+    (state.myPlayer.color === "white") === state.board.whiteToMove;
 
   const findActiveValue = (): number => {
     for (let i = 0; i < 64; i++) {
@@ -107,12 +112,6 @@ export default function Piece({
       } else {
         activeValues.current[i].setValue(0);
       }
-    }
-  };
-
-  const resetPossibleMoves = () => {
-    for (let i = 0; i < 64; i++) {
-      possibleMoves.current[i].setValue(0);
     }
   };
 
@@ -145,14 +144,17 @@ export default function Piece({
       startField: move.startField,
       endField: move.endField,
       promotePiece: move.promotePiece,
-      isDrawOffered: false,
+      doesResign: false,
     };
+    console.log("submitMoveRequest");
+    console.log(submitMoveRequest);
     dispatch({
       type: "playMove",
       payload: move,
     });
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
+        if (!boardResponse) return;
         dispatch({
           type: "setDataFromBoardResponse",
           payload: { boardResponse },
@@ -176,13 +178,15 @@ export default function Piece({
       onPanResponderTerminationRequest: () => true,
       onPanResponderStart() {
         const activeField = findActiveValue();
-        if (isPossibleMove(positionNumber)) {
+        if (isPossibleMove(positionNumber) && isMyTurn) {
+          if (ableToMove){
           const move = moveFactory({
             pieces: state.board.position,
-            startField: activeField,
-            endField: positionNumber,
+            startField: rotateBoard ? 63 - activeField: activeField,
+            endField: rotateBoard ? 63 - positionNumber : positionNumber,
           });
-          handleMove(move);
+           handleMove(move);
+        }
 
           resetActiveValues();
           resetPossibleMoves();
@@ -208,16 +212,20 @@ export default function Piece({
         const endField =
           Math.round((position.x + gestureState.dx) / SIZE) +
           Math.round((position.y + gestureState.dy) / SIZE) * 8;
-        if (isPossibleMove(endField)) {
+        if (isPossibleMove(rotateBoard ? 63 - endField : endField) && isMyTurn) {
+          if (ableToMove){
           const move = moveFactory({
             pieces: state.board.position,
-            startField: positionNumber,
-            endField,
+            startField: rotateBoard ? 63 - positionNumber: positionNumber,
+            endField: rotateBoard ? 63 - endField : endField,
           });
-          console.log();
+
           handleMove(move);
           resetPossibleMoves();
           setValueActive(endField);
+        }else 
+
+          resetPossibleMoves();
         }
 
         Animated.spring(pan, {

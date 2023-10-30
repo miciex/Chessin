@@ -16,16 +16,17 @@ import { RootStackParamList } from "../../../../Routing";
 type Props = {
   date: String;
   nick: string;
-  rank: Number;
+  rank: number;
   result?: string;
   navigation: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
     undefined
   >;
+  gameId: number
 };
 
-const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
+const EndedGame = ({ nick, rank, result, date, navigation, gameId }: Props) => {
   const Result = () => {
     if (result == "win") {
       return <FontAwesome5 name="trophy" size={17} color="rgb(235, 203, 47)" />;
@@ -63,14 +64,14 @@ const EndedGame = ({ nick, rank, result, date, navigation }: Props) => {
         }}
       />   
         <Text>
-          {nick} {rank.toString()}
+          {nick} {Math.floor(rank)}
         </Text>
       </Pressable>
       </View>
         <View style={styles.gameInfoContainer}>
           <Text style={styles.dateText}> {date}{"   "}</Text>
           <Pressable onPress={()=>{
-            navigation.navigate("AnalyzeGame")
+            navigation.navigate("AnalyzeGame", {gameId})
           }}><FontAwesome5 name="chess-board" size={22} color="black" /></Pressable>
           
           <Text

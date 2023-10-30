@@ -9,17 +9,21 @@ export const fetchandStoreUser = async () => {
   return fetchLoggedUser()
     .then((data) => {
       let user: User = loggedUserToUser(data);
+      console.log("user: " + user)
       save("user", JSON.stringify(user));
       return user;
     })
     .catch((err) => {
+      console.log("failed to fetch user.")
       throw new Error(err);
     });
 };
 
 export const fetchLoggedUser = async () => {
   const accessToken = await getValueFor("accessToken");
+  console.log("access token: "+accessToken)
   if (accessToken === null) throw new Error("user is not logged in");
+  console.log("fetching user...");
   return fetch(findUserbyTokenLink, {
     method: "POST",
     headers: new Headers({
@@ -28,8 +32,12 @@ export const fetchLoggedUser = async () => {
     }),
   })
     .then((response) => {
-      if (response.status === 200)
-        return response.json() as unknown as loggedUserResponse;
+      if (response.status === 200){
+        return response.json().catch(err=>{
+          console.log("failded to parse response")
+          throw new Error(err)
+        }) as unknown as loggedUserResponse;
+      }
       else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {
@@ -39,6 +47,7 @@ export const fetchLoggedUser = async () => {
       }
     })
     .catch((err) => {
+      console.log("Fetch logged user failed");
       throw new Error(err);
     });
 };

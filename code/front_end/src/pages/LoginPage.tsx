@@ -59,6 +59,7 @@ export default function Login({ navigation }: Props) {
     login({ email, password })
       .then((response) => {
         if (response.status === 200) {
+          navigation.navigate("Home");
           return response.json();
         } else if (response.status === 202) {
           setShowAuthCode(true);
@@ -80,7 +81,6 @@ export default function Login({ navigation }: Props) {
         if (!responseData) {
           return false;
         }
-        console.log("got authenticationResponse");
         setUserDataFromResponse(responseData);
         return true;
       })
@@ -98,8 +98,7 @@ export default function Login({ navigation }: Props) {
         .json()
         .then((data) => {
           setUserDataFromResponse(data);
-        })
-        .then(() => {
+        }).then(()=>{
           navigation.navigate("Home");
         })
         .catch((err) => {
@@ -156,12 +155,6 @@ export default function Login({ navigation }: Props) {
 
           <Submit onSubmit={onSubmit} />
         </View>
-
-        <View style={styles.logosContainer}>
-          <LogInWithOtherFirm brand="google" />
-          <LogInWithOtherFirm brand="facebook" />
-          <LogInWithOtherFirm brand="apple" />
-        </View>
         <View style={styles.authLinksContainer}>
           <View style={styles.authLinkButton}>
             <BaseButton
@@ -171,7 +164,17 @@ export default function Login({ navigation }: Props) {
               }}
               color={ColorsPallet.light}
             />
+            
           </View>
+          <View style={styles.authLinkButton}>
+          <BaseButton
+              text="Remind password"
+              handlePress={() => {
+                navigation.navigate("RemindPassword");
+              }}
+              color={ColorsPallet.light}
+            />
+            </View>
           <View style={styles.authLinkButton}>
             <BaseButton
               text="Register"
@@ -183,7 +186,7 @@ export default function Login({ navigation }: Props) {
           </View>
         </View>
       </View>
-      <Footer navigation={navigation} />
+      {/* <Footer navigation={navigation} /> */}
     </View>
   );
 }
@@ -210,7 +213,7 @@ const styles = StyleSheet.create({
   },
   authLinksContainer: {
     width: "100%",
-    height: 70,
+    height: 105,
     gap: 8,
     alignItems: "center",
     justifyContent: "center",

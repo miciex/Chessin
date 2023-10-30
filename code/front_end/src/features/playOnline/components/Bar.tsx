@@ -37,16 +37,23 @@ export default function Bar({ state, dispatch, isMyPlayer }: Props) {
       <View style={styles.textContainer}>
         <FontAwesome name="user-circle" size={32} color="black" />
         <Text style={styles.text}>{player ? player.firstname : ""}</Text>
-        <Text style={styles.text}>{rating}</Text>
-        {state.board.result !== GameResults.NONE && (
-          <>
-            <Entypo name="plus" size={24} />
-            <Text style={[styles.text, styles[getRatingChangeColor()]]}>
-              {ratingChange}
-            </Text>
-          </>
-        )}
+        <View style={styles.eloContainer}>
+          <Text style={styles.text}>{rating}</Text>
+          {state.board.result !== GameResults.NONE && (
+            <>
+              {ratingChange < 0 ? (
+                <Entypo name="minus" size={24} />
+              ) : (
+                <Entypo name="plus" size={24} />
+              )}
+              <Text style={[styles.text, styles[getRatingChangeColor()]]}>
+                {Math.abs(ratingChange)}
+              </Text>
+            </>
+          )}
+        </View>
       </View>
+
       <View style={styles.iconsContainer}>
         <View style={styles.timerContainer}>
           <PlayerTimer
@@ -74,6 +81,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
     height: 48,
+    gap: 8,
   },
   text: {
     fontSize: 20,
@@ -87,23 +95,24 @@ const styles = StyleSheet.create({
   },
   timerContainer: {
     height: "100%",
-    flex: 1,
   },
   iconsContainer: {
     flexDirection: "row",
-    gap: 8,
-    justifyContent: "space-between",
+    gap: 16,
     alignItems: "center",
-    flex: 1,
     height: "100%",
   },
   green: {
-    color: "green",
+    color: ColorsPallet.green,
   },
   gray: {
-    color: "gray",
+    color: ColorsPallet.gray,
   },
   red: {
-    color: "red",
+    color: ColorsPallet.red,
+  },
+  eloContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

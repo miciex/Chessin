@@ -94,7 +94,9 @@ export default function Notification({ route, navigation }: Props) {
     
 
     checkInvitations().then((data) =>{ 
-      if(data === undefined) return
+      console.log("check invite data: ")
+      console.log(data)
+      if(!data) return
       setInvitations(data.map(x => responseUserToUser(x, "")))
     })
   }, [invitations])

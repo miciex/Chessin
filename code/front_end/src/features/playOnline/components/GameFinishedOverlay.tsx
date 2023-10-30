@@ -50,14 +50,19 @@ export default function GameFinishedOverlay({
         return state.board.whiteToMove
           ? "Black won by mate"
           : "White won by mate";
+      case GameResults.ABANDONED:
+        return "Game abandoned";
       default:
         return "Unknown result";
     }
   };
 
+  const showOverlay =
+    state.board.result !== GameResults.NONE && state.searchingGame === false;
+
   const winnerText = getText();
 
-  return state.board.result !== GameResults.NONE ? (
+  return showOverlay ? (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
         <View style={styles.textContainer}>
@@ -84,9 +89,9 @@ export default function GameFinishedOverlay({
 const styles = StyleSheet.create({
   outerContainer: {
     width: "100%",
-    height: "100%",
+    height: "72.5%",
     position: "absolute",
-    top: 0,
+    top: 50,
     zIndex: 1,
     justifyContent: "center",
     alignItems: "center",

@@ -139,6 +139,7 @@ export default function Register({ navigation }: Props) {
   const onSubmit = () => {
     setInputsValid();
     if (!areInputsValid()) return;
+    console.log("registering")
     register({
       email,
       password,
@@ -148,8 +149,9 @@ export default function Register({ navigation }: Props) {
       country: country.Name,
     })
       .then((response) => {
+        console.log("response status: "+response.status);
         if (response.status === 200) {
-          navigation.navigate("Home");
+          navigation.navigate("UserNotAuthenticated");
         } else if (response.status === 202) {
           setShowAuthCode(true);
         } else if (response.status === 400) {
@@ -159,6 +161,21 @@ export default function Register({ navigation }: Props) {
       .catch((error) => {
         throw new Error(error);
       });
+  };
+
+  const handleVerifyCodeResponse = async (response: Response) => {
+    if (response.status === 200) {
+          navigation.navigate("Home")
+    } else if (response.status === 400) {
+      response
+        .text()
+        .then((data) => {
+          throw new Error(data);
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    }
   };
 
   return showAuthCode ? (
@@ -175,6 +192,7 @@ export default function Register({ navigation }: Props) {
         nameInGame: nick,
         country: country?.Name,
       }}
+      handleVerifyCodeResponse={handleVerifyCodeResponse}
     />
   ) : (
     <View style={styles.appContainer}>
@@ -249,13 +267,8 @@ export default function Register({ navigation }: Props) {
           </View>
         </ScrollView>
         <Submit onSubmit={onSubmit} />
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          <LogInWithOtherFirm brand="google" />
-          <LogInWithOtherFirm brand="facebook" />
-          <LogInWithOtherFirm brand="apple" />
-        </View>
       </View>
-      <Footer navigation={navigation} />
+      {/* <Footer navigation={navigation} /> */}
     </View>
   );
 }
