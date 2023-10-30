@@ -8,11 +8,12 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
-import { addFriendFunc, getFriendsList, getUser } from "../services/userServices";
+import { addFriendFunc, checkInvitations, getFriendsList, getUser, handleFriendInvitationFunc } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { fetchUser } from "../services/userServices";
+import { FriendInvitationResponseType } from "../utils/ServicesTypes";
 
 const ended_games = [
   {
@@ -152,6 +153,7 @@ useEffect(()=>{
   }
 
   const [friends, setFriends] = useState<Array<User>>([])
+  const [invitations, setInvitations] = useState<Array<User>>([])
 
   const checkNicknameInObjects = (mainObject: Array<User>, targetNickname:string) => {
     return mainObject.some(obj => obj.nameInGame === targetNickname);
@@ -161,6 +163,11 @@ useEffect(()=>{
     if(nameInGame)getFriendsList(nameInGame).then((data) =>{ 
       if(data === undefined) return
       setFriends(data.map(x => responseUserToUser(x, "")))
+    })
+
+    checkInvitations().then((data) =>{ 
+      if(data === undefined) return
+      setInvitations(data.map(x => responseUserToUser(x, "")))
     })
    
      
@@ -181,15 +188,28 @@ useEffect(()=>{
         </View>
 
         {
-            ifMyAccount || checkNicknameInObjects(friends, user?.nameInGame ? user?.nameInGame: "")? "" : <View style={styles.invite}>
+            ifMyAccount || checkNicknameInObjects(friends, user?.nameInGame ? user?.nameInGame: "") || checkNicknameInObjects(invitations, user2?.nameInGame ? user2.nameInGame: "")? "" : <View style={styles.invite}>
             <BaseButton
               handlePress={() => {
-                handleAddFriend
+                
+                handleAddFriend()
               }}
-              text="Send Invitation"
+              text="Send invitation"
             />
           </View>
+        }{
+          user2 && checkNicknameInObjects(invitations, user2.nameInGame)?  <View style={styles.invite}>
+          <BaseButton
+            handlePress={() => {
+              
+              handleFriendInvitationFunc({friendNickname: user2.nameInGame, responseType: FriendInvitationResponseType.ACCEPT})
+            }}
+            text={"Accept Invitation"}
+          />
+        </View>: ""
         }
+        
+        
         
         {ifMyAccount?  "" : <View style={styles.invite}> 
           <BaseButton

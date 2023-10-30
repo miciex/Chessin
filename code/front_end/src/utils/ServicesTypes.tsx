@@ -123,7 +123,7 @@ export type ListenForMoveRequest = {
 };
 
 export type HandleFriendInvitation = {
-  friendNick: string;
+  friendNickname: string;
   responseType: FriendInvitationResponseType;
 
 }

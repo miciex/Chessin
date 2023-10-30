@@ -35,12 +35,11 @@ export default function Friends({ route, navigation }: Props) {
   const nameInGame = route?.params?.nameInGame;
  
   useEffect(()=>{
-    console.log(nameInGame)
     if(nameInGame)getFriendsList(nameInGame).then((data) =>{ 
       if(data === undefined) return
       setFriends(data.map(x => responseUserToUser(x, "")))
       
-    })
+    }).catch(()=>console.error("fuck"))
   }, [nameInGame])
   
   return (

@@ -8,6 +8,7 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Heading from "../components/Heading";
 import Invitation from "../features/socials/components/Invitation";
+import InvitationToGame from "../features/socials/components/InvitationToGame";
 import Notify from "../features/socials/components/Notify";
 import { checkInvitations } from "../services/userServices";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
@@ -87,21 +88,27 @@ type Props = {
 export default function Notification({ route, navigation }: Props) {
 
   const [invitations, setInvitations] = useState<Array<User>>([])
+  const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([])
   
   useEffect(()=>{
     
 
     checkInvitations().then((data) =>{ 
-      console.log(data)
       if(data === undefined) return
       setInvitations(data.map(x => responseUserToUser(x, "")))
     })
-  }, [])
+  }, [invitations])
   return (
     <View style={styles.appContainer}>
       <ScrollView>
+        
         <View style={styles.contentContainer}>
         <Heading text={"Notifications"} />
+        {
+         invitationsToGame.map(player=>(
+          <InvitationToGame nick={player.nameInGame} rank={player.highestRanking} navigation={navigation} email={player.email}/>
+     ))
+        }
         {invitations.map(player=>(
              <Invitation nick={player.nameInGame} rank={player.highestRanking} navigation={navigation} email={player.email}/>
         ))}

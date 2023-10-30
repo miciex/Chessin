@@ -64,7 +64,7 @@ import { User } from "../../../utils/PlayerUtilities";
           />   
           <View>
             <Text style={{fontSize: 20, width: 300}}>
-             {nick} zaprasza do znajomych
+             {nick} zaprasza do gry
             </Text>
             <Text style={{color: "rgb(212, 209, 207)"}}>
               {user?.highestRanking.toString()}

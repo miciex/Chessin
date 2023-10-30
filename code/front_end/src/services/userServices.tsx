@@ -4,7 +4,8 @@ import {
   friendInvitation,
   findUsersByNickname,
   getFriends,
-  checkInvitationsLink
+  checkInvitationsLink,
+  gameInvitation
 } from "../utils/ApiEndpoints";
 import { CodeVerificationRequest , HandleFriendInvitation, HandleSearchBarSocials} from "../utils/ServicesTypes";
 import {
@@ -31,7 +32,6 @@ export const storeUser = async (value: User) => {
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
     throw new Error(err);
   });
-  console.log("user stored");
 };
 
 // getting data
@@ -69,8 +69,9 @@ export const fetchUser = async ( Nickname: string, email?: string) => {
       return responseUserToUser(data, email ? email : "");
     })
     .catch((err) => {
-      return {country: "none", firstname: "doesntt exist", lastname: "doesnt exist", email: "doesnt exist", nameInGame: "doesnt exist", highestRanking: 0, ranking: {blitz: 0, bullet: 0, rapid: 0, classical: 0}};
       throw new Error(err);
+      return {country: "none", firstname: "doesntt exist", lastname: "doesnt exist", email: "doesnt exist", nameInGame: "doesnt exist", highestRanking: 0, ranking: {BLITZ: 0, BULLET: 0, RAPID: 0, CLASSICAL: 0}};
+     
       
     });
 
@@ -204,6 +205,28 @@ export const handleFriendInvitationFunc = async (request: HandleFriendInvitation
   return response;
 }
 
+export const handleGameInvitation = async (request: HandleFriendInvitation) =>{
+  const accessToken = await getValueFor("accessToken");
+  const response = await fetch(gameInvitation, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(request)
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      return response.text();
+    } else {
+      throw new Error("Something went wrong on api server!");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+  return response;
+}
 
 export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
@@ -226,7 +249,6 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
     }
   })
   .catch((error) => {
-    console.log("shit");
     console.error(error);
   });
   return response;
@@ -253,7 +275,6 @@ export async function getFriendsList  (nameInGame:string){
         }
   })
   .catch((error) => {
-    console.log("eror")
     console.error(error);
   });
   return response;

@@ -17,9 +17,10 @@ import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButt
 import { GameLengthTypeContext } from "../features/gameMenuPage/context/GameLengthContext";
 import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
 import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
-import { User } from "../utils/PlayerUtilities";
+import { User, getRanking } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { GameType } from "../chess-logic/board";
+import { setPendingGameRequest } from "../features/playOnline/services/playOnlineService";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -127,7 +128,18 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                 </View>
                 <View style={{ width: "80%", height: 80 }}>
                   <BaseButton
-                    handlePress={() => {}}
+                    handlePress={() => {
+                      if(!user) return
+                      // navigation.navigate("PlayOnline", {
+                      //   request: setPendingGameRequest(
+                      //     gameTempo.totalTime,
+                      //     gameTempo.increment,
+                      //     getRanking(gameTempo.gameType, user),
+                      //     user.nameInGame,
+                      //     gameTempo.gameType
+                      //   ),
+                      // })
+                    }}
                     text="Graj"
                     fontSizeProps={30}
                   />
