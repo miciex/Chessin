@@ -306,7 +306,10 @@ public class ChessGameController {
 
             activeGames.get(request.getGameId()).wait(timeLeft);
 
-            if(!Arrays.asList(GameResults.NONE, GameResults.DRAW_AGREEMENT).contains(activeBoards.get(request.getGameId()).getGameResult()))
+            if(activeBoards.get(request.getGameId()).getGameResult() == GameResults.DRAW_AGREEMENT)
+                return ResponseEntity.status(100).body("Draw agreement.");
+
+            if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
             {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
@@ -337,7 +340,7 @@ public class ChessGameController {
         if(!activeBoards.containsKey(id))
             return ResponseEntity.badRequest().body("Game not found.");
 
-        synchronized(activeGames.get(id))
+        synchronized(activeBoards.get(id))
         {
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
 
@@ -366,7 +369,7 @@ public class ChessGameController {
         if(activeBoards.get(id).isBlackOffersDraw() || activeBoards.get(id).isWhiteOffersDraw())
             return ResponseEntity.badRequest().body("You have already offered draw.");
 
-        synchronized(activeGames.get(id))
+        synchronized(activeBoards.get(id))
         {
             if(activeBoards.get(id).getWhiteEmail().equals(email))
                 activeBoards.get(id).setWhiteOffersDraw(true);
@@ -408,7 +411,7 @@ public class ChessGameController {
         else if(activeBoards.get(request.getGameId()).getBlackEmail().equals(email) && activeBoards.get(request.getGameId()).isBlackOffersDraw())
             return ResponseEntity.badRequest().body("You cannot respond to your own draw offer.");
 
-        synchronized(activeGames.get(request.getGameId()))
+        synchronized(activeBoards.get(request.getGameId()))
         {
             if(request.getResponseType() == ResponseType.ACCEPT)
             {
@@ -448,7 +451,7 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body("You are not playing this game.");
 
 
-        synchronized(activeGames.get(id))
+        synchronized(activeBoards.get(id))
         {
             if(activeBoards.get(id).getWhiteEmail().equals(email) && activeBoards.get(id).isWhiteOffersDraw()) {
                 activeBoards.get(id).setWhiteOffersDraw(false);
