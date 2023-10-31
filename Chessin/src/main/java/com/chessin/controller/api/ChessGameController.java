@@ -306,7 +306,7 @@ public class ChessGameController {
 
             activeGames.get(request.getGameId()).wait(timeLeft);
 
-            if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
+            if(!Arrays.asList(GameResults.NONE, GameResults.DRAW_AGREEMENT).contains(activeBoards.get(request.getGameId()).getGameResult()))
             {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
@@ -416,6 +416,7 @@ public class ChessGameController {
                 activeBoards.get(request.getGameId()).setGameResult(GameResults.DRAW_AGREEMENT);
                 //chessGameRepository.updateGameResult(request.getGameId(), GameResults.DRAW_AGREEMENT);
                 activeBoards.get(request.getGameId()).notifyAll();
+                activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
             }
             else
