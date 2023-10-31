@@ -7,15 +7,15 @@ import { ColorsPallet } from "../../../utils/Constants";
 type Props = {
   modalTxt: string;
   showModal: boolean;
-  toggleModal: () => void;
-  modalAction: () => void;
+  handleDecline: () => void;
+  handleAccept: () => void;
 };
 
-export default function ResignGameModal({
+export default function OnlineBarModal({
   modalTxt,
   showModal,
-  toggleModal,
-  modalAction,
+  handleDecline,
+  handleAccept,
 }: Props) {
   return (
     showModal ? (
@@ -26,10 +26,10 @@ export default function ResignGameModal({
           <Text>{modalTxt}</Text>
           <View style={styles.buttonsContainer}>
             <View style={styles.buttonContainer}>
-              <BaseButton text="Yes" handlePress={modalAction} fontColor={ColorsPallet.green}/>
+              <BaseButton text="Yes" handlePress={handleAccept} fontColor={ColorsPallet.green}/>
             </View>
             <View style={styles.buttonContainer}>
-              <BaseButton text="No" handlePress={toggleModal} fontColor={ColorsPallet.red}/>
+              <BaseButton text="No" handlePress={handleDecline} fontColor={ColorsPallet.red}/>
             </View>
           </View>
         </View>

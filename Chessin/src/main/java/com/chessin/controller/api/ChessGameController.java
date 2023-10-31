@@ -416,7 +416,7 @@ public class ChessGameController {
                 activeBoards.get(request.getGameId()).setWhiteOffersDraw(false);
                 activeBoards.get(request.getGameId()).setBlackOffersDraw(false);
                 activeGames.get(request.getGameId()).notifyAll();
-                return ResponseEntity.ok().body("Draw offer declined.");
+                return ResponseEntity.status(100).body("Draw offer declined.");
             }
         }
     }

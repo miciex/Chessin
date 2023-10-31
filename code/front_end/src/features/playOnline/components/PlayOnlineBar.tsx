@@ -5,16 +5,20 @@ import {
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
 import { FontAwesome } from "@expo/vector-icons";
-import BaseButton from "../../../components/BaseButton";
-import ResignGameModal from "./ResignGameModal";
+import OnlineBarModal from "./OnlineBarModal";
 import { submitMove } from "../services/playOnlineService";
-import { BoardResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
+import { BoardResponse, RespondToDrawOfferRequest, SubmitMoveRequest } from "../../../utils/ServicesTypes";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { offerDraw } from "../../../services/chessGameService";
+import { ResponseType } from "../../../utils/ServicesTypes";
 
 type Props = {
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
   toggleSettings: () => void;
   toggleRotateBoard: () => void;
+  opponentOfferedDraw: boolean;
+  handleRespondToDrawOffer: (response: RespondToDrawOfferRequest) => void;
 };
 
 export default function PlayOnlineBar({
@@ -22,6 +26,8 @@ export default function PlayOnlineBar({
   toggleRotateBoard,
   state,
   dispatch,
+  opponentOfferedDraw,
+  handleRespondToDrawOffer,
 }: Props) {
   const [showResign, setShowResign] = useState(false);
 
@@ -35,7 +41,7 @@ export default function PlayOnlineBar({
       doesResign: true,
     };
     submitMove(request)
-      .then((boardResponse: BoardResponse) => {
+      .then((boardResponse: BoardResponse ) => {
         if (!boardResponse) return;
         dispatch({
           type: "setDataFromBoardResponse",
@@ -50,9 +56,32 @@ export default function PlayOnlineBar({
       });
   };
 
+  const sendDrawOffer = () => {
+    offerDraw(String(state.gameId)).catch(() => {
+      throw new Error("Failed to offer draw");
+    });
+  }
+
   const toggleResign = () => {
     setShowResign((prev) => !prev);
   };
+
+  const acceptDraw = () => {
+    handleRespondToDrawOffer({
+      gameId: state.gameId,
+      responseType: ResponseType.ACCEPT,
+    })
+  }
+
+  const declineDraw = () => {
+    handleRespondToDrawOffer({
+      gameId: state.gameId,
+      responseType: ResponseType.DECLINE,
+    })
+  }
+
+  
+    
 
   const modalTxt =
     state.board.moves.length > 1
@@ -61,14 +90,26 @@ export default function PlayOnlineBar({
 
   return (
     <View style={styles.gameOptionsContainer}>
-      <ResignGameModal
-        showModal={showResign}
-        toggleModal={toggleResign}
-        modalAction={resign}
+      <OnlineBarModal
+        showModal={showResign && !opponentOfferedDraw}
+        handleDecline={toggleResign}
+        handleAccept={resign}
         modalTxt={modalTxt}
       />
-      {!showResign && (
+      <OnlineBarModal
+        showModal={opponentOfferedDraw}
+        handleDecline={declineDraw}
+        handleAccept={acceptDraw}
+        modalTxt={"Your opponent offered a draw. Do you accept?"}
+        />
+      {(!showResign && !opponentOfferedDraw) && (
         <>
+          <MaterialCommunityIcons
+            name="fraction-one-half"
+            size={34}
+            color="black"
+            onPress={sendDrawOffer}
+          />
           <FontAwesome
             name="flag-o"
             size={34}
