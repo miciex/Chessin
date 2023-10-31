@@ -144,15 +144,15 @@ public class ChessGameService {
             else
                 ratingCalculator.updateRatings(new Result(whiteRating, blackRating));
         }
-        else if(Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_TIMEOUT).contains(game.getGameResult()))
+        else if(Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_TIMEOUT).contains(board.getGameResult()))
         {
             ratingCalculator.updateRatings(new Result(whiteRating, blackRating));
         }
-        else if(Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_TIMEOUT).contains(game.getGameResult()))
+        else if(Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_TIMEOUT).contains(board.getGameResult()))
         {
             ratingCalculator.updateRatings(new Result(blackRating, whiteRating));
         }
-        else if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.DRAW_50_MOVE_RULE, GameResults.INSUFFICIENT_MATERIAL, GameResults.STALEMATE).contains(game.getGameResult()))
+        else if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.DRAW_50_MOVE_RULE, GameResults.INSUFFICIENT_MATERIAL, GameResults.STALEMATE).contains(board.getGameResult()))
         {
             ratingCalculator.updateRatings(new Result(whiteRating, blackRating, true));
         }
