@@ -22,6 +22,7 @@ import com.chessin.model.playing.ResponseType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -211,5 +212,31 @@ public class UserController {
         User user = userRepository.findByEmail(email).get();
 
         return ResponseEntity.ok().body(UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, true));
+    }
+
+    @PostMapping("/getUsers/{nickname}/{page}")
+    public ResponseEntity<?> getUsers(@PathVariable String nickname, @PathVariable String page)
+    {
+        int pageInt;
+        try
+        {
+            pageInt = Integer.parseInt(page);
+
+            if(pageInt < 0)
+                return ResponseEntity.badRequest().body("Page must be positive.");
+        }
+        catch(NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Page must be a number.");
+        }
+
+        if(!userRepository.existsByNameInGame(nickname))
+            return ResponseEntity.badRequest().body("User does not exist.");
+
+        List<UserResponse> users = new ArrayList<>();
+
+        userRepository.findAllByNameInGameContaining(nickname, PageRequest.of(pageInt, 10)).stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(users::add);
+
+        return ResponseEntity.ok().body(users);
     }
 }
