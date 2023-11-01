@@ -86,6 +86,8 @@ public class ChessGameController {
                         .startTime(Instant.now().toEpochMilli())
                         .isRated(foundGame.isRated())
                         .gameResult(GameResults.NONE)
+                        .whiteRating(userService.getRating(players.get(whitePlayerIndex), HelpMethods.getGameType(foundGame.getTimeControl())))
+                        .blackRating(userService.getRating(players.get(blackPlayerIndex), HelpMethods.getGameType(foundGame.getTimeControl())))
                         .build();
 
                 chessGameRepository.save(game);
@@ -270,6 +272,7 @@ public class ChessGameController {
 
             if(board.getGameResult() != GameResults.NONE)
             {
+                chessGameRepository.updateGameResult(request.getGameId(), board.getGameResult());
                 if(activeGames.get(request.getGameId()).isRated())
                     activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
                 activeGames.get(request.getGameId()).notifyAll();
