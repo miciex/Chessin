@@ -24,7 +24,7 @@ export default function Footer({ navigation }: Props) {
   };
 
   const handleAnalyze = () => {
-    navigation.navigate("AnalyzeGame");
+    navigation.navigate("LastGame");
   };
 
   return (
