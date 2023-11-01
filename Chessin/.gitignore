@@ -25,6 +25,7 @@ target/
 /dist/
 /nbdist/
 /.idea/
+/.idea/workspace.xml
 /.nb-gradle/
 build/
 !**/src/main/**/build/
