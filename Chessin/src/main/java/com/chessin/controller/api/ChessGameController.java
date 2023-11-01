@@ -14,6 +14,7 @@ import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.utils.Constants;
 import com.chessin.model.utils.HelpMethods;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -133,6 +134,7 @@ public class ChessGameController {
         }
     }
 
+    @Transactional
     @PostMapping("/cancelSearch")
     public ResponseEntity<?> cancelSearch(HttpServletRequest servlet)
     {
@@ -149,6 +151,7 @@ public class ChessGameController {
         return ResponseEntity.ok().body("Search cancelled");
     }
 
+    @Transactional
     @PostMapping("/listenForMove")
     public ResponseEntity<?> listenForMove(@RequestBody ListenForMoveRequest request) throws InterruptedException {
         if(!activeGames.containsKey(request.getGameId()))
@@ -164,6 +167,7 @@ public class ChessGameController {
         }
     }
 
+    @Transactional
     @PostMapping("/listenForFirstMove/{gameId}")
     public ResponseEntity<?> listenForFirstMove(@PathVariable String gameId) throws InterruptedException {
         long id;
@@ -200,8 +204,8 @@ public class ChessGameController {
         }
     }
 
-    @PostMapping("/submitMove")
     @Transactional
+    @PostMapping("/submitMove")
     public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request, HttpServletRequest servlet) throws InterruptedException {
         if(!activeBoards.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body("Game not found.");
@@ -212,33 +216,33 @@ public class ChessGameController {
 
             Board board = activeBoards.get(request.getGameId());
 
-            if(request.isDoesResign())
-            {
-                if(board.getWhiteEmail().equals(email))
-                {
-                    board.setGameResult(GameResults.WHITE_RESIGN);
-                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.WHITE_RESIGN);
-                    activeBoards.replace(request.getGameId(), board);
-                    if(activeGames.get(request.getGameId()).isRated())
-                        activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
-                    activeGames.get(request.getGameId()).notifyAll();
-                    return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
-                }
-                else if(board.getBlackEmail().equals(email))
-                {
-                    board.setGameResult(GameResults.BLACK_RESIGN);
-                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.BLACK_RESIGN);
-                    activeBoards.replace(request.getGameId(), board);
-                    if(activeGames.get(request.getGameId()).isRated())
-                        activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
-                    activeGames.get(request.getGameId()).notifyAll();
-                    return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
-                }
-                else
-                {
-                    return ResponseEntity.badRequest().body("You are not playing this game.");
-                }
-            }
+//            if(request.isDoesResign())
+//            {
+//                if(board.getWhiteEmail().equals(email))
+//                {
+//                    board.setGameResult(GameResults.WHITE_RESIGN);
+//                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.WHITE_RESIGN);
+//                    activeBoards.replace(request.getGameId(), board);
+//                    if(activeGames.get(request.getGameId()).isRated())
+//                        activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
+//                    activeGames.get(request.getGameId()).notifyAll();
+//                    return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+//                }
+//                else if(board.getBlackEmail().equals(email))
+//                {
+//                    board.setGameResult(GameResults.BLACK_RESIGN);
+//                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.BLACK_RESIGN);
+//                    activeBoards.replace(request.getGameId(), board);
+//                    if(activeGames.get(request.getGameId()).isRated())
+//                        activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
+//                    activeGames.get(request.getGameId()).notifyAll();
+//                    return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
+//                }
+//                else
+//                {
+//                    return ResponseEntity.badRequest().body("You are not playing this game.");
+//                }
+//            }
 
             long now = Instant.now().toEpochMilli();
             if(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
@@ -313,8 +317,8 @@ public class ChessGameController {
             {
                 Board endBoard = activeBoards.get(request.getGameId());
                 activeBoards.remove(request.getGameId());
-                activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
-                chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
+                //activeGames.get(request.getGameId()).setGameResult(endBoard.getGameResult());
+                //chessGameRepository.updateGameResult(request.getGameId(), endBoard.getGameResult());
 //                if(activeGames.get(request.getGameId()).isRated())
 //                    endBoard = chessGameService.updateRatings(activeGames.get(request.getGameId()), endBoard);
                 activeGames.remove(request.getGameId());
@@ -322,6 +326,89 @@ public class ChessGameController {
             }
 
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
+        }
+    }
+
+    @Transactional
+    @PostMapping("/listenForResignation/{gameId}")
+    public ResponseEntity<?> listenForResignation(@PathVariable String gameId) throws InterruptedException {
+        long id;
+
+        try {
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Invalid game id.");
+        }
+
+        if(!activeBoards.containsKey(id))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        synchronized(activeBoards.get(id))
+        {
+            activeGames.get(id).wait(Constants.Application.waitForMoveTime);
+
+            if(activeBoards.get(id).getGameResult() != GameResults.NONE)
+            {
+                Board endBoard = activeBoards.get(id);
+                activeBoards.remove(id);
+                activeGames.remove(id);
+
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
+            }
+            else
+            {
+                return ResponseEntity.status(100).body("Opponent has not resigned.");
+            }
+        }
+    }
+
+    @Transactional
+    @PostMapping("/resign/{gameId}")
+    public ResponseEntity<?> resign(@PathVariable String gameId, HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        long id;
+
+        try {
+            id = Long.parseLong(gameId);
+        }
+        catch (NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Invalid game id.");
+        }
+
+        if(!activeBoards.containsKey(id))
+            return ResponseEntity.badRequest().body("Game not found.");
+
+        synchronized(activeBoards.get(id))
+        {
+            if(activeBoards.get(id).getWhiteEmail().equals(email))
+            {
+                activeBoards.get(id).setGameResult(GameResults.WHITE_RESIGN);
+                chessGameRepository.updateGameResult(id, GameResults.WHITE_RESIGN);
+                activeBoards.replace(id, activeBoards.get(id));
+                if(activeGames.get(id).isRated())
+                    activeBoards.replace(id, chessGameService.updateRatings(activeGames.get(id), activeBoards.get(id)));
+                activeGames.get(id).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
+            }
+            else if(activeBoards.get(id).getBlackEmail().equals(email))
+            {
+                activeBoards.get(id).setGameResult(GameResults.BLACK_RESIGN);
+                chessGameRepository.updateGameResult(id, GameResults.BLACK_RESIGN);
+                activeBoards.replace(id, activeBoards.get(id));
+                if(activeGames.get(id).isRated())
+                    activeBoards.replace(id, chessGameService.updateRatings(activeGames.get(id), activeBoards.get(id)));
+                activeGames.get(id).notifyAll();
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
+            }
+            else
+            {
+                return ResponseEntity.badRequest().body("You are not playing this game.");
+            }
         }
     }
 
@@ -345,7 +432,10 @@ public class ChessGameController {
         {
             activeGames.get(id).wait(Constants.Application.waitForMoveTime);
 
-            return ResponseEntity.ok().body("Opponent has request draw.");
+            if(activeBoards.get(id).isWhiteOffersDraw() || activeBoards.get(id).isBlackOffersDraw())
+                return ResponseEntity.ok().body("Opponent has requested draw.");
+            else
+                return ResponseEntity.ok().body("Opponent has not requested draw.");
         }
     }
 
@@ -433,12 +523,13 @@ public class ChessGameController {
         }
     }
 
+    @Transactional
     @PostMapping("/cancelDrawOffer/{gameId}")
     public ResponseEntity<?> cancelDrawOffer(@PathVariable String gameId, HttpServletRequest servlet)
     {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        int id;
+        long id;
 
         try {
             id = Integer.parseInt(gameId);
@@ -533,6 +624,7 @@ public class ChessGameController {
 
     }
 
+    @Transactional
     @PostMapping("/inviteFriend")
     public ResponseEntity<?> inviteFriend(@RequestBody GameInvitationRequest request, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -579,6 +671,7 @@ public class ChessGameController {
         }
     }
 
+    @Transactional
     @PostMapping("/respondToGameInvitation")
     public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
