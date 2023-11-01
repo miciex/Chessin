@@ -4,6 +4,7 @@ import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.requests.*;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
+import com.chessin.controller.responses.ResponseMessage;
 import com.chessin.model.playing.*;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
 import com.chessin.model.playing.Glicko2.Repositories.BulletRatingRepository;
@@ -55,12 +56,12 @@ public class ChessGameController {
 
         if(pendingGames.containsKey(email))
         {
-            return ResponseEntity.badRequest().body("User is already searching for a game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User is already searching for a game."));
         }
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
         {
-            return ResponseEntity.badRequest().body("User is already playing a game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User is already playing a game."));
         }
 
         PendingChessGame foundGame = chessGameService.searchNewGame(request, new ArrayList<>(pendingGames.values()));
@@ -87,6 +88,7 @@ public class ChessGameController {
                         .gameType(HelpMethods.getGameType(foundGame.getTimeControl()))
                         .startTime(Instant.now().toEpochMilli())
                         .isRated(foundGame.isRated())
+                        .gameResult(GameResults.NONE)
                         .build();
 
                 chessGameRepository.save(game);
@@ -115,17 +117,17 @@ public class ChessGameController {
         pendingGames.put(email, pendingChessGame);
 
         synchronized (pendingGames.get(pendingChessGame.getUser().getEmail())) {
-            pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.gameSearchTime);
+            pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.GAME_SEARCH_TIME);
         }
 
         synchronized (pendingGames.get(pendingChessGame.getUser().getEmail())) {
             if (pendingGames.get(pendingChessGame.getUser().getEmail()).getOpponent() == null) {
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
-                return ResponseEntity.badRequest().body("No opponent found");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("No opponent found"));
             }
             else
             {
-                pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.timeout);
+                pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.TIMEOUT);
 
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
 
@@ -141,28 +143,28 @@ public class ChessGameController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!userRepository.existsByEmail(email))
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User not found"));
 
         if(pendingGames.get(email) != null)
             pendingGames.remove(email);
         else
-            return ResponseEntity.badRequest().body("No search found");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("No search found"));
 
-        return ResponseEntity.ok().body("Search cancelled");
+        return ResponseEntity.ok().body(ResponseMessage.of("Search cancelled"));
     }
 
     @Transactional
     @PostMapping("/listenForMove")
     public ResponseEntity<?> listenForMove(@RequestBody ListenForMoveRequest request) throws InterruptedException {
         if(!activeGames.containsKey(request.getGameId()))
-            return ResponseEntity.badRequest().body("Game not found");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Game not found"));
 
         if(!chessGameService.validateMoves(request.getMoves(), activeBoards.get(request.getGameId())))
             return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(request.getGameId()))));
 
         synchronized(activeGames.get(request.getGameId()))
         {
-            activeGames.get(request.getGameId()).wait(Constants.Application.waitForMoveTime);
+            activeGames.get(request.getGameId()).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
     }
@@ -177,18 +179,18 @@ public class ChessGameController {
         }
         catch (NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Invalid game id");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invalid game id"));
         }
 
         if(!activeBoards.containsKey(id))
-            return ResponseEntity.badRequest().body("Game not found.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Game not found."));
 
         if(!activeBoards.get(id).getMoves().isEmpty())
             return ResponseEntity.ok().body(BoardResponse.fromBoard(chessGameService.calculateTime(activeBoards.get(id))));
 
         synchronized(activeGames.get(id))
         {
-            activeGames.get(id).wait(Constants.Application.waitForMoveTime);
+            activeGames.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty())
             {
@@ -208,41 +210,13 @@ public class ChessGameController {
     @PostMapping("/submitMove")
     public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request, HttpServletRequest servlet) throws InterruptedException {
         if(!activeBoards.containsKey(request.getGameId()))
-            return ResponseEntity.badRequest().body("Game not found.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Game not found."));
 
         synchronized(activeGames.get(request.getGameId()))
         {
             String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
             Board board = activeBoards.get(request.getGameId());
-
-//            if(request.isDoesResign())
-//            {
-//                if(board.getWhiteEmail().equals(email))
-//                {
-//                    board.setGameResult(GameResults.WHITE_RESIGN);
-//                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.WHITE_RESIGN);
-//                    activeBoards.replace(request.getGameId(), board);
-//                    if(activeGames.get(request.getGameId()).isRated())
-//                        activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
-//                    activeGames.get(request.getGameId()).notifyAll();
-//                    return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
-//                }
-//                else if(board.getBlackEmail().equals(email))
-//                {
-//                    board.setGameResult(GameResults.BLACK_RESIGN);
-//                    chessGameRepository.updateGameResult(request.getGameId(), GameResults.BLACK_RESIGN);
-//                    activeBoards.replace(request.getGameId(), board);
-//                    if(activeGames.get(request.getGameId()).isRated())
-//                        activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
-//                    activeGames.get(request.getGameId()).notifyAll();
-//                    return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
-//                }
-//                else
-//                {
-//                    return ResponseEntity.badRequest().body("You are not playing this game.");
-//                }
-//            }
 
             long now = Instant.now().toEpochMilli();
             if(board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) <= 0)
@@ -269,26 +243,26 @@ public class ChessGameController {
             }
 
             if(board.isWhiteTurn() && !board.getWhiteEmail().equals(email)){
-                return ResponseEntity.badRequest().body("It's not your turn.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("It's not your turn."));
             }
             else if(!board.isWhiteTurn() && !board.getBlackEmail().equals(email)){
-                return ResponseEntity.badRequest().body("It's not your turn.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("It's not your turn."));
             }
 
             if(request.getMovedPiece() < 16 != board.isWhiteTurn())
-                return ResponseEntity.badRequest().body("It's not your turn.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("It's not your turn."));
 
             if(!board.getPosition().containsValue(request.getMovedPiece()))
-                return ResponseEntity.badRequest().body("This piece does not exist.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("This piece does not exist."));
 
             if(!board.getPosition().containsKey(request.getStartField()))
-                return ResponseEntity.badRequest().body("There is no piece on this field.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("There is no piece on this field."));
 
             ArrayList<Integer> moves = board.possibleMoves(request.getStartField());
             moves = board.deleteImpossibleMoves(moves, request.getStartField());
 
             if(!moves.contains(request.getEndField())){
-                return ResponseEntity.badRequest().body("Illegal move.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("Illegal move."));
             }
 
             long timeLeft = board.isWhiteTurn() ? board.getWhiteTime() - Math.abs(board.getLastMoveTime() - now) : board.getBlackTime() - Math.abs(board.getLastMoveTime() - now);
@@ -311,7 +285,7 @@ public class ChessGameController {
             activeGames.get(request.getGameId()).wait(timeLeft);
 
             if(activeBoards.get(request.getGameId()).getGameResult() == GameResults.DRAW_AGREEMENT)
-                return ResponseEntity.status(100).body("Draw agreement.");
+                return ResponseEntity.status(100).body(ResponseMessage.of("Draw agreement."));
 
             if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
             {
@@ -339,15 +313,15 @@ public class ChessGameController {
         }
         catch (NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Invalid game id.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invalid game id."));
         }
 
         if(!activeBoards.containsKey(id))
-            return ResponseEntity.badRequest().body("Game not found.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Game not found."));
 
         synchronized(activeBoards.get(id))
         {
-            activeBoards.get(id).wait(Constants.Application.waitForMoveTime);
+            activeBoards.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if(activeBoards.get(id).getGameResult() != GameResults.NONE)
             {
@@ -359,7 +333,7 @@ public class ChessGameController {
             }
             else
             {
-                return ResponseEntity.status(100).body("Opponent has not resigned.");
+                return ResponseEntity.status(100).body(ResponseMessage.of("Opponent has not resigned."));
             }
         }
     }
@@ -377,11 +351,11 @@ public class ChessGameController {
         }
         catch (NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Invalid game id.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invalid game id."));
         }
 
         if(!activeBoards.containsKey(id))
-            return ResponseEntity.badRequest().body("Game not found.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Game not found."));
 
         synchronized(activeBoards.get(id))
         {
@@ -407,7 +381,7 @@ public class ChessGameController {
             }
             else
             {
-                return ResponseEntity.badRequest().body("You are not playing this game.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("You are not playing this game."));
             }
         }
     }
@@ -422,20 +396,20 @@ public class ChessGameController {
         }
         catch (NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Invalid game id.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invalid game id."));
         }
 
         if(!activeBoards.containsKey(id))
-            return ResponseEntity.badRequest().body("Game not found.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Game not found."));
 
         synchronized(activeBoards.get(id))
         {
-            activeBoards.get(id).wait(Constants.Application.waitForMoveTime);
+            activeBoards.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if(activeBoards.get(id).isWhiteOffersDraw() || activeBoards.get(id).isBlackOffersDraw())
-                return ResponseEntity.ok().body("Opponent has requested draw.");
+                return ResponseEntity.ok().body(ResponseMessage.of("Opponent has requested draw."));
             else
-                return ResponseEntity.status(100).body("Opponent has not requested draw.");
+                return ResponseEntity.status(100).body(ResponseMessage.of("Opponent has not requested draw."));
         }
     }
 
@@ -451,14 +425,14 @@ public class ChessGameController {
         }
         catch (NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Invalid game id.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invalid game id."));
         }
 
         if(!activeBoards.get(id).getWhiteEmail().equals(email) && !activeBoards.get(id).getBlackEmail().equals(email))
-            return ResponseEntity.badRequest().body("You are not playing this game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("You are not playing this game."));
 
         if(activeBoards.get(id).isBlackOffersDraw() || activeBoards.get(id).isWhiteOffersDraw())
-            return ResponseEntity.badRequest().body("You have already offered draw.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("You have already offered draw."));
 
         synchronized(activeBoards.get(id))
         {
@@ -468,7 +442,7 @@ public class ChessGameController {
                 activeBoards.get(id).setBlackOffersDraw(true);
 
             activeBoards.get(id).notifyAll();
-            activeBoards.get(id).wait(Constants.Application.waitForMoveTime);
+            activeBoards.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if(activeBoards.get(id).getGameResult() != GameResults.NONE)
             {
@@ -481,7 +455,7 @@ public class ChessGameController {
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
             else
-                return ResponseEntity.status(100).body("Opponent has not accepted draw.");
+                return ResponseEntity.status(100).body(ResponseMessage.of("Opponent has not accepted draw."));
         }
     }
 
@@ -492,15 +466,15 @@ public class ChessGameController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && !activeBoards.get(request.getGameId()).getBlackEmail().equals(email))
-            return ResponseEntity.badRequest().body("You are not playing this game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("You are not playing this game."));
 
         if(!activeBoards.get(request.getGameId()).isBlackOffersDraw() && !activeBoards.get(request.getGameId()).isWhiteOffersDraw())
-            return ResponseEntity.badRequest().body("Opponent has not offered draw.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Opponent has not offered draw."));
 
         if(activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && activeBoards.get(request.getGameId()).isWhiteOffersDraw())
-            return ResponseEntity.badRequest().body("You cannot respond to your own draw offer.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("You cannot respond to your own draw offer."));
         else if(activeBoards.get(request.getGameId()).getBlackEmail().equals(email) && activeBoards.get(request.getGameId()).isBlackOffersDraw())
-            return ResponseEntity.badRequest().body("You cannot respond to your own draw offer.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("You cannot respond to your own draw offer."));
 
         synchronized(activeBoards.get(request.getGameId()))
         {
@@ -518,7 +492,7 @@ public class ChessGameController {
                 activeBoards.get(request.getGameId()).setWhiteOffersDraw(false);
                 activeBoards.get(request.getGameId()).setBlackOffersDraw(false);
                 activeBoards.get(request.getGameId()).notifyAll();
-                return ResponseEntity.status(100).body("Draw offer declined.");
+                return ResponseEntity.status(100).body(ResponseMessage.of("Draw offer declined."));
             }
         }
     }
@@ -536,11 +510,11 @@ public class ChessGameController {
         }
         catch (NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Invalid game id.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invalid game id."));
         }
 
         if(!activeBoards.get(id).getWhiteEmail().equals(email) && !activeBoards.get(id).getBlackEmail().equals(email))
-            return ResponseEntity.badRequest().body("You are not playing this game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("You are not playing this game."));
 
 
         synchronized(activeBoards.get(id))
@@ -554,10 +528,10 @@ public class ChessGameController {
                 activeBoards.get(id).notifyAll();
             }
             else
-                return ResponseEntity.badRequest().body("You have not offered draw.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("You have not offered draw."));
         }
 
-        return ResponseEntity.ok().body("Draw offer cancelled.");
+        return ResponseEntity.ok().body(ResponseMessage.of("Draw offer cancelled."));
     }
 
     @PostMapping("/getGame/{gameId}")
@@ -569,11 +543,11 @@ public class ChessGameController {
         }
         catch (NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Invalid game id.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invalid game id."));
         }
 
         if(!chessGameRepository.existsById(id))
-            return ResponseEntity.badRequest().body("Game not found.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Game not found."));
 
         if(activeGames.containsKey(id))
             return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
@@ -589,7 +563,7 @@ public class ChessGameController {
         if(game.isPresent())
             return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
         else
-            return ResponseEntity.badRequest().body("This player is not playing any game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("This player is not playing any game."));
 
     }
 
@@ -601,7 +575,7 @@ public class ChessGameController {
         if(board.isPresent())
             return ResponseEntity.ok().body(BoardResponse.fromBoard(board.get()));
         else
-            return ResponseEntity.badRequest().body("This player is not playing any game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("This player is not playing any game."));
 
     }
 
@@ -614,13 +588,13 @@ public class ChessGameController {
         }
         catch (NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Wrong game id.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Wrong game id."));
         }
 
         if(activeBoards.containsKey(id))
             return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
         else
-            return ResponseEntity.badRequest().body("Game not found.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Game not found."));
 
     }
 
@@ -633,12 +607,12 @@ public class ChessGameController {
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
         {
-            return ResponseEntity.badRequest().body("User is already playing a game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User is already playing a game."));
         }
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(friendEmail) || game.getBlackUser().getEmail().equals(friendEmail)))
         {
-            return ResponseEntity.badRequest().body("Friend is already playing a game.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Friend is already playing a game."));
         }
 
         GameInvitation pendingInvitation = GameInvitation.builder()
@@ -654,15 +628,15 @@ public class ChessGameController {
 
         synchronized(pendingInvitations.get(email))
         {
-            pendingInvitations.get(email).wait(Constants.Application.gameSearchTime);
+            pendingInvitations.get(email).wait(Constants.Application.GAME_SEARCH_TIME);
 
             if(pendingInvitations.get(email).getFriend() == null)
             {
-                return ResponseEntity.badRequest().body("Friend didn't accept your request");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("Friend didn't accept your request"));
             }
             else
             {
-                pendingInvitations.get(email).wait(Constants.Application.timeout);
+                pendingInvitations.get(email).wait(Constants.Application.TIMEOUT);
 
                 pendingInvitations.remove(email);
 
@@ -678,7 +652,7 @@ public class ChessGameController {
         String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
 
         if(!pendingInvitations.containsKey(friendEmail))
-            return ResponseEntity.badRequest().body("You have not been invited by this player.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("You have not been invited by this player."));
 
         if(request.getResponseType() == ResponseType.ACCEPT)
         {
@@ -700,6 +674,7 @@ public class ChessGameController {
                     .gameType(HelpMethods.getGameType(pendingInvitations.get(friendEmail).getTimeControl()))
                     .startTime(Instant.now().toEpochMilli())
                     .isRated(pendingInvitations.get(friendEmail).isRated())
+                    .gameResult(GameResults.NONE)
                     .build();
 
             chessGameRepository.save(game);
@@ -718,6 +693,6 @@ public class ChessGameController {
 
         pendingInvitations.remove(friendEmail);
 
-        return ResponseEntity.ok().body("Invitation responded.");
+        return ResponseEntity.ok().body(ResponseMessage.of("Invitation responded."));
     }
 }
