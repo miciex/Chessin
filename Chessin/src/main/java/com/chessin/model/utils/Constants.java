@@ -14,10 +14,15 @@ public class Constants {
     public static class Application
     {
         public static final int GAME_SEARCH_TIME = 1000 * 60 * 60;
+        public static final int gameSearchTime = 1000 * 60 * 60;
         public static final int WAIT_FOR_MOVE_TIME = 1000 * 60 * 60;
+        public static final int waitForMoveTime = 1000 * 60 * 60;
         public static final int TIMEOUT = 100;
+        public static final int timeout = 100;
         public static final int ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 15 * 2137;
+        public static final int accessTokenExpirationTime = 1000 * 60 * 15 * 2137;
         public static final int REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
+        public static final int refreshTokenExpirationTime = 1000 * 60 * 60 * 24 * 7;
         public static final int DEFAULT_PAGE_SIZE = 10;
     }
 

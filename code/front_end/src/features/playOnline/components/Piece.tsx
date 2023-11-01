@@ -144,7 +144,6 @@ export default function Piece({
       startField: move.startField,
       endField: move.endField,
       promotePiece: move.promotePiece,
-      doesResign: false,
     };
     console.log("submitMoveRequest");
     console.log(submitMoveRequest);

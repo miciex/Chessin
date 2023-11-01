@@ -21,6 +21,7 @@ type Props = {
   handleRespondToDrawOffer: (response: RespondToDrawOfferRequest) => void;
   handleListenForDrawOffer: (gameId: string) => void;
   handleSendDrawOffer: () => void;
+  handleResign: (gameId: string) => void;
 };
 
 export default function PlayOnlineBar({
@@ -31,34 +32,10 @@ export default function PlayOnlineBar({
   opponentOfferedDraw,
   handleRespondToDrawOffer,
   handleListenForDrawOffer,
-  handleSendDrawOffer
+  handleSendDrawOffer,
+  handleResign
 }: Props) {
   const [showResign, setShowResign] = useState(false);
-
-  const resign = () => {
-    const request: SubmitMoveRequest = {
-      gameId: state.gameId,
-      movedPiece: 0,
-      startField: -1,
-      endField: -1,
-      promotePiece: 0,
-      doesResign: true,
-    };
-    submitMove(request)
-      .then((boardResponse: BoardResponse ) => {
-        if (!boardResponse) return;
-        dispatch({
-          type: "setDataFromBoardResponse",
-          payload: { boardResponse },
-        });
-      })
-      .catch((err) => {
-        throw new Error("Failed to resign");
-      })
-      .finally(() => {
-        setShowResign(false);
-      });
-  };
 
   const toggleResign = () => {
     setShowResign((prev) => !prev);
@@ -79,7 +56,9 @@ export default function PlayOnlineBar({
     handleListenForDrawOffer(String(state.gameId));
   }
 
-  
+  const resign = () => {
+    handleResign(String(state.gameId));
+  }
     
 
   const modalTxt =

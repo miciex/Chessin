@@ -3,7 +3,9 @@ import {
   getGameByIdLink,
   getGameHistoryLink,
   listenForDrawOfferLink,
+  listenForResignationLink,
   offerDrawLink,
+  resignLink,
   respondToDrawOfferLink,
 } from "../utils/ApiEndpoints";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
@@ -94,3 +96,39 @@ export const respondToDrawOffer = async (
     body: JSON.stringify(respondToDrawOfferRequest),
   });
 };
+
+export const listenForResignation = async (id: string) => {
+  const accessToken = await getValueFor("accessToken").catch(() => {
+    throw new Error(
+      "Couldn't get game history, because accessToken isn't stored"
+    );
+  });
+
+  return handleFetch(`${listenForResignationLink}${id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  }).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const resign = async (id: string) => {
+  const accessToken = await getValueFor("accessToken").catch(() => {
+    throw new Error(
+      "Couldn't get game history, because accessToken isn't stored"
+    );
+  });
+
+  return handleFetch(`${resignLink}${id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  }).catch((error) => {
+    throw new Error(error);
+  });
+}

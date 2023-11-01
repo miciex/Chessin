@@ -39,7 +39,9 @@ import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import {
   listenForDrawOffer,
+  listenForResignation,
   offerDraw,
+  resign,
   respondToDrawOffer,
 } from "../services/chessGameService";
 
@@ -102,6 +104,34 @@ export default function PlayOnline({ navigation, route }: Props) {
     });
   }
 
+  const handleListenForResign = (gameId: string) => {
+    listenForResignation(gameId)
+    .then((response : BoardResponse | null) => {
+      if (response === null) return;
+      dispatch({
+        type: "setDataFromBoardResponse",
+        payload: { boardResponse: response },
+      });
+    }).
+    catch((err) => {
+      throw new Error(err)
+    });
+  }
+
+  const handleResign = (gameId: string) => {
+    resign(gameId)
+    .then((response : BoardResponse | null) => {
+      if (response === null) return;
+      dispatch({
+        type: "setDataFromBoardResponse",
+        payload: { boardResponse: response },
+      });
+    }).
+    catch((err) => {
+      throw new Error(err)
+    });
+  }
+
   const searchNewGame = () => {
     dispatch({ type: "setSearchingGame", payload: true });
     getValueFor("user")
@@ -121,6 +151,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .then((data: ChessGameResponse) => {
                   if (!data) return;
                   handleListenForDrawOffer(String(data.id));
+                  handleListenForResign(String(data.id));
                   dispatch({
                     type: "setUpGame",
                     payload: {
@@ -210,8 +241,6 @@ export default function PlayOnline({ navigation, route }: Props) {
                   throw new Error(err);
                 });
             } else {
-              // console.log(response.status);
-              // console.log(response.statusText);
               throw new Error("Something went wrong while searching for game");
             }
           })
@@ -329,6 +358,7 @@ export default function PlayOnline({ navigation, route }: Props) {
           handleRespondToDrawOffer={handleRespondToDrawOffer}
           handleListenForDrawOffer={handleListenForDrawOffer}
           handleSendDrawOffer={handleOfferDraw}
+          handleResign={handleResign}
         />
 
         <Bar state={state} dispatch={dispatch} rotateBoard={rotateBoard} />

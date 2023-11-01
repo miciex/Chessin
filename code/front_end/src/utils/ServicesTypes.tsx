@@ -71,7 +71,6 @@ export type SubmitMoveRequest = {
   startField: number;
   endField: number;
   promotePiece: number;
-  doesResign: boolean;
 };
 
 export type BoardResponse = {
