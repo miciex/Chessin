@@ -301,7 +301,7 @@ public class ChessGameController {
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(board));
             }
 
-            cancelDrawOffer(Long.toString(request.getGameId()), servlet);
+            //cancelDrawOffer(Long.toString(request.getGameId()), servlet);
             activeGames.get(request.getGameId()).notifyAll();
 
             activeGames.get(request.getGameId()).wait(timeLeft);
@@ -325,6 +325,7 @@ public class ChessGameController {
         }
     }
 
+    @Transactional
     @PostMapping("/listenForDrawOffer/{gameId}")
     public ResponseEntity<?> listenForDrawOffer(@PathVariable String gameId) throws InterruptedException {
         long id;
@@ -390,7 +391,7 @@ public class ChessGameController {
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
             }
             else
-                return ResponseEntity.ok().body("Opponent has not accepted draw.");
+                return ResponseEntity.status(100).body("Opponent has not accepted draw.");
         }
     }
 

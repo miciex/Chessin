@@ -9,7 +9,7 @@ import OnlineBarModal from "./OnlineBarModal";
 import { submitMove } from "../services/playOnlineService";
 import { BoardResponse, RespondToDrawOfferRequest, SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { offerDraw } from "../../../services/chessGameService";
+import { listenForDrawOffer, offerDraw } from "../../../services/chessGameService";
 import { ResponseType } from "../../../utils/ServicesTypes";
 
 type Props = {
@@ -19,6 +19,8 @@ type Props = {
   toggleRotateBoard: () => void;
   opponentOfferedDraw: boolean;
   handleRespondToDrawOffer: (response: RespondToDrawOfferRequest) => void;
+  handleListenForDrawOffer: (gameId: string) => void;
+  handleSendDrawOffer: () => void;
 };
 
 export default function PlayOnlineBar({
@@ -28,6 +30,8 @@ export default function PlayOnlineBar({
   dispatch,
   opponentOfferedDraw,
   handleRespondToDrawOffer,
+  handleListenForDrawOffer,
+  handleSendDrawOffer
 }: Props) {
   const [showResign, setShowResign] = useState(false);
 
@@ -56,12 +60,6 @@ export default function PlayOnlineBar({
       });
   };
 
-  const sendDrawOffer = () => {
-    offerDraw(String(state.gameId)).catch(() => {
-      throw new Error("Failed to offer draw");
-    });
-  }
-
   const toggleResign = () => {
     setShowResign((prev) => !prev);
   };
@@ -78,6 +76,7 @@ export default function PlayOnlineBar({
       gameId: state.gameId,
       responseType: ResponseType.DECLINE,
     })
+    handleListenForDrawOffer(String(state.gameId));
   }
 
   
@@ -108,7 +107,7 @@ export default function PlayOnlineBar({
             name="fraction-one-half"
             size={34}
             color="black"
-            onPress={sendDrawOffer}
+            onPress={handleSendDrawOffer}
           />
           <FontAwesome
             name="flag-o"

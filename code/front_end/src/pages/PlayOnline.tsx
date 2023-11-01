@@ -39,6 +39,7 @@ import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import {
   listenForDrawOffer,
+  offerDraw,
   respondToDrawOffer,
 } from "../services/chessGameService";
 
@@ -91,6 +92,16 @@ export default function PlayOnline({ navigation, route }: Props) {
     else setRotateBoard(true);
   };
 
+  const handleListenForDrawOffer = (gameId: string) => {
+    listenForDrawOffer(gameId)
+    .then(() => {
+      setOpponentOfferedDraw(true);
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+  }
+
   const searchNewGame = () => {
     dispatch({ type: "setSearchingGame", payload: true });
     getValueFor("user")
@@ -109,13 +120,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .json()
                 .then((data: ChessGameResponse) => {
                   if (!data) return;
-                  listenForDrawOffer(String(data.id))
-                    .then(() => {
-                      setOpponentOfferedDraw(true);
-                    })
-                    .catch((err) => {
-                      throw new Error(err);
-                    });
+                  handleListenForDrawOffer(String(data.id));
                   dispatch({
                     type: "setUpGame",
                     payload: {
@@ -249,28 +254,42 @@ export default function PlayOnline({ navigation, route }: Props) {
     dispatch({ type: "setCurrentPosition", payload: position });
   };
 
+  const handleResponseFromDrawOffer = (board: BoardResponse | null) => {
+    if (!board) {
+      return listenForDrawOffer(String(state.gameId))
+        .then(() => {
+          setOpponentOfferedDraw(true);
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    }
+    dispatch({
+      type: "setDataFromBoardResponse",
+      payload: { boardResponse: board },
+    });
+    setOpponentOfferedDraw(false);
+  }
+
   const handleRespondToDrawOffer = (response: RespondToDrawOfferRequest) => {
     respondToDrawOffer(response)
       .then((board: BoardResponse | null) => {
-        if (!board) {
-          return listenForDrawOffer(String(state.gameId))
-            .then(() => {
-              setOpponentOfferedDraw(true);
-            })
-            .catch((err) => {
-              throw new Error(err);
-            });
-        }
-        dispatch({
-          type: "setDataFromBoardResponse",
-          payload: { boardResponse: board },
-        });
-        setOpponentOfferedDraw(false);
+        handleResponseFromDrawOffer(board);
       })
       .catch((err) => {
         throw new Error(err);
       });
   };
+
+  const handleOfferDraw = () => {
+    offerDraw(String(state.gameId))
+    .then((board: BoardResponse | null) => {
+      handleResponseFromDrawOffer(board);
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+  }
 
   return (
     <View style={styles.container}>
@@ -308,6 +327,8 @@ export default function PlayOnline({ navigation, route }: Props) {
           toggleRotateBoard={toggleRotateBoard}
           opponentOfferedDraw={opponentOfferedDraw}
           handleRespondToDrawOffer={handleRespondToDrawOffer}
+          handleListenForDrawOffer={handleListenForDrawOffer}
+          handleSendDrawOffer={handleOfferDraw}
         />
 
         <Bar state={state} dispatch={dispatch} rotateBoard={rotateBoard} />
