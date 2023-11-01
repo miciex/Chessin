@@ -6,6 +6,7 @@ import com.chessin.controller.requests.FriendInvitationResponseRequest;
 import com.chessin.controller.requests.SetActiveRequest;
 import com.chessin.controller.responses.ChessGameResponse;
 import com.chessin.controller.responses.FriendInvitationResponse;
+import com.chessin.controller.responses.ResponseMessage;
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.ChessGameRepository;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
@@ -69,7 +70,7 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         User user = userService.setActive(email, request.isOnline());
-        return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body("User not found.");
+        return user != null ? ResponseEntity.ok().body(user) : ResponseEntity.badRequest().body(ResponseMessage.of("User not found."));
     }
 
     @PostMapping("/addFriend")
@@ -78,13 +79,13 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!userRepository.existsByEmail(email))
-            return ResponseEntity.badRequest().body("User does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User does not exist."));
         else if(!userRepository.existsByNameInGame(request.getFriendNickname()))
-            return ResponseEntity.badRequest().body("Friend does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Friend does not exist."));
         else if(email.equals(userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail()))
-            return ResponseEntity.badRequest().body("You cannot add yourself as a friend.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("You cannot add yourself as a friend."));
         else if(friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
-            return ResponseEntity.badRequest().body("Invitation already sent.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invitation already sent."));
 
         friendInvitationRepository.save(FriendInvitation.builder()
                 .user(userRepository.findByEmail(email).get())
@@ -92,7 +93,7 @@ public class UserController {
                 .date(Instant.now())
                 .build());
 
-        return ResponseEntity.ok().body("Invitation sent");
+        return ResponseEntity.ok().body(ResponseMessage.of("Invitation sent"));
     }
 
     @PostMapping("/checkInvitations")
@@ -101,7 +102,7 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!friendInvitationRepository.existsByUserEmail(email))
-            return ResponseEntity.badRequest().body("No invitations");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("No invitations"));
 
         List<FriendInvitation> invitations = friendInvitationRepository.findAllByFriend(userRepository.findByEmail(email).get());
 
@@ -120,7 +121,7 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!friendInvitationRepository.existsByFriendEmailAndUserNameInGame(email, request.getFriendNickname()))
-            return ResponseEntity.badRequest().body("Invitation does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invitation does not exist."));
 
         friendInvitationRepository.deleteByUserNameInGameAndFriendEmail(request.getFriendNickname(), email);
 
@@ -136,14 +137,14 @@ public class UserController {
             userRepository.save(friend);
         }
 
-        return ResponseEntity.ok().body("Invitation responded");
+        return ResponseEntity.ok().body(ResponseMessage.of("Invitation responded"));
     }
 
     @PostMapping("/getFriends/{nickname}")
     public ResponseEntity<?> getFriends(@PathVariable String nickname)
     {
         if(!userRepository.existsByNameInGame(nickname))
-            return ResponseEntity.badRequest().body("User does not exist");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User does not exist"));
 
         User user = userRepository.findByNameInGame(nickname).get();
 
@@ -161,9 +162,9 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!userRepository.existsByEmail(email))
-            return ResponseEntity.badRequest().body("User does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User does not exist."));
         else if(!userRepository.existsByNameInGame(request.getFriendNickname()))
-            return ResponseEntity.badRequest().body("Friend does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Friend does not exist."));
 
         User user = userRepository.findByEmail(email).get();
         User friend = userRepository.findByNameInGame(request.getFriendNickname()).get();
@@ -174,7 +175,7 @@ public class UserController {
         userRepository.save(user);
         userRepository.save(friend);
 
-        return ResponseEntity.ok().body("Friend removed.");
+        return ResponseEntity.ok().body(ResponseMessage.of("Friend removed."));
     }
 
     @PostMapping("/removeInvitation")
@@ -183,18 +184,18 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!friendInvitationRepository.existsByUserEmailAndFriendNameInGame(email, request.getFriendNickname()))
-            return ResponseEntity.badRequest().body("Invitation does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Invitation does not exist."));
 
         friendInvitationRepository.deleteByUserEmailAndFriendNameInGame(email, request.getFriendNickname());
 
-        return ResponseEntity.ok().body("Invitation removed.");
+        return ResponseEntity.ok().body(ResponseMessage.of("Invitation removed."));
     }
 
     @PostMapping("/getGames/{nickname}")
     public ResponseEntity<?> getGames(@PathVariable String nickname)
     {
         if(!userRepository.existsByNameInGame(nickname))
-            return ResponseEntity.badRequest().body("User does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User does not exist."));
 
         List<ChessGameResponse> games = new ArrayList<>();
 
@@ -209,7 +210,7 @@ public class UserController {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         if(!userRepository.existsByEmail(email))
-            return ResponseEntity.badRequest().body("User does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User does not exist."));
 
         User user = userRepository.findByEmail(email).get();
 
@@ -225,15 +226,15 @@ public class UserController {
             pageInt = Integer.parseInt(page);
 
             if(pageInt < 0)
-                return ResponseEntity.badRequest().body("Page must be positive.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("Page must be positive."));
         }
         catch(NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Page must be a number.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Page must be a number."));
         }
 
         if(!userRepository.existsByNameInGame(nickname))
-            return ResponseEntity.badRequest().body("User does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User does not exist."));
 
         List<UserResponse> users = new ArrayList<>();
 
@@ -251,15 +252,15 @@ public class UserController {
             pageInt = Integer.parseInt(page);
 
             if(pageInt < 0)
-                return ResponseEntity.badRequest().body("Page must be positive.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("Page must be positive."));
         }
         catch(NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Page must be a number.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Page must be a number."));
         }
 
         if(!userRepository.existsByNameInGame(nickname))
-            return ResponseEntity.badRequest().body("User does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User does not exist."));
 
         List<UserResponse> friends = new ArrayList<>();
         userRepository.findByNameInGame(nickname).get().getFriends().stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(friends::add);
@@ -276,15 +277,15 @@ public class UserController {
             pageInt = Integer.parseInt(page);
 
             if(pageInt < 0)
-                return ResponseEntity.badRequest().body("Page must be positive.");
+                return ResponseEntity.badRequest().body(ResponseMessage.of("Page must be positive."));
         }
         catch(NumberFormatException e)
         {
-            return ResponseEntity.badRequest().body("Page must be a number.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("Page must be a number."));
         }
 
         if(!userRepository.existsByNameInGame(nickname))
-            return ResponseEntity.badRequest().body("User does not exist.");
+            return ResponseEntity.badRequest().body(ResponseMessage.of("User does not exist."));
 
         List<ChessGameResponse> games = new ArrayList<>();
 
