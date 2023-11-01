@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseMessage {
+public class MessageResponse {
     private String message;
 
-    public static ResponseMessage of(String message){
-        return ResponseMessage.builder()
+    public static MessageResponse of(String message){
+        return MessageResponse.builder()
                 .message(message)
                 .build();
     }
