@@ -1,6 +1,7 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
+import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.*;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
@@ -37,10 +38,7 @@ public class ChessGameController {
     private final ChessGameService chessGameService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final ClassicalRatingRepository classicalRatingRepository;
-    private final RapidRatingRepository rapidRatingRepository;
-    private final BlitzRatingRepository blitzRatingRepository;
-    private final BulletRatingRepository bulletRatingRepository;
+    private final UserService userService;
 
     private final ConcurrentHashMap<String, PendingChessGame> pendingGames = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Board> activeBoards = new ConcurrentHashMap<>();
@@ -99,7 +97,7 @@ public class ChessGameController {
 
                 pendingGames.get(foundGame.getUser().getEmail()).notifyAll();
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, userService));
             }
         }
 
@@ -130,7 +128,7 @@ public class ChessGameController {
 
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId()), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId()), userService));
             }
         }
     }
@@ -553,9 +551,9 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
         if(activeGames.containsKey(id))
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id), userService));
 
-        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get(), userService));
     }
 
     @PostMapping("/getGameByUsername/{username}")
@@ -564,7 +562,7 @@ public class ChessGameController {
         Optional<ChessGame> game = activeGames.values().stream().filter(x -> x.getBlackUser().getNameInGame().equals(username) || x.getWhiteUser().getNameInGame().equals(username)).findFirst();
 
         if(game.isPresent())
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get(), userService));
         else
             return ResponseEntity.badRequest().body(MessageResponse.of("This player is not playing any game."));
 
@@ -643,7 +641,7 @@ public class ChessGameController {
 
                 pendingInvitations.remove(email);
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingInvitation.getId()), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingInvitation.getId()), userService));
             }
         }
     }
@@ -689,7 +687,7 @@ public class ChessGameController {
 
             pendingInvitations.get(friendEmail).notifyAll();
 
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, userService));
         }
 
         pendingInvitations.get(friendEmail).notifyAll();
