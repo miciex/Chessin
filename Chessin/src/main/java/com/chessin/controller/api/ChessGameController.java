@@ -435,7 +435,7 @@ public class ChessGameController {
             if(activeBoards.get(id).isWhiteOffersDraw() || activeBoards.get(id).isBlackOffersDraw())
                 return ResponseEntity.ok().body("Opponent has requested draw.");
             else
-                return ResponseEntity.ok().body("Opponent has not requested draw.");
+                return ResponseEntity.status(100).body("Opponent has not requested draw.");
         }
     }
 
@@ -494,7 +494,7 @@ public class ChessGameController {
         if(!activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && !activeBoards.get(request.getGameId()).getBlackEmail().equals(email))
             return ResponseEntity.badRequest().body("You are not playing this game.");
 
-        if(activeBoards.get(request.getGameId()).isBlackOffersDraw() == false && activeBoards.get(request.getGameId()).isWhiteOffersDraw() == false)
+        if(!activeBoards.get(request.getGameId()).isBlackOffersDraw() && !activeBoards.get(request.getGameId()).isWhiteOffersDraw())
             return ResponseEntity.badRequest().body("Opponent has not offered draw.");
 
         if(activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && activeBoards.get(request.getGameId()).isWhiteOffersDraw())
