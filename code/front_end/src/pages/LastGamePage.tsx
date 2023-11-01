@@ -1,5 +1,5 @@
 import { View, StyleSheet, ScrollView } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import EndedGame from "../features/home/components/EndedGame";
 import { ColorsPallet } from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -7,69 +7,11 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Footer from "../components/Footer";
 import Heading from "../components/Heading";
-
-const ended_games = [
-  {
-    date: "01.10.2022",
-    playerNick: "Pusznik",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "MaciekNieBij",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Slaweczuk",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Strzała",
-    rank: 1500,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Bestia",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Sharku",
-    rank: 1000,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-];
+import { User } from "../utils/PlayerUtilities";
+import { ChessGameResponse } from "../utils/ServicesTypes";
+import { getValueFor } from "../utils/AsyncStoreFunctions";
+import { getGameHistory } from "../services/chessGameService";
+import BaseButton from "../components/BaseButton";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -81,23 +23,81 @@ type Props = {
 };
 
 export default function LastGame({ navigation }: Props) {
+  const [user, setUser] = useState<User>();
+  const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
+  const [gamesPage, setGamesPage] = useState<number>(0);
+
+  const updateGamesPage = () => {
+    setGamesPage((prev) => prev + 1);
+  };
+
+  const handleGetMoreGames = () => {
+    //...Try to load more old games. If the code succeeded call udpateGamesPage
+  };
+
+  useEffect(() => {
+    getValueFor("user")
+      .then((user) => {
+        if (!user) return navigation.navigate("UserNotAuthenticated");
+        let parsedUser: User = JSON.parse(user);
+        if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
+        setUser(parsedUser);
+        getGameHistory(parsedUser.nameInGame).then((response) => {
+          console.log("Got response");
+          console.log(response.status);
+          if (response.status === 200) {
+            response
+              .json()
+              .then((data: ChessGameResponse[]) => {
+                setUserGames(data);
+              })
+              .catch((error) => {
+                console.error(error);
+                throw new Error("Couldn't load game history");
+              });
+          } else throw new Error("Couldn't load game history");
+        });
+      })
+      .catch((error) => {
+        navigation.navigate("UserNotAuthenticated");
+        throw new Error(error);
+      });
+  }, []);
+
   return (
     <View style={styles.appContainer}>
       <ScrollView>
         <View style={styles.contentContainer}>
-          <Heading text={"Old Games"} />
-          {ended_games.map((gracz, index) => (
+          <Heading text={"Game History"} />
+          {userGames.map((game) => (
             <View style={{ width: "90%" }}>
               <EndedGame
-                nick={gracz.playerNick}
-                rank={gracz.rank}
-                result={gracz.lastGameResult}
+                nick={
+                  game.whiteUser.nameInGame === user?.nameInGame
+                    ? game.blackUser.nameInGame
+                    : game.whiteUser.nameInGame
+                }
+                rank={
+                  game.whiteUser.nameInGame === user?.nameInGame
+                    ? game.blackRating
+                    : game.whiteRating
+                }
+                result={"win"}
                 navigation={navigation}
-                key={index}
-                date={gracz.date}
+                key={`${game.id}${user?.nameInGame}`}
+                date={"2023.10.27"}
+                gameId={game.id}
               />
             </View>
           ))}
+          <View style={styles.buttonContainer}>
+            <BaseButton
+              text="Load more games"
+              handlePress={() => {}}
+              fontColor="black"
+              color="transparent"
+            />
+          </View>
         </View>
       </ScrollView>
       <Footer navigation={navigation} />
@@ -115,6 +115,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
     flex: 8,
     alignItems: "center",
+  },
+  buttonContainer:{
+    margin: 12,
+    height: 32,
+    width: '50%'
   },
 
   endedGames: {},
