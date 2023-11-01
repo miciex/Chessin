@@ -484,7 +484,6 @@ public class ChessGameController {
                 activeBoards.get(request.getGameId()).setGameResult(GameResults.DRAW_AGREEMENT);
                 //chessGameRepository.updateGameResult(request.getGameId(), GameResults.DRAW_AGREEMENT);
                 activeBoards.get(request.getGameId()).notifyAll();
-                activeGames.get(request.getGameId()).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
             }
             else

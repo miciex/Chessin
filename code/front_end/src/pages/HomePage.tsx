@@ -13,6 +13,7 @@ import { getValueFor } from "../utils/AsyncStoreFunctions";
 import ChooseYourLevelModal from "../features/home/components/ChooseYourLevelModal";
 import { ChessGameResponse } from "../utils/ServicesTypes";
 import { getGameHistory } from "../services/chessGameService";
+import { getPagedGames } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home", undefined>;
@@ -32,7 +33,7 @@ const HomePage = ({ navigation }: Props) => {
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
         setUser(parsedUser);
         console.log("User: " + parsedUser.nameInGame);
-        getGameHistory(parsedUser.nameInGame).then((response) => {
+        getPagedGames(parsedUser.nameInGame, 0).then((response) => {
           console.log("Got response")
           console.log(response.status);
           if (response.status === 200) {
@@ -41,8 +42,7 @@ const HomePage = ({ navigation }: Props) => {
               .then((data: ChessGameResponse[]) => {
                 setUserGames(data);
               })
-              .catch((error) => {
-                console.error(error);
+              .catch(() => {
                 throw new Error("Couldn't load game history");
               });
           } else throw new Error("Couldn't load game history");
