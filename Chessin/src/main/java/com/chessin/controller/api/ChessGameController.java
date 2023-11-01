@@ -347,7 +347,7 @@ public class ChessGameController {
 
         synchronized(activeBoards.get(id))
         {
-            activeGames.get(id).wait(Constants.Application.waitForMoveTime);
+            activeBoards.get(id).wait(Constants.Application.waitForMoveTime);
 
             if(activeBoards.get(id).getGameResult() != GameResults.NONE)
             {
@@ -392,7 +392,7 @@ public class ChessGameController {
                 activeBoards.replace(id, activeBoards.get(id));
                 if(activeGames.get(id).isRated())
                     activeBoards.replace(id, chessGameService.updateRatings(activeGames.get(id), activeBoards.get(id)));
-                activeGames.get(id).notifyAll();
+                activeBoards.get(id).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
             }
             else if(activeBoards.get(id).getBlackEmail().equals(email))
@@ -402,7 +402,7 @@ public class ChessGameController {
                 activeBoards.replace(id, activeBoards.get(id));
                 if(activeGames.get(id).isRated())
                     activeBoards.replace(id, chessGameService.updateRatings(activeGames.get(id), activeBoards.get(id)));
-                activeGames.get(id).notifyAll();
+                activeBoards.get(id).notifyAll();
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
             }
             else
@@ -430,7 +430,7 @@ public class ChessGameController {
 
         synchronized(activeBoards.get(id))
         {
-            activeGames.get(id).wait(Constants.Application.waitForMoveTime);
+            activeBoards.get(id).wait(Constants.Application.waitForMoveTime);
 
             if(activeBoards.get(id).isWhiteOffersDraw() || activeBoards.get(id).isBlackOffersDraw())
                 return ResponseEntity.ok().body("Opponent has requested draw.");

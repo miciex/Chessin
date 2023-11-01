@@ -31,6 +31,7 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { Rankings } from "../utils/PlayerUtilities";
 import { GameType } from "../chess-logic/board";
+import { handleFetch } from "../lib/fetch";
 
 export const storeUser = async (value: User) => {
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
@@ -180,11 +181,12 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
     },
     body: JSON.stringify(request),
   })
-    .then((response) => {
+    .then(async(response) => {
       if (response.status === 200) {
-        return response.text().catch((error) => {
+        const msg = await response.json().catch((error) => {
           throw new Error(error);
-        });
+        })
+        return msg.message;
       } else {
         throw new Error("Something went wrong on api server!");
       }
@@ -207,9 +209,10 @@ export const handleFriendInvitationFunc = async (
     },
     body: JSON.stringify(request),
   })
-    .then((response) => {
+    .then(async(response) => {
       if (response.status === 200) {
-        return response.text();
+        const msg = await response.json().catch((error) =>{throw new Error(error)});
+        return msg.message; 
       } else {
         throw new Error("Something went wrong on api server!");
       }
@@ -331,3 +334,19 @@ export const updateUserRating = async (rating: number, gameType: GameType) => {
   save("user", JSON.stringify(user));
 };
 
+
+export const getPagedGames = async (nameInGame:string, page:number) => {
+  const accessToken = await getValueFor("accessToken").catch(() => {
+    throw new Error(
+      "Couldn't get game history, because accessToken isn't stored"
+    );
+  });
+
+  return handleFetch(`${getGameHistoryLink}${nameInGame}/${page}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};

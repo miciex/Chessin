@@ -107,6 +107,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   const handleListenForResign = (gameId: string) => {
     listenForResignation(gameId)
     .then((response : BoardResponse | null) => {
+      console.log("handle Listen for Resing Response: " + response)
       if (response === null) return;
       dispatch({
         type: "setDataFromBoardResponse",
@@ -121,6 +122,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   const handleResign = (gameId: string) => {
     resign(gameId)
     .then((response : BoardResponse | null) => {
+      console.log("resignation response: " + response);
       if (response === null) return;
       dispatch({
         type: "setDataFromBoardResponse",

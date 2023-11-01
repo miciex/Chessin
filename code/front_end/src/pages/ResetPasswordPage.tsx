@@ -63,7 +63,7 @@ export default function ResetPasswordPage({
     setEmailValid(emailValid);
     if (!emailValid) return;
     twoFaEnabled({ email })
-      .then((response) => {
+      .then(async (response) => {
         if (response.status === 200) {
           logoutUser()
             .then(() => {
@@ -72,12 +72,13 @@ export default function ResetPasswordPage({
             .catch((err) => {
               throw new Error(err);
             });
-          return response.text() as unknown as TwoFactorAuthenticationResponse;
+            const msg = await response.json();
+          return msg.message as unknown as TwoFactorAuthenticationResponse;
         } else if (response.status === 400) {
           response
-            .text()
+            .json()
             .then((data) => {
-              throw new Error(data);
+              throw new Error(data.message);
             })
             .catch((err) => {
               throw new Error(err);
