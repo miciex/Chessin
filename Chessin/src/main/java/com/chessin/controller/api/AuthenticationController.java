@@ -1,7 +1,7 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.requests.*;
-import com.chessin.controller.responses.ResponseMessage;
+import com.chessin.controller.responses.MessageResponse;
 import com.chessin.model.register.authentication.refreshToken.RefreshToken;
 import com.chessin.controller.register.RefreshTokenService;
 import com.chessin.model.register.authentication.refreshToken.TokenRefreshException;
@@ -28,7 +28,7 @@ public class AuthenticationController {
         request.setEmail(request.getEmail().toLowerCase());
 
         if(repository.existsByEmail(request.getEmail())){
-            return ResponseEntity.badRequest().body(ResponseMessage.of("Email already exists in the database."));
+            return ResponseEntity.badRequest().body(MessageResponse.of("Email already exists in the database."));
         }
 
         return service.register(request);
@@ -39,7 +39,7 @@ public class AuthenticationController {
         request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
-            return ResponseEntity.badRequest().body(ResponseMessage.of("Email does not exist in the database."));
+            return ResponseEntity.badRequest().body(MessageResponse.of("Email does not exist in the database."));
         }
 
         return service.authenticate(request);
@@ -50,7 +50,7 @@ public class AuthenticationController {
         request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
-            return ResponseEntity.badRequest().body(ResponseMessage.of("Email does not exist in the database."));
+            return ResponseEntity.badRequest().body(MessageResponse.of("Email does not exist in the database."));
         }
 
         return switch (request.getVerificationType()) {
@@ -58,7 +58,7 @@ public class AuthenticationController {
             case CHANGE_PASSWORD -> service.finishChangingPassword(request);
             case REMIND_PASSWORD -> service.finishRemindingPassword(request);
             case REGISTER -> service.activateAccount(request);
-            default -> ResponseEntity.badRequest().body(ResponseMessage.of("Invalid verification type."));
+            default -> ResponseEntity.badRequest().body(MessageResponse.of("Invalid verification type."));
         };
     }
 
@@ -67,7 +67,7 @@ public class AuthenticationController {
         request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
-            return ResponseEntity.badRequest().body(ResponseMessage.of("Email does not exist in the database."));
+            return ResponseEntity.badRequest().body(MessageResponse.of("Email does not exist in the database."));
         }
 
         return service.changePassword(request);
@@ -78,7 +78,7 @@ public class AuthenticationController {
         request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
-            return ResponseEntity.badRequest().body(ResponseMessage.of("Email does not exist in the database."));
+            return ResponseEntity.badRequest().body(MessageResponse.of("Email does not exist in the database."));
         }
 
          return service.remindPassword(request);
@@ -89,11 +89,11 @@ public class AuthenticationController {
         request.setEmail(request.getEmail().toLowerCase());
 
         if(!repository.existsByEmail(request.getEmail())){
-            return ResponseEntity.badRequest().body(ResponseMessage.of("Email does not exist in the database."));
+            return ResponseEntity.badRequest().body(MessageResponse.of("Email does not exist in the database."));
         }
 
         return repository.findByEmail(request.getEmail()).get().isTwoFactorAuthenticationEnabled()
-                ? ResponseEntity.ok().body(ResponseMessage.of("True")) : ResponseEntity.ok().body(ResponseMessage.of("False"));
+                ? ResponseEntity.ok().body(MessageResponse.of("True")) : ResponseEntity.ok().body(MessageResponse.of("False"));
     }
 
     @PostMapping("/refreshToken")
