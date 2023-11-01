@@ -87,6 +87,7 @@ public class ChessGameController {
                         .gameType(HelpMethods.getGameType(foundGame.getTimeControl()))
                         .startTime(Instant.now().toEpochMilli())
                         .isRated(foundGame.isRated())
+                        .gameResult(GameResults.NONE)
                         .build();
 
                 chessGameRepository.save(game);
@@ -700,6 +701,7 @@ public class ChessGameController {
                     .gameType(HelpMethods.getGameType(pendingInvitations.get(friendEmail).getTimeControl()))
                     .startTime(Instant.now().toEpochMilli())
                     .isRated(pendingInvitations.get(friendEmail).isRated())
+                    .gameResult(GameResults.NONE)
                     .build();
 
             chessGameRepository.save(game);
