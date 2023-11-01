@@ -602,6 +602,37 @@ public class ChessGameController {
 
     }
 
+    @PostMapping("/isUserPlaying/{username}")
+    public ResponseEntity<?> isUserPlaying(@PathVariable String username)
+    {
+        String email = userRepository.findByNameInGame(username).get().getEmail();
+        boolean isPlaying = activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email));
+
+        return isPlaying ? ResponseEntity.ok().body(MessageResponse.of("True")) : ResponseEntity.ok().body(MessageResponse.of("False"));
+    }
+
+    @PostMapping("/isUserPlayingTimeControl/{username}/{timeControl}/{increment}")
+    public ResponseEntity<?> isUserPlaying(@PathVariable String username, @PathVariable int timeControl, @PathVariable int increment)
+    {
+        String email = userRepository.findByNameInGame(username).get().getEmail();
+        boolean isPlaying = activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email));
+
+        if(isPlaying)
+        {
+            List<ChessGame> games = activeGames.values().stream().filter(x -> x.getWhiteUser().getEmail().equals(email) || x.getBlackUser().getEmail().equals(email)).toList();
+
+            for(ChessGame game : games)
+            {
+                if(game.getTimeControl() == timeControl && game.getIncrement() == increment)
+                    return ResponseEntity.ok().body(MessageResponse.of("True"));
+                else
+                    return ResponseEntity.ok().body(MessageResponse.of("False"));
+            }
+        }
+
+        return ResponseEntity.ok().body(MessageResponse.of("False"));
+    }
+
     @Transactional
     @PostMapping("/inviteFriend")
     public ResponseEntity<?> inviteFriend(@RequestBody GameInvitationRequest request, HttpServletRequest servlet) throws InterruptedException {
