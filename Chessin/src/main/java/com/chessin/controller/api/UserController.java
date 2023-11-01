@@ -19,10 +19,12 @@ import com.chessin.model.register.user.UserRepository;
 import com.chessin.model.social.FriendInvitation;
 import com.chessin.model.social.FriendInvitationRepository;
 import com.chessin.model.playing.ResponseType;
+import com.chessin.model.utils.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -235,8 +237,59 @@ public class UserController {
 
         List<UserResponse> users = new ArrayList<>();
 
-        userRepository.findAllByNameInGameContaining(nickname, PageRequest.of(pageInt, 10)).stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(users::add);
+        userRepository.findAllByNameInGameContaining(nickname, PageRequest.of(pageInt, Constants.Application.DEFAULT_PAGE_SIZE)).stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(users::add);
 
         return ResponseEntity.ok().body(users);
+    }
+
+    @PostMapping("/getFriends/{nickname}/{page}")
+    public ResponseEntity<?> getFriends(@PathVariable String nickname, @PathVariable String page)
+    {
+        int pageInt;
+        try
+        {
+            pageInt = Integer.parseInt(page);
+
+            if(pageInt < 0)
+                return ResponseEntity.badRequest().body("Page must be positive.");
+        }
+        catch(NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Page must be a number.");
+        }
+
+        if(!userRepository.existsByNameInGame(nickname))
+            return ResponseEntity.badRequest().body("User does not exist.");
+
+        List<UserResponse> friends = new ArrayList<>();
+        userRepository.findByNameInGame(nickname).get().getFriends().stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(friends::add);
+
+        return ResponseEntity.ok().body(userService.getFriends(pageInt, Constants.Application.DEFAULT_PAGE_SIZE, friends));
+    }
+
+    @PostMapping("/getGames/{nickname}/{page}")
+    public ResponseEntity<?> getGames(@PathVariable String nickname, @PathVariable String page)
+    {
+        int pageInt;
+        try
+        {
+            pageInt = Integer.parseInt(page);
+
+            if(pageInt < 0)
+                return ResponseEntity.badRequest().body("Page must be positive.");
+        }
+        catch(NumberFormatException e)
+        {
+            return ResponseEntity.badRequest().body("Page must be a number.");
+        }
+
+        if(!userRepository.existsByNameInGame(nickname))
+            return ResponseEntity.badRequest().body("User does not exist.");
+
+        List<ChessGameResponse> games = new ArrayList<>();
+
+        chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGamePage(nickname, PageRequest.of(pageInt, Constants.Application.DEFAULT_PAGE_SIZE)).stream().map((ChessGame game) -> ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(games::add);
+
+        return ResponseEntity.ok().body(games);
     }
 }

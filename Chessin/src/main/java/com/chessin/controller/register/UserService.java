@@ -1,11 +1,15 @@
 package com.chessin.controller.register;
 
+import com.chessin.controller.responses.UserResponse;
 import com.chessin.model.register.user.Provider;
 import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,5 +35,15 @@ public class UserService {
             userRepository.save(user);
         }
         return user;
+    }
+
+    public List<UserResponse> getFriends(int page, int size, List<UserResponse> friends)
+    {
+        Pageable pageable = PageRequest.of(page, size);
+
+        int start = (int)pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), friends.size());
+
+        return friends.subList(start, end);
     }
 }

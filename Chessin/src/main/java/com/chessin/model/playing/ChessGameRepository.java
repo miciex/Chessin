@@ -2,6 +2,8 @@ package com.chessin.model.playing;
 
 import com.chessin.model.register.user.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +26,7 @@ public interface ChessGameRepository extends JpaRepository<ChessGame, Long> {
 
     @Query(value = "SELECT cg FROM ChessGame cg WHERE cg.whiteUser.nameInGame = :nickname OR cg.blackUser.nameInGame = :nickname")
     List<ChessGame> findAllByWhiteNameInGameOrBlackNameInGame(@Param(value = "nickname") String nickname);
+
+    @Query(value = "SELECT cg FROM ChessGame cg WHERE cg.whiteUser.nameInGame = :nickname OR cg.blackUser.nameInGame = :nickname")
+    List<ChessGame> findAllByWhiteNameInGameOrBlackNameInGamePage(@Param(value = "nickname") String nickname, Pageable pageable);
 }

@@ -4,11 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="" />
+    <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/api/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/api/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/register/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/register/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/ChessGameRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/model/playing/ChessGameRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/model/register/user/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/model/register/user/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/model/utils/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/model/utils/Constants.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -23,10 +38,12 @@
     <option name="generalSettings">
       <MavenGeneralSettings>
         <option name="mavenHome" value="Use Maven wrapper" />
-        <option name="useMavenConfig" value="true" />
       </MavenGeneralSettings>
     </option>
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
+}]]></component>
   <component name="ProjectId" id="2QVczJ3H3ZsjWa8IxSa91ltlzBz" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -104,6 +121,7 @@
       <workItem from="1698095118802" duration="1925000" />
       <workItem from="1698252619040" duration="2926000" />
       <workItem from="1698337340087" duration="24655000" />
+      <workItem from="1698842816466" duration="1263000" />
     </task>
     <servers />
   </component>
@@ -130,7 +148,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
-          <line>109</line>
+          <line>110</line>
           <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -142,26 +160,6 @@
           <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java</url>
           <line>314</line>
           <option name="timeStamp" value="61" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
-          <line>89</line>
-          <option name="timeStamp" value="69" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
-          <line>86</line>
-          <option name="timeStamp" value="70" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
-          <line>85</line>
-          <option name="timeStamp" value="71" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
-          <line>88</line>
-          <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/chessin/model/playing/Board.java</url>
