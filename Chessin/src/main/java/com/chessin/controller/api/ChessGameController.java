@@ -195,17 +195,21 @@ public class ChessGameController {
         {
             activeGames.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
-            if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty())
+            if(activeBoards.containsKey(id))
             {
-                Board endBoard = activeBoards.get(id);
-                endBoard.setGameResult(GameResults.ABANDONED);
-                chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
-                activeBoards.remove(id);
-                activeGames.remove(id);
-                return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
+                if (activeBoards.get(id).getGameResult() == GameResults.NONE) {
+                    if (activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty()) {
+                        Board endBoard = activeBoards.get(id);
+                        endBoard.setGameResult(GameResults.ABANDONED);
+                        chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
+                        activeBoards.remove(id);
+                        activeGames.remove(id);
+                        return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
+                    } else
+                        return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
+                } else
+                    return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
             }
-
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
         }
     }
 
@@ -410,13 +414,16 @@ public class ChessGameController {
         {
             activeBoards.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
-            if(activeBoards.get(id).isWhiteOffersDraw() || activeBoards.get(id).isBlackOffersDraw())
-                if((activeBoards.get(id).isWhiteOffersDraw() && activeBoards.get(id).getWhiteEmail().equals(email)) || (activeBoards.get(id).isBlackOffersDraw() && activeBoards.get(id).getBlackEmail().equals(email)))
-                    return ResponseEntity.accepted().body(MessageResponse.of("Draw successfully offered."));
+            if(activeBoards.containsKey(id))
+            {
+                if (activeBoards.get(id).isWhiteOffersDraw() || activeBoards.get(id).isBlackOffersDraw())
+                    if ((activeBoards.get(id).isWhiteOffersDraw() && activeBoards.get(id).getWhiteEmail().equals(email)) || (activeBoards.get(id).isBlackOffersDraw() && activeBoards.get(id).getBlackEmail().equals(email)))
+                        return ResponseEntity.accepted().body(MessageResponse.of("Draw successfully offered."));
+                    else
+                        return ResponseEntity.ok().body(MessageResponse.of("Opponent has requested draw."));
                 else
-                    return ResponseEntity.ok().body(MessageResponse.of("Opponent has requested draw."));
-            else
-                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not requested draw."));
+                    return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not requested draw."));
+            }
         }
     }
 
@@ -451,12 +458,13 @@ public class ChessGameController {
             activeBoards.get(id).notifyAll();
             activeBoards.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
-            if(activeBoards.get(id).getGameResult() != GameResults.NONE)
+            if(activeBoards.containsKey(id))
             {
-                return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
+                if (activeBoards.get(id).getGameResult() != GameResults.NONE) {
+                    return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
+                } else
+                    return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not accepted draw."));
             }
-            else
-                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not accepted draw."));
         }
     }
 
