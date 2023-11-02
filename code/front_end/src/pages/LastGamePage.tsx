@@ -12,6 +12,7 @@ import { ChessGameResponse } from "../utils/ServicesTypes";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { getGameHistory } from "../services/chessGameService";
 import BaseButton from "../components/BaseButton";
+import { getPagedGames } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -27,12 +28,18 @@ export default function LastGame({ navigation }: Props) {
   const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
   const [gamesPage, setGamesPage] = useState<number>(0);
 
-  const updateGamesPage = () => {
-    setGamesPage((prev) => prev + 1);
+
+  const updateGamesPage = (nameInGame:string) => {
+    getPagedGames(nameInGame, gamesPage).then((data:ChessGameResponse[]|null) => {
+      if(!data) return;
+      setGamesPage((prev) => prev + 1);
+      setUserGames(prev => [...prev, ...data]);
+    });
   };
 
   const handleGetMoreGames = () => {
-    //...Try to load more old games. If the code succeeded call udpateGamesPage
+    if(!user) return;
+    updateGamesPage(user.nameInGame);
   };
 
   useEffect(() => {
@@ -42,21 +49,7 @@ export default function LastGame({ navigation }: Props) {
         let parsedUser: User = JSON.parse(user);
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
         setUser(parsedUser);
-        getGameHistory(parsedUser.nameInGame).then((response) => {
-          console.log("Got response");
-          console.log(response.status);
-          if (response.status === 200) {
-            response
-              .json()
-              .then((data: ChessGameResponse[]) => {
-                setUserGames(data);
-              })
-              .catch((error) => {
-                console.error(error);
-                throw new Error("Couldn't load game history");
-              });
-          } else throw new Error("Couldn't load game history");
-        });
+        updateGamesPage(parsedUser.nameInGame);
       })
       .catch((error) => {
         navigation.navigate("UserNotAuthenticated");
@@ -93,7 +86,7 @@ export default function LastGame({ navigation }: Props) {
           <View style={styles.buttonContainer}>
             <BaseButton
               text="Load more games"
-              handlePress={() => {}}
+              handlePress={handleGetMoreGames}
               fontColor="black"
               color="transparent"
             />

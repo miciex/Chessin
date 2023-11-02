@@ -35,3 +35,4 @@ export const offerDrawLink = `${chessGameLink}offerDraw/`;
 export const respondToDrawOfferLink = `${chessGameLink}respondToDrawOffer`;
 export const listenForResignationLink = `${chessGameLink}listenForResignation/`;
 export const resignLink = `${chessGameLink}resign/`;
+export const getBoardByUsernameLink = `${chessGameLink}getBoardByUsername/`;

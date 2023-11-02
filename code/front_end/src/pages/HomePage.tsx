@@ -33,19 +33,9 @@ const HomePage = ({ navigation }: Props) => {
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
         setUser(parsedUser);
         console.log("User: " + parsedUser.nameInGame);
-        getPagedGames(parsedUser.nameInGame, 0).then((response) => {
-          console.log("Got response")
-          console.log(response.status);
-          if (response.status === 200) {
-            response
-              .json()
-              .then((data: ChessGameResponse[]) => {
-                setUserGames(data);
-              })
-              .catch(() => {
-                throw new Error("Couldn't load game history");
-              });
-          } else throw new Error("Couldn't load game history");
+        getPagedGames(parsedUser.nameInGame, 0).then((data:ChessGameResponse[]|null) => {
+          if(!data) return;
+          setUserGames(data);
         });
       })
       .catch((error) => {

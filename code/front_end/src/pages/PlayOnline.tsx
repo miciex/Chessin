@@ -38,6 +38,7 @@ import {
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import {
+  getBoardByUsername,
   listenForDrawOffer,
   listenForResignation,
   offerDraw,
@@ -194,55 +195,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .catch((err) => {
                   throw new Error(err);
                 });
-            } else if (response.status === 202) {
-              getGameByUsername(user.nameInGame)
-                .then((data: ChessGameResponse | undefined) => {
-                  if (!data) return;
-                  const isMyPlayerWhite =
-                    data.whiteUser.nameInGame === user.nameInGame;
-                  const myColor = isMyPlayerWhite ? "white" : "black";
-                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
-                  dispatch({
-                    type: "setUpGame",
-                    payload: {
-                      chessGameResponse: data,
-                      nameInGame: request.nameInGame,
-                    },
-                  });
-                  getBoardByGameId(data.id).then(
-                    (boardResponse: BoardResponse) => {
-                      dispatch({
-                        type: "setDataFromBoardResponse",
-                        payload: { boardResponse },
-                      });
-                      if (
-                        boardResponse.gameResult !== GameResults.NONE ||
-                        boardResponse.whiteTurn === (myColor === "white")
-                      )
-                        return;
-                      listenForMove({
-                        gameId: data.id,
-                        moves: boardResponse.moves,
-                      })
-                        .then((board: BoardResponse | undefined) => {
-                          if (board === undefined) return;
-                          dispatch({
-                            type: "setDataFromBoardResponse",
-                            payload: {
-                              boardResponse: board,
-                            },
-                          });
-                        })
-                        .catch((err) => {
-                          throw new Error(err);
-                        });
-                    }
-                  );
-                })
-                .catch((err) => {
-                  throw new Error(err);
-                });
-            } else {
+            }  else {
               throw new Error("Something went wrong while searching for game");
             }
           })
@@ -289,7 +242,8 @@ export default function PlayOnline({ navigation, route }: Props) {
     if (!board) {
       return listenForDrawOffer(String(state.gameId))
         .then(() => {
-          setOpponentOfferedDraw(true);
+          setOpponentOfferedDraw(false);
+          listenForDrawOffer(String(state.gameId));
         })
         .catch((err) => {
           throw new Error(err);
