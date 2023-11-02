@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
       height: 100
     },
     profile:{
-      height: 50
+      height: 50,
+      marginLeft: 6
     },
     text:{
       textAlign: "center"

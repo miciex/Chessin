@@ -1,5 +1,6 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
 import { User, responseUser } from "../utils/PlayerUtilities";
+
 import {
   friendInvitation,
   findUsersByNickname,
@@ -173,6 +174,7 @@ export const setUserDataFromResponse = async (
 
 export const addFriendFunc = async (request: FriendInvitationRequest) => {
   const accessToken = await getValueFor("accessToken");
+  console.log("s")
   const response = await fetch(addFriendLink, {
     method: "POST",
     headers: {
@@ -245,6 +247,7 @@ export const handleGameInvitation = async (request: HandleFriendInvitation) =>{
   return response;
 }
 
+<<<<<<< Updated upstream
 export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
   const response = await fetch(`${getFriends}${request.searchNickname}`, {
@@ -273,6 +276,9 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
     });
   return response;
 }
+=======
+
+>>>>>>> Stashed changes
 
 export const checkInvitations = async () => {
   const accessToken = await getValueFor("accessToken");
@@ -328,10 +334,17 @@ export const updateUserRating = async (rating: number, gameType: GameType) => {
   save("user", JSON.stringify(user));
 };
 
+<<<<<<< Updated upstream
 export const checkSendedInvitations = async () => {
   const accessToken = await getValueFor("accessToken");
 
   const response = await fetch(checkSendedInvitationsLink, {
+=======
+export const getFriendsList = async (nick:string) => {
+  const accessToken = await getValueFor("accessToken");
+
+  const response = await fetch(`${getFriends}${nick}`, {
+>>>>>>> Stashed changes
     method: "POST",
     headers: {
       "Content-Type": "application/json",

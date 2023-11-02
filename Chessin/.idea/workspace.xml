@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="" />
+    <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/features/authentication/services/loginServices.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/features/authentication/services/loginServices.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/pages/ProfilePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/pages/ProfilePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/services/userServices.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/services/userServices.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/utils/ApiEndpoints.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/utils/ApiEndpoints.tsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,11 +28,6 @@
         <option name="mavenHome" value="Use Maven wrapper" />
         <option name="useMavenConfig" value="true" />
       </MavenGeneralSettings>
-    </option>
-    <option name="importingSettings">
-      <MavenImportingSettings>
-        <option name="workspaceImportEnabled" value="true" />
-      </MavenImportingSettings>
     </option>
   </component>
   <component name="ProjectId" id="2QVczJ3H3ZsjWa8IxSa91ltlzBz" />
@@ -101,6 +102,8 @@
       <workItem from="1691394644901" duration="1926000" />
       <workItem from="1691411924746" duration="3096000" />
       <workItem from="1691432550562" duration="20000" />
+      <workItem from="1698680832274" duration="4005000" />
+      <workItem from="1698921068820" duration="1506000" />
     </task>
     <servers />
   </component>
@@ -108,6 +111,15 @@
     <option name="version" value="3" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/UserController.java</url>
+          <line>74</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="SpringBootApplicationConfigurationType">
         <watch expression="userRepository" language="JAVA" />

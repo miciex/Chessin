@@ -91,6 +91,7 @@ const HomePage = ({ navigation }: Props) => {
   useEffect(() => {
     getValueFor("user")
       .then((user) => {
+        console.log(user)
         if (!user) return navigation.navigate("UserNotAuthenticated");
         let parsedUser: User = JSON.parse(user);
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
@@ -148,6 +149,7 @@ const HomePage = ({ navigation }: Props) => {
                 text="Choose Your Level"
               />
             </View>
+            
             <TopButtons navigation={navigation} user={user} />
             <View style={styles.oldGamesButton}>
               <BaseButton
