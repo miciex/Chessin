@@ -247,10 +247,9 @@ export const handleGameInvitation = async (request: HandleFriendInvitation) =>{
   return response;
 }
 
-<<<<<<< Updated upstream
 export async function handleSearchBarSocials (request: HandleSearchBarSocials){
   const accessToken = await getValueFor("accessToken");
-  const response = await fetch(`${getFriends}${request.searchNickname}`, {
+  const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -276,9 +275,6 @@ export async function handleSearchBarSocials (request: HandleSearchBarSocials){
     });
   return response;
 }
-=======
-
->>>>>>> Stashed changes
 
 export const checkInvitations = async () => {
   const accessToken = await getValueFor("accessToken");
@@ -334,17 +330,11 @@ export const updateUserRating = async (rating: number, gameType: GameType) => {
   save("user", JSON.stringify(user));
 };
 
-<<<<<<< Updated upstream
-export const checkSendedInvitations = async () => {
-  const accessToken = await getValueFor("accessToken");
 
-  const response = await fetch(checkSendedInvitationsLink, {
-=======
 export const getFriendsList = async (nick:string) => {
   const accessToken = await getValueFor("accessToken");
 
   const response = await fetch(`${getFriends}${nick}`, {
->>>>>>> Stashed changes
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -353,6 +343,37 @@ export const getFriendsList = async (nick:string) => {
   })
     .then((response) => {
       if (response.status === 200) {
+        return response.json().catch((error) => {
+          throw new Error(error);
+        }) as unknown as Array<responseUser>;
+      } else if (response.status === 400) {
+        throw new Error("Bad request");
+      } else if (response.status === 401) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+
+  return response;
+};
+
+export const checkSendedInvitations = async () => {
+  const accessToken = await getValueFor("accessToken");
+  
+  const response = await fetch(`${checkSendedInvitationsLink}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        console.log("shit")
         return response.json().catch((error) => {
           throw new Error(error);
         }) as unknown as Array<responseUser>;

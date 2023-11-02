@@ -8,7 +8,7 @@ import EndedGame from "../features/home/components/EndedGame";
 import Heading from "../components/Heading";
 import FriendsIconList from "../features/playWithFriend/components/FriendsIconList";
 import BaseButton from "../components/BaseButton";
-import { addFriendFunc, checkInvitations, getFriendsList, getUser, handleFriendInvitationFunc } from "../services/userServices";
+import { addFriendFunc, checkInvitations, checkSendedInvitations, getFriendsList, getUser, handleFriendInvitationFunc } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
@@ -17,8 +17,6 @@ import { FriendInvitationResponseType } from "../utils/ServicesTypes";
 import LogoutButton from "../components/LogoutButton";
 import { getGameHistory } from "../services/chessGameService";
 import { ChessGameResponse } from "../utils/ServicesTypes";
-import { checkSendedInvitations } from "../utils/ApiEndpoints";
-
 const ended_games = [
   {
     date: "01.10.2022",
@@ -100,7 +98,6 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
   const [ifMyAccount, setIfMyAccount] = useState<boolean>();
 
   const nameInGame = route?.params?.nameInGame;
-  console.log(nameInGame)
   const goToFriendsMenu = () => {
     navigation.navigate("Friends", {
       nameInGame: user2?.nameInGame ? user2?.nameInGame : user ? user?.nameInGame : "",
@@ -141,7 +138,6 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
       setIfMyAccount(true);
       setUser2(undefined);
     } else {
-      console.log(nameInGame)
       setIfMyAccount(false);
     }
     if (
@@ -152,15 +148,16 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           if (user === null) {
             return;
           }
-          console.log("changing the value of user: " + user);
           setUser2(user);
           checkSendedInvitations().then((data) =>{ 
+            console.log("data")
             if(data === undefined) return
             setSendedInvitations(data.map(x => responseUserToUser(x, "")))
           })
+
         })
         .catch((err) => {
-          console.log("failed to fetch user");
+          console.error("failed to fetch user");
           throw new Error(err);
         });
     }
