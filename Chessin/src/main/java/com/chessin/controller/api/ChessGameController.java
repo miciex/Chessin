@@ -350,7 +350,7 @@ public class ChessGameController {
             }
             else
             {
-                return ResponseEntity.status(HttpStatus.CONTINUE).body(MessageResponse.of("Opponent has not resigned."));
+                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not resigned."));
             }
         }
     }
