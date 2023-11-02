@@ -156,6 +156,8 @@ export default function PlayOnline({ navigation, route }: Props) {
                   const isMyPlayerWhite =
                     data.whiteUser.nameInGame === user.nameInGame;
                   const myColor = isMyPlayerWhite ? "white" : "black";
+                  handleListenForDrawOffer(String(data.id));
+                  handleListenForResign(String(data.id));
                   setRotateBoardAfterFoundGame(isMyPlayerWhite);
                   dispatch({
                     type: "setUpGame",

@@ -62,7 +62,7 @@ const HomePage = ({ navigation }: Props) => {
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
         <ScrollView>
-          {levelModal ? (
+          {/* {levelModal ? (
             <>
               <ChooseYourLevelModal
                 toggleGear={toggleLevel}
@@ -70,9 +70,9 @@ const HomePage = ({ navigation }: Props) => {
               />
               {}
             </>
-          ) : null}
+          ) : null} */}
           <View style={{ width: "100%", alignItems: "center" }}>
-            <Text>Your ELO Level: {levelOfPlayer}</Text>
+            {/* <Text>Your ELO Level: {levelOfPlayer}</Text>
             <View style={styles.oldGamesButton}>
               <BaseButton
                 handlePress={() => {
@@ -80,7 +80,7 @@ const HomePage = ({ navigation }: Props) => {
                 }}
                 text="Choose Your Level"
               />
-            </View>
+            </View> */}
             <TopButtons navigation={navigation} user={user} />
             <View style={styles.oldGamesButton}>
               <BaseButton
@@ -99,7 +99,7 @@ const HomePage = ({ navigation }: Props) => {
                   result={"win"}
                   navigation={navigation}
                   key={`${game.id}${user?.nameInGame}`}
-                  date={"2023.10.27"}
+                  date={new Date(game.startTime)}
                   gameId={game.id}
                 />
               </View>

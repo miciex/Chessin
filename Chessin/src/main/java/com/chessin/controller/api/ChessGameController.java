@@ -176,8 +176,7 @@ public class ChessGameController {
         try {
             id = Long.parseLong(gameId);
         }
-        catch (NumberFormatException e)
-        {
+        catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body(MessageResponse.of("Invalid game id"));
         }
 
@@ -190,18 +189,18 @@ public class ChessGameController {
         synchronized(activeGames.get(id))
         {
             activeGames.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
-
-            if(activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty())
-            {
-                Board endBoard = activeBoards.get(id);
-                endBoard.setGameResult(GameResults.ABANDONED);
-                chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
-                activeBoards.remove(id);
-                activeGames.remove(id);
-                return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
+            if(activeBoards.get(id).getGameResult() == GameResults.NONE) {
+                if (activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty()) {
+                    Board endBoard = activeBoards.get(id);
+                    endBoard.setGameResult(GameResults.ABANDONED);
+                    chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
+                    activeBoards.remove(id);
+                    activeGames.remove(id);
+                    return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
+                }
+                    return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
             }
-
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
+                return ResponseEntity.accepted().body(MessageResponse.of("Game ended."));
         }
     }
 
@@ -538,7 +537,7 @@ public class ChessGameController {
         return ResponseEntity.ok().body(MessageResponse.of("Draw offer cancelled."));
     }
 
-    @PostMapping("/getGa,me/{gameId}")
+    @PostMapping("/getGame/{gameId}")
     public ResponseEntity<?> getGame(@PathVariable("gameId") String gameId)
     {
         long id;

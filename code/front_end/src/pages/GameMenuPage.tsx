@@ -68,7 +68,7 @@ export default function GameMenu({ navigation }: Props) {
             <View style={styles.appContainer}>
               <View style={styles.contentContainer}>
                 <View style={styles.chooseGameContainer}>
-                  {gameType === "Play With Bot" ? (
+                  {/* {gameType === "Play With Bot" ? (
                     <>
                       <View style={styles.gameOptionsContainer}>
                         <BotGameOptions
@@ -84,16 +84,16 @@ export default function GameMenu({ navigation }: Props) {
                         </View>
                       </View>
                     </>
-                  ) : (
+                  ) : ( */}
                     <PlayOnlineOptions navigation={navigation} user={user} />
-                  )}
+                  {/* )} */}
                 </View>
-                <View style={styles.bottomButtonsContainer}>
+                {/* <View style={styles.bottomButtonsContainer}>
                   <BottomButtons
                     navigation={navigation}
                     handleSetType={setGame}
                   />
-                </View>
+                </View> */}
               </View>
               <Footer navigation={navigation} />
             </View>

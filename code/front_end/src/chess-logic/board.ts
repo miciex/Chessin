@@ -35,6 +35,29 @@ export const enum GameResults {
   ABANDONED = "ABANDONED",
 }
 
+export const getWinner = (result:GameResults, whiteToMove: boolean) => {
+  switch (result) {
+    case GameResults.BLACK_RESIGN:
+    case GameResults.BLACK_TIMEOUT:
+      return "white";
+    case GameResults.WHITE_RESIGN:
+    case GameResults.WHITE_TIMEOUT:
+      return "black";
+    case GameResults.ABANDONED:
+      return "abandoned";
+    case GameResults.DRAW_AGREEMENT:
+    case GameResults.INSUFFICIENT_MATERIAL:
+    case GameResults.STALEMATE:
+    case GameResults.THREE_FOLD:
+    case GameResults.DRAW_50_MOVE_RULE:
+      return "draw";
+    case GameResults.MATE:
+      return whiteToMove ? "black" : "white";
+    default:
+      return null;
+  }
+};
+
 export enum GameType {
   CLASSICAL = "CLASSICAL",
   BLITZ = "BLITZ",
@@ -84,7 +107,7 @@ export const BoardResponseToOnlineBoard = (
   boardResponse: BoardResponse
 ): OnlineBoardType => {
   const moves = boardResponse.moves.map((move) => moveFactory(move));
-  
+
   return {
     fen: boardResponse.startBoard,
     visualBoard: boardResponse.visualBoard,

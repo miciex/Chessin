@@ -63,6 +63,7 @@ export type ChessGameResponse = {
   whiteRatinChange: number;
   blackRatingChange: number;
   isRated: boolean;
+  startTime: number;
 };
 
 export type SubmitMoveRequest = {
