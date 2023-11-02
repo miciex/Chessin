@@ -16,10 +16,10 @@ public class FriendInvitationResponse {
     private String nameInGame;
     Date date;
 
-    public static FriendInvitationResponse fromFriendInvitation(FriendInvitation friendInvitation){
+    public static FriendInvitationResponse fromFriendInvitation(FriendInvitation friendInvitation, boolean isFriend){
         return FriendInvitationResponse
                 .builder()
-                .nameInGame(friendInvitation.getUser().getNameInGame())
+                .nameInGame(isFriend ? friendInvitation.getUser().getNameInGame() : friendInvitation.getFriend().getNameInGame())
                 .date(Date.from(friendInvitation.getDate()))
                 .build();
     }
