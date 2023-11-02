@@ -188,7 +188,7 @@ public class ChessGameService {
         board.setBlackRatingChange(blackRating.getRating() - blackRatingBefore);
         board.setRated(game.isRated());
 
-        chessGameRepository.updateRating(game.getId(), whiteRatingBefore, blackRatingBefore, board.getWhiteRatingChange(), board.getBlackRatingChange());
+        chessGameRepository.updateRatingChange(game.getId(), board.getWhiteRatingChange(), board.getBlackRatingChange());
 
         return board;
     }

@@ -49,7 +49,7 @@ public class UserController {
     @PostMapping("/findByNickname/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname){
         Optional<User> user = userRepository.findByNameInGame(nickname);
-        UserResponse userResponse = UserResponse.fromUser(user.orElseThrow(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false);
+        UserResponse userResponse = UserResponse.fromUser(user.orElseThrow(), userService, false);
         return ResponseEntity.ok().body(userResponse);
     }
 
@@ -59,7 +59,7 @@ public class UserController {
         List<User> users = userRepository.findByNameInGameContaining(nickname);
         List<UserResponse> responses = new ArrayList<>();
 
-        users.stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(responses::add);
+        users.stream().map((User user) -> UserResponse.fromUser(user, userService, false)).forEach(responses::add);
 
         return ResponseEntity.ok().body(responses);
     }
@@ -150,7 +150,7 @@ public class UserController {
         List<UserResponse> friends = new ArrayList<>();
 
         for(User friend : user.getFriends())
-            friends.add(UserResponse.fromUser(friend, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false));
+            friends.add(UserResponse.fromUser(friend, userService, false));
 
         return ResponseEntity.ok().body(friends);
     }
@@ -198,7 +198,7 @@ public class UserController {
 
         List<ChessGameResponse> games = new ArrayList<>();
 
-        chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGame(nickname).stream().map((ChessGame game) -> ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(games::add);
+        chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGame(nickname).stream().map((ChessGame game) -> ChessGameResponse.fromChessGame(game, userService)).forEach(games::add);
 
         return ResponseEntity.ok().body(games);
     }
@@ -213,7 +213,7 @@ public class UserController {
 
         User user = userRepository.findByEmail(email).get();
 
-        return ResponseEntity.ok().body(UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, true));
+        return ResponseEntity.ok().body(UserResponse.fromUser(user, userService, true));
     }
 
     @PostMapping("/getUsers/{nickname}/{page}")
@@ -237,7 +237,7 @@ public class UserController {
 
         List<UserResponse> users = new ArrayList<>();
 
-        userRepository.findAllByNameInGameContaining(nickname, PageRequest.of(pageInt, Constants.Application.DEFAULT_PAGE_SIZE)).stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(users::add);
+        userRepository.findAllByNameInGameContaining(nickname, PageRequest.of(pageInt, Constants.Application.DEFAULT_PAGE_SIZE)).stream().map((User user) -> UserResponse.fromUser(user, userService, false)).forEach(users::add);
 
         return ResponseEntity.ok().body(users);
     }
@@ -262,7 +262,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(MessageResponse.of("User does not exist."));
 
         List<UserResponse> friends = new ArrayList<>();
-        userRepository.findByNameInGame(nickname).get().getFriends().stream().map((User user) -> UserResponse.fromUser(user, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false)).forEach(friends::add);
+        userRepository.findByNameInGame(nickname).get().getFriends().stream().map((User user) -> UserResponse.fromUser(user, userService, false)).forEach(friends::add);
 
         return ResponseEntity.ok().body(userService.getFriends(pageInt, Constants.Application.DEFAULT_PAGE_SIZE, friends));
     }
@@ -288,7 +288,7 @@ public class UserController {
 
         List<ChessGameResponse> games = new ArrayList<>();
 
-        chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGamePage(nickname, PageRequest.of(pageInt, Constants.Application.DEFAULT_PAGE_SIZE)).stream().map((ChessGame game) -> ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository)).forEach(games::add);
+        chessGameRepository.findAllByWhiteNameInGameOrBlackNameInGamePage(nickname, PageRequest.of(pageInt, Constants.Application.DEFAULT_PAGE_SIZE)).stream().map((ChessGame game) -> ChessGameResponse.fromChessGame(game, userService)).forEach(games::add);
 
         return ResponseEntity.ok().body(games);
     }

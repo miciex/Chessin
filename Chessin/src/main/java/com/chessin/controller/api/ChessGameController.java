@@ -1,6 +1,7 @@
 package com.chessin.controller.api;
 
 import com.chessin.controller.playing.ChessGameService;
+import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.*;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
@@ -37,10 +38,7 @@ public class ChessGameController {
     private final ChessGameService chessGameService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final ClassicalRatingRepository classicalRatingRepository;
-    private final RapidRatingRepository rapidRatingRepository;
-    private final BlitzRatingRepository blitzRatingRepository;
-    private final BulletRatingRepository bulletRatingRepository;
+    private final UserService userService;
 
     private final ConcurrentHashMap<String, PendingChessGame> pendingGames = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Board> activeBoards = new ConcurrentHashMap<>();
@@ -88,6 +86,8 @@ public class ChessGameController {
                         .startTime(Instant.now().toEpochMilli())
                         .isRated(foundGame.isRated())
                         .gameResult(GameResults.NONE)
+                        .whiteRating(userService.getRating(players.get(whitePlayerIndex), HelpMethods.getGameType(foundGame.getTimeControl())))
+                        .blackRating(userService.getRating(players.get(blackPlayerIndex), HelpMethods.getGameType(foundGame.getTimeControl())))
                         .build();
 
                 chessGameRepository.save(game);
@@ -99,7 +99,7 @@ public class ChessGameController {
 
                 pendingGames.get(foundGame.getUser().getEmail()).notifyAll();
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, userService));
             }
         }
 
@@ -130,7 +130,7 @@ public class ChessGameController {
 
                 pendingGames.remove(pendingChessGame.getUser().getEmail());
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId()), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingChessGame.getId()), userService));
             }
         }
     }
@@ -272,6 +272,7 @@ public class ChessGameController {
 
             if(board.getGameResult() != GameResults.NONE)
             {
+                chessGameRepository.updateGameResult(request.getGameId(), board.getGameResult());
                 if(activeGames.get(request.getGameId()).isRated())
                     activeBoards.replace(request.getGameId(), chessGameService.updateRatings(activeGames.get(request.getGameId()), activeBoards.get(request.getGameId())));
                 activeGames.get(request.getGameId()).notifyAll();
@@ -553,9 +554,9 @@ public class ChessGameController {
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
         if(activeGames.containsKey(id))
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(id), userService));
 
-        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+        return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get(), userService));
     }
 
     @PostMapping("/getGameByUsername/{username}")
@@ -564,7 +565,7 @@ public class ChessGameController {
         Optional<ChessGame> game = activeGames.values().stream().filter(x -> x.getBlackUser().getNameInGame().equals(username) || x.getWhiteUser().getNameInGame().equals(username)).findFirst();
 
         if(game.isPresent())
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get(), userService));
         else
             return ResponseEntity.badRequest().body(MessageResponse.of("This player is not playing any game."));
 
@@ -599,6 +600,37 @@ public class ChessGameController {
         else
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
+    }
+
+    @PostMapping("/isUserPlaying/{username}")
+    public ResponseEntity<?> isUserPlaying(@PathVariable String username)
+    {
+        String email = userRepository.findByNameInGame(username).get().getEmail();
+        boolean isPlaying = activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email));
+
+        return isPlaying ? ResponseEntity.ok().body(MessageResponse.of("True")) : ResponseEntity.ok().body(MessageResponse.of("False"));
+    }
+
+    @PostMapping("/isUserPlayingTimeControl/{username}/{timeControl}/{increment}")
+    public ResponseEntity<?> isUserPlaying(@PathVariable String username, @PathVariable int timeControl, @PathVariable int increment)
+    {
+        String email = userRepository.findByNameInGame(username).get().getEmail();
+        boolean isPlaying = activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email));
+
+        if(isPlaying)
+        {
+            List<ChessGame> games = activeGames.values().stream().filter(x -> x.getWhiteUser().getEmail().equals(email) || x.getBlackUser().getEmail().equals(email)).toList();
+
+            for(ChessGame game : games)
+            {
+                if(game.getTimeControl() == timeControl && game.getIncrement() == increment)
+                    return ResponseEntity.ok().body(MessageResponse.of("True"));
+                else
+                    return ResponseEntity.ok().body(MessageResponse.of("False"));
+            }
+        }
+
+        return ResponseEntity.ok().body(MessageResponse.of("False"));
     }
 
     @Transactional
@@ -643,7 +675,7 @@ public class ChessGameController {
 
                 pendingInvitations.remove(email);
 
-                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingInvitation.getId()), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(activeGames.get(pendingInvitation.getId()), userService));
             }
         }
     }
@@ -689,7 +721,7 @@ public class ChessGameController {
 
             pendingInvitations.get(friendEmail).notifyAll();
 
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository));
+            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, userService));
         }
 
         pendingInvitations.get(friendEmail).notifyAll();
