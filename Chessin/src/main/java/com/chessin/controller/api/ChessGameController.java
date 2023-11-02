@@ -210,6 +210,8 @@ public class ChessGameController {
                 } else
                     return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
             }
+            else
+                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
         }
     }
 
@@ -424,6 +426,8 @@ public class ChessGameController {
                 else
                     return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not requested draw."));
             }
+            else
+                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
         }
     }
 
@@ -465,6 +469,8 @@ public class ChessGameController {
                 } else
                     return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not accepted draw."));
             }
+            else
+                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
         }
     }
 
