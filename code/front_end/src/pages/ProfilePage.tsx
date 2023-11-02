@@ -17,6 +17,7 @@ import { FriendInvitationResponseType } from "../utils/ServicesTypes";
 import LogoutButton from "../components/LogoutButton";
 import { getGameHistory } from "../services/chessGameService";
 import { ChessGameResponse } from "../utils/ServicesTypes";
+import { checkSendedInvitations } from "../utils/ApiEndpoints";
 
 const ended_games = [
   {
@@ -99,6 +100,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
   const [ifMyAccount, setIfMyAccount] = useState<boolean>();
 
   const nameInGame = route?.params?.nameInGame;
+  console.log(nameInGame)
   const goToFriendsMenu = () => {
     navigation.navigate("Friends", {
       nameInGame: user2?.nameInGame ? user2?.nameInGame : user ? user?.nameInGame : "",
@@ -133,15 +135,17 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
   }, []);
 
   useEffect(() => {
-    if (user &&(user.nameInGame == nameInGame) || nameInGame === undefined) {
+    
+    if (user &&(user.nameInGame == nameInGame || nameInGame=="user")) {
+    
       setIfMyAccount(true);
       setUser2(undefined);
     } else {
+      console.log(nameInGame)
       setIfMyAccount(false);
     }
     if (
-      !(user&&(user.nameInGame == nameInGame) || nameInGame === undefined) &&
-      nameInGame
+      nameInGame!="user" && nameInGame
     ) {
       fetchUser(nameInGame)
         .then((user) => {
@@ -150,6 +154,10 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           }
           console.log("changing the value of user: " + user);
           setUser2(user);
+          checkSendedInvitations().then((data) =>{ 
+            if(data === undefined) return
+            setSendedInvitations(data.map(x => responseUserToUser(x, "")))
+          })
         })
         .catch((err) => {
           console.log("failed to fetch user");
@@ -195,6 +203,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
   };
 
   const [friends, setFriends] = useState<Array<User>>([])
+  const [sendedInvitations, setSendedInvitations] = useState<Array<User>>([])
   const [invitations, setInvitations] = useState<Array<User>>([])
 
   const checkNicknameInObjects = (mainObject: Array<User>, targetNickname:string) => {
@@ -241,17 +250,34 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           friends,
           user?.nameInGame ? user?.nameInGame : ""
         ) ? (
-          <LogoutButton navigation={navigation} setUserNotAuthenticated={setUserNotAuthenticated}/>
+          ""
         ) : (
+          checkNicknameInObjects(
+            sendedInvitations,
+            user2?.nameInGame ? user2?.nameInGame : ""
+          ) 
+          ?
+          <View style={styles.invite}>
+          <BaseButton
+            handlePress={() => {
+              console.log("Wysłano")
+            }}
+            text="Wysłano zaproszenie"
+          />
+        </View>
+          : 
           <View style={styles.invite}>
             <BaseButton
               handlePress={() => {
-                handleAddFriend;
+                handleAddFriend();
               }}
               text="Send invitation"
             />
           </View>
-        }{
+        )
+        }
+        
+        {
           user2 && checkNicknameInObjects(invitations, user2.nameInGame)?  <View style={styles.invite}>
           <BaseButton
             handlePress={() => {
@@ -265,14 +291,18 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
         
         
         
-        {ifMyAccount?  "" : <View style={styles.invite}> 
-          <BaseButton
-            handlePress={() => {
-              playWithFriend();
-            }}
-            text="Play Game"
-          />
-        </View> }
+        {ifMyAccount? 
+         <LogoutButton navigation={navigation} setUserNotAuthenticated={setUserNotAuthenticated}/>
+          : 
+          <View style={styles.invite}> 
+            <BaseButton
+              handlePress={() => {
+                playWithFriend();
+              }}
+              text="Play Game"
+            />
+          </View> 
+          }
         <Heading
           text={"Friends"}
           navigation={navigation}
@@ -287,6 +317,9 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           navigation={navigation}
           stringNavigation={toOldGames}
         />
+        <View style={{ width: "85%" }}>{component}</View>
+        <View style={{ width: "85%" }}>{component}</View>
+        <View style={{ width: "85%" }}>{component}</View>
         <View style={{ width: "85%" }}>{component}</View>
       </View>
     </ScrollView>

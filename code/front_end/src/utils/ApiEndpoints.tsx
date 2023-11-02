@@ -1,4 +1,4 @@
-export const baseLink = "http://192.168.1.101:8080/api/v1/";
+export const baseLink = "http://192.168.141.70:8080/api/v1/";
 export const authLink = `${baseLink}auth/`;
 export const registerLink = `${authLink}register`;
 export const authenticateLink = `${authLink}authenticate`;
@@ -11,6 +11,7 @@ export const userLink = `${baseLink}user/`;
 export const findByNicknameLink = `${userLink}findByNickname/`;
 export const setActive = `${userLink}setActive`;
 export const checkInvitationsLink = `${userLink}checkInvitations`;
+export const checkSendedInvitationsLink = `${userLink}getInvitations`;
 export const respondtoInvitationLink = `${userLink}respondToInvitation`;
 export const removeFriendLink = `${userLink}removeFriend`;
 export const removeInvitationLink = `${userLink}removeInvitation`;
