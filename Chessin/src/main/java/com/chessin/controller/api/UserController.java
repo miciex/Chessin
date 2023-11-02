@@ -136,6 +136,8 @@ public class UserController {
         return ResponseEntity.ok().body("Invitation responded");
     }
 
+
+
     @PostMapping("/getFriends/{nickname}")
     public ResponseEntity<?> getFriends(@PathVariable String nickname)
     {
