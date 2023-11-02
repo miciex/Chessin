@@ -73,8 +73,8 @@ public class ChessGameController {
                 int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
                 int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
 
-//                whitePlayerIndex = 1;
-//                blackPlayerIndex = 0;
+                whitePlayerIndex = 1;
+                blackPlayerIndex = 0;
 
                 List<User> players = Arrays.asList(foundGame.getUser(), userRepository.findByEmail(email).get());
 
@@ -272,7 +272,7 @@ public class ChessGameController {
             activeGames.get(request.getGameId()).wait(timeLeft);
 
             if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.BLACK_RESIGN, GameResults.WHITE_RESIGN).contains(activeBoards.get(request.getGameId()).getGameResult()))
-                return ResponseEntity.status(100).body(MessageResponse.of("Game has ended."));
+                return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
 
             if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
             {
@@ -318,7 +318,9 @@ public class ChessGameController {
 
     @Transactional
     @PostMapping("/listenForResignation/{gameId}")
-    public ResponseEntity<?> listenForResignation(@PathVariable String gameId) throws InterruptedException {
+    public ResponseEntity<?> listenForResignation(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
         long id;
 
         try {
@@ -338,7 +340,10 @@ public class ChessGameController {
 
             if(activeBoards.get(id).getGameResult() != GameResults.NONE)
             {
-                return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
+                if((activeBoards.get(id).getGameResult() == GameResults.WHITE_RESIGN && activeBoards.get(id).getWhiteEmail().equals(email)) || (activeBoards.get(id).getGameResult() == GameResults.BLACK_RESIGN && activeBoards.get(id).getBlackEmail().equals(email)))
+                    return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
+                else
+                    return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
             }
             else
             {
@@ -407,11 +412,11 @@ public class ChessGameController {
 
             if(activeBoards.get(id).isWhiteOffersDraw() || activeBoards.get(id).isBlackOffersDraw())
                 if((activeBoards.get(id).isWhiteOffersDraw() && activeBoards.get(id).getWhiteEmail().equals(email)) || (activeBoards.get(id).isBlackOffersDraw() && activeBoards.get(id).getBlackEmail().equals(email)))
-                    return ResponseEntity.status(100).body(MessageResponse.of("Draw successfully offered."));
+                    return ResponseEntity.accepted().body(MessageResponse.of("Draw successfully offered."));
                 else
                     return ResponseEntity.ok().body(MessageResponse.of("Opponent has requested draw."));
             else
-                return ResponseEntity.status(100).body(MessageResponse.of("Opponent has not requested draw."));
+                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not requested draw."));
         }
     }
 
@@ -451,7 +456,7 @@ public class ChessGameController {
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
             }
             else
-                return ResponseEntity.status(100).body(MessageResponse.of("Opponent has not accepted draw."));
+                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not accepted draw."));
         }
     }
 
@@ -483,7 +488,7 @@ public class ChessGameController {
                 activeBoards.get(request.getGameId()).setWhiteOffersDraw(false);
                 activeBoards.get(request.getGameId()).setBlackOffersDraw(false);
                 activeBoards.get(request.getGameId()).notifyAll();
-                return ResponseEntity.status(100).body(MessageResponse.of("Draw offer declined."));
+                return ResponseEntity.accepted().body(MessageResponse.of("Draw offer declined."));
             }
         }
     }
