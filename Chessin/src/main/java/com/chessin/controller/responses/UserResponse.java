@@ -1,5 +1,7 @@
 package com.chessin.controller.responses;
 
+import com.chessin.controller.register.UserService;
+import com.chessin.model.playing.GameType;
 import com.chessin.model.playing.Glicko2.Entities.BlitzRating;
 import com.chessin.model.playing.Glicko2.Entities.BulletRating;
 import com.chessin.model.playing.Glicko2.Entities.ClassicalRating;
@@ -32,17 +34,17 @@ public class UserResponse {
     private String country;
     private String email;
 
-    public static UserResponse fromUser(User user, ClassicalRatingRepository classicalRatingRepository, RapidRatingRepository rapidRatingRepository, BlitzRatingRepository blitzRatingRepository, BulletRatingRepository bulletRatingRepository, boolean returnEmail){
+    public static UserResponse fromUser(User user, UserService userService, boolean returnEmail){
         return UserResponse.builder()
                 .id(user.getId())
                 .firstname(user.getFirstname())
                 .lastName(user.getLastName())
                 .nameInGame(user.getNameInGame())
                 .country(user.getCountry())
-                .ratingClassical(classicalRatingRepository.findByUser(user).orElse(new ClassicalRating(user, new RatingCalculator())).getRating())
-                .ratingRapid(rapidRatingRepository.findByUser(user).orElse(new RapidRating(user, new RatingCalculator())).getRating())
-                .ratingBlitz(blitzRatingRepository.findByUser(user).orElse(new BlitzRating(user, new RatingCalculator())).getRating())
-                .ratingBullet(bulletRatingRepository.findByUser(user).orElse(new BulletRating(user, new RatingCalculator())).getRating())
+                .ratingClassical(userService.getRating(user, GameType.CLASSICAL))
+                .ratingRapid(userService.getRating(user, GameType.RAPID))
+                .ratingBlitz(userService.getRating(user, GameType.BLITZ))
+                .ratingBullet(userService.getRating(user, GameType.BULLET))
                 .email(returnEmail ? user.getEmail() : null)
                 .build();
     }

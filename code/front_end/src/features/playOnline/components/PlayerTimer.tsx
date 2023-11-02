@@ -18,7 +18,7 @@ export default function PlayerTimer({ state, isMyPlayer, dispatch }: Props) {
   useEffect(() => {
     setTimer();
     return () => clearTimeout(timeout);
-  }, [state.board.whiteToMove, state.gameStarted, state.board.result]);
+  }, [state.board.moves.length, state.board.result, state.board.whiteToMove]);
 
   const player = isMyPlayer ? state.myPlayer : state.opponent;
   let timeout: number;
@@ -26,7 +26,7 @@ export default function PlayerTimer({ state, isMyPlayer, dispatch }: Props) {
   const setTimer = () => {
     if (
       state.board.whiteToMove === (player?.color === "white") &&
-      state.gameStarted &&
+      state.board.moves.length>0 &&
       state.board.result === GameResults.NONE
     ) {
       timeout = setTimeout(setTimer, 1000);
