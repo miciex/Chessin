@@ -108,7 +108,25 @@ public class UserController {
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
         for(FriendInvitation invitation : invitations)
-            responses.add(FriendInvitationResponse.fromFriendInvitation(invitation));
+            responses.add(FriendInvitationResponse.fromFriendInvitation(invitation, true));
+
+        return ResponseEntity.ok().body(responses);
+    }
+
+    @PostMapping("/getInvitations")
+    public ResponseEntity<?> getInvitations(HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(!friendInvitationRepository.existsByUserEmail(email))
+            return ResponseEntity.badRequest().body(MessageResponse.of("No invitations"));
+
+        List<FriendInvitation> invitations = friendInvitationRepository.findAllByUser(userRepository.findByEmail(email).get());
+
+        List<FriendInvitationResponse> responses = new ArrayList<>();
+
+        for(FriendInvitation invitation : invitations)
+            responses.add(FriendInvitationResponse.fromFriendInvitation(invitation, false));
 
         return ResponseEntity.ok().body(responses);
     }
