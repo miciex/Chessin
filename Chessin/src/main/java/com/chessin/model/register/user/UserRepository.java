@@ -1,7 +1,5 @@
 package com.chessin.model.register.user;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByNameInGame(String nameInGame);
     Optional<User> findByNameInGame(String nameInGame);
     List<User> findByNameInGameContaining(String nickname);
-    List<User> findAllByNameInGameContaining(String nickname, Pageable pageable);
 
     @Modifying
     @Query(value = "UPDATE User cg SET cg.password = :password WHERE cg.email = :email")

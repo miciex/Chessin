@@ -13,11 +13,10 @@ import { GameResults } from "../../../chess-logic/board";
 type Props = {
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
-  rotateBoard: boolean;
+  isMyPlayer: boolean;
 };
 
-export default function Bar({ state, dispatch, rotateBoard }: Props) {
-  const isMyPlayer = (!rotateBoard && state.myPlayer.color === "white" || rotateBoard && state.myPlayer.color === "black")
+export default function Bar({ state, dispatch, isMyPlayer }: Props) {
   const player = isMyPlayer ? state.myPlayer : state.opponent;
   const isPlayerWhite = player.color === "white";
   const ratingChange = Math.round(

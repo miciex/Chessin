@@ -194,9 +194,9 @@ export default function Piece({
           panCut.setValue({ x: 0, y: 0 });
         } else if (id !== 0) {
           const possibleMoves = possibleMovesAfterCheck(
-            rotateBoard ? 63 - positionNumber : positionNumber,
+            positionNumber,
             state.board
-          ).map(possibleMove => rotateBoard ? 63 - possibleMove : possibleMove);
+          );
           setValueActive(positionNumber);
           setPossibleMoves(possibleMoves);
         }

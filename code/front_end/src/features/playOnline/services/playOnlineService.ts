@@ -196,9 +196,6 @@ export const submitMove = async (request: SubmitMoveRequest) => {
     body: JSON.stringify(request),
   })
     .then((response) => {
-      if(response.status===100){
-        return null;
-      }
       if (response.status === 200) {
         return response.json();
       } else if (response.status === 400) {

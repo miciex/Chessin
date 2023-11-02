@@ -50,6 +50,8 @@ export default function Board({
   const pieces = useMemo<JSX.Element[]>(() => {
     resetActiveValues();
     resetPossibleMoves();
+    console.log("Current positions: ");
+    console.log(state.currentPosition);
     let position =
       (state.board.positions.length === 0 ||
       state.currentPosition >= state.board.positions.length ||

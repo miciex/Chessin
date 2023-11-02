@@ -16,7 +16,6 @@ import com.chessin.model.utils.HelpMethods;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -145,15 +144,15 @@ public class ChessGameService {
             else
                 ratingCalculator.updateRatings(new Result(whiteRating, blackRating));
         }
-        else if(Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_TIMEOUT).contains(board.getGameResult()))
+        else if(Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_TIMEOUT).contains(game.getGameResult()))
         {
             ratingCalculator.updateRatings(new Result(whiteRating, blackRating));
         }
-        else if(Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_TIMEOUT).contains(board.getGameResult()))
+        else if(Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_TIMEOUT).contains(game.getGameResult()))
         {
             ratingCalculator.updateRatings(new Result(blackRating, whiteRating));
         }
-        else if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.DRAW_50_MOVE_RULE, GameResults.INSUFFICIENT_MATERIAL, GameResults.STALEMATE).contains(board.getGameResult()))
+        else if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.DRAW_50_MOVE_RULE, GameResults.INSUFFICIENT_MATERIAL, GameResults.STALEMATE).contains(game.getGameResult()))
         {
             ratingCalculator.updateRatings(new Result(whiteRating, blackRating, true));
         }
@@ -188,7 +187,7 @@ public class ChessGameService {
         board.setBlackRatingChange(blackRating.getRating() - blackRatingBefore);
         board.setRated(game.isRated());
 
-        chessGameRepository.updateRatingChange(game.getId(), board.getWhiteRatingChange(), board.getBlackRatingChange());
+        chessGameRepository.updateRating(game.getId(), whiteRatingBefore, blackRatingBefore, board.getWhiteRatingChange(), board.getBlackRatingChange());
 
         return board;
     }

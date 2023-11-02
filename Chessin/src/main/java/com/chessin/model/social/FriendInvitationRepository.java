@@ -13,7 +13,6 @@ import java.util.Optional;
 public interface FriendInvitationRepository extends JpaRepository<FriendInvitation, Long> {
     boolean existsByUserEmail(String email);
     List<FriendInvitation> findAllByFriend(User user);
-    List<FriendInvitation> findAllByUser(User user);
     @Modifying
     @Query("delete from FriendInvitation f where f.user.email = ?1 and f.friend.nameInGame = ?2")
     void deleteByUserEmailAndFriendNameInGame(String userEmail, String friendNickname);

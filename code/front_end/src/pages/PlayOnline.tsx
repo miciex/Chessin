@@ -30,18 +30,9 @@ import {
   searchForGame,
 } from "../features/playOnline/services/playOnlineService";
 import { RouteProp } from "@react-navigation/native";
-import {
-  BoardResponse,
-  ChessGameResponse,
-  RespondToDrawOfferRequest,
-} from "../utils/ServicesTypes";
+import { BoardResponse, ChessGameResponse } from "../utils/ServicesTypes";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import {
-  listenForDrawOffer,
-  offerDraw,
-  respondToDrawOffer,
-} from "../services/chessGameService";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -61,7 +52,6 @@ export default function PlayOnline({ navigation, route }: Props) {
   );
   const [showSettings, setShowSettings] = useState(false);
   const [rotateBoard, setRotateBoard] = useState(false);
-  const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
 
   const toggleSettings = () => {
     setShowSettings((prev) => !prev);
@@ -69,14 +59,6 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const toggleRotateBoard = () => {
     setRotateBoard((prev) => !prev);
-  };
-
-  const opponentOfferedDrawTrue = () => {
-    setOpponentOfferedDraw(true);
-  };
-
-  const opponentOfferedDrawFalse = () => {
-    setOpponentOfferedDraw(false);
   };
 
   useEffect(() => {
@@ -91,16 +73,6 @@ export default function PlayOnline({ navigation, route }: Props) {
     if (isMyPlayerWhite) setRotateBoard(false);
     else setRotateBoard(true);
   };
-
-  const handleListenForDrawOffer = (gameId: string) => {
-    listenForDrawOffer(gameId)
-    .then(() => {
-      setOpponentOfferedDraw(true);
-    })
-    .catch((err) => {
-      throw new Error(err);
-    });
-  }
 
   const searchNewGame = () => {
     dispatch({ type: "setSearchingGame", payload: true });
@@ -119,8 +91,6 @@ export default function PlayOnline({ navigation, route }: Props) {
               response
                 .json()
                 .then((data: ChessGameResponse) => {
-                  if (!data) return;
-                  handleListenForDrawOffer(String(data.id));
                   dispatch({
                     type: "setUpGame",
                     payload: {
@@ -254,56 +224,19 @@ export default function PlayOnline({ navigation, route }: Props) {
     dispatch({ type: "setCurrentPosition", payload: position });
   };
 
-  const handleResponseFromDrawOffer = (board: BoardResponse | null) => {
-    if (!board) {
-      return listenForDrawOffer(String(state.gameId))
-        .then(() => {
-          setOpponentOfferedDraw(true);
-        })
-        .catch((err) => {
-          throw new Error(err);
-        });
-    }
-    dispatch({
-      type: "setDataFromBoardResponse",
-      payload: { boardResponse: board },
-    });
-    setOpponentOfferedDraw(false);
-  }
-
-  const handleRespondToDrawOffer = (response: RespondToDrawOfferRequest) => {
-    respondToDrawOffer(response)
-      .then((board: BoardResponse | null) => {
-        handleResponseFromDrawOffer(board);
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
-  };
-
-  const handleOfferDraw = () => {
-    offerDraw(String(state.gameId))
-    .then((board: BoardResponse | null) => {
-      handleResponseFromDrawOffer(board);
-    })
-    .catch((err) => {
-      throw new Error(err);
-    });
-  }
-
   return (
     <View style={styles.container}>
       <View style={styles.gameRecordContainer}>
-        <ScrollView horizontal={true}>
-          <GameRecord
-            moves={state.board.moves}
-            positions={state.board.positions}
-            currentPosition={state.currentPosition}
-            setCurrentPosition={setCurrentPosition}
-          />
-        </ScrollView>
-      </View>
-
+        <ScrollView horizontal={true} >
+      <GameRecord
+        moves={state.board.moves}
+        positions={state.board.positions}
+        currentPosition={state.currentPosition}
+        setCurrentPosition={setCurrentPosition}
+      />
+      </ScrollView>
+    </View>
+      
       <SettingsGameModal
         toggleGear={toggleSettings}
         gearModalOn={showSettings}
@@ -313,7 +246,11 @@ export default function PlayOnline({ navigation, route }: Props) {
         {state.searchingGame || state.myPlayer.color === null ? (
           <WaitingForGame />
         ) : null}
-        <Bar state={state} dispatch={dispatch} rotateBoard={!rotateBoard} />
+        <Bar
+          state={state}
+          dispatch={dispatch}
+          isMyPlayer={false === !rotateBoard}
+        />
         <TestBoard
           state={state}
           dispatch={dispatch}
@@ -325,13 +262,13 @@ export default function PlayOnline({ navigation, route }: Props) {
           dispatch={dispatch}
           toggleSettings={toggleSettings}
           toggleRotateBoard={toggleRotateBoard}
-          opponentOfferedDraw={opponentOfferedDraw}
-          handleRespondToDrawOffer={handleRespondToDrawOffer}
-          handleListenForDrawOffer={handleListenForDrawOffer}
-          handleSendDrawOffer={handleOfferDraw}
         />
 
-        <Bar state={state} dispatch={dispatch} rotateBoard={rotateBoard} />
+        <Bar
+          state={state}
+          dispatch={dispatch}
+          isMyPlayer={true === !rotateBoard}
+        />
         <GameFinishedOverlay
           state={state}
           dispatch={dispatch}
@@ -355,10 +292,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-evenly",
   },
-  gameRecordContainer: {
+  gameRecordContainer:{
     width: "100%",
     height: 24,
     justifyContent: "center",
     backgroundColor: ColorsPallet.dark,
-  },
+  }
 });

@@ -1,6 +1,5 @@
 package com.chessin.controller.responses;
 
-import com.chessin.controller.register.UserService;
 import com.chessin.model.playing.ChessGame;
 import com.chessin.model.playing.GameType;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
@@ -40,11 +39,11 @@ public class ChessGameResponse {
     private boolean isRated;
     private long startTime;
 
-    public static ChessGameResponse fromChessGame(ChessGame game, UserService userService){
+    public static ChessGameResponse fromChessGame(ChessGame game, ClassicalRatingRepository classicalRatingRepository, RapidRatingRepository rapidRatingRepository, BlitzRatingRepository blitzRatingRepository, BulletRatingRepository bulletRatingRepository){
         ChessGameResponse response = ChessGameResponse.builder()
                 .id(game.getId())
-                .whiteUser(UserResponse.fromUser(game.getWhiteUser(), userService, false))
-                .blackUser(UserResponse.fromUser(game.getBlackUser(), userService, false))
+                .whiteUser(UserResponse.fromUser(game.getWhiteUser(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false))
+                .blackUser(UserResponse.fromUser(game.getBlackUser(), classicalRatingRepository, rapidRatingRepository, blitzRatingRepository, bulletRatingRepository, false))
                 .moves(new ArrayList<>())
                 .availableCastles(game.getAvailableCastles())
                 .timeControl(game.getTimeControl())

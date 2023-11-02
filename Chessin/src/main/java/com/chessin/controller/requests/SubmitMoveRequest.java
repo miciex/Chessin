@@ -13,4 +13,5 @@ public class SubmitMoveRequest {
     private int startField;
     private int endField;
     private int promotePiece;
+    private boolean doesResign;
 }
