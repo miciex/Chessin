@@ -121,8 +121,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
               .then((data: ChessGameResponse[]) => {
                 setUserGames(data);
               })
-              .catch((error) => {
-                console.error(error);
+              .catch(() => {
                 throw new Error("Couldn't load game history");
               });
           } else throw new Error("Couldn't load game history");

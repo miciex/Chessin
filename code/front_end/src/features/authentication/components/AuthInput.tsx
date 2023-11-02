@@ -10,6 +10,8 @@ type Props = {
   isValid?: boolean | null;
   notValidText?: string;
   onSubmitEditing?: () => void;
+  onFocus?: () => void;
+  activeInput?: string
 };
 
 export default function AuthInput({
@@ -20,8 +22,10 @@ export default function AuthInput({
   isValid,
   notValidText,
   onSubmitEditing,
+  onFocus,
+  activeInput
 }: Props) {
-  return (
+  return (activeInput === undefined || activeInput === "" || activeInput === placeholder) ? (
     <View
       style={
         isValid === false ? styles.inValidContainer : styles.validContainer
@@ -35,6 +39,7 @@ export default function AuthInput({
           style={styles.textInput}
           secureTextEntry={securityTextEntry}
           onSubmitEditing={onSubmitEditing}
+          onFocus={onFocus}
         />
       </View>
       {isValid === false ? (
@@ -43,7 +48,7 @@ export default function AuthInput({
         </ScrollView>
       ) : null}
     </View>
-  );
+  ) : null;
 }
 
 const styles = StyleSheet.create({
