@@ -177,3 +177,11 @@ export type RespondToDrawOfferRequest ={
   gameId: number;
   responseType: ResponseType;
 }
+
+export type MessageResponse = {
+  message: string;
+}
+
+export type BooleanMessageResponse = {
+  message: "True" | "False";
+}

@@ -1,6 +1,6 @@
 import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useReducer, useEffect } from "react";
-import { GameResults } from "../chess-logic/board";
+import { GameResults, GameType } from "../chess-logic/board";
 import {
   Player,
   User,
@@ -32,13 +32,15 @@ import {
 import { RouteProp } from "@react-navigation/native";
 import {
   BoardResponse,
+  BooleanMessageResponse,
   ChessGameResponse,
   RespondToDrawOfferRequest,
 } from "../utils/ServicesTypes";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import {
-  getBoardByUsername,
+  isUserPlaying,
+  isUserPlayingTimeControl,
   listenForDrawOffer,
   listenForResignation,
   offerDraw,
@@ -56,11 +58,11 @@ type Props = {
 };
 
 export default function PlayOnline({ navigation, route }: Props) {
-  const { request } = route.params;
+  const request = route.params?.request;
 
   const [state, dispatch] = useReducer(
     reducer,
-    getInitialState(request.isRated, request.gameType)
+    getInitialState(request?.isRated, request?.gameType)
   );
   const [showSettings, setShowSettings] = useState(false);
   const [rotateBoard, setRotateBoard] = useState(false);
@@ -145,7 +147,57 @@ export default function PlayOnline({ navigation, route }: Props) {
       .then((user) => {
         if (user === undefined) return;
         dispatch({ type: "setMyPlayer", payload: userToPlayer(user, null) });
-
+        isUserPlaying(user.nameInGame)
+        .then((response:BooleanMessageResponse) => {
+          if(response.message === "True") {
+            getGameByUsername(user.nameInGame)
+                .then((data: ChessGameResponse | undefined) => {
+                  if (!data) return;
+                  const isMyPlayerWhite =
+                    data.whiteUser.nameInGame === user.nameInGame;
+                  const myColor = isMyPlayerWhite ? "white" : "black";
+                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
+                  dispatch({
+                    type: "setUpGame",
+                    payload: {
+                      chessGameResponse: data,
+                      nameInGame: user.nameInGame,
+                    },
+                  });
+                  getBoardByGameId(data.id).then(
+                    (boardResponse: BoardResponse) => {
+                      dispatch({
+                        type: "setDataFromBoardResponse",
+                        payload: { boardResponse },
+                      });
+                      if (
+                        boardResponse.gameResult !== GameResults.NONE ||
+                        boardResponse.whiteTurn === (myColor === "white")
+                      )
+                        return;
+                      listenForMove({
+                        gameId: data.id,
+                        moves: boardResponse.moves,
+                      })
+                        .then((board: BoardResponse | undefined) => {
+                          if (board === undefined) return;
+                          dispatch({
+                            type: "setDataFromBoardResponse",
+                            payload: {
+                              boardResponse: board,
+                            },
+                          });
+                        })
+                        .catch((err) => {
+                          throw new Error(err);
+                        });
+                    }
+                  );
+                })
+                .catch((err) => {
+                  throw new Error(err);
+                });
+          }else if(request){
         searchForGame(request)
           .then((response) => {
             if (response.status === 200) {
@@ -202,10 +254,17 @@ export default function PlayOnline({ navigation, route }: Props) {
           .catch((err) => {
             throw new Error(err);
           });
+        }
+        else {
+          navigation.navigate("GameMenu");
+        }
       })
       .catch((err) => {
         throw new Error(err);
       });
+    }).catch((err) => {
+      throw new Error(err);
+    })
   };
 
   const unMount = () => {

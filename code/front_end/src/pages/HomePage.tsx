@@ -11,8 +11,8 @@ import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import ChooseYourLevelModal from "../features/home/components/ChooseYourLevelModal";
-import { ChessGameResponse } from "../utils/ServicesTypes";
-import { getGameHistory } from "../services/chessGameService";
+import { BooleanMessageResponse, ChessGameResponse } from "../utils/ServicesTypes";
+import { getGameHistory, isUserPlaying } from "../services/chessGameService";
 import { getPagedGames } from "../services/userServices";
 
 type Props = {
@@ -32,10 +32,17 @@ const HomePage = ({ navigation }: Props) => {
         let parsedUser: User = JSON.parse(user);
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
         setUser(parsedUser);
-        console.log("User: " + parsedUser.nameInGame);
+        isUserPlaying(parsedUser.nameInGame).then((data:BooleanMessageResponse)=>{
+          if(!data) return;
+          if(data.message==="True") navigation.navigate("PlayOnline");
+        }).catch((err)=>{
+          throw new Error(err);
+        });
         getPagedGames(parsedUser.nameInGame, 0).then((data:ChessGameResponse[]|null) => {
           if(!data) return;
           setUserGames(data);
+        }).catch((err) => {
+          throw err;
         });
       })
       .catch((error) => {

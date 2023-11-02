@@ -538,7 +538,7 @@ public class ChessGameController {
         return ResponseEntity.ok().body(MessageResponse.of("Draw offer cancelled."));
     }
 
-    @PostMapping("/getGame/{gameId}")
+    @PostMapping("/getGa,me/{gameId}")
     public ResponseEntity<?> getGame(@PathVariable("gameId") String gameId)
     {
         long id;

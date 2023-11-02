@@ -43,7 +43,7 @@ export type RootStackParamList = {
   PlayBot: undefined;
   PlayOnline: {
     request: PendingChessGameRequest;
-  };
+  } | undefined;
   PlayWithFriendsMenu: {
     userArg: User;
   };

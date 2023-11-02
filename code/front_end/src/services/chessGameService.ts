@@ -2,6 +2,8 @@ import { handleFetch, handlePost } from "../lib/fetch";
 import {
   getGameByIdLink,
   getGameHistoryLink,
+  isUserPlayingLink,
+  isUserPlayingTimeControlLink,
   listenForDrawOfferLink,
   listenForResignationLink,
   offerDrawLink,
@@ -58,6 +60,18 @@ export const resign = async (id: string) => {
 
 export const getBoardByUsername = async (username: string) => {
   return handlePost(`${getBoardByUsername}${username}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const isUserPlaying = async (username: string) => {
+  return handlePost(`${isUserPlayingLink}${username}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const isUserPlayingTimeControl = async (username: string, timeControl: string, increment:string) => {
+  return handlePost(`${isUserPlayingTimeControlLink}${username}/${timeControl}/${increment}`).catch((error) => {
     throw new Error(error);
   });
 }

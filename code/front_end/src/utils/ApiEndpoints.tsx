@@ -36,3 +36,5 @@ export const respondToDrawOfferLink = `${chessGameLink}respondToDrawOffer`;
 export const listenForResignationLink = `${chessGameLink}listenForResignation/`;
 export const resignLink = `${chessGameLink}resign/`;
 export const getBoardByUsernameLink = `${chessGameLink}getBoardByUsername/`;
+export const isUserPlayingLink = `${chessGameLink}isUserPlaying/`;
+export const isUserPlayingTimeControlLink = `${chessGameLink}isUserPlayingTimeControl/`;
