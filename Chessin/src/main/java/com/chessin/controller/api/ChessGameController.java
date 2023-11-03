@@ -278,7 +278,8 @@ public class ChessGameController {
         try {
             id = Long.parseLong(gameId);
         }
-        catch (NumberFormatException e) {
+        catch (NumberFormatException e)
+        {
             return ResponseEntity.badRequest().body(MessageResponse.of("Invalid game id"));
         }
 
@@ -396,7 +397,8 @@ public class ChessGameController {
         {
             synchronized(activeBoards.get(gameId))
             {
-                synchronized (disconnections.get(gameId)) {
+                synchronized(disconnections.get(gameId))
+                {
                     gameResult.ifPresent(gameResults -> activeBoards.get(gameId).setGameResult(gameResults));
                     chessGameRepository.updateGameResult(gameId, gameResult.orElse(activeBoards.get(gameId).getGameResult()));
                     if (activeGames.get(gameId).isRated())
@@ -417,7 +419,8 @@ public class ChessGameController {
         {
             synchronized(activeBoards.get(gameId))
             {
-                synchronized (disconnections.get(gameId)) {
+                synchronized(disconnections.get(gameId))
+                {
                     Board endBoard = activeBoards.get(gameId);
                     activeBoards.remove(gameId);
                     activeGames.remove(gameId);
@@ -462,7 +465,7 @@ public class ChessGameController {
             }
             else
             {
-                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not resigned."));
+                return ResponseEntity.status(HttpStatus.CONTINUE).body(MessageResponse.of("Opponent has not resigned."));
             }
         }
     }
