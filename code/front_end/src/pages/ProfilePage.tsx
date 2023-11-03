@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
 import React, { useState, useEffect } from "react";
 import Profile from "../features/playWithFriend/components/Profile";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -96,6 +96,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
   const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
   const [user2, setUser2] = useState<User>();
   const [ifMyAccount, setIfMyAccount] = useState<boolean>();
+  const [refresh, setRefresh] = useState<boolean>(true);
 
   const nameInGame = route?.params?.nameInGame;
   const goToFriendsMenu = () => {
@@ -161,7 +162,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           throw new Error(err);
         });
     }
-  }, [nameInGame, user]);
+  }, [nameInGame, user, refresh]);
 
   let component = userGames.slice(0, 5).map((game) => (
     <View style={{ width: "90%" }}>
@@ -197,6 +198,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
       .catch((err) => {
         throw new Error(err);
       });
+      setRefresh(!refresh)
   };
 
   const [friends, setFriends] = useState<Array<User>>([])
@@ -213,6 +215,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
       setFriends(data.map(x => responseUserToUser(x, "")))
     })
 
+    console.log("Shit")
     checkInvitations().then((data) =>{ 
       if(data === undefined) return
       setInvitations(data.map(x => responseUserToUser(x, "")))
@@ -255,27 +258,15 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           ) 
           ?
           <View style={styles.invite}>
-          <BaseButton
-            handlePress={() => {
-              console.log("Wysłano")
-            }}
-            text="Wysłano zaproszenie"
-          />
+          <View style={styles.sent}>
+          <Text style={{fontSize: 16}}>Invitation Sent</Text>
+          </View>
         </View>
           : 
-          <View style={styles.invite}>
-            <BaseButton
-              handlePress={() => {
-                handleAddFriend();
-              }}
-              text="Send invitation"
-            />
-          </View>
-        )
-        }
-        
-        {
-          user2 && checkNicknameInObjects(invitations, user2.nameInGame)?  <View style={styles.invite}>
+          (
+            user2 && checkNicknameInObjects(invitations, user2.nameInGame)
+            ?
+            <View style={styles.invite}>
           <BaseButton
             handlePress={() => {
               
@@ -283,7 +274,19 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
             }}
             text={"Accept Invitation"}
           />
-        </View>: ""
+        </View>
+        :
+        <View style={styles.invite}>
+            <BaseButton
+              handlePress={() => {
+                handleAddFriend();
+              }}
+              text="Send invitation"
+            />
+          </View>
+          )
+          
+        )
         }
         
         
@@ -337,5 +340,13 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 55,
     margin: 3,
+  },
+  sent: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: ColorsPallet.dark,
   },
 });
