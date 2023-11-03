@@ -2,6 +2,7 @@ package com.chessin.controller.responses;
 
 import com.chessin.controller.register.UserService;
 import com.chessin.model.playing.ChessGame;
+import com.chessin.model.playing.GameResults;
 import com.chessin.model.playing.GameType;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
 import com.chessin.model.playing.Glicko2.Repositories.BulletRatingRepository;
@@ -39,6 +40,7 @@ public class ChessGameResponse {
     private double blackRatingChange;
     private boolean isRated;
     private long startTime;
+    private GameResults gameResult;
 
     public static ChessGameResponse fromChessGame(ChessGame game, UserService userService){
         ChessGameResponse response = ChessGameResponse.builder()
@@ -58,6 +60,7 @@ public class ChessGameResponse {
                 .blackRatingChange(game.getBlackRatingChange())
                 .isRated(game.isRated())
                 .startTime(game.getStartTime())
+                .gameResult(game.getGameResult())
                 .build();
 
         if(game.getMoves() != null)
