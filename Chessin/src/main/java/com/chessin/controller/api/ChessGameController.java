@@ -396,14 +396,16 @@ public class ChessGameController {
         {
             synchronized(activeBoards.get(gameId))
             {
-                gameResult.ifPresent(gameResults -> activeBoards.get(gameId).setGameResult(gameResults));
-                chessGameRepository.updateGameResult(gameId, gameResult.orElse(activeBoards.get(gameId).getGameResult()));
-                if (activeGames.get(gameId).isRated())
-                    activeBoards.replace(gameId, chessGameService.updateRatings(activeGames.get(gameId), activeBoards.get(gameId)));
-                activeGames.get(gameId).notifyAll();
-                activeBoards.get(gameId).notifyAll();
-                disconnections.get(gameId).notifyAll();
-                return activeBoards.get(gameId);
+                synchronized (disconnections.get(gameId)) {
+                    gameResult.ifPresent(gameResults -> activeBoards.get(gameId).setGameResult(gameResults));
+                    chessGameRepository.updateGameResult(gameId, gameResult.orElse(activeBoards.get(gameId).getGameResult()));
+                    if (activeGames.get(gameId).isRated())
+                        activeBoards.replace(gameId, chessGameService.updateRatings(activeGames.get(gameId), activeBoards.get(gameId)));
+                    activeGames.get(gameId).notifyAll();
+                    activeBoards.get(gameId).notifyAll();
+                    disconnections.get(gameId).notifyAll();
+                    return activeBoards.get(gameId);
+                }
             }
         }
     }
@@ -415,11 +417,13 @@ public class ChessGameController {
         {
             synchronized(activeBoards.get(gameId))
             {
-                Board endBoard = activeBoards.get(gameId);
-                activeBoards.remove(gameId);
-                activeGames.remove(gameId);
-                disconnections.remove(gameId);
-                return endBoard;
+                synchronized (disconnections.get(gameId)) {
+                    Board endBoard = activeBoards.get(gameId);
+                    activeBoards.remove(gameId);
+                    activeGames.remove(gameId);
+                    disconnections.remove(gameId);
+                    return endBoard;
+                }
             }
         }
     }

@@ -100,10 +100,13 @@ export default function Login({ navigation }: Props) {
       response
         .json()
         .then((data) => {
-          setUserDataFromResponse(data);
-        })
-        .then(() => {
-          navigation.navigate("Home");
+          setUserDataFromResponse(data)
+            .then(() => {
+              navigation.navigate("Home");
+            })
+            .catch((err) => {
+              throw new Error(err);
+            });
         })
         .catch((err) => {
           throw new Error(err);

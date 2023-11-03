@@ -94,6 +94,8 @@ const Routing = () => {
         });
       })
       .catch((err) => {
+        save("user", "");
+        setUserNotAuthenticated();
         throw new Error(err);
       });
     const resetToken = setInterval(() => {

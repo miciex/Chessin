@@ -22,7 +22,9 @@ export default function UserNotAuthenticatedPage({ navigation }: Props) {
     getValueFor("user").then((value)=>{
       if(value){
         navigation.navigate("Home");
-      }});
+      }}).catch((err)=>{
+        throw new Error("User not authenticated");
+      })
     },[]);
 
   

@@ -149,8 +149,8 @@ export default function Piece({
       type: "playMove",
       payload: move,
     });
-    if(state.board.moves.length ===0)
-    dispatch({ type: "setCurrentPosition", payload: 0});
+    if(state.board.moves.length === 0)
+      dispatch({ type: "setCurrentPosition", payload: 0});
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
         if (!boardResponse) return;

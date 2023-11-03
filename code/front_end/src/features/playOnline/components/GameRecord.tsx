@@ -13,20 +13,29 @@ type Props = {
   setCurrentPosition: (position: number) => void;
   positions: Array<{[key:number]:number}>;
   currentPosition: number;
+  analyzeGame?: boolean
 };
 export default function GameRecord({
   moves,
   setCurrentPosition,
   positions,
-  currentPosition
+  currentPosition,
+  analyzeGame
 }: Props) {
-  const movesContent = moves.map((move, index) => {
+
+  const movesCut = analyzeGame&& moves.length >0 ? moves.slice(0) : moves;
+  const getPos = (index:number) => {
+    if(!analyzeGame) return index;
+    return index + 1;
+  }
+
+  const movesContent = movesCut.map((move, index) => {
     return (
       <GameRecordMove
         move={moveToChessNotation(positions[index], move)}
         key={index}
         handlePress={() => {
-          setCurrentPosition(index);
+          setCurrentPosition(getPos(index));
         }}
         currentPosition={currentPosition}
         id={index}
