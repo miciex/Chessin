@@ -33,4 +33,7 @@ public interface ChessGameRepository extends JpaRepository<ChessGame, Long> {
 
     @Query(value = "SELECT cg FROM ChessGame cg WHERE cg.whiteUser.nameInGame = :nickname OR cg.blackUser.nameInGame = :nickname")
     List<ChessGame> findAllByWhiteNameInGameOrBlackNameInGamePage(@Param(value = "nickname") String nickname, Pageable pageable);
+
+    @Modifying
+    void deleteById(long id);
 }
