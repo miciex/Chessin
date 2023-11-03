@@ -3,7 +3,7 @@ import { getValueFor } from "../utils/AsyncStoreFunctions";
 export const handleFetch = async (url: string, options: RequestInit = {}) => {
   return fetch(url, options)
   .then(response => {
-    if(response.status === 100){
+    if(response.status === 202){
       return null;
     }
     if(response.status === 200) {

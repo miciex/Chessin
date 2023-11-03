@@ -6,27 +6,31 @@ import { FontAwesome } from "@expo/vector-icons";
 import { ColorsPallet, StackParamList } from "../../../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
+import { GameResults, getWinner } from "../../../chess-logic/board";
 
 type Props = {
   date: Date;
   nick: string;
   rank: number;
-  result?: string;
+  result: GameResults;
   navigation: NativeStackNavigationProp<
     RootStackParamList,
     StackParamList,
     undefined
   >;
   gameId: number;
+  myPlayerWhite: boolean;
+  whiteToMove: boolean;
 };
 
-const EndedGame = ({ nick, rank, result, date, navigation, gameId }: Props) => {
+const EndedGame = ({ nick, rank, result, date, navigation, gameId, myPlayerWhite,whiteToMove }: Props) => {
   const Result = () => {
-    if (result == "win") {
+    const winner = getWinner(result, whiteToMove);
+    if(winner === "white" && myPlayerWhite) {
       return <FontAwesome5 name="trophy" size={17} color="rgb(235, 203, 47)" />;
-    } else if (result == "draw") {
+    } else if (winner === "draw" || winner === "abandoned") {
       return <FontAwesome5 name="balance-scale" size={17} color="black" />;
-    } else if (result == "lose") {
+    } else if (winner === "white" !== myPlayerWhite) {
       return (
         <Text>
           <FontAwesome name="close" size={20} color="rgb(194, 10, 10)" />{" "}

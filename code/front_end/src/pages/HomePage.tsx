@@ -42,7 +42,7 @@ const HomePage = ({ navigation }: Props) => {
           if(!data) return;
           setUserGames(data);
         }).catch((err) => {
-          throw err;
+          throw err;  
         });
       })
       .catch((error) => {
@@ -96,11 +96,13 @@ const HomePage = ({ navigation }: Props) => {
                 <EndedGame
                   nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
                   rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
-                  result={"win"}
+                  result={game.gameResult}
                   navigation={navigation}
                   key={`${game.id}${user?.nameInGame}`}
                   date={new Date(game.startTime)}
                   gameId={game.id}
+                  myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
+                  whiteToMove={game.whiteStarts&&game.moves.length%2===0 || game.moves.length%2===1 && !game.whiteStarts}
                 />
               </View>
             ))}

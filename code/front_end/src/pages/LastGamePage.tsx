@@ -65,21 +65,15 @@ export default function LastGame({ navigation }: Props) {
           {userGames.map((game) => (
             <View style={{ width: "90%" }}>
               <EndedGame
-                nick={
-                  game.whiteUser.nameInGame === user?.nameInGame
-                    ? game.blackUser.nameInGame
-                    : game.whiteUser.nameInGame
-                }
-                rank={
-                  game.whiteUser.nameInGame === user?.nameInGame
-                    ? game.blackRating
-                    : game.whiteRating
-                }
-                result={"win"}
+                nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
+                rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
+                result={game.gameResult}
                 navigation={navigation}
                 key={`${game.id}${user?.nameInGame}`}
-                date={"2023.10.27"}
+                date={new Date(game.startTime)}
                 gameId={game.id}
+                myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
+                whiteToMove={game.whiteStarts&&game.moves.length%2===0 || game.moves.length%2===1 && !game.whiteStarts}
               />
             </View>
           ))}

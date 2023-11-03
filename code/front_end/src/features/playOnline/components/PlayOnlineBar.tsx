@@ -19,7 +19,6 @@ type Props = {
   toggleRotateBoard: () => void;
   opponentOfferedDraw: boolean;
   handleRespondToDrawOffer: (response: RespondToDrawOfferRequest) => void;
-  handleListenForDrawOffer: (gameId: string) => void;
   handleSendDrawOffer: () => void;
   handleResign: (gameId: string) => void;
 };
@@ -31,7 +30,6 @@ export default function PlayOnlineBar({
   dispatch,
   opponentOfferedDraw,
   handleRespondToDrawOffer,
-  handleListenForDrawOffer,
   handleSendDrawOffer,
   handleResign
 }: Props) {
@@ -53,7 +51,6 @@ export default function PlayOnlineBar({
       gameId: state.gameId,
       responseType: ResponseType.DECLINE,
     })
-    handleListenForDrawOffer(String(state.gameId));
   }
 
   const resign = () => {

@@ -18,6 +18,8 @@ import { moveToChessNotation } from "../chess-logic/convertion";
 import Board from "../features/analyzeGame/components/Board";
 import { getGameById } from "../services/chessGameService";
 import { ChessGameResponse } from "../utils/ServicesTypes";
+import BaseButton from "../components/BaseButton";
+import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -42,14 +44,7 @@ export default function AnalyzeGame({ navigation, route }: Props) {
             });
           });
         } else if (response.status === 400) {
-          response
-            .text()
-            .then((error) => {
-              throw new Error(error);
-            })
-            .catch((error) => {
-              throw new Error(error);
-            });
+          throw new Error("bard request");
         } else throw new Error("Something went wrong");
       })
       .catch((error) => {
@@ -59,6 +54,14 @@ export default function AnalyzeGame({ navigation, route }: Props) {
 
   const changeCurrentPosition = (position: number) => {
     dispatch({ type: "setCurrentPosition", payload: position });
+  };
+
+  const setNextPosition = () => {
+    dispatch({ type: "setNextPosition" });
+  };
+
+  const setPreviousPosition = () => {
+    dispatch({ type: "setPreviousPosition" });
   };
 
   return (
@@ -85,6 +88,34 @@ export default function AnalyzeGame({ navigation, route }: Props) {
               currentPosition={state.currentPosition}
               setCurrentPosition={changeCurrentPosition}
             />
+            <View style={styles.arrowButtonsContainer}>
+              <View style={styles.arrowButtonContainer}>
+                <BaseButton
+                  text=""
+                  element={
+                    <Ionicons
+                      name="arrow-back-circle-outline"
+                      size={24}
+                      color="black"
+                    />
+                  }
+                  handlePress={setNextPosition}
+                />
+              </View>
+              <View style={styles.arrowButtonContainer}>
+                <BaseButton
+                  text=""
+                  element={
+                    <Ionicons
+                      name="arrow-forward-circle-outline"
+                      size={24}
+                      color="black"
+                    />
+                  }
+                  handlePress={setPreviousPosition}
+                />
+              </View>
+            </View>
           </View>
         </ScrollView>
       </View>
@@ -126,5 +157,16 @@ const styles = StyleSheet.create({
   scrollView: {
     width: "100%",
     backgroundColor: ColorsPallet.darker,
+  },
+  arrowButtonContainer: {
+    width: "50%",
+    height: 55,
+    overflow: "hidden",
+    borderRadius: 10,
+    flexDirection: "row",
+  },
+  arrowButtonsContainer: {
+    width: "25%",
+    height: "100%",
   },
 });

@@ -1,5 +1,6 @@
 import {
   BoardResponseToOnlineBoard,
+  GameResults,
   GameType,
   OnlineBoardType,
   playMove,
@@ -32,6 +33,7 @@ export type AnalyzeGameState = {
   blackRatingChange: number;
   isRated: boolean;
   currentPosition: number;
+  gameResult: GameResults
 };
 
 const chessGameResponseToAnalyzeGameState = (
@@ -55,6 +57,7 @@ const chessGameResponseToAnalyzeGameState = (
     blackRatingChange: chessGameResponse.blackRatingChange,
     isRated: chessGameResponse.isRated,
     currentPosition: 0,
+    gameResult: chessGameResponse.gameResult
   };
 };
 
@@ -89,6 +92,10 @@ export type AnalyzeGameAction =
   | {
       type: "setUpGame";
       payload: { chessGameResponse: ChessGameResponse; nameInGame: string };
+    }|{
+      type: "setNextPosition";
+    }|{
+      type: "setPreviousPosition";
     };
 
 export const getInitialState = (
@@ -113,6 +120,7 @@ export const getInitialState = (
     blackRatingChange: 0,
     isRated,
     currentPosition: 0,
+    gameResult: GameResults.NONE
   };
 };
 
@@ -144,6 +152,14 @@ export function reducer(
           action.payload
         ),
       };
+    case "setNextPosition":
+      if (state.currentPosition < state.moves.length - 1) {
+        return { ...state, currentPosition: state.currentPosition + 1 };
+      }
+    case "setPreviousPosition":
+      if (state.currentPosition > 0) {
+        return { ...state, currentPosition: state.currentPosition - 1 };
+      }
     default:
       return state;
   }

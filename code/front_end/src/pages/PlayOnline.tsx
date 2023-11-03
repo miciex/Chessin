@@ -34,6 +34,7 @@ import {
   BoardResponse,
   BooleanMessageResponse,
   ChessGameResponse,
+  MessageResponse,
   RespondToDrawOfferRequest,
 } from "../utils/ServicesTypes";
 import GameRecord from "../features/playOnline/components/GameRecord";
@@ -47,6 +48,7 @@ import {
   resign,
   respondToDrawOffer,
 } from "../services/chessGameService";
+import MessageQueue from "react-native/Libraries/BatchedBridge/MessageQueue";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -78,6 +80,7 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const opponentOfferedDrawTrue = () => {
     setOpponentOfferedDraw(true);
+    console.log("opponentOfferedDraw")
   };
 
   const opponentOfferedDrawFalse = () => {
@@ -99,7 +102,8 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleListenForDrawOffer = (gameId: string) => {
     listenForDrawOffer(gameId)
-    .then(() => {
+    .then((msg: MessageQueue | null) => {
+      if(!msg) return;
       setOpponentOfferedDraw(true);
     })
     .catch((err) => {
@@ -110,7 +114,6 @@ export default function PlayOnline({ navigation, route }: Props) {
   const handleListenForResign = (gameId: string) => {
     listenForResignation(gameId)
     .then((response : BoardResponse | null) => {
-      console.log("handle Listen for Resing Response: " + response)
       if (response === null) return;
       dispatch({
         type: "setDataFromBoardResponse",
@@ -125,7 +128,6 @@ export default function PlayOnline({ navigation, route }: Props) {
   const handleResign = (gameId: string) => {
     resign(gameId)
     .then((response : BoardResponse | null) => {
-      console.log("resignation response: " + response);
       if (response === null) return;
       dispatch({
         type: "setDataFromBoardResponse",
@@ -301,9 +303,11 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleResponseFromDrawOffer = (board: BoardResponse | null) => {
     if (!board) {
+      setOpponentOfferedDraw(false);
       return listenForDrawOffer(String(state.gameId))
-        .then(() => {
-          setOpponentOfferedDraw(false);
+        .then((msg: MessageResponse | null) => {
+          if(!msg) return;
+          setOpponentOfferedDraw(true);
           listenForDrawOffer(String(state.gameId));
         })
         .catch((err) => {
@@ -373,7 +377,6 @@ export default function PlayOnline({ navigation, route }: Props) {
           toggleRotateBoard={toggleRotateBoard}
           opponentOfferedDraw={opponentOfferedDraw}
           handleRespondToDrawOffer={handleRespondToDrawOffer}
-          handleListenForDrawOffer={handleListenForDrawOffer}
           handleSendDrawOffer={handleOfferDraw}
           handleResign={handleResign}
         />
