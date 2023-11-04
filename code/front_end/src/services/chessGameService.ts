@@ -4,9 +4,11 @@ import {
   getGameHistoryLink,
   isUserPlayingLink,
   isUserPlayingTimeControlLink,
+  listenForDisconnectionLink,
   listenForDrawOfferLink,
   listenForResignationLink,
   offerDrawLink,
+  pingLink,
   resignLink,
   respondToDrawOfferLink,
 } from "../utils/ApiEndpoints";
@@ -72,6 +74,18 @@ export const isUserPlaying = async (username: string) => {
 
 export const isUserPlayingTimeControl = async (username: string, timeControl: string, increment:string) => {
   return handlePost(`${isUserPlayingTimeControlLink}${username}/${timeControl}/${increment}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const ping = async (gameId: string) => {
+  return handlePost(`${pingLink}${gameId}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const listenForDisconnections = async (gameId: string) => {
+  return handlePost(`${listenForDisconnectionLink}${gameId}`).catch((error) => {
     throw new Error(error);
   });
 }

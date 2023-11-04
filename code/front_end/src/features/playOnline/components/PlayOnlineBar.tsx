@@ -21,6 +21,7 @@ type Props = {
   handleRespondToDrawOffer: (response: RespondToDrawOfferRequest) => void;
   handleSendDrawOffer: () => void;
   handleResign: (gameId: string) => void;
+  opponentDisconnected: boolean;
 };
 
 export default function PlayOnlineBar({
@@ -31,9 +32,11 @@ export default function PlayOnlineBar({
   opponentOfferedDraw,
   handleRespondToDrawOffer,
   handleSendDrawOffer,
-  handleResign
+  handleResign,
+  opponentDisconnected
 }: Props) {
   const [showResign, setShowResign] = useState(false);
+  const [showOpponentDisconnected, setShowOpponentDisconnected] = useState(true);
 
   const toggleResign = () => {
     setShowResign((prev) => !prev);
@@ -55,6 +58,7 @@ export default function PlayOnlineBar({
 
   const resign = () => {
     handleResign(String(state.gameId));
+    setShowResign(false);
   }
     
 
@@ -66,18 +70,18 @@ export default function PlayOnlineBar({
   return (
     <View style={styles.gameOptionsContainer}>
       <OnlineBarModal
-        showModal={showResign && !opponentOfferedDraw}
+        showModal={showResign && !opponentOfferedDraw&& !(showOpponentDisconnected && opponentDisconnected)}
         handleDecline={toggleResign}
         handleAccept={resign}
         modalTxt={modalTxt}
       />
       <OnlineBarModal
-        showModal={opponentOfferedDraw}
+        showModal={opponentOfferedDraw&& !(showOpponentDisconnected && opponentDisconnected)}
         handleDecline={declineDraw}
         handleAccept={acceptDraw}
         modalTxt={"Your opponent offered a draw. Do you accept?"}
         />
-      {(!showResign && !opponentOfferedDraw) && (
+      {(!showResign && !opponentOfferedDraw && !(showOpponentDisconnected && opponentDisconnected)) && (
         <>
           <MaterialCommunityIcons
             name="fraction-one-half"
@@ -105,6 +109,19 @@ export default function PlayOnlineBar({
           />
         </>
       )}
+      {opponentDisconnected && showOpponentDisconnected ?(
+        <View>
+          <View style={styles.closeButtonContainer}>
+            <FontAwesome
+              name="close"
+              size={34}
+              color="black"
+              onPress={() => setShowOpponentDisconnected(false)}
+            />
+            </View>
+          <Text style={{color: "red"}}>Opponent disconnected</Text>
+        </View>
+      ):null}
     </View>
   );
 }
@@ -116,5 +133,11 @@ const styles = StyleSheet.create({
     height: 48,
     justifyContent: "space-evenly",
     alignItems: "center",
+  },
+  closeButtonContainer: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    zIndex: 1,
   },
 });

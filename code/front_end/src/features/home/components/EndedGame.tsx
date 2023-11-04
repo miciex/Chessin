@@ -26,14 +26,14 @@ type Props = {
 const EndedGame = ({ nick, rank, result, date, navigation, gameId, myPlayerWhite,whiteToMove }: Props) => {
   const Result = () => {
     const winner = getWinner(result, whiteToMove);
-    if(winner === "white" && myPlayerWhite) {
+    if((winner === "white") === myPlayerWhite) {
       return <FontAwesome5 name="trophy" size={17} color="rgb(235, 203, 47)" />;
     } else if (winner === "draw" || winner === "abandoned") {
       return <FontAwesome5 name="balance-scale" size={17} color="black" />;
-    } else if (winner === "white" !== myPlayerWhite) {
+    } else if ((winner === "white") !== myPlayerWhite) {
       return (
         <Text>
-          <FontAwesome name="close" size={20} color="rgb(194, 10, 10)" />{" "}
+          <FontAwesome name="close" size={20} color="rgb(194, 10, 10)" />
         </Text>
       );
     }

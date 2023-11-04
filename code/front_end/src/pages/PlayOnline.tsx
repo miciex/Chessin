@@ -42,9 +42,11 @@ import { ColorsPallet } from "../utils/Constants";
 import {
   isUserPlaying,
   isUserPlayingTimeControl,
+  listenForDisconnections,
   listenForDrawOffer,
   listenForResignation,
   offerDraw,
+  ping,
   resign,
   respondToDrawOffer,
 } from "../services/chessGameService";
@@ -69,6 +71,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [showSettings, setShowSettings] = useState(false);
   const [rotateBoard, setRotateBoard] = useState(false);
   const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
+  const [opponentDisconnected, setOpponentDisconnected] = useState(false);
 
   const toggleSettings = () => {
     setShowSettings((prev) => !prev);
@@ -94,6 +97,23 @@ export default function PlayOnline({ navigation, route }: Props) {
       unMount();
     };
   }, []);
+
+  useEffect(() => {
+    if(state.gameId<0) return;
+    if(state.myPlayer.color == undefined) return;
+    const interval = setInterval(() => {
+      handlePing(String(state.gameId))
+      .catch(()=>{
+        throw new Error("Error while pinging");
+      })
+    }, 10000);
+    handleListenForDisconnect(String(state.gameId))
+    .catch(()=>{
+      throw new Error("Error while listening for disconnect");
+    });
+    return () => clearInterval(interval);
+  },[state.gameId])
+
 
   const setRotateBoardAfterFoundGame = (isMyPlayerWhite: boolean) => {
     if (isMyPlayerWhite) setRotateBoard(false);
@@ -138,6 +158,46 @@ export default function PlayOnline({ navigation, route }: Props) {
       throw new Error(err)
     });
   }
+
+  const handlePing = async (gameId: string) => {
+    ping(gameId)
+    .then((response :MessageResponse| BoardResponse | null) => {
+      if (!response){ 
+        //opponent reconnected
+        setOpponentDisconnected(false);
+        handleListenForDisconnect(gameId)
+        .catch((err) => {
+          throw new Error(err);
+        }); 
+      }
+      else if("message" in response){
+        //opponent didn't disconnect
+        setOpponentDisconnected(false);
+      }
+      else{
+        //opponent disconnected
+        setOpponentDisconnected(true);
+        dispatch({
+          type: "setDataFromBoardResponse",
+          payload: { boardResponse: response },
+        });
+      }
+    }).
+    catch((err) => {
+      throw new Error(err)
+    });
+  }
+
+  const handleListenForDisconnect = async (gameId: string) => {
+    listenForDisconnections(gameId)
+    .then((response: MessageResponse | null) => {
+      if (response === null) return;
+      setOpponentDisconnected(true);
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+  };
 
   const searchNewGame = () => {
     dispatch({ type: "setSearchingGame", payload: true });
@@ -195,6 +255,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                         .catch((err) => {
                           throw new Error(err);
                         });
+
                     }
                   );
                 })
@@ -245,6 +306,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                       ).catch((err) => {
                         throw new Error(err);
                       });
+
                     }
                   );
                 })
@@ -379,6 +441,7 @@ export default function PlayOnline({ navigation, route }: Props) {
           handleRespondToDrawOffer={handleRespondToDrawOffer}
           handleSendDrawOffer={handleOfferDraw}
           handleResign={handleResign}
+          opponentDisconnected={opponentDisconnected}
         />
 
         <Bar state={state} dispatch={dispatch} rotateBoard={rotateBoard} />

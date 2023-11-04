@@ -74,8 +74,8 @@ public class ChessGameController {
                 int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
                 int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
 
-                whitePlayerIndex = 1;
-                blackPlayerIndex = 0;
+//                whitePlayerIndex = 1;
+//                blackPlayerIndex = 0;
 
                 List<User> players = Arrays.asList(foundGame.getUser(), userRepository.findByEmail(email).get());
 
@@ -472,8 +472,7 @@ public class ChessGameController {
 
     @Transactional
     @PostMapping("/resign/{gameId}")
-    public ResponseEntity<?> resign(@PathVariable String gameId, HttpServletRequest servlet)
-    {
+    public ResponseEntity<?> resign(@PathVariable String gameId, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         long id;
