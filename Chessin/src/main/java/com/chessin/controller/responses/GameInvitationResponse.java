@@ -2,6 +2,7 @@ package com.chessin.controller.responses;
 
 import com.chessin.controller.register.UserService;
 import com.chessin.model.playing.GameInvitation;
+import com.chessin.model.playing.PlayerColor;
 import com.chessin.model.register.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class GameInvitationResponse {
     private long timeControl;
     private long increment;
     private boolean isRated;
+    private PlayerColor playerColor;
 
     public static GameInvitationResponse fromGameInvitation(GameInvitation gameInvitation, UserService userService)
     {
@@ -33,6 +35,7 @@ public class GameInvitationResponse {
                 .timeControl(gameInvitation.getTimeControl())
                 .increment(gameInvitation.getIncrement())
                 .isRated(gameInvitation.isRated())
+                .playerColor(gameInvitation.getPlayerColor())
                 .build();
     }
 }

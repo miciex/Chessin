@@ -22,4 +22,5 @@ public class GameInvitation {
     private long timeControl;
     private long increment;
     private boolean isRated;
+    private PlayerColor playerColor;
 }
