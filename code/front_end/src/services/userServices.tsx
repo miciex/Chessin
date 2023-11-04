@@ -10,6 +10,7 @@ import {
   getGameHistoryLink,
   checkSendedInvitationsLink,
   inviteToGameLink,
+  checkInvitationsToGameLink,
 } from "../utils/ApiEndpoints";
 import {
   CodeVerificationRequest,
@@ -416,3 +417,33 @@ export const inviteToGame = async (request: InviteToGameRequest) =>{
   });
   return response;
 }
+
+export const checkInvitationsToGame = async () => {
+  const accessToken = await getValueFor("accessToken");
+  console.log('jost')
+  const response = await fetch(checkInvitationsToGameLink, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json().catch((error) => {
+          throw new Error(error);
+        }) as unknown as Array<responseUser>;
+      } else if (response.status === 400) {
+        throw new Error("Bad request");
+      } else if (response.status === 401) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+
+  return response;
+};

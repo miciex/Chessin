@@ -135,9 +135,10 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
 
                       let request = {
                         friendNickname: user2? user2.nameInGame : "",
-                        timeControl: 0,
-                        increment: 0,
-                        isRated: true
+                        timeControl: gameTempo.totalTime,
+                        increment: gameTempo.increment,
+                        isRated: isEnabled,
+                        color: chosenColor
                       }
 
                       inviteToGame(request)

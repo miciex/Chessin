@@ -33,3 +33,4 @@ export const getBoardbyGameIdLink = `${chessGameLink}getBoardByGameId/`;
 export const getGameHistoryLink = `${userLink}getGames/`;
 export const getGameByIdLink = `${chessGameLink}getGame/`
 export const inviteToGameLink = `${chessGameLink}inviteFriend`
+export const checkInvitationsToGameLink = `${chessGameLink}checkGameInvitations`

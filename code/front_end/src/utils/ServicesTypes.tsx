@@ -1,6 +1,7 @@
 import { responseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
 import { GameResults, GameType } from "../chess-logic/board";
+import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColorContext";
 
 export type RegisterRequest = {
   firstname: string;
@@ -133,7 +134,7 @@ export type InviteToGameRequest = {
   timeControl: number;
   increment: number;
   isRated: boolean;
-
+  color: PlayColorsContextType;
 }
 
 export type HandleSearchBarSocials = {
