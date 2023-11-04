@@ -9,11 +9,13 @@ import {
   gameInvitation,
   getGameHistoryLink,
   checkSendedInvitationsLink,
+  inviteToGameLink,
 } from "../utils/ApiEndpoints";
 import {
   CodeVerificationRequest,
   HandleFriendInvitation,
   HandleSearchBarSocials,
+  InviteToGameRequest,
 } from "../utils/ServicesTypes";
 import {
   getHighestRanking,
@@ -391,3 +393,26 @@ export const checkSendedInvitations = async () => {
 
   return response;
 };
+
+export const inviteToGame = async (request: InviteToGameRequest) =>{
+  const accessToken = await getValueFor("accessToken");
+  const response = await fetch(inviteToGameLink, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(request)
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      return response.text();
+    } else {
+      throw new Error("Something went wrong on api server!");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+  return response;
+}

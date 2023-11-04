@@ -21,6 +21,8 @@ import { User, getRanking } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { GameType } from "../chess-logic/board";
 import { setPendingGameRequest } from "../features/playOnline/services/playOnlineService";
+import { inviteToGameLink } from "../utils/ApiEndpoints";
+import { inviteToGame } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -130,16 +132,27 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                   <BaseButton
                     handlePress={() => {
                       if(!user) return
+
+                      let request = {
+                        friendNickname: user2? user2.nameInGame : "",
+                        timeControl: 0,
+                        increment: 0,
+                        isRated: true
+                      }
+
+                      inviteToGame(request)
                       // navigation.navigate("PlayOnline", {
                       //   request: setPendingGameRequest(
                       //     gameTempo.totalTime,
                       //     gameTempo.increment,
                       //     getRanking(gameTempo.gameType, user),
                       //     user.nameInGame,
-                      //     gameTempo.gameType
+                      //     gameTempo.
                       //   ),
                       // })
                     }}
+
+                    
                     text="Graj"
                     fontSizeProps={30}
                   />

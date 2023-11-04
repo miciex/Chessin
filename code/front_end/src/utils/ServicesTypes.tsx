@@ -128,6 +128,14 @@ export type HandleFriendInvitation = {
 
 }
 
+export type InviteToGameRequest = {
+  friendNickname: string;
+  timeControl: number;
+  increment: number;
+  isRated: boolean;
+
+}
+
 export type HandleSearchBarSocials = {
   searchNickname: string;
 }
