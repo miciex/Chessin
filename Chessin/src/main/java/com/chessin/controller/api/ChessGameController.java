@@ -5,6 +5,7 @@ import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.*;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
+import com.chessin.controller.responses.GameInvitationResponse;
 import com.chessin.controller.responses.MessageResponse;
 import com.chessin.model.playing.*;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/api/v1/game")
@@ -818,6 +821,22 @@ public class ChessGameController {
         pendingInvitations.remove(friendEmail);
 
         return ResponseEntity.ok().body(MessageResponse.of("Invitation responded."));
+    }
+
+    @Transactional
+    @PostMapping("/checkGameInvitations")
+    public ResponseEntity<?> checkGameInvitations(HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        List<GameInvitation> invitations = pendingInvitations.values().stream().filter(x -> x.getFriend().getEmail().equals(email)).toList();
+
+        if(invitations.isEmpty())
+            return ResponseEntity.ok().body(MessageResponse.of("No invitations."));
+
+        List<GameInvitationResponse> responses = invitations.stream().map((GameInvitation invitation) -> GameInvitationResponse.fromGameInvitation(invitation, userService)).toList();
+
+        return ResponseEntity.ok().body(responses);
     }
 
     @Transactional
