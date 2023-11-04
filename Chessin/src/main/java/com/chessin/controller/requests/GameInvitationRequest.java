@@ -1,5 +1,6 @@
 package com.chessin.controller.requests;
 
+import com.chessin.model.playing.PlayerColor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,4 +15,5 @@ public class GameInvitationRequest {
     private long timeControl;
     private long increment;
     private boolean isRated;
+    private PlayerColor playerColor;
 }

@@ -742,6 +742,7 @@ public class ChessGameController {
                 .timeControl(request.getTimeControl())
                 .increment(request.getIncrement())
                 .isRated(request.isRated())
+                .playerColor(request.getPlayerColor())
                 .build();
 
         pendingInvitations.put(email, pendingInvitation);
@@ -784,8 +785,18 @@ public class ChessGameController {
         {
             pendingInvitations.get(friendEmail).setFriend(userRepository.findByEmail(email).get());
 
-            int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
-            int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+            int whitePlayerIndex, blackPlayerIndex;
+
+            if(pendingInvitations.get(friendEmail).getPlayerColor() == PlayerColor.RANDOM)
+            {
+                whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
+                blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+            }
+            else
+            {
+                whitePlayerIndex = pendingInvitations.get(friendEmail).getPlayerColor() == PlayerColor.WHITE ? 0 : 1;
+                blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+            }
 
             List<User> players = Arrays.asList(userRepository.findByEmail(friendEmail).get(), userRepository.findByEmail(email).get());
 
