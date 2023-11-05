@@ -154,15 +154,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                       console.log(typeof isEnabled, "typ zmiennej");
 
                       inviteToGame(request);
-                      // navigation.navigate("PlayOnline", {
-                      //   request: setPendingGameRequest(
-                      //     gameTempo.totalTime,
-                      //     gameTempo.increment,
-                      //     getRanking(gameTempo.gameType, user),
-                      //     user.nameInGame,
-                      //     gameTempo.
-                      //   ),
-                      // })
+                      navigation.navigate("PlayOnline");
                     }}
                     text="Graj"
                     fontSizeProps={30}
