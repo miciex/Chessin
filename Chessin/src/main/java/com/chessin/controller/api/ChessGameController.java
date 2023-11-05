@@ -207,7 +207,7 @@ public class ChessGameController {
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
             {
-                disconnections.get(id).getPing().notifyAll();
+                //disconnections.get(id).getPing().notifyAll();
 
                 synchronized(disconnections.get(id).getListener()) {
                     disconnections.get(id).getListener().notifyAll();

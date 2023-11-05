@@ -101,6 +101,8 @@ export default function PlayOnline({ navigation, route }: Props) {
   useEffect(() => {
     if(state.gameId<0) return;
     if(state.myPlayer.color == undefined) return;
+    console.log("game result: " + JSON.stringify(state.board.result))
+    if(state.board.result !== GameResults.NONE) return;
     const interval = setInterval(() => {
       handlePing(String(state.gameId))
       .catch(()=>{
@@ -112,7 +114,7 @@ export default function PlayOnline({ navigation, route }: Props) {
       throw new Error("Error while listening for disconnect");
     });
     return () => clearInterval(interval);
-  },[state.gameId])
+  },[state.gameId, state.board.result])
 
 
   const setRotateBoardAfterFoundGame = (isMyPlayerWhite: boolean) => {

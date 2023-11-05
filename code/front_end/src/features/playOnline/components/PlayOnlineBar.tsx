@@ -11,6 +11,7 @@ import { BoardResponse, RespondToDrawOfferRequest, SubmitMoveRequest } from "../
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { listenForDrawOffer, offerDraw } from "../../../services/chessGameService";
 import { ResponseType } from "../../../utils/ServicesTypes";
+import BaseButton from "../../../components/BaseButton";
 
 type Props = {
   state: PlayOnlineState;
@@ -112,12 +113,12 @@ export default function PlayOnlineBar({
       {opponentDisconnected && showOpponentDisconnected ?(
         <View>
           <View style={styles.closeButtonContainer}>
-            <FontAwesome
+            <BaseButton text="" element={<FontAwesome
               name="close"
-              size={34}
+              size={24}
               color="black"
-              onPress={() => setShowOpponentDisconnected(false)}
-            />
+            />} handlePress={() => setShowOpponentDisconnected(false)}/>
+            
             </View>
           <Text style={{color: "red"}}>Opponent disconnected</Text>
         </View>
@@ -136,8 +137,10 @@ const styles = StyleSheet.create({
   },
   closeButtonContainer: {
     position: "absolute",
-    left: 0,
-    top: 0,
+    left: -20,
+    top: -20,
     zIndex: 1,
+    width: 24,
+    height: 24,
   },
 });
