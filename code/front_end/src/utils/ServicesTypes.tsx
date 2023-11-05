@@ -187,3 +187,7 @@ export type MessageResponse = {
 export type BooleanMessageResponse = {
   message: "True" | "False";
 }
+
+export const enum DisconnectionStatus {
+  FINE = "FINE", DISCONNECTED="DISCONNECTED", RECONNECTED="RECONNECTED", NO_CHANGE = "NO_CHANGE"
+}

@@ -34,6 +34,7 @@ import {
   BoardResponse,
   BooleanMessageResponse,
   ChessGameResponse,
+  DisconnectionStatus,
   MessageResponse,
   RespondToDrawOfferRequest,
 } from "../utils/ServicesTypes";
@@ -163,19 +164,20 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handlePing = async (gameId: string) => {
     ping(gameId)
-    .then((response :MessageResponse| BoardResponse | null) => {
-      if (!response){ 
-        //opponent reconnected
-        setOpponentDisconnected(false);
-        handleListenForDisconnect(gameId)
-        .catch((err) => {
-          throw new Error(err);
-        }); 
+    .then((response :DisconnectionStatus| BoardResponse) => {
+      if(typeof response === "string"){
+        switch(response as DisconnectionStatus){
+        case DisconnectionStatus.DISCONNECTED:
+          setOpponentDisconnected(true);
+          break;
+        case DisconnectionStatus.RECONNECTED:
+          setOpponentDisconnected(false);
+          break;
+        case DisconnectionStatus.FINE:
+        case DisconnectionStatus.NO_CHANGE:
+          return;
       }
-      else if("message" in response){
-        //opponent didn't disconnect
-        setOpponentDisconnected(false);
-      }
+    }
       else{
         //opponent disconnected
         setOpponentDisconnected(true);
