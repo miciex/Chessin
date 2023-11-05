@@ -41,10 +41,6 @@ public class UserController {
     private final JwtService jwtService;
     private final FriendInvitationRepository friendInvitationRepository;
     private final ChessGameRepository chessGameRepository;
-    private final ClassicalRatingRepository classicalRatingRepository;
-    private final RapidRatingRepository rapidRatingRepository;
-    private final BlitzRatingRepository blitzRatingRepository;
-    private final BulletRatingRepository bulletRatingRepository;
 
     @PostMapping("/findByNickname/{nickname}")
     public ResponseEntity<?> findByNickname(@PathVariable String nickname){
@@ -100,15 +96,14 @@ public class UserController {
     {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
-        if(!friendInvitationRepository.existsByUserEmail(email))
+        if(!friendInvitationRepository.existsByFriendEmail(email))
             return ResponseEntity.badRequest().body(MessageResponse.of("No invitations"));
 
         List<FriendInvitation> invitations = friendInvitationRepository.findAllByFriend(userRepository.findByEmail(email).get());
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
-        for(FriendInvitation invitation : invitations)
-            responses.add(FriendInvitationResponse.fromFriendInvitation(invitation, true));
+        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, true)).forEach(responses::add);
 
         return ResponseEntity.ok().body(responses);
     }
@@ -125,8 +120,7 @@ public class UserController {
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
-        for(FriendInvitation invitation : invitations)
-            responses.add(FriendInvitationResponse.fromFriendInvitation(invitation, false));
+        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, false)).forEach(responses::add);
 
         return ResponseEntity.ok().body(responses);
     }

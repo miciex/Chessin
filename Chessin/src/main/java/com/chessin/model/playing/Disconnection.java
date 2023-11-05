@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class Disconnection {
     boolean whiteDisconnected;
     boolean blackDisconnected;
+    Object ping;
+    Object listener;
 }
