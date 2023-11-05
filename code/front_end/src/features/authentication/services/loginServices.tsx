@@ -9,7 +9,7 @@ export const fetchandStoreUser = async () => {
   return fetchLoggedUser()
     .then((data) => {
       let user: User = loggedUserToUser(data);
-      console.log("user: " + user)
+      console.log("user: " + user.nameInGame)
       save("user", JSON.stringify(user));
       return user;
     })

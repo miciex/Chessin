@@ -11,14 +11,81 @@ import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import ChooseYourLevelModal from "../features/home/components/ChooseYourLevelModal";
-import { BooleanMessageResponse, ChessGameResponse } from "../utils/ServicesTypes";
+import {
+  BooleanMessageResponse,
+  ChessGameResponse,
+} from "../utils/ServicesTypes";
 import { getGameHistory, isUserPlaying } from "../services/chessGameService";
 import { getPagedGames } from "../services/userServices";
+
+//przykladowe stary gry
+const ended_games = [
+  {
+    date: "01.10.2022",
+    playerNick: "Pusznik",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "MaciekNieBij",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Slaweczuk",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Strzała",
+    rank: 1500,
+    lastGameResult: "lose",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Bestia",
+    rank: 1500,
+    lastGameResult: "win",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Sharku",
+    rank: 1000,
+    lastGameResult: "lose",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+  {
+    date: "01.10.2022",
+    playerNick: "Zocho",
+    rank: 1300,
+    lastGameResult: "draw",
+  },
+];
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home", undefined>;
   route: RouteProp<RootStackParamList, "Home">;
-  setUserAuthenticated: ()=>void;
+  setUserAuthenticated: () => void;
 };
 
 const HomePage = ({ navigation }: Props) => {
@@ -28,22 +95,27 @@ const HomePage = ({ navigation }: Props) => {
   useEffect(() => {
     getValueFor("user")
       .then((user) => {
+        console.log(user);
         if (!user) return navigation.navigate("UserNotAuthenticated");
         let parsedUser: User = JSON.parse(user);
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
         setUser(parsedUser);
-        isUserPlaying(parsedUser.nameInGame).then((data:BooleanMessageResponse)=>{
-          if(!data) return;
-          if(data.message==="True") navigation.navigate("PlayOnline");
-        }).catch((err)=>{
-          throw new Error(err);
-        });
-        getPagedGames(parsedUser.nameInGame, 0).then((data:ChessGameResponse[]|null) => {
-          if(!data) return;
-          setUserGames(data);
-        }).catch((err) => {
-          throw err;  
-        });
+        isUserPlaying(parsedUser.nameInGame)
+          .then((data: BooleanMessageResponse) => {
+            if (!data) return;
+            if (data.message === "True") navigation.navigate("PlayOnline");
+          })
+          .catch((err) => {
+            throw new Error(err);
+          });
+        getPagedGames(parsedUser.nameInGame, 0)
+          .then((data: ChessGameResponse[] | null) => {
+            if (!data) return;
+            setUserGames(data);
+          })
+          .catch((err) => {
+            throw err;
+          });
       })
       .catch((error) => {
         navigation.navigate("UserNotAuthenticated");
@@ -94,15 +166,26 @@ const HomePage = ({ navigation }: Props) => {
             {userGames.map((game) => (
               <View style={{ width: "90%" }}>
                 <EndedGame
-                  nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
-                  rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
+                  nick={
+                    game.whiteUser.nameInGame === user?.nameInGame
+                      ? game.blackUser.nameInGame
+                      : game.whiteUser.nameInGame
+                  }
+                  rank={
+                    game.whiteUser.nameInGame === user?.nameInGame
+                      ? game.blackRating
+                      : game.whiteRating
+                  }
                   result={game.gameResult}
                   navigation={navigation}
                   key={`${game.id}${user?.nameInGame}`}
                   date={new Date(game.startTime)}
                   gameId={game.id}
                   myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
-                  whiteToMove={game.whiteStarts&&game.moves.length%2===0 || game.moves.length%2===1 && !game.whiteStarts}
+                  whiteToMove={
+                    (game.whiteStarts && game.moves.length % 2 === 0) ||
+                    (game.moves.length % 2 === 1 && !game.whiteStarts)
+                  }
                 />
               </View>
             ))}

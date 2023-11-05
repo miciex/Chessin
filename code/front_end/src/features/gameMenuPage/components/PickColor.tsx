@@ -13,11 +13,11 @@ type Props = {
 };
 
 const iconNames = ["chess-king", "random", "chess-king"];
-const colors = ["black", "black", "white"];
+const colors = ["white", "black", "black"];
 const colorsContext = new Array<PlayColorsContextType>(
-  "white",
-  "random",
-  "black"
+  "WHITE",
+  "RANDOM",
+  "BLACK"
 );
 
 export default function PickColor({ handleOnClick }: Props) {

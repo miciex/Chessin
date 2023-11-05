@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/GameInvitationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/GameInvitationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/features/gameMenuPage/components/PickColor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/features/gameMenuPage/components/PickColor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/features/gameMenuPage/context/PlayColorContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/features/gameMenuPage/context/PlayColorContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/pages/PlayWithFriendsMenuPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/pages/PlayWithFriendsMenuPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/services/userServices.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/services/userServices.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/utils/ServicesTypes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/utils/ServicesTypes.tsx" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Use Maven wrapper" />
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2QVczJ3H3ZsjWa8IxSa91ltlzBz" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/wojte/Desktop/Chessin_BE/Chessin&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;ba07b2238b8243fe17c60bfbc41b78e3&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="ChessinApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="Chessin" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.chessin.ChessinApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="" />
+      <created>1685442450734</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1685442450734</updated>
+      <workItem from="1685442451877" duration="1194000" />
+      <workItem from="1685689380981" duration="598000" />
+      <workItem from="1685955676198" duration="1697000" />
+      <workItem from="1685982273415" duration="1232000" />
+      <workItem from="1686559354247" duration="4596000" />
+      <workItem from="1686598655614" duration="2169000" />
+      <workItem from="1686601512479" duration="117000" />
+      <workItem from="1686650006345" duration="1698000" />
+      <workItem from="1686727258727" duration="7453000" />
+      <workItem from="1686810122170" duration="1334000" />
+      <workItem from="1686893797290" duration="1657000" />
+      <workItem from="1686899506907" duration="3991000" />
+      <workItem from="1687078097051" duration="6618000" />
+      <workItem from="1687281578159" duration="8820000" />
+      <workItem from="1687420199987" duration="2284000" />
+      <workItem from="1687423263487" duration="6055000" />
+      <workItem from="1687431081159" duration="726000" />
+      <workItem from="1688986678884" duration="624000" />
+      <workItem from="1689019461361" duration="614000" />
+      <workItem from="1689070017361" duration="2159000" />
+      <workItem from="1689076864852" duration="611000" />
+      <workItem from="1691005369009" duration="3637000" />
+      <workItem from="1691049011506" duration="15569000" />
+      <workItem from="1691252855294" duration="69000" />
+      <workItem from="1691252967264" duration="148000" />
+      <workItem from="1691253140308" duration="2135000" />
+      <workItem from="1691255605988" duration="1393000" />
+      <workItem from="1691257080831" duration="1990000" />
+      <workItem from="1691348898606" duration="1577000" />
+      <workItem from="1691394644901" duration="1926000" />
+      <workItem from="1691411924746" duration="3096000" />
+      <workItem from="1691432550562" duration="20000" />
+      <workItem from="1698680832274" duration="4005000" />
+      <workItem from="1698921068820" duration="1506000" />
+      <workItem from="1698927554616" duration="833000" />
+      <workItem from="1699110702341" duration="1623000" />
+      <workItem from="1699130619515" duration="91000" />
+      <workItem from="1699179645657" duration="2078000" />
+      <workItem from="1699196741901" duration="3451000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/UserController.java</url>
+          <line>74</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java</url>
+          <line>737</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="SpringBootApplicationConfigurationType">
+        <watch expression="userRepository" language="JAVA" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>

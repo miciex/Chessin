@@ -1,16 +1,23 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
 import { User, responseUser } from "../utils/PlayerUtilities";
+
 import {
   friendInvitation,
   findUsersByNickname,
   getFriends,
   checkInvitationsLink,
+  gameInvitation,
   getGameHistoryLink,
+  checkSendedInvitationsLink,
+  inviteToGameLink,
+  checkInvitationsToGameLink,
 } from "../utils/ApiEndpoints";
 import {
   CodeVerificationRequest,
+  FriendInvitationResponseType,
   HandleFriendInvitation,
   HandleSearchBarSocials,
+  InviteToGameRequest,
 } from "../utils/ServicesTypes";
 import {
   getHighestRanking,
@@ -31,13 +38,15 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { Rankings } from "../utils/PlayerUtilities";
 import { GameType } from "../chess-logic/board";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../Routing";
+import { StackParamList } from "../utils/Constants";
 import { handleFetch } from "../lib/fetch";
 
 export const storeUser = async (value: User) => {
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
     throw new Error(err);
   });
-  console.log("user stored");
 };
 
 // getting data
@@ -173,6 +182,7 @@ export const setUserDataFromResponse = async (
 
 export const addFriendFunc = async (request: FriendInvitationRequest) => {
   const accessToken = await getValueFor("accessToken");
+  console.log("s");
   const response = await fetch(addFriendLink, {
     method: "POST",
     headers: {
@@ -181,12 +191,11 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
     },
     body: JSON.stringify(request),
   })
-    .then(async(response) => {
+    .then((response) => {
       if (response.status === 200) {
-        const msg = await response.json().catch((error) => {
+        return response.text().catch((error) => {
           throw new Error(error);
-        })
-        return msg.message;
+        });
       } else {
         throw new Error("Something went wrong on api server!");
       }
@@ -209,10 +218,42 @@ export const handleFriendInvitationFunc = async (
     },
     body: JSON.stringify(request),
   })
-    .then(async(response) => {
+    .then((response) => {
       if (response.status === 200) {
-        const msg = await response.json().catch((error) =>{throw new Error(error)});
-        return msg.message; 
+        return response.text();
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  return response;
+};
+
+export const handleGameInvitation = async (
+  request: HandleFriendInvitation,
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    StackParamList,
+    undefined
+  >
+) => {
+  if (request.responseType == FriendInvitationResponseType.ACCEPT) {
+    navigation.replace("PlayOnline");
+  }
+  const accessToken = await getValueFor("accessToken");
+  const response = await fetch(gameInvitation, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(request),
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.text();
       } else {
         throw new Error("Something went wrong on api server!");
       }
@@ -225,7 +266,6 @@ export const handleFriendInvitationFunc = async (
 
 export async function handleSearchBarSocials(request: HandleSearchBarSocials) {
   const accessToken = await getValueFor("accessToken");
-
   const response = await fetch(
     `${findUsersByNickname}${request.searchNickname}`,
     {
@@ -236,30 +276,6 @@ export async function handleSearchBarSocials(request: HandleSearchBarSocials) {
       },
     }
   )
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json().catch((error) => {
-          throw new Error(error);
-        }) as unknown as Array<responseUser>;
-      } else {
-        throw new Error("Something went wrong on api server!");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-  return response;
-}
-
-export async function getFriendsList(nameInGame: string) {
-  const accessToken = await getValueFor("accessToken");
-  const response = await fetch(`${getFriends}${nameInGame}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
     .then((response) => {
       if (response.status === 200) {
         return response.json().catch((error) => {
@@ -334,8 +350,122 @@ export const updateUserRating = async (rating: number, gameType: GameType) => {
   save("user", JSON.stringify(user));
 };
 
+export const getFriendsList = async (nick: string) => {
+  const accessToken = await getValueFor("accessToken");
 
-export const getPagedGames = async (nameInGame:string, page:number) => {
+  const response = await fetch(`${getFriends}${nick}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json().catch((error) => {
+          throw new Error(error);
+        }) as unknown as Array<responseUser>;
+      } else if (response.status === 400) {
+        throw new Error("Bad request");
+      } else if (response.status === 401) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+
+  return response;
+};
+
+export const checkSendedInvitations = async () => {
+  const accessToken = await getValueFor("accessToken");
+
+  const response = await fetch(`${checkSendedInvitationsLink}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        console.log("shit");
+        return response.json().catch((error) => {
+          throw new Error(error);
+        }) as unknown as Array<responseUser>;
+      } else if (response.status === 400) {
+        throw new Error("Bad request");
+      } else if (response.status === 401) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+
+  return response;
+};
+
+export const inviteToGame = async (request: InviteToGameRequest) => {
+  console.log(request);
+  const accessToken = await getValueFor("accessToken");
+  const response = await fetch(inviteToGameLink, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(request),
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.text();
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  return response;
+};
+
+export const checkInvitationsToGame = async () => {
+  const accessToken = await getValueFor("accessToken");
+  console.log("jost");
+  const response = await fetch(checkInvitationsToGameLink, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json().catch((error) => {
+          throw new Error(error);
+        }) as unknown as Array<responseUser>;
+      } else if (response.status === 400) {
+        throw new Error("Bad request");
+      } else if (response.status === 401) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+
+  return response;
+};
+
+export const getPagedGames = async (nameInGame: string, page: number) => {
   const accessToken = await getValueFor("accessToken").catch(() => {
     throw new Error(
       "Couldn't get game history, because accessToken isn't stored"

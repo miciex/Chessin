@@ -6,16 +6,8 @@ import { StackParamList } from '../../../utils/Constants'
 import { ColorsPallet } from '../../../utils/Constants'
 import { getFriendsList } from '../../../services/userServices'
 import { User, responseUserToPlayer, responseUserToUser } from '../../../utils/PlayerUtilities'
-//powinien byc jakis dostep do baxy danych ktory mi da id i avatar najlepszych friends jako objecty
 
-const bestFriends = [
-    {email: "", rank: 1000, playerNick: "Pusznik", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
-    {email: "", rank: 1000, playerNick: "MaciekNieBij" , avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
-    {email: "", rank: 1000, playerNick: "Slaweczuk", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
-    {email: "", rank: 1000, playerNick: "Strzała", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
-    {email: "", rank: 1000, playerNick: "Bestia", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png" },
-    {email: "", rank: 1000, playerNick: "Sharku", avatar: "https://p.kindpng.com/picc/s/697-6978240_south-park-png-cartman-south-park-png-transparent.png"},
-]
+
 
 type Props={
   navigation: NativeStackNavigationProp<
@@ -31,9 +23,10 @@ export default function FriendsIconList ({ navigation, nameInGame }: Props){
   const [friends, setFriends] = useState<Array<User>>([])
 
   useEffect(()=>{
-    if(nameInGame)getFriendsList(nameInGame).then((data) =>{ 
+    if(nameInGame)getFriendsList(nameInGame).then((data) =>{
       if(data === undefined) return
       setFriends(data.map(x => responseUserToUser(x, "")))
+      
     })
   }, [nameInGame])
 
@@ -99,7 +92,8 @@ const styles = StyleSheet.create({
       height: 100
     },
     profile:{
-      height: 50
+      height: 50,
+      marginLeft: 6
     },
     text:{
       textAlign: "center"

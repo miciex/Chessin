@@ -17,9 +17,12 @@ import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButt
 import { GameLengthTypeContext } from "../features/gameMenuPage/context/GameLengthContext";
 import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
 import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
-import { User } from "../utils/PlayerUtilities";
+import { User, getRanking } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { GameType } from "../chess-logic/board";
+import { setPendingGameRequest } from "../features/playOnline/services/playOnlineService";
+import { inviteToGameLink } from "../utils/ApiEndpoints";
+import { inviteToGame } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -47,14 +50,14 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   };
 
   const [chosenColor, setChosenColor] =
-    useState<PlayColorsContextType>("random");
+    useState<PlayColorsContextType>("RANDOM");
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
 
   const [gameTempo, setGameTempo] = useState<LengthType>({
     gameType: GameType.BLITZ,
-    totalTime: 180,
+    totalTime: 5000,
     increment: 0,
   });
   const handleGameTempoChange = (tempo: LengthType) => {
@@ -65,8 +68,12 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
 
   const [isEnabled, setIsEnabled] = useState(true);
 
+  const handlePressRanked = () => {
+    setIsEnabled(!isEnabled);
+    console.log(isEnabled, " cjik");
+  };
   return (
-    <View style={{ width: "100%", height: "100%"}}>
+    <View style={{ width: "100%", height: "100%" }}>
       <PlayColorsContext.Provider value={chosenColor}>
         <View style={styles.appContainer}>
           {timerModalOpen ? (
@@ -79,14 +86,17 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
               <View style={styles.profileBox}>
                 <Profile
                   nick={user2 ? user2.nameInGame : ""}
-                  
-                  rank={user2 ? user2.ranking : {
-                    BULLET: 0,
-                    BLITZ: 0,
-                    RAPID: 0,
-                    CLASSICAL: 0,
-                }}
-                country={user2? user2.country : "POland"}
+                  rank={
+                    user2
+                      ? user2.ranking
+                      : {
+                          BULLET: 0,
+                          BLITZ: 0,
+                          RAPID: 0,
+                          CLASSICAL: 0,
+                        }
+                  }
+                  country={user2 ? user2.country : "POland"}
                 />
                 <View style={{ width: 400, height: 130 }}>
                   <ChooseTimeButton
@@ -102,7 +112,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                   <View style={styles.medalButton}>
                     <BaseCustomContentButton
                       handlePress={() => {
-                        () => setIsEnabled(!isEnabled);
+                        setIsEnabled(!isEnabled);
                       }}
                       content={
                         <FontAwesome5
@@ -122,12 +132,30 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                     thumbColor={"#f4f3f4"}
                     ios_backgroundColor={"grey"}
                     value={isEnabled}
-                    onTouchMove={() => setIsEnabled(!isEnabled)}
+                    onTouchMove={() => {
+                      handlePressRanked();
+                    }}
                   />
                 </View>
+
                 <View style={{ width: "80%", height: 80 }}>
                   <BaseButton
-                    handlePress={() => {}}
+                    handlePress={() => {
+                      if (!user) return;
+                      console.log(isEnabled, " wartosc isRated");
+                      let request = {
+                        friendNickname: user2 ? user2.nameInGame : "",
+                        timeControl: gameTempo.totalTime,
+                        increment: gameTempo.increment,
+                        isRated: isEnabled,
+                        playerColor: chosenColor,
+                      };
+
+                      console.log(typeof isEnabled, "typ zmiennej");
+
+                      inviteToGame(request);
+                      navigation.navigate("PlayOnline");
+                    }}
                     text="Graj"
                     fontSizeProps={30}
                   />

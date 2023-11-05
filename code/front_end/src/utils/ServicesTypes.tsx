@@ -1,6 +1,7 @@
 import { responseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
 import { GameResults, GameType } from "../chess-logic/board";
+import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColorContext";
 
 export type RegisterRequest = {
   firstname: string;
@@ -124,22 +125,30 @@ export type ListenForMoveRequest = {
 };
 
 export type HandleFriendInvitation = {
-  friendNick: string;
+  friendNickname: string;
   responseType: FriendInvitationResponseType;
+};
 
-}
+export type InviteToGameRequest = {
+  friendNickname: string;
+  timeControl: number;
+  increment: number;
+  isRated: boolean;
+  playerColor: string;
+};
 
 export type HandleSearchBarSocials = {
   searchNickname: string;
-}
+};
 
 export enum FriendInvitationResponseType {
-  ACCEPT="ACCEPT", DECLINE="DECLINE"
+  ACCEPT = "ACCEPT",
+  DECLINE = "DECLINE",
 }
 
 export type NameInGame = {
   nameInGame: string;
-}
+};
 export type PasswordChangeRequest = {
   email: string;
   oldPassword?: string;
@@ -175,14 +184,14 @@ export enum ResponseType {
   DECLINE = "DECLINE",
 }
 
-export type RespondToDrawOfferRequest ={
+export type RespondToDrawOfferRequest = {
   gameId: number;
   responseType: ResponseType;
-}
+};
 
 export type MessageResponse = {
   message: string;
-}
+};
 
 export type BooleanMessageResponse = {
   message: "True" | "False";

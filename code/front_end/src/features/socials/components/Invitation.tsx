@@ -64,7 +64,7 @@ import { User } from "../../../utils/PlayerUtilities";
           />   
           <View>
             <Text style={{fontSize: 20, width: 300}}>
-             {nick}
+             {nick} zaprasza do znajomych
             </Text>
             <Text style={{color: "rgb(212, 209, 207)"}}>
               {user?.highestRanking.toString()}
@@ -76,10 +76,10 @@ import { User } from "../../../utils/PlayerUtilities";
         <View >
             <View style={{flexDirection: "row", justifyContent: "space-evenly"}}>
             <View style={styles.confirmButton}>
-                <BaseButton text="Accept" handlePress={()=>{handleFriendInvitationFunc({friendNick: nick, responseType: FriendInvitationResponseType.ACCEPT})}} color="green"/>
+                <BaseButton text="Accept" handlePress={()=>{handleFriendInvitationFunc({friendNickname: nick, responseType: FriendInvitationResponseType.ACCEPT})}} color="green"/>
             </View>
             <View style={styles.confirmButton}>
-                <BaseButton text="Reject" handlePress={()=>{handleFriendInvitationFunc({friendNick: nick, responseType: FriendInvitationResponseType.DECLINE})}} color="red"/>
+                <BaseButton text="Reject" handlePress={()=>{handleFriendInvitationFunc({friendNickname: nick, responseType: FriendInvitationResponseType.DECLINE})}} color="red"/>
             </View>
             </View>
           </View>
