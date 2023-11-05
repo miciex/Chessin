@@ -144,14 +144,13 @@ export default function Piece({
       startField: move.startField,
       endField: move.endField,
       promotePiece: move.promotePiece,
-      doesResign: false,
     };
-    console.log("submitMoveRequest");
-    console.log(submitMoveRequest);
     dispatch({
       type: "playMove",
       payload: move,
     });
+    if(state.board.moves.length === 0)
+      dispatch({ type: "setCurrentPosition", payload: 0});
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
         if (!boardResponse) return;

@@ -64,6 +64,8 @@ export type ChessGameResponse = {
   whiteRatinChange: number;
   blackRatingChange: number;
   isRated: boolean;
+  startTime: number;
+  gameResult: GameResults;
 };
 
 export type SubmitMoveRequest = {
@@ -72,7 +74,6 @@ export type SubmitMoveRequest = {
   startField: number;
   endField: number;
   promotePiece: number;
-  doesResign: boolean;
 };
 
 export type BoardResponse = {
@@ -186,4 +187,12 @@ export enum ResponseType {
 export type RespondToDrawOfferRequest = {
   gameId: number;
   responseType: ResponseType;
+};
+
+export type MessageResponse = {
+  message: string;
+};
+
+export type BooleanMessageResponse = {
+  message: "True" | "False";
 };

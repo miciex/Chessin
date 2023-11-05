@@ -113,11 +113,11 @@ export type PlayOnlineAction =
     };
 
 export const getInitialState = (
-  isRated: boolean,
-  gameType: GameType
+  isRated?: boolean,
+  gameType?: GameType
 ): PlayOnlineState => {
   return {
-    board: getInitialOnlineBoard(isRated, gameType),
+    board: getInitialOnlineBoard(isRated!==undefined ? isRated : true, gameType!==undefined ? gameType : GameType.BLITZ),
     myPlayer: getBasePlayer(),
     opponent: getBasePlayer(),
     gameFinished: false,

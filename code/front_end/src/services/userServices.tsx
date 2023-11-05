@@ -38,6 +38,10 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { Rankings } from "../utils/PlayerUtilities";
 import { GameType } from "../chess-logic/board";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../Routing";
+import { StackParamList } from "../utils/Constants";
+import { handleFetch } from "../lib/fetch";
 
 export const storeUser = async (value: User) => {
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
@@ -229,7 +233,11 @@ export const handleFriendInvitationFunc = async (
 
 export const handleGameInvitation = async (
   request: HandleFriendInvitation,
-  navigation
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    StackParamList,
+    undefined
+  >
 ) => {
   if (request.responseType == FriendInvitationResponseType.ACCEPT) {
     navigation.replace("PlayOnline");
@@ -455,4 +463,20 @@ export const checkInvitationsToGame = async () => {
     });
 
   return response;
+};
+
+export const getPagedGames = async (nameInGame: string, page: number) => {
+  const accessToken = await getValueFor("accessToken").catch(() => {
+    throw new Error(
+      "Couldn't get game history, because accessToken isn't stored"
+    );
+  });
+
+  return handleFetch(`${getGameHistoryLink}${nameInGame}/${page}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 };

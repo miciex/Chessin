@@ -77,8 +77,8 @@ public class ChessGameController {
                 int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
                 int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
 
-                whitePlayerIndex = 1;
-                blackPlayerIndex = 0;
+//                whitePlayerIndex = 1;
+//                blackPlayerIndex = 0;
 
                 List<User> players = Arrays.asList(foundGame.getUser(), userRepository.findByEmail(email).get());
 
@@ -104,7 +104,13 @@ public class ChessGameController {
 
                 activeBoards.put(game.getId(), Board.fromGame(game));
                 activeGames.put(game.getId(), game);
-                disconnections.put(game.getId(), Disconnection.builder().whiteDisconnected(false).blackDisconnected(false).build());
+                disconnections.put(game.getId(), Disconnection.builder()
+                                .whiteDisconnected(false)
+                                .blackDisconnected(false)
+                                .realDisconnection(false)
+                                .ping(new Object())
+                                .listener(new Object())
+                                .build());
 
                 pendingGames.get(foundGame.getUser().getEmail()).notifyAll();
 
@@ -188,25 +194,31 @@ public class ChessGameController {
 
         boolean isWhite = activeBoards.get(id).getWhiteEmail().equals(email);
 
-        synchronized(disconnections.get(id))
+        synchronized(disconnections.get(id).getPing())
         {
+            if(((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected())) && disconnections.get(id).isRealDisconnection())
+                return ResponseEntity.ok().body(DisconnectionStatus.NO_CHANGE);
 
             disconnections.get(id).setBlackDisconnected(isWhite);
             disconnections.get(id).setWhiteDisconnected(!isWhite);
 
-            disconnections.get(id).notifyAll();
-            disconnections.get(id).wait(Constants.Application.WAIT_FOR_PING_TIME);
+            disconnections.get(id).getPing().notifyAll();
+            disconnections.get(id).getPing().wait(Constants.Application.WAIT_FOR_PING_TIME);
 
             if(!disconnections.containsKey(id))
-                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
             {
-                disconnections.notifyAll();
-                disconnections.wait(Constants.Application.DISCONNECTION_TIME);
+                disconnections.get(id).setRealDisconnection(true);
+                synchronized(disconnections.get(id).getListener()) {
+                    disconnections.get(id).getListener().notifyAll();
+                }
+
+                disconnections.get(id).getPing().wait(Constants.Application.DISCONNECTION_TIME);
 
                 if(!disconnections.containsKey(id))
-                    return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                    return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
                 if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
                 {
@@ -217,11 +229,13 @@ public class ChessGameController {
 
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                 }
-                else
-                    return ResponseEntity.accepted().body(MessageResponse.of("Opponent reconnected."));
+                else {
+                    disconnections.get(id).setRealDisconnection(false);
+                    return ResponseEntity.ok().body(DisconnectionStatus.RECONNECTED);
+                }
             }
             else
-                return ResponseEntity.ok().body(MessageResponse.of("Opponent did not disconnect."));
+                return ResponseEntity.ok().body(DisconnectionStatus.FINE);
         }
     }
 
@@ -246,14 +260,14 @@ public class ChessGameController {
 
         boolean isWhite = activeBoards.get(id).getWhiteEmail().equals(email);
 
-        synchronized(disconnections.get(id))
+        synchronized(disconnections.get(id).getListener())
         {
-            disconnections.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
+            disconnections.get(id).getListener().wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
-                return ResponseEntity.ok().body(MessageResponse.of("Opponent has disconnected."));
+                return ResponseEntity.ok().body(DisconnectionStatus.DISCONNECTED);
             else
-                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not disconnected."));
+                return ResponseEntity.ok().body(DisconnectionStatus.FINE);
         }
     }
 
@@ -434,8 +448,7 @@ public class ChessGameController {
 
     @Transactional
     @PostMapping("/resign/{gameId}")
-    public ResponseEntity<?> resign(@PathVariable String gameId, HttpServletRequest servlet)
-    {
+    public ResponseEntity<?> resign(@PathVariable String gameId, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         long id;
@@ -818,7 +831,13 @@ public class ChessGameController {
 
             activeBoards.put(game.getId(), Board.fromGame(game));
             activeGames.put(game.getId(), game);
-            disconnections.put(game.getId(), Disconnection.builder().whiteDisconnected(false).blackDisconnected(false).build());
+            disconnections.put(game.getId(), Disconnection.builder()
+                    .whiteDisconnected(false)
+                    .blackDisconnected(false)
+                    .realDisconnection(false)
+                    .ping(new Object())
+                    .listener(new Object())
+                    .build());
 
             pendingInvitations.get(friendEmail).setId(game.getId());
 

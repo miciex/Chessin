@@ -11,6 +11,7 @@ import { BoardResponse, RespondToDrawOfferRequest, SubmitMoveRequest } from "../
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { listenForDrawOffer, offerDraw } from "../../../services/chessGameService";
 import { ResponseType } from "../../../utils/ServicesTypes";
+import BaseButton from "../../../components/BaseButton";
 
 type Props = {
   state: PlayOnlineState;
@@ -19,8 +20,9 @@ type Props = {
   toggleRotateBoard: () => void;
   opponentOfferedDraw: boolean;
   handleRespondToDrawOffer: (response: RespondToDrawOfferRequest) => void;
-  handleListenForDrawOffer: (gameId: string) => void;
   handleSendDrawOffer: () => void;
+  handleResign: (gameId: string) => void;
+  opponentDisconnected: boolean;
 };
 
 export default function PlayOnlineBar({
@@ -30,35 +32,12 @@ export default function PlayOnlineBar({
   dispatch,
   opponentOfferedDraw,
   handleRespondToDrawOffer,
-  handleListenForDrawOffer,
-  handleSendDrawOffer
+  handleSendDrawOffer,
+  handleResign,
+  opponentDisconnected
 }: Props) {
   const [showResign, setShowResign] = useState(false);
-
-  const resign = () => {
-    const request: SubmitMoveRequest = {
-      gameId: state.gameId,
-      movedPiece: 0,
-      startField: -1,
-      endField: -1,
-      promotePiece: 0,
-      doesResign: true,
-    };
-    submitMove(request)
-      .then((boardResponse: BoardResponse ) => {
-        if (!boardResponse) return;
-        dispatch({
-          type: "setDataFromBoardResponse",
-          payload: { boardResponse },
-        });
-      })
-      .catch((err) => {
-        throw new Error("Failed to resign");
-      })
-      .finally(() => {
-        setShowResign(false);
-      });
-  };
+  const [showOpponentDisconnected, setShowOpponentDisconnected] = useState(true);
 
   const toggleResign = () => {
     setShowResign((prev) => !prev);
@@ -76,10 +55,12 @@ export default function PlayOnlineBar({
       gameId: state.gameId,
       responseType: ResponseType.DECLINE,
     })
-    handleListenForDrawOffer(String(state.gameId));
   }
 
-  
+  const resign = () => {
+    handleResign(String(state.gameId));
+    setShowResign(false);
+  }
     
 
   const modalTxt =
@@ -90,18 +71,18 @@ export default function PlayOnlineBar({
   return (
     <View style={styles.gameOptionsContainer}>
       <OnlineBarModal
-        showModal={showResign && !opponentOfferedDraw}
+        showModal={showResign && !opponentOfferedDraw&& !(showOpponentDisconnected && opponentDisconnected)}
         handleDecline={toggleResign}
         handleAccept={resign}
         modalTxt={modalTxt}
       />
       <OnlineBarModal
-        showModal={opponentOfferedDraw}
+        showModal={opponentOfferedDraw&& !(showOpponentDisconnected && opponentDisconnected)}
         handleDecline={declineDraw}
         handleAccept={acceptDraw}
         modalTxt={"Your opponent offered a draw. Do you accept?"}
         />
-      {(!showResign && !opponentOfferedDraw) && (
+      {(!showResign && !opponentOfferedDraw && !(showOpponentDisconnected && opponentDisconnected)) && (
         <>
           <MaterialCommunityIcons
             name="fraction-one-half"
@@ -129,6 +110,19 @@ export default function PlayOnlineBar({
           />
         </>
       )}
+      {opponentDisconnected && showOpponentDisconnected ?(
+        <View>
+          <View style={styles.closeButtonContainer}>
+            <BaseButton text="" element={<FontAwesome
+              name="close"
+              size={24}
+              color="black"
+            />} handlePress={() => setShowOpponentDisconnected(false)}/>
+            
+            </View>
+          <Text style={{color: "red"}}>Opponent disconnected</Text>
+        </View>
+      ):null}
     </View>
   );
 }
@@ -140,5 +134,13 @@ const styles = StyleSheet.create({
     height: 48,
     justifyContent: "space-evenly",
     alignItems: "center",
+  },
+  closeButtonContainer: {
+    position: "absolute",
+    left: -20,
+    top: -20,
+    zIndex: 1,
+    width: 24,
+    height: 24,
   },
 });

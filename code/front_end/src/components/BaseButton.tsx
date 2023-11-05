@@ -1,14 +1,15 @@
 import { View, Pressable, Text, StyleSheet, ViewStyle } from "react-native";
-import React from "react";
+import React, { ReactNode } from "react";
 import { ColorsPallet } from "../utils/Constants";
 
 type Props = {
   handlePress: () => void;
-  text: string;
+  text: string ;
   style?: ViewStyle;
   color?: string;
   fontSizeProps?: number;
   fontColor?: string;
+  element?: ReactNode;
 };
 //text chce wiekszy
 export default function BaseButton({
@@ -18,6 +19,7 @@ export default function BaseButton({
   color,
   fontSizeProps,
   fontColor,
+  element
 }: Props) {
   if (!fontSizeProps) fontSizeProps = 16;
 
@@ -31,16 +33,14 @@ export default function BaseButton({
         }}
         android_ripple={{ color: ColorsPallet.darker, borderless: false }}
       >
-        <Text style={{}}>
-          <Text
+          {element? element :(<Text
             style={{
               fontSize: fontSizeProps,
               color: fontColor ? fontColor : ColorsPallet.darker,
             }}
           >
             {text}
-          </Text>
-        </Text>
+        </Text>)}
       </Pressable>
     </View>
   );

@@ -119,8 +119,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
               .then((data: ChessGameResponse[]) => {
                 setUserGames(data);
               })
-              .catch((error) => {
-                console.error(error);
+              .catch(() => {
                 throw new Error("Couldn't load game history");
               });
           } else throw new Error("Couldn't load game history");
@@ -169,11 +168,13 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
       <EndedGame
         nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
         rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
-        result={"win"}
+        result={game.gameResult}
         navigation={navigation}
         key={`${game.id}${user?.nameInGame}`}
-        date={"2023.10.27"}
+        date={new Date(game.startTime)}
         gameId={game.id}
+        myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
+        whiteToMove={game.whiteStarts&&game.moves.length%2===0 || game.moves.length%2===1 && !game.whiteStarts}
       />
     </View>
   ))

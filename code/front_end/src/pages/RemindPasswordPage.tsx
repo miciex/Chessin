@@ -64,6 +64,7 @@ export default function RemindPasswordPage({
     useState<boolean>(true);
 
   const [showCodeModal, setShowCodeModal] = useState<boolean>(false);
+  const [activeInput, setActiveInput] = useState<string>("");
 
   const validateEmail = (): boolean => {
     return emailRegex.test(email);
@@ -71,6 +72,7 @@ export default function RemindPasswordPage({
 
   const setIsEmailValid = (): void => {
     setEmailValid(validateEmail());
+    setActiveInput("");
   };
 
   const isInputValid = () => {
@@ -128,6 +130,7 @@ export default function RemindPasswordPage({
 
   const setIsNewPasswordValid = (): void => {
     setNewPasswordValid(validateNewPassword());
+    setActiveInput("");
   };
 
   const validateRepeatPassword = (): boolean => {
@@ -136,6 +139,7 @@ export default function RemindPasswordPage({
 
   const setIsRepeatNewPasswordValid = (): void => {
     setRepeatNewPasswordValid(validateRepeatPassword());
+    setActiveInput("");
   };
 
   const hideModal = (): void => {
@@ -174,7 +178,6 @@ export default function RemindPasswordPage({
   };
 
   const modal = getModal();
-  console.log(loggedIn);
   return modal !== null ? (
     modal
   ) : (
@@ -187,6 +190,8 @@ export default function RemindPasswordPage({
           isValid={emailValid}
           notValidText="Email is not valid"
           onSubmitEditing={setIsEmailValid}
+          onFocus={() => setActiveInput("Email")}
+          activeInput={activeInput}
         />
         <>
           <AuthInput
@@ -196,6 +201,8 @@ export default function RemindPasswordPage({
             isValid={newPasswordValid}
             notValidText={notValidPasswordMessage}
             onSubmitEditing={setIsNewPasswordValid}
+            onFocus={() => setActiveInput("Password")}
+            activeInput={activeInput}
           ></AuthInput>
           <AuthInput
             placeholder="Repeat password"
@@ -204,14 +211,16 @@ export default function RemindPasswordPage({
             isValid={repeatNewPasswordValid}
             notValidText={notValidPasswordRepeatMessage}
             onSubmitEditing={setIsRepeatNewPasswordValid}
+            onFocus={() => setActiveInput("Repeat password")}
+            activeInput={activeInput}
           ></AuthInput>
         </>
+        {activeInput === "" ? (
         <View style={styles.submitButton}>
           <BaseButton text="Submit" handlePress={handleSubmit} />
-        </View>
+        </View>)
+        :null}
       </View>
-
-      <Footer navigation={navigation} />
     </View>
   );
 }

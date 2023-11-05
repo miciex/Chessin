@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, {useContext, useEffect} from "react";
+import React, { useContext, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import BaseButton from "../components/BaseButton";
@@ -16,36 +16,49 @@ type Props = {
 };
 
 export default function UserNotAuthenticatedPage({ navigation }: Props) {
-
-
-  useEffect(()=>{
-    getValueFor("user").then((value)=>{
-      if(value){
-        navigation.navigate("Home");
-      }});
-    },[]);
-
-  
-
-  
+  useEffect(() => {
+    getValueFor("user")
+        .then((value) => {
+          if (value) {
+            clearInterval(interval);
+            navigation.navigate("Home");
+          }
+        })
+        .catch((err) => {
+          throw new Error("User not authenticated");
+        });
+    const interval = setInterval(() => {
+      getValueFor("user")
+        .then((value) => {
+          if (value) {
+            clearInterval(interval);
+            navigation.navigate("Home");
+          }
+        })
+        .catch((err) => {
+          throw new Error("User not authenticated");
+        });
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <View style={styles.mainContainer}>
-        <Text style={styles.text}>You are not logged in</Text>
-        <Text style={styles.text}>Log in to see your profile</Text>
-        <View style={styles.buttonContainer}>
-          <BaseButton
-            handlePress={() => navigation.navigate("Login")}
-            text="Log in"
-            style={{ width: "50%" }}
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <BaseButton
-            handlePress={() => navigation.navigate("Register")}
-            text="Register"
-            style={{ width: "50%" }}
-          />
+      <Text style={styles.text}>You are not logged in</Text>
+      <Text style={styles.text}>Log in to see your profile</Text>
+      <View style={styles.buttonContainer}>
+        <BaseButton
+          handlePress={() => navigation.navigate("Login")}
+          text="Log in"
+          style={{ width: "50%" }}
+        />
+      </View>
+      <View style={styles.buttonContainer}>
+        <BaseButton
+          handlePress={() => navigation.navigate("Register")}
+          text="Register"
+          style={{ width: "50%" }}
+        />
       </View>
     </View>
   );
@@ -58,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 20,
     paddingTop: 50,
-    backgroundColor: ColorsPallet.lighter
+    backgroundColor: ColorsPallet.lighter,
   },
   buttonsContainer: {
     flex: 3,
@@ -82,5 +95,5 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     color: ColorsPallet.darker,
-  }
+  },
 });

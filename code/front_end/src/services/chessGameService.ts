@@ -1,9 +1,15 @@
-import { handleFetch } from "../lib/fetch";
+import { handleFetch, handlePost } from "../lib/fetch";
 import {
   getGameByIdLink,
   getGameHistoryLink,
+  isUserPlayingLink,
+  isUserPlayingTimeControlLink,
+  listenForDisconnectionLink,
   listenForDrawOfferLink,
+  listenForResignationLink,
   offerDrawLink,
+  pingLink,
+  resignLink,
   respondToDrawOfferLink,
 } from "../utils/ApiEndpoints";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
@@ -11,67 +17,25 @@ import { User } from "../utils/PlayerUtilities";
 import { RespondToDrawOfferRequest } from "../utils/ServicesTypes";
 
 export const getGameHistory = async (nick: string) => {
-  const accessToken = await getValueFor("accessToken").catch(() => {
-    throw new Error(
-      "Couldn't get game history, because accessToken isn't stored"
-    );
-  });
-  return await fetch(`${getGameHistoryLink}${nick}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
+  return handlePost(`${getGameHistoryLink}${nick}`).catch((error) => {
+    throw new Error(error);
   });
 };
 
 export const getGameById = async (id: string) => {
-  const accessToken = await getValueFor("accessToken").catch(() => {
-    throw new Error(
-      "Couldn't get game history, because accessToken isn't stored"
-    );
-  });
-  return await fetch(`${getGameByIdLink}${id}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
+  return handlePost(`${getGameByIdLink}${id}`).catch((error) => {
+    throw new Error(error);
   });
 };
 
 export const listenForDrawOffer = async (id: string) => {
-  const accessToken = await getValueFor("accessToken").catch(() => {
-    throw new Error(
-      "Couldn't get game history, because accessToken isn't stored"
-    );
-  });
-  
-  return handleFetch(`${listenForDrawOfferLink}${id}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  }).catch((error) => {
+  return handlePost(`${listenForDrawOfferLink}${id}`).catch((error) => {
     throw new Error(error);
   });
 };
 
 export const offerDraw = async (id: string) => {
-  const accessToken = await getValueFor("accessToken").catch(() => {
-    throw new Error(
-      "Couldn't get game history, because accessToken isn't stored"
-    );
-  });
-
-  return handleFetch(`${offerDrawLink}${id}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  }).catch((error) => {
+  return handlePost(`${offerDrawLink}${id}`).catch((error) => {
     throw new Error(error);
   });
 };
@@ -79,18 +43,49 @@ export const offerDraw = async (id: string) => {
 export const respondToDrawOffer = async (
   respondToDrawOfferRequest: RespondToDrawOfferRequest
 ) => {
-  const accessToken = await getValueFor("accessToken").catch(() => {
-    throw new Error(
-      "Couldn't get game history, because accessToken isn't stored"
-    );
-  });
-
-  return handleFetch(`${respondToDrawOfferLink}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(respondToDrawOfferRequest),
+  return handlePost(`${respondToDrawOfferLink}`,JSON.stringify(respondToDrawOfferRequest) ).catch((error) => {
+    throw new Error(error);
   });
 };
+
+export const listenForResignation = async (id: string) => {
+  return handlePost(`${listenForResignationLink}${id}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const resign = async (id: string) => {
+  return handlePost(`${resignLink}${id}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const getBoardByUsername = async (username: string) => {
+  return handlePost(`${getBoardByUsername}${username}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const isUserPlaying = async (username: string) => {
+  return handlePost(`${isUserPlayingLink}${username}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const isUserPlayingTimeControl = async (username: string, timeControl: string, increment:string) => {
+  return handlePost(`${isUserPlayingTimeControlLink}${username}/${timeControl}/${increment}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const ping = async (gameId: string) => {
+  return handlePost(`${pingLink}${gameId}`).catch((error) => {
+    throw new Error(error);
+  });
+}
+
+export const listenForDisconnections = async (gameId: string) => {
+  return handlePost(`${listenForDisconnectionLink}${gameId}`).catch((error) => {
+    throw new Error(error);
+  });
+}

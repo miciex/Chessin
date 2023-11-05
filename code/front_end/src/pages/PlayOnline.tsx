@@ -1,6 +1,6 @@
 import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useReducer, useEffect } from "react";
-import { GameResults } from "../chess-logic/board";
+import { GameResults, GameType } from "../chess-logic/board";
 import {
   Player,
   User,
@@ -32,16 +32,25 @@ import {
 import { RouteProp } from "@react-navigation/native";
 import {
   BoardResponse,
+  BooleanMessageResponse,
   ChessGameResponse,
+  MessageResponse,
   RespondToDrawOfferRequest,
 } from "../utils/ServicesTypes";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
 import {
+  isUserPlaying,
+  isUserPlayingTimeControl,
+  listenForDisconnections,
   listenForDrawOffer,
+  listenForResignation,
   offerDraw,
+  ping,
+  resign,
   respondToDrawOffer,
 } from "../services/chessGameService";
+import MessageQueue from "react-native/Libraries/BatchedBridge/MessageQueue";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -53,15 +62,16 @@ type Props = {
 };
 
 export default function PlayOnline({ navigation, route }: Props) {
-  const { request } = route.params;
+  const request = route.params?.request;
 
   const [state, dispatch] = useReducer(
     reducer,
-    getInitialState(request.isRated, request.gameType)
+    getInitialState(request?.isRated, request?.gameType)
   );
   const [showSettings, setShowSettings] = useState(false);
   const [rotateBoard, setRotateBoard] = useState(false);
   const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
+  const [opponentDisconnected, setOpponentDisconnected] = useState(false);
 
   const toggleSettings = () => {
     setShowSettings((prev) => !prev);
@@ -73,6 +83,7 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const opponentOfferedDrawTrue = () => {
     setOpponentOfferedDraw(true);
+    console.log("opponentOfferedDraw")
   };
 
   const opponentOfferedDrawFalse = () => {
@@ -87,6 +98,25 @@ export default function PlayOnline({ navigation, route }: Props) {
     };
   }, []);
 
+  useEffect(() => {
+    if(state.gameId<0) return;
+    if(state.myPlayer.color == undefined) return;
+    console.log("game result: " + JSON.stringify(state.board.result))
+    if(state.board.result !== GameResults.NONE) return;
+    const interval = setInterval(() => {
+      handlePing(String(state.gameId))
+      .catch(()=>{
+        throw new Error("Error while pinging");
+      })
+    }, 10000);
+    handleListenForDisconnect(String(state.gameId))
+    .catch(()=>{
+      throw new Error("Error while listening for disconnect");
+    });
+    return () => clearInterval(interval);
+  },[state.gameId, state.board.result])
+
+
   const setRotateBoardAfterFoundGame = (isMyPlayerWhite: boolean) => {
     if (isMyPlayerWhite) setRotateBoard(false);
     else setRotateBoard(true);
@@ -94,13 +124,82 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleListenForDrawOffer = (gameId: string) => {
     listenForDrawOffer(gameId)
-    .then(() => {
+    .then((msg: MessageQueue | null) => {
+      if(!msg) return;
       setOpponentOfferedDraw(true);
     })
     .catch((err) => {
       throw new Error(err);
     });
   }
+
+  const handleListenForResign = (gameId: string) => {
+    listenForResignation(gameId)
+    .then((response : BoardResponse | null) => {
+      if (response === null) return;
+      dispatch({
+        type: "setDataFromBoardResponse",
+        payload: { boardResponse: response },
+      });
+    }).
+    catch((err) => {
+      throw new Error(err)
+    });
+  }
+
+  const handleResign = (gameId: string) => {
+    resign(gameId)
+    .then((response : BoardResponse | null) => {
+      if (response === null) return;
+      dispatch({
+        type: "setDataFromBoardResponse",
+        payload: { boardResponse: response },
+      });
+    }).
+    catch((err) => {
+      throw new Error(err)
+    });
+  }
+
+  const handlePing = async (gameId: string) => {
+    ping(gameId)
+    .then((response :MessageResponse| BoardResponse | null) => {
+      if (!response){ 
+        //opponent reconnected
+        setOpponentDisconnected(false);
+        handleListenForDisconnect(gameId)
+        .catch((err) => {
+          throw new Error(err);
+        }); 
+      }
+      else if("message" in response){
+        //opponent didn't disconnect
+        setOpponentDisconnected(false);
+      }
+      else{
+        //opponent disconnected
+        setOpponentDisconnected(true);
+        dispatch({
+          type: "setDataFromBoardResponse",
+          payload: { boardResponse: response },
+        });
+      }
+    }).
+    catch((err) => {
+      throw new Error(err)
+    });
+  }
+
+  const handleListenForDisconnect = async (gameId: string) => {
+    listenForDisconnections(gameId)
+    .then((response: MessageResponse | null) => {
+      if (response === null) return;
+      setOpponentDisconnected(true);
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+  };
 
   const searchNewGame = () => {
     dispatch({ type: "setSearchingGame", payload: true });
@@ -112,7 +211,60 @@ export default function PlayOnline({ navigation, route }: Props) {
       .then((user) => {
         if (user === undefined) return;
         dispatch({ type: "setMyPlayer", payload: userToPlayer(user, null) });
+        isUserPlaying(user.nameInGame)
+        .then((response:BooleanMessageResponse) => {
+          if(response.message === "True") {
+            getGameByUsername(user.nameInGame)
+                .then((data: ChessGameResponse | undefined) => {
+                  if (!data) return;
+                  const isMyPlayerWhite =
+                    data.whiteUser.nameInGame === user.nameInGame;
+                  const myColor = isMyPlayerWhite ? "white" : "black";
+                  handleListenForDrawOffer(String(data.id));
+                  handleListenForResign(String(data.id));
+                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
+                  dispatch({
+                    type: "setUpGame",
+                    payload: {
+                      chessGameResponse: data,
+                      nameInGame: user.nameInGame,
+                    },
+                  });
+                  getBoardByGameId(data.id).then(
+                    (boardResponse: BoardResponse) => {
+                      dispatch({
+                        type: "setDataFromBoardResponse",
+                        payload: { boardResponse },
+                      });
+                      if (
+                        boardResponse.gameResult !== GameResults.NONE ||
+                        boardResponse.whiteTurn === (myColor === "white")
+                      )
+                        return;
+                      listenForMove({
+                        gameId: data.id,
+                        moves: boardResponse.moves,
+                      })
+                        .then((board: BoardResponse | undefined) => {
+                          if (board === undefined) return;
+                          dispatch({
+                            type: "setDataFromBoardResponse",
+                            payload: {
+                              boardResponse: board,
+                            },
+                          });
+                        })
+                        .catch((err) => {
+                          throw new Error(err);
+                        });
 
+                    }
+                  );
+                })
+                .catch((err) => {
+                  throw new Error(err);
+                });
+          }else if(request){
         searchForGame(request)
           .then((response) => {
             if (response.status === 200) {
@@ -121,6 +273,7 @@ export default function PlayOnline({ navigation, route }: Props) {
                 .then((data: ChessGameResponse) => {
                   if (!data) return;
                   handleListenForDrawOffer(String(data.id));
+                  handleListenForResign(String(data.id));
                   dispatch({
                     type: "setUpGame",
                     payload: {
@@ -155,73 +308,31 @@ export default function PlayOnline({ navigation, route }: Props) {
                       ).catch((err) => {
                         throw new Error(err);
                       });
+
                     }
                   );
                 })
                 .catch((err) => {
                   throw new Error(err);
                 });
-            } else if (response.status === 202) {
-              getGameByUsername(user.nameInGame)
-                .then((data: ChessGameResponse | undefined) => {
-                  if (!data) return;
-                  const isMyPlayerWhite =
-                    data.whiteUser.nameInGame === user.nameInGame;
-                  const myColor = isMyPlayerWhite ? "white" : "black";
-                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
-                  dispatch({
-                    type: "setUpGame",
-                    payload: {
-                      chessGameResponse: data,
-                      nameInGame: request.nameInGame,
-                    },
-                  });
-                  getBoardByGameId(data.id).then(
-                    (boardResponse: BoardResponse) => {
-                      dispatch({
-                        type: "setDataFromBoardResponse",
-                        payload: { boardResponse },
-                      });
-                      if (
-                        boardResponse.gameResult !== GameResults.NONE ||
-                        boardResponse.whiteTurn === (myColor === "white")
-                      )
-                        return;
-                      listenForMove({
-                        gameId: data.id,
-                        moves: boardResponse.moves,
-                      })
-                        .then((board: BoardResponse | undefined) => {
-                          if (board === undefined) return;
-                          dispatch({
-                            type: "setDataFromBoardResponse",
-                            payload: {
-                              boardResponse: board,
-                            },
-                          });
-                        })
-                        .catch((err) => {
-                          throw new Error(err);
-                        });
-                    }
-                  );
-                })
-                .catch((err) => {
-                  throw new Error(err);
-                });
-            } else {
-              // console.log(response.status);
-              // console.log(response.statusText);
+            }  else {
               throw new Error("Something went wrong while searching for game");
             }
           })
           .catch((err) => {
             throw new Error(err);
           });
+        }
+        else {
+          navigation.navigate("GameMenu");
+        }
       })
       .catch((err) => {
         throw new Error(err);
       });
+    }).catch((err) => {
+      throw new Error(err);
+    })
   };
 
   const unMount = () => {
@@ -256,9 +367,12 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleResponseFromDrawOffer = (board: BoardResponse | null) => {
     if (!board) {
+      setOpponentOfferedDraw(false);
       return listenForDrawOffer(String(state.gameId))
-        .then(() => {
+        .then((msg: MessageResponse | null) => {
+          if(!msg) return;
           setOpponentOfferedDraw(true);
+          listenForDrawOffer(String(state.gameId));
         })
         .catch((err) => {
           throw new Error(err);
@@ -327,8 +441,9 @@ export default function PlayOnline({ navigation, route }: Props) {
           toggleRotateBoard={toggleRotateBoard}
           opponentOfferedDraw={opponentOfferedDraw}
           handleRespondToDrawOffer={handleRespondToDrawOffer}
-          handleListenForDrawOffer={handleListenForDrawOffer}
           handleSendDrawOffer={handleOfferDraw}
+          handleResign={handleResign}
+          opponentDisconnected={opponentDisconnected}
         />
 
         <Bar state={state} dispatch={dispatch} rotateBoard={rotateBoard} />

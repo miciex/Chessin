@@ -53,6 +53,7 @@ export default function ResetPasswordPage({
   const [isTwoFaChecked, setIsTwoFaChecked] = useState<boolean>(false);
 
   const [showCodeModal, setShowCodeModal] = useState<boolean>(false);
+  const [activeInput, setActiveInput] = useState<string>("");
 
   const validateEmail = (): boolean => {
     return emailRegex.test(email);
@@ -63,7 +64,7 @@ export default function ResetPasswordPage({
     setEmailValid(emailValid);
     if (!emailValid) return;
     twoFaEnabled({ email })
-      .then((response) => {
+      .then(async (response) => {
         if (response.status === 200) {
           logoutUser()
             .then(() => {
@@ -72,12 +73,13 @@ export default function ResetPasswordPage({
             .catch((err) => {
               throw new Error(err);
             });
-          return response.text() as unknown as TwoFactorAuthenticationResponse;
+          const msg = await response.json();
+          return msg.message as unknown as TwoFactorAuthenticationResponse;
         } else if (response.status === 400) {
           response
-            .text()
+            .json()
             .then((data) => {
-              throw new Error(data);
+              throw new Error(data.message);
             })
             .catch((err) => {
               throw new Error(err);
@@ -149,6 +151,7 @@ export default function ResetPasswordPage({
 
   const setIsPasswordValid = (): void => {
     setPasswordValid(validatePassword());
+    setActiveInput("");
   };
 
   const validateNewPassword = (): boolean => {
@@ -157,6 +160,7 @@ export default function ResetPasswordPage({
 
   const setIsNewPasswordValid = (): void => {
     setNewPasswordValid(validateNewPassword());
+    setActiveInput("");
   };
 
   const validateRepeatPassword = (): boolean => {
@@ -165,6 +169,7 @@ export default function ResetPasswordPage({
 
   const setIsRepeatNewPasswordValid = (): void => {
     setRepeatNewPasswordValid(validateRepeatPassword());
+    setActiveInput("");
   };
 
   const hideModal = (): void => {
@@ -195,6 +200,8 @@ export default function ResetPasswordPage({
             isValid={passwordValid}
             notValidText={notValidPasswordMessage}
             onSubmitEditing={setIsPasswordValid}
+            onFocus={() => setActiveInput("oldPassword")}
+            activeInput={activeInput}
           ></AuthInput>
           <AuthInput
             placeholder="Password"
@@ -203,6 +210,8 @@ export default function ResetPasswordPage({
             isValid={newPasswordValid}
             notValidText={notValidPasswordMessage}
             onSubmitEditing={setIsNewPasswordValid}
+            onFocus={() => setActiveInput("Password")}
+            activeInput={activeInput}
           ></AuthInput>
           <AuthInput
             placeholder="Repeat password"
@@ -211,6 +220,8 @@ export default function ResetPasswordPage({
             isValid={repeatNewPasswordValid}
             notValidText={notValidPasswordRepeatMessage}
             onSubmitEditing={setIsRepeatNewPasswordValid}
+            onFocus={() => setActiveInput("Repeat password")}
+            activeInput={activeInput}
           ></AuthInput>
           <View style={styles.submitButton}>
             <BaseButton text="Submit" handlePress={resetPassword} />
@@ -225,18 +236,21 @@ export default function ResetPasswordPage({
             isValid={emailValid}
             notValidText={notValidEmailMessage}
             onSubmitEditing={setIsEmailValid}
+            onFocus={() => setActiveInput("Email")}
+            activeInput={activeInput}
           ></AuthInput>
           <View>
-            <View style={styles.submitButton}>
-              <BaseButton
-                text="Submit"
-                handlePress={checkIs2faEnabled}
-              ></BaseButton>
-            </View>
+            {activeInput === "" ? (
+              <View style={styles.submitButton}>
+                <BaseButton
+                  text="Submit"
+                  handlePress={checkIs2faEnabled}
+                ></BaseButton>
+              </View>
+            ) : null}
           </View>
         </View>
       )}
-      <Footer navigation={navigation} />
     </View>
   );
 }
