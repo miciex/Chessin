@@ -5,6 +5,7 @@ import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.*;
 import com.chessin.controller.responses.BoardResponse;
 import com.chessin.controller.responses.ChessGameResponse;
+import com.chessin.controller.responses.GameInvitationResponse;
 import com.chessin.controller.responses.MessageResponse;
 import com.chessin.model.playing.*;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/api/v1/game")
@@ -207,7 +210,11 @@ public class ChessGameController {
 
                 if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
                 {
-                    finishGame(id, Optional.of(isWhite ? GameResults.BLACK_TIMEOUT : GameResults.WHITE_TIMEOUT));
+                    if(activeBoards.get(id).getMoves().size() < 2)
+                        finishGame(id, Optional.of(GameResults.ABANDONED));
+                    else
+                        finishGame(id, Optional.of(isWhite ? GameResults.BLACK_TIMEOUT : GameResults.WHITE_TIMEOUT));
+
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                 }
                 else
@@ -297,12 +304,8 @@ public class ChessGameController {
             {
                 if (activeBoards.get(id).getGameResult() == GameResults.NONE) {
                     if (activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty()) {
-                        Board endBoard = activeBoards.get(id);
-                        endBoard.setGameResult(GameResults.ABANDONED);
-                        chessGameRepository.updateGameResult(id, GameResults.ABANDONED);
-                        activeBoards.remove(id);
-                        activeGames.remove(id);
-                        return ResponseEntity.ok().body(BoardResponse.fromBoard(endBoard));
+                        finishGame(id, Optional.of(GameResults.ABANDONED));
+                        return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                     } else
                         return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
                 } else
@@ -391,47 +394,6 @@ public class ChessGameController {
     }
 
     @Transactional
-    public Board finishGame(long gameId, Optional<GameResults> gameResult)
-    {
-        synchronized(activeGames.get(gameId))
-        {
-            synchronized(activeBoards.get(gameId))
-            {
-                synchronized(disconnections.get(gameId))
-                {
-                    gameResult.ifPresent(gameResults -> activeBoards.get(gameId).setGameResult(gameResults));
-                    chessGameRepository.updateGameResult(gameId, gameResult.orElse(activeBoards.get(gameId).getGameResult()));
-                    if (activeGames.get(gameId).isRated())
-                        activeBoards.replace(gameId, chessGameService.updateRatings(activeGames.get(gameId), activeBoards.get(gameId)));
-                    activeGames.get(gameId).notifyAll();
-                    activeBoards.get(gameId).notifyAll();
-                    disconnections.get(gameId).notifyAll();
-                    return activeBoards.get(gameId);
-                }
-            }
-        }
-    }
-
-    @Transactional
-    public Board clearGame(long gameId)
-    {
-        synchronized(activeGames.get(gameId))
-        {
-            synchronized(activeBoards.get(gameId))
-            {
-                synchronized(disconnections.get(gameId))
-                {
-                    Board endBoard = activeBoards.get(gameId);
-                    activeBoards.remove(gameId);
-                    activeGames.remove(gameId);
-                    disconnections.remove(gameId);
-                    return endBoard;
-                }
-            }
-        }
-    }
-
-    @Transactional
     @PostMapping("/listenForResignation/{gameId}")
     public ResponseEntity<?> listenForResignation(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -490,6 +452,9 @@ public class ChessGameController {
 
         synchronized(activeBoards.get(id))
         {
+            if(activeBoards.get(id).getMoves().size() < 2)
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(finishGame(id, Optional.of(GameResults.ABANDONED))));
+
             if(activeBoards.get(id).getWhiteEmail().equals(email))
             {
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(finishGame(id, Optional.of(GameResults.WHITE_RESIGN))));
@@ -776,6 +741,7 @@ public class ChessGameController {
                 .timeControl(request.getTimeControl())
                 .increment(request.getIncrement())
                 .isRated(request.isRated())
+                .playerColor(request.getPlayerColor())
                 .build();
 
         pendingInvitations.put(email, pendingInvitation);
@@ -818,8 +784,18 @@ public class ChessGameController {
         {
             pendingInvitations.get(friendEmail).setFriend(userRepository.findByEmail(email).get());
 
-            int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
-            int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+            int whitePlayerIndex, blackPlayerIndex;
+
+            if(pendingInvitations.get(friendEmail).getPlayerColor() == PlayerColor.RANDOM)
+            {
+                whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
+                blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+            }
+            else
+            {
+                whitePlayerIndex = pendingInvitations.get(friendEmail).getPlayerColor() == PlayerColor.WHITE ? 0 : 1;
+                blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+            }
 
             List<User> players = Arrays.asList(userRepository.findByEmail(friendEmail).get(), userRepository.findByEmail(email).get());
 
@@ -855,5 +831,71 @@ public class ChessGameController {
         pendingInvitations.remove(friendEmail);
 
         return ResponseEntity.ok().body(MessageResponse.of("Invitation responded."));
+    }
+
+    @Transactional
+    @PostMapping("/checkGameInvitations")
+    public ResponseEntity<?> checkGameInvitations(HttpServletRequest servlet)
+    {
+        String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        List<GameInvitation> invitations = pendingInvitations.values().stream().filter(x -> x.getFriend().getEmail().equals(email)).toList();
+
+        if(invitations.isEmpty())
+            return ResponseEntity.ok().body(MessageResponse.of("No invitations."));
+
+        List<GameInvitationResponse> responses = invitations.stream().map((GameInvitation invitation) -> GameInvitationResponse.fromGameInvitation(invitation, userService)).toList();
+
+        return ResponseEntity.ok().body(responses);
+    }
+
+    @Transactional
+    public Board finishGame(long gameId, Optional<GameResults> gameResult)
+    {
+        synchronized(activeGames.get(gameId))
+        {
+            synchronized(activeBoards.get(gameId))
+            {
+                synchronized(disconnections.get(gameId))
+                {
+                    if(gameResult.orElse(GameResults.NONE) == GameResults.ABANDONED)
+                    {
+                        activeBoards.get(gameId).setGameResult(GameResults.ABANDONED);
+                        chessGameRepository.deleteById(gameId);
+                        activeGames.get(gameId).notifyAll();
+                        activeBoards.get(gameId).notifyAll();
+                        disconnections.get(gameId).notifyAll();
+                        return activeBoards.get(gameId);
+                    }
+                    gameResult.ifPresent(gameResults -> activeBoards.get(gameId).setGameResult(gameResults));
+                    chessGameRepository.updateGameResult(gameId, gameResult.orElse(activeBoards.get(gameId).getGameResult()));
+                    if (activeGames.get(gameId).isRated())
+                        activeBoards.replace(gameId, chessGameService.updateRatings(activeGames.get(gameId), activeBoards.get(gameId)));
+                    activeGames.get(gameId).notifyAll();
+                    activeBoards.get(gameId).notifyAll();
+                    disconnections.get(gameId).notifyAll();
+                    return activeBoards.get(gameId);
+                }
+            }
+        }
+    }
+
+    @Transactional
+    public Board clearGame(long gameId)
+    {
+        synchronized(activeGames.get(gameId))
+        {
+            synchronized(activeBoards.get(gameId))
+            {
+                synchronized(disconnections.get(gameId))
+                {
+                    Board endBoard = activeBoards.get(gameId);
+                    activeBoards.remove(gameId);
+                    activeGames.remove(gameId);
+                    disconnections.remove(gameId);
+                    return endBoard;
+                }
+            }
+        }
     }
 }
