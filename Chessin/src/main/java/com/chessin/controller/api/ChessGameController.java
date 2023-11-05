@@ -107,6 +107,7 @@ public class ChessGameController {
                 disconnections.put(game.getId(), Disconnection.builder()
                                 .whiteDisconnected(false)
                                 .blackDisconnected(false)
+                                .realDisconnection(false)
                                 .ping(new Object())
                                 .listener(new Object())
                                 .build());
@@ -195,6 +196,8 @@ public class ChessGameController {
 
         synchronized(disconnections.get(id).getPing())
         {
+            if(((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected())) && disconnections.get(id).isRealDisconnection())
+                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has disconnected."));
 
             disconnections.get(id).setBlackDisconnected(isWhite);
             disconnections.get(id).setWhiteDisconnected(!isWhite);
@@ -207,8 +210,8 @@ public class ChessGameController {
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
             {
-                disconnections.get(id).getPing().notifyAll();
-
+                //disconnections.get(id).getPing().notifyAll();
+                disconnections.get(id).setRealDisconnection(true);
                 synchronized(disconnections.get(id).getListener()) {
                     disconnections.get(id).getListener().notifyAll();
                 }
@@ -227,8 +230,10 @@ public class ChessGameController {
 
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                 }
-                else
+                else {
+                    disconnections.get(id).setRealDisconnection(false);
                     return ResponseEntity.accepted().body(MessageResponse.of("Opponent reconnected."));
+                }
             }
             else
                 return ResponseEntity.ok().body(MessageResponse.of("Opponent did not disconnect."));
@@ -831,6 +836,7 @@ public class ChessGameController {
             disconnections.put(game.getId(), Disconnection.builder()
                     .whiteDisconnected(false)
                     .blackDisconnected(false)
+                    .realDisconnection(false)
                     .ping(new Object())
                     .listener(new Object())
                     .build());
