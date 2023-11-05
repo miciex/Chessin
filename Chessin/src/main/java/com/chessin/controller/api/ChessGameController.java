@@ -197,7 +197,7 @@ public class ChessGameController {
         synchronized(disconnections.get(id).getPing())
         {
             if(((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected())) && disconnections.get(id).isRealDisconnection())
-                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has disconnected."));
+                return ResponseEntity.ok().body(DisconnectionStatus.NO_CHANGE);
 
             disconnections.get(id).setBlackDisconnected(isWhite);
             disconnections.get(id).setWhiteDisconnected(!isWhite);
@@ -206,7 +206,7 @@ public class ChessGameController {
             disconnections.get(id).getPing().wait(Constants.Application.WAIT_FOR_PING_TIME);
 
             if(!disconnections.containsKey(id))
-                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
             {
@@ -218,7 +218,7 @@ public class ChessGameController {
                 disconnections.get(id).getPing().wait(Constants.Application.DISCONNECTION_TIME);
 
                 if(!disconnections.containsKey(id))
-                    return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                    return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
                 if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
                 {
@@ -231,11 +231,11 @@ public class ChessGameController {
                 }
                 else {
                     disconnections.get(id).setRealDisconnection(false);
-                    return ResponseEntity.accepted().body(MessageResponse.of("Opponent reconnected."));
+                    return ResponseEntity.ok().body(DisconnectionStatus.RECONNECTED);
                 }
             }
             else
-                return ResponseEntity.ok().body(MessageResponse.of("Opponent did not disconnect."));
+                return ResponseEntity.ok().body(DisconnectionStatus.FINE);
         }
     }
 
@@ -265,9 +265,9 @@ public class ChessGameController {
             disconnections.get(id).getListener().wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
-                return ResponseEntity.ok().body(MessageResponse.of("Opponent has disconnected."));
+                return ResponseEntity.ok().body(DisconnectionStatus.DISCONNECTED);
             else
-                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not disconnected."));
+                return ResponseEntity.ok().body(DisconnectionStatus.FINE);
         }
     }
 
