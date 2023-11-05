@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface FriendInvitationRepository extends JpaRepository<FriendInvitation, Long> {
     boolean existsByUserEmail(String email);
+    boolean existsByFriendEmail(String email);
     List<FriendInvitation> findAllByFriend(User user);
     List<FriendInvitation> findAllByUser(User user);
     @Modifying

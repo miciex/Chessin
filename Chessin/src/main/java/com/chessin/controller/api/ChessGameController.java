@@ -104,7 +104,12 @@ public class ChessGameController {
 
                 activeBoards.put(game.getId(), Board.fromGame(game));
                 activeGames.put(game.getId(), game);
-                disconnections.put(game.getId(), Disconnection.builder().whiteDisconnected(false).blackDisconnected(false).build());
+                disconnections.put(game.getId(), Disconnection.builder()
+                                .whiteDisconnected(false)
+                                .blackDisconnected(false)
+                                .ping(new Object())
+                                .listener(new Object())
+                                .build());
 
                 pendingGames.get(foundGame.getUser().getEmail()).notifyAll();
 
@@ -188,22 +193,27 @@ public class ChessGameController {
 
         boolean isWhite = activeBoards.get(id).getWhiteEmail().equals(email);
 
-        synchronized(disconnections.get(id))
+        synchronized(disconnections.get(id).getPing())
         {
 
             disconnections.get(id).setBlackDisconnected(isWhite);
             disconnections.get(id).setWhiteDisconnected(!isWhite);
 
-            disconnections.get(id).notifyAll();
-            disconnections.get(id).wait(Constants.Application.WAIT_FOR_PING_TIME);
+            disconnections.get(id).getPing().notifyAll();
+            disconnections.get(id).getPing().wait(Constants.Application.WAIT_FOR_PING_TIME);
 
             if(!disconnections.containsKey(id))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
             {
-                disconnections.notifyAll();
-                disconnections.wait(Constants.Application.DISCONNECTION_TIME);
+                disconnections.get(id).getPing().notifyAll();
+
+                synchronized(disconnections.get(id).getListener()) {
+                    disconnections.get(id).getListener().notifyAll();
+                }
+
+                disconnections.get(id).getPing().wait(Constants.Application.DISCONNECTION_TIME);
 
                 if(!disconnections.containsKey(id))
                     return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
@@ -246,9 +256,9 @@ public class ChessGameController {
 
         boolean isWhite = activeBoards.get(id).getWhiteEmail().equals(email);
 
-        synchronized(disconnections.get(id))
+        synchronized(disconnections.get(id).getListener())
         {
-            disconnections.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
+            disconnections.get(id).getListener().wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
                 return ResponseEntity.ok().body(MessageResponse.of("Opponent has disconnected."));
@@ -817,7 +827,12 @@ public class ChessGameController {
 
             activeBoards.put(game.getId(), Board.fromGame(game));
             activeGames.put(game.getId(), game);
-            disconnections.put(game.getId(), Disconnection.builder().whiteDisconnected(false).blackDisconnected(false).build());
+            disconnections.put(game.getId(), Disconnection.builder()
+                    .whiteDisconnected(false)
+                    .blackDisconnected(false)
+                    .ping(new Object())
+                    .listener(new Object())
+                    .build());
 
             pendingInvitations.get(friendEmail).setId(game.getId());
 
