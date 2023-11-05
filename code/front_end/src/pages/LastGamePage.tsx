@@ -108,7 +108,4 @@ const styles = StyleSheet.create({
     height: 32,
     width: '50%'
   },
-
-  endedGames: {},
-  endGame: {},
 });
