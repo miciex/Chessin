@@ -197,7 +197,7 @@ public class ChessGameController {
         synchronized(disconnections.get(id).getPing())
         {
             if(((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected())) && disconnections.get(id).isRealDisconnection())
-                return ResponseEntity.ok().body(DisconnectionStatus.DISCONNECTED);
+                return ResponseEntity.ok().body(DisconnectionStatus.NO_CHANGE);
 
             disconnections.get(id).setBlackDisconnected(isWhite);
             disconnections.get(id).setWhiteDisconnected(!isWhite);
