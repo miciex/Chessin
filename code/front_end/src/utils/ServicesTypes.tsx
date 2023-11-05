@@ -126,28 +126,28 @@ export type ListenForMoveRequest = {
 export type HandleFriendInvitation = {
   friendNickname: string;
   responseType: FriendInvitationResponseType;
-
-}
+};
 
 export type InviteToGameRequest = {
   friendNickname: string;
   timeControl: number;
   increment: number;
   isRated: boolean;
-  color: PlayColorsContextType;
-}
+  playerColor: string;
+};
 
 export type HandleSearchBarSocials = {
   searchNickname: string;
-}
+};
 
 export enum FriendInvitationResponseType {
-  ACCEPT="ACCEPT", DECLINE="DECLINE"
+  ACCEPT = "ACCEPT",
+  DECLINE = "DECLINE",
 }
 
 export type NameInGame = {
   nameInGame: string;
-}
+};
 export type PasswordChangeRequest = {
   email: string;
   oldPassword?: string;
@@ -183,7 +183,7 @@ export enum ResponseType {
   DECLINE = "DECLINE",
 }
 
-export type RespondToDrawOfferRequest ={
+export type RespondToDrawOfferRequest = {
   gameId: number;
   responseType: ResponseType;
-}
+};

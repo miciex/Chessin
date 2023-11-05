@@ -14,6 +14,7 @@ import {
 } from "../utils/ApiEndpoints";
 import {
   CodeVerificationRequest,
+  FriendInvitationResponseType,
   HandleFriendInvitation,
   HandleSearchBarSocials,
   InviteToGameRequest,
@@ -177,7 +178,7 @@ export const setUserDataFromResponse = async (
 
 export const addFriendFunc = async (request: FriendInvitationRequest) => {
   const accessToken = await getValueFor("accessToken");
-  console.log("s")
+  console.log("s");
   const response = await fetch(addFriendLink, {
     method: "POST",
     headers: {
@@ -226,8 +227,13 @@ export const handleFriendInvitationFunc = async (
   return response;
 };
 
-
-export const handleGameInvitation = async (request: HandleFriendInvitation) =>{
+export const handleGameInvitation = async (
+  request: HandleFriendInvitation,
+  navigation
+) => {
+  if (request.responseType == FriendInvitationResponseType.ACCEPT) {
+    navigation.replace("PlayOnline");
+  }
   const accessToken = await getValueFor("accessToken");
   const response = await fetch(gameInvitation, {
     method: "POST",
@@ -235,30 +241,33 @@ export const handleGameInvitation = async (request: HandleFriendInvitation) =>{
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify(request)
+    body: JSON.stringify(request),
   })
-  .then((response) => {
-    if (response.status === 200) {
-      return response.text();
-    } else {
-      throw new Error("Something went wrong on api server!");
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+    .then((response) => {
+      if (response.status === 200) {
+        return response.text();
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   return response;
-}
+};
 
-export async function handleSearchBarSocials (request: HandleSearchBarSocials){
+export async function handleSearchBarSocials(request: HandleSearchBarSocials) {
   const accessToken = await getValueFor("accessToken");
-  const response = await fetch(`${findUsersByNickname}${request.searchNickname}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
+  const response = await fetch(
+    `${findUsersByNickname}${request.searchNickname}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  )
     .then((response) => {
       if (response.status === 200) {
         return response.json().catch((error) => {
@@ -333,8 +342,7 @@ export const updateUserRating = async (rating: number, gameType: GameType) => {
   save("user", JSON.stringify(user));
 };
 
-
-export const getFriendsList = async (nick:string) => {
+export const getFriendsList = async (nick: string) => {
   const accessToken = await getValueFor("accessToken");
 
   const response = await fetch(`${getFriends}${nick}`, {
@@ -366,7 +374,7 @@ export const getFriendsList = async (nick:string) => {
 
 export const checkSendedInvitations = async () => {
   const accessToken = await getValueFor("accessToken");
-  
+
   const response = await fetch(`${checkSendedInvitationsLink}`, {
     method: "POST",
     headers: {
@@ -376,7 +384,7 @@ export const checkSendedInvitations = async () => {
   })
     .then((response) => {
       if (response.status === 200) {
-        console.log("shit")
+        console.log("shit");
         return response.json().catch((error) => {
           throw new Error(error);
         }) as unknown as Array<responseUser>;
@@ -395,7 +403,8 @@ export const checkSendedInvitations = async () => {
   return response;
 };
 
-export const inviteToGame = async (request: InviteToGameRequest) =>{
+export const inviteToGame = async (request: InviteToGameRequest) => {
+  console.log(request);
   const accessToken = await getValueFor("accessToken");
   const response = await fetch(inviteToGameLink, {
     method: "POST",
@@ -403,24 +412,24 @@ export const inviteToGame = async (request: InviteToGameRequest) =>{
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify(request)
+    body: JSON.stringify(request),
   })
-  .then((response) => {
-    if (response.status === 200) {
-      return response.text();
-    } else {
-      throw new Error("Something went wrong on api server!");
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+    .then((response) => {
+      if (response.status === 200) {
+        return response.text();
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   return response;
-}
+};
 
 export const checkInvitationsToGame = async () => {
   const accessToken = await getValueFor("accessToken");
-  console.log('jost')
+  console.log("jost");
   const response = await fetch(checkInvitationsToGameLink, {
     method: "POST",
     headers: {

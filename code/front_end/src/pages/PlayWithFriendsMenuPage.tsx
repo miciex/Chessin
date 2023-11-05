@@ -50,14 +50,14 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   };
 
   const [chosenColor, setChosenColor] =
-    useState<PlayColorsContextType>("random");
+    useState<PlayColorsContextType>("RANDOM");
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
 
   const [gameTempo, setGameTempo] = useState<LengthType>({
     gameType: GameType.BLITZ,
-    totalTime: 180,
+    totalTime: 5000,
     increment: 0,
   });
   const handleGameTempoChange = (tempo: LengthType) => {
@@ -68,8 +68,12 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
 
   const [isEnabled, setIsEnabled] = useState(true);
 
+  const handlePressRanked = () => {
+    setIsEnabled(!isEnabled);
+    console.log(isEnabled, " cjik");
+  };
   return (
-    <View style={{ width: "100%", height: "100%"}}>
+    <View style={{ width: "100%", height: "100%" }}>
       <PlayColorsContext.Provider value={chosenColor}>
         <View style={styles.appContainer}>
           {timerModalOpen ? (
@@ -82,14 +86,17 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
               <View style={styles.profileBox}>
                 <Profile
                   nick={user2 ? user2.nameInGame : ""}
-                  
-                  rank={user2 ? user2.ranking : {
-                    BULLET: 0,
-                    BLITZ: 0,
-                    RAPID: 0,
-                    CLASSICAL: 0,
-                }}
-                country={user2? user2.country : "POland"}
+                  rank={
+                    user2
+                      ? user2.ranking
+                      : {
+                          BULLET: 0,
+                          BLITZ: 0,
+                          RAPID: 0,
+                          CLASSICAL: 0,
+                        }
+                  }
+                  country={user2 ? user2.country : "POland"}
                 />
                 <View style={{ width: 400, height: 130 }}>
                   <ChooseTimeButton
@@ -105,7 +112,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                   <View style={styles.medalButton}>
                     <BaseCustomContentButton
                       handlePress={() => {
-                        () => setIsEnabled(!isEnabled);
+                        setIsEnabled(!isEnabled);
                       }}
                       content={
                         <FontAwesome5
@@ -125,23 +132,28 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                     thumbColor={"#f4f3f4"}
                     ios_backgroundColor={"grey"}
                     value={isEnabled}
-                    onTouchMove={() => setIsEnabled(!isEnabled)}
+                    onTouchMove={() => {
+                      handlePressRanked();
+                    }}
                   />
                 </View>
+
                 <View style={{ width: "80%", height: 80 }}>
                   <BaseButton
                     handlePress={() => {
-                      if(!user) return
-
+                      if (!user) return;
+                      console.log(isEnabled, " wartosc isRated");
                       let request = {
-                        friendNickname: user2? user2.nameInGame : "",
+                        friendNickname: user2 ? user2.nameInGame : "",
                         timeControl: gameTempo.totalTime,
                         increment: gameTempo.increment,
                         isRated: isEnabled,
-                        color: chosenColor
-                      }
+                        playerColor: chosenColor,
+                      };
 
-                      inviteToGame(request)
+                      console.log(typeof isEnabled, "typ zmiennej");
+
+                      inviteToGame(request);
                       // navigation.navigate("PlayOnline", {
                       //   request: setPendingGameRequest(
                       //     gameTempo.totalTime,
@@ -152,8 +164,6 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                       //   ),
                       // })
                     }}
-
-                    
                     text="Graj"
                     fontSizeProps={30}
                   />

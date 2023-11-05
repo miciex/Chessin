@@ -10,7 +10,10 @@ import Heading from "../components/Heading";
 import Invitation from "../features/socials/components/Invitation";
 import InvitationToGame from "../features/socials/components/InvitationToGame";
 import Notify from "../features/socials/components/Notify";
-import { checkInvitations, checkInvitationsToGame } from "../services/userServices";
+import {
+  checkInvitations,
+  checkInvitationsToGame,
+} from "../services/userServices";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
 
 const ended_games = [
@@ -86,43 +89,48 @@ type Props = {
 };
 
 export default function Notification({ route, navigation }: Props) {
+  const [invitations, setInvitations] = useState<Array<User>>([]);
+  const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([]);
 
-  const [invitations, setInvitations] = useState<Array<User>>([])
-  const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([])
-  
-  useEffect(()=>{
-    console.log("fuck")
+  useEffect(() => {
+    console.log("fuck");
 
-    checkInvitations().then((data) =>{ 
-      console.log("check invite data: ")
-      console.log(data)
-      if(!data) return
-      setInvitations(data.map(x => responseUserToUser(x, "")))
-    })
+    checkInvitations().then((data) => {
+      console.log("check invite data: ");
+      console.log(data);
+      if (!data) return;
+      setInvitations(data.map((x) => responseUserToUser(x, "")));
+    });
 
-    checkInvitationsToGame().then((data) =>{ 
-      console.log("check invite data: ")
-      console.log(data)
-      if(!data) return
-      setInvitationsToGame(data.map(x => responseUserToUser(x, "")))
-    })
-  }, [invitations, invitationsToGame])
+    checkInvitationsToGame().then((data) => {
+      console.log("check invite data: ");
+      console.log(data);
+      if (!data) return;
+      setInvitationsToGame(data.map((x) => responseUserToUser(x, "")));
+    });
+  }, [invitations, invitationsToGame]);
   return (
     <View style={styles.appContainer}>
       <ScrollView>
-        
         <View style={styles.contentContainer}>
-        <Heading text={"Notifications"} />
-        {
-         invitationsToGame.map(player=>(
-          <InvitationToGame nick={player.nameInGame} rank={player.highestRanking} navigation={navigation} email={player.email}/>
-     ))
-        }
-        {invitations.map(player=>(
-             <Invitation nick={player.nameInGame} rank={player.highestRanking} navigation={navigation} email={player.email}/>
-        ))}
-         <Notify text="Gratulacje osiagnales 1000 elo"/>
-         
+          <Heading text={"Notifications"} />
+          {invitationsToGame.map((player) => (
+            <InvitationToGame
+              nick={player.nameInGame}
+              rank={player.highestRanking}
+              navigation={navigation}
+              email={player.email}
+            />
+          ))}
+          {invitations.map((player) => (
+            <Invitation
+              nick={player.nameInGame}
+              rank={player.highestRanking}
+              navigation={navigation}
+              email={player.email}
+            />
+          ))}
+          <Notify text="Gratulacje osiagnales 1000 elo" />
         </View>
       </ScrollView>
     </View>

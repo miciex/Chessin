@@ -1,5 +1,5 @@
 import { createContext } from "react";
 
-export type PlayColorsContextType = "white" | "black" | "random";
+export type PlayColorsContextType = "WHITE" | "BLACK" | "RANDOM";
 
-export const PlayColorsContext = createContext<PlayColorsContextType>("random");
+export const PlayColorsContext = createContext<PlayColorsContextType>("RANDOM");
