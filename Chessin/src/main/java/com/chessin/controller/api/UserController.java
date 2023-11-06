@@ -83,7 +83,7 @@ public class UserController {
         friendInvitationRepository.save(FriendInvitation.builder()
                 .user(userRepository.findByEmail(email).get())
                 .friend(userRepository.findByNameInGame(request.getFriendNickname()).get())
-                .date(Instant.now())
+                .date(Instant.now().toEpochMilli())
                 .build());
 
         return ResponseEntity.ok().body(MessageResponse.of("Invitation sent"));
@@ -100,7 +100,7 @@ public class UserController {
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
-        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, true)).forEach(responses::add);
+        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, userService, true)).forEach(responses::add);
 
         return ResponseEntity.ok().body(responses);
     }
@@ -116,7 +116,7 @@ public class UserController {
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
-        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, false)).forEach(responses::add);
+        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, userService, false)).forEach(responses::add);
 
         return ResponseEntity.ok().body(responses);
     }
