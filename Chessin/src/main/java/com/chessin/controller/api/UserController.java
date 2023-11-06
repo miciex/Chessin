@@ -85,7 +85,7 @@ public class UserController {
         friendInvitationRepository.save(FriendInvitation.builder()
                 .user(userRepository.findByEmail(email).get())
                 .friend(userRepository.findByNameInGame(request.getFriendNickname()).get())
-                .date(Instant.now())
+                .date(Instant.now().toEpochMilli())
                 .build());
 
         return ResponseEntity.ok().body(MessageResponse.of("Invitation sent"));

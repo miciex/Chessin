@@ -15,13 +15,13 @@ import java.util.Date;
 @NoArgsConstructor
 public class FriendInvitationResponse {
     private UserResponse nameInGame;
-    Date date;
+    long date;
 
     public static FriendInvitationResponse fromFriendInvitation(FriendInvitation friendInvitation, UserService userService, boolean isFriend){
         return FriendInvitationResponse
                 .builder()
                 .nameInGame(UserResponse.fromUser(isFriend ? friendInvitation.getUser() : friendInvitation.getFriend(), userService, false))
-                .date(Date.from(friendInvitation.getDate()))
+                .date(friendInvitation.getDate())
                 .build();
     }
 }
