@@ -13,7 +13,10 @@ import {
   handleFriendInvitationFunc,
   handleGameInvitation,
 } from "../../../services/userServices";
-import { FriendInvitationResponseType } from "../../../utils/ServicesTypes";
+import {
+  ChessGameResponse,
+  FriendInvitationResponseType,
+} from "../../../utils/ServicesTypes";
 import { User } from "../../../utils/PlayerUtilities";
 
 type Props = {
@@ -83,7 +86,10 @@ const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
                     responseType: FriendInvitationResponseType.ACCEPT,
                   },
                   navigation
-                );
+                ).then((response: null | ChessGameResponse) => {
+                  if (!response) return;
+                  navigation.navigate("PlayOnline");
+                });
               }}
               color="green"
             />

@@ -41,7 +41,7 @@ import { GameType } from "../chess-logic/board";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { StackParamList } from "../utils/Constants";
-import { handleFetch } from "../lib/fetch";
+import { handleFetch, handlePost } from "../lib/fetch";
 
 export const storeUser = async (value: User) => {
   await AsynStorage.setItem("user", JSON.stringify(value)).catch((err) => {
@@ -220,7 +220,7 @@ export const handleFriendInvitationFunc = async (
   })
     .then((response) => {
       if (response.status === 200) {
-        return response.text();
+        return response.json();
       } else {
         throw new Error("Something went wrong on api server!");
       }
@@ -239,29 +239,9 @@ export const handleGameInvitation = async (
     undefined
   >
 ) => {
-  if (request.responseType == FriendInvitationResponseType.ACCEPT) {
-    navigation.replace("PlayOnline");
-  }
-  const accessToken = await getValueFor("accessToken");
-  const response = await fetch(gameInvitation, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(request),
-  })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.text();
-      } else {
-        throw new Error("Something went wrong on api server!");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-  return response;
+  return handlePost(gameInvitation, JSON.stringify(request)).catch(() => {
+    throw new Error("failed linijka 246");
+  });
 };
 
 export async function handleSearchBarSocials(request: HandleSearchBarSocials) {
@@ -413,26 +393,11 @@ export const checkSendedInvitations = async () => {
 
 export const inviteToGame = async (request: InviteToGameRequest) => {
   console.log(request);
-  const accessToken = await getValueFor("accessToken");
-  const response = await fetch(inviteToGameLink, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(request),
-  })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.text();
-      } else {
-        throw new Error("Something went wrong on api server!");
-      }
-    })
-    .catch((error) => {
+  return handlePost(inviteToGameLink, JSON.stringify(request)).catch(
+    (error) => {
       console.error(error);
-    });
-  return response;
+    }
+  );
 };
 
 export const checkInvitationsToGame = async () => {

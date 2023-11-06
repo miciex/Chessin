@@ -18,15 +18,15 @@ type Props = {
 export default function UserNotAuthenticatedPage({ navigation }: Props) {
   useEffect(() => {
     getValueFor("user")
-        .then((value) => {
-          if (value) {
-            clearInterval(interval);
-            navigation.navigate("Home");
-          }
-        })
-        .catch((err) => {
-          throw new Error("User not authenticated");
-        });
+      .then((value) => {
+        if (value) {
+          clearInterval(interval);
+          navigation.navigate("Home");
+        }
+      })
+      .catch((err) => {
+        throw new Error("User not authenticated");
+      });
     const interval = setInterval(() => {
       getValueFor("user")
         .then((value) => {
