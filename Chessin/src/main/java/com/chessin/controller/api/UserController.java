@@ -103,7 +103,7 @@ public class UserController {
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
-        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, true)).forEach(responses::add);
+        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, userService, true)).forEach(responses::add);
 
         return ResponseEntity.ok().body(responses);
     }
@@ -120,7 +120,7 @@ public class UserController {
 
         List<FriendInvitationResponse> responses = new ArrayList<>();
 
-        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, false)).forEach(responses::add);
+        invitations.stream().map((FriendInvitation invitation) -> FriendInvitationResponse.fromFriendInvitation(invitation, userService, false)).forEach(responses::add);
 
         return ResponseEntity.ok().body(responses);
     }
