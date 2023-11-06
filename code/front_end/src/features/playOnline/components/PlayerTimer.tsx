@@ -20,6 +20,12 @@ export default function PlayerTimer({ state, isMyPlayer, dispatch }: Props) {
     return () => clearTimeout(timeout);
   }, [state.board.moves.length, state.board.result, state.board.whiteToMove]);
 
+  useEffect(() => {
+    setDisconnectionTimer();
+    return () => clearTimeout(timeout);
+  },[state.opponentDisconnected, state.board.result, state.board.whiteToMove]);
+
+
   const player = isMyPlayer ? state.myPlayer : state.opponent;
   let timeout: number;
 
@@ -40,7 +46,33 @@ export default function PlayerTimer({ state, isMyPlayer, dispatch }: Props) {
     }
   };
 
-  const time =
+  const setDisconnectionTimer = () => {
+    if (
+      !isMyPlayer &&
+      state.board.result === GameResults.NONE
+      &&state.disconnectionTimer >= timeEndDate
+    ) {
+      timeout = setTimeout(setTimer, 1000);
+
+      dispatch({
+        type: "updateDisconnectionTimerByMillis",
+        payload: -1000,
+      });
+    }
+  }
+
+  const getTimeToString = (time:Date | null) =>{
+    if(!time) return "0:00";
+  return time >= timeEndDate
+      ? time.getMinutes().toString() +
+        ":" +
+        (time.getSeconds().toString().length === 1
+          ? "0" + time.getSeconds().toString()
+          : time.getSeconds().toString())
+      : "0:00";
+}
+
+  const time = getTimeToString(state.opponentDisconnected && state.board.result === GameResults.NONE ? state.disconnectionTimer :player?.timeLeft);
     player?.timeLeft && player.timeLeft >= timeEndDate
       ? player.timeLeft.getMinutes().toString() +
         ":" +

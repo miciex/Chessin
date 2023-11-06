@@ -217,7 +217,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
 
     checkInvitations().then((data) =>{ 
       if(data === undefined) return
-      setInvitations(data.map(x => responseUserToUser(x, "")))
+      setInvitations(data.map(x => responseUserToUser(x.user, "")))
     })
    
      

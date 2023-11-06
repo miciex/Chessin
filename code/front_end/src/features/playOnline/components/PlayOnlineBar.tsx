@@ -12,33 +12,26 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { listenForDrawOffer, offerDraw } from "../../../services/chessGameService";
 import { ResponseType } from "../../../utils/ServicesTypes";
 import BaseButton from "../../../components/BaseButton";
+import { GameResults } from "../../../chess-logic/board";
 
 type Props = {
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
-  toggleSettings: () => void;
-  toggleRotateBoard: () => void;
-  opponentOfferedDraw: boolean;
   handleRespondToDrawOffer: (response: RespondToDrawOfferRequest) => void;
   handleSendDrawOffer: () => void;
   handleResign: (gameId: string) => void;
-  opponentDisconnected: boolean;
 };
 
 export default function PlayOnlineBar({
-  toggleSettings,
-  toggleRotateBoard,
   state,
   dispatch,
-  opponentOfferedDraw,
   handleRespondToDrawOffer,
   handleSendDrawOffer,
   handleResign,
-  opponentDisconnected
 }: Props) {
   const [showResign, setShowResign] = useState(false);
   const [showOpponentDisconnected, setShowOpponentDisconnected] = useState(true);
-
+  const [showOpponentReconnected, setShowOpponentReconnected] = useState(true)
   const toggleResign = () => {
     setShowResign((prev) => !prev);
   };
@@ -68,21 +61,23 @@ export default function PlayOnlineBar({
       ? "Are you sure you want to resign?"
       : "Are you sure you want to abort the game?";
 
+  const showOpponentDisconnectedInfo = (showOpponentDisconnected && state.opponentDisconnected && state.board.result === GameResults.NONE);
+  const showOpponentReconnectedInfo = (showOpponentReconnected && state.opponentReconnected && state.board.result === GameResults.NONE)
   return (
     <View style={styles.gameOptionsContainer}>
       <OnlineBarModal
-        showModal={showResign && !opponentOfferedDraw&& !(showOpponentDisconnected && opponentDisconnected)}
+        showModal={showResign && !state.opponentOfferedDraw&& !showOpponentDisconnectedInfo&& !showOpponentReconnectedInfo}
         handleDecline={toggleResign}
         handleAccept={resign}
         modalTxt={modalTxt}
       />
       <OnlineBarModal
-        showModal={opponentOfferedDraw&& !(showOpponentDisconnected && opponentDisconnected)}
+        showModal={state.opponentOfferedDraw&& !showOpponentDisconnectedInfo && !showOpponentReconnectedInfo}
         handleDecline={declineDraw}
         handleAccept={acceptDraw}
         modalTxt={"Your opponent offered a draw. Do you accept?"}
         />
-      {(!showResign && !opponentOfferedDraw && !(showOpponentDisconnected && opponentDisconnected)) && (
+      {(!showResign && !state.opponentOfferedDraw && !showOpponentDisconnectedInfo&& !showOpponentReconnectedInfo) && (
         <>
           <MaterialCommunityIcons
             name="fraction-one-half"
@@ -100,17 +95,17 @@ export default function PlayOnlineBar({
             name="retweet"
             size={24}
             color="black"
-            onPress={toggleRotateBoard}
+            onPress={()=>{dispatch({type: "toggleRotateBoard"})}}
           />
           <FontAwesome
             name="gear"
             size={34}
             color="black"
-            onPress={toggleSettings}
+            onPress={()=>{dispatch({type: "toggleSettings"})}}
           />
         </>
       )}
-      {opponentDisconnected && showOpponentDisconnected ?(
+      {(showOpponentDisconnectedInfo && !showOpponentReconnectedInfo)?(
         <View>
           <View style={styles.closeButtonContainer}>
             <BaseButton text="" element={<FontAwesome
@@ -121,6 +116,19 @@ export default function PlayOnlineBar({
             
             </View>
           <Text style={{color: "red"}}>Opponent disconnected</Text>
+        </View>
+      ):null}
+      {showOpponentReconnectedInfo ? (
+        <View>
+          <View style={styles.closeButtonContainer}>
+            <BaseButton text="" element={<FontAwesome
+              name="close"
+              size={24}
+              color="black"
+            />} handlePress={() => setShowOpponentReconnected(false)}/>
+            
+            </View>
+          <Text style={{color: "green"}}>Opponent reconnected</Text>
         </View>
       ):null}
     </View>

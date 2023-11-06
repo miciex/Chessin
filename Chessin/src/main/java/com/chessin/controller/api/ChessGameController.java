@@ -264,7 +264,10 @@ public class ChessGameController {
                         .disconnectionTime(Constants.Application.DISCONNECTION_TIME)
                         .build());
             else
-                return ResponseEntity.ok().body(DisconnectionStatus.FINE);
+                return ResponseEntity.ok().body(DisconnectionResponse.builder()
+                        .disconnectionStatus(DisconnectionStatus.FINE)
+                        .disconnectionTime(0)
+                        .build());
         }
     }
 

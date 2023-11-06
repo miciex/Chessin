@@ -58,7 +58,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
 
   const [gameTempo, setGameTempo] = useState<LengthType>({
     gameType: GameType.BLITZ,
-    totalTime: 5000,
+    totalTime: 5 * 1000 * 60,
     increment: 0,
   });
   const handleGameTempoChange = (tempo: LengthType) => {

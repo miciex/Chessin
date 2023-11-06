@@ -34,6 +34,7 @@ import {
   BoardResponse,
   BooleanMessageResponse,
   ChessGameResponse,
+  DisconnectionResponse,
   DisconnectionStatus,
   MessageResponse,
   RespondToDrawOfferRequest,
@@ -69,28 +70,6 @@ export default function PlayOnline({ navigation, route }: Props) {
     reducer,
     getInitialState(request?.isRated, request?.gameType)
   );
-  const [showSettings, setShowSettings] = useState(false);
-  const [rotateBoard, setRotateBoard] = useState(false);
-  const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
-  const [opponentDisconnected, setOpponentDisconnected] = useState(false);
-  //TODO: show when opponent reconnects
-  //TODO: show timer when opponent disconnects
-
-  const toggleSettings = () => {
-    setShowSettings((prev) => !prev);
-  };
-
-  const toggleRotateBoard = () => {
-    setRotateBoard((prev) => !prev);
-  };
-
-  const opponentOfferedDrawTrue = () => {
-    setOpponentOfferedDraw(true);
-  };
-
-  const opponentOfferedDrawFalse = () => {
-    setOpponentOfferedDraw(false);
-  };
 
   useEffect(() => {
     searchNewGame();
@@ -120,15 +99,15 @@ export default function PlayOnline({ navigation, route }: Props) {
 
 
   const setRotateBoardAfterFoundGame = (isMyPlayerWhite: boolean) => {
-    if (isMyPlayerWhite) setRotateBoard(false);
-    else setRotateBoard(true);
+    if (isMyPlayerWhite) dispatch({type:"setRotateBoard",payload:false});
+    else dispatch({type:"setRotateBoard",payload:true});
   };
 
   const handleListenForDrawOffer = (gameId: string) => {
     listenForDrawOffer(gameId)
     .then((msg: MessageQueue | null) => {
       if(!msg) return;
-      setOpponentOfferedDraw(true);
+      dispatch({type:"setOpponentOfferedDraw", payload:true});
     })
     .catch((err) => {
       throw new Error(err);
@@ -169,10 +148,12 @@ export default function PlayOnline({ navigation, route }: Props) {
       if(typeof response === "string"){
         switch(response as DisconnectionStatus){
         case DisconnectionStatus.DISCONNECTED:
-          setOpponentDisconnected(true);
+          dispatch({type: "setOpponentDisconnected", payload:true});
+          dispatch({type: "setOpponentReconnected", payload:false});
           break;
         case DisconnectionStatus.RECONNECTED:
-          setOpponentDisconnected(false);
+          dispatch({type: "setOpponentDisconnected", payload:false});
+          dispatch({type: "setOpponentReconnected", payload:true});
           break;
         case DisconnectionStatus.FINE:
         case DisconnectionStatus.NO_CHANGE:
@@ -181,7 +162,7 @@ export default function PlayOnline({ navigation, route }: Props) {
     }
       else{
         //opponent disconnected
-        setOpponentDisconnected(true);
+        dispatch({type: "setOpponentDisconnected", payload:true});
         dispatch({
           type: "setDataFromBoardResponse",
           payload: { boardResponse: response },
@@ -195,9 +176,18 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleListenForDisconnect = async (gameId: string) => {
     listenForDisconnections(gameId)
-    .then((response: MessageResponse | null) => {
+    .then((response: DisconnectionResponse | null) => {
       if (response === null) return;
-      setOpponentDisconnected(true);
+      if(DisconnectionStatus.DISCONNECTED === response.disconnectionStatus){
+      dispatch({type: "setOpponentDisconnected", payload:true});
+      dispatch({type: "setOpponentReconnected", payload:false});
+      dispatch({type: "setDisconnectionTimer", payload:new Date(response.disconnectionTime)});
+      }
+      else if(DisconnectionStatus.RECONNECTED === response.disconnectionStatus){
+        dispatch({type: "setOpponentDisconnected", payload:false});
+        dispatch({type: "setOpponentReconnected", payload:false});
+        dispatch({type: "setDisconnectionTimer", payload:new Date(response.disconnectionTime)});
+      }
     })
     .catch((err) => {
       throw new Error(err);
@@ -370,11 +360,11 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleResponseFromDrawOffer = (board: BoardResponse | null) => {
     if (!board) {
-      setOpponentOfferedDraw(false);
+      dispatch({type: "setOpponentOfferedDraw", payload:false});
       return listenForDrawOffer(String(state.gameId))
         .then((msg: MessageResponse | null) => {
           if(!msg) return;
-          setOpponentOfferedDraw(true);
+          dispatch({type: "setOpponentOfferedDraw", payload:true});
           listenForDrawOffer(String(state.gameId));
         })
         .catch((err) => {
@@ -385,7 +375,7 @@ export default function PlayOnline({ navigation, route }: Props) {
       type: "setDataFromBoardResponse",
       payload: { boardResponse: board },
     });
-    setOpponentOfferedDraw(false);
+    dispatch({type: "setOpponentOfferedDraw", payload:false});
   }
 
   const handleRespondToDrawOffer = (response: RespondToDrawOfferRequest) => {
@@ -422,34 +412,30 @@ export default function PlayOnline({ navigation, route }: Props) {
       </View>
 
       <SettingsGameModal
-        toggleGear={toggleSettings}
-        gearModalOn={showSettings}
+        toggleGear={()=>{dispatch({type: "toggleSettings"})}}
+        gearModalOn={state.showSettings}
       />
 
       <View style={styles.contentContainer}>
         {state.searchingGame || state.myPlayer.color === null ? (
           <WaitingForGame />
         ) : null}
-        <Bar state={state} dispatch={dispatch} rotateBoard={!rotateBoard} />
+        <Bar state={state} dispatch={dispatch} rotateBoard={!state.rotateBoard} />
         <TestBoard
           state={state}
           dispatch={dispatch}
-          rotateBoard={rotateBoard}
+          rotateBoard={state.rotateBoard}
           ableToMove={true}
         />
         <PlayOnlineBar
           state={state}
           dispatch={dispatch}
-          toggleSettings={toggleSettings}
-          toggleRotateBoard={toggleRotateBoard}
-          opponentOfferedDraw={opponentOfferedDraw}
           handleRespondToDrawOffer={handleRespondToDrawOffer}
           handleSendDrawOffer={handleOfferDraw}
           handleResign={handleResign}
-          opponentDisconnected={opponentDisconnected}
         />
 
-        <Bar state={state} dispatch={dispatch} rotateBoard={rotateBoard} />
+        <Bar state={state} dispatch={dispatch} rotateBoard={state.rotateBoard} />
         <GameFinishedOverlay
           state={state}
           dispatch={dispatch}

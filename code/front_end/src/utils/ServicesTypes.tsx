@@ -219,3 +219,8 @@ export type FriendInvitationResponse = {
   user: ResponseUser;
   date: number;
 };
+
+export type DisconnectionResponse = {
+  disconnectionStatus: DisconnectionStatus;
+  disconnectionTime: number;
+}
