@@ -77,9 +77,6 @@ public class ChessGameController {
                 int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
                 int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
 
-                whitePlayerIndex = 1;
-                blackPlayerIndex = 0;
-
                 List<User> players = Arrays.asList(foundGame.getUser(), userRepository.findByEmail(email).get());
 
                 ChessGame game = ChessGame.builder()
@@ -226,7 +223,7 @@ public class ChessGameController {
                     if(activeBoards.get(id).getMoves().size() < 2)
                         finishGame(id, Optional.of(GameResults.ABANDONED));
                     else
-                        finishGame(id, Optional.of(isWhite ? GameResults.BLACK_TIMEOUT : GameResults.WHITE_TIMEOUT));
+                        finishGame(id, Optional.of(isWhite ? GameResults.BLACK_DISCONNECTED : GameResults.WHITE_DISCONNECTED));
 
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                 }
@@ -738,6 +735,9 @@ public class ChessGameController {
     public ResponseEntity<?> inviteFriend(@RequestBody GameInvitationRequest request, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
+        if(!userRepository.existsByNameInGame(request.getFriendNickname()))
+            return ResponseEntity.badRequest().body(MessageResponse.of("User not found."));
+
         String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
@@ -789,8 +789,12 @@ public class ChessGameController {
 
     @Transactional
     @PostMapping("/respondToGameInvitation")
-    public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet) throws InterruptedException {
+    public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(!userRepository.existsByNameInGame(request.getFriendNickname()))
+            return ResponseEntity.badRequest().body(MessageResponse.of("User not found."));
+
         String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
 
         if(!pendingInvitations.containsKey(friendEmail))
