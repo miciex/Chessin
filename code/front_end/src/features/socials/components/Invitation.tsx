@@ -31,6 +31,8 @@ const Invitation = ({ email, nick, rank, navigation }: Props) => {
     navigation.navigate("ProfilePage", { nameInGame: nick });
   };
 
+  let refresh = 0;
+
   const [user, setUser] = useState<User>();
 
   useEffect(() => {
@@ -40,7 +42,7 @@ const Invitation = ({ email, nick, rank, navigation }: Props) => {
       }
       setUser(user);
     });
-  });
+  }, [refresh]);
 
   return (
     <View style={styles.record}>
@@ -80,6 +82,7 @@ const Invitation = ({ email, nick, rank, navigation }: Props) => {
                   friendNickname: nick,
                   responseType: FriendInvitationResponseType.ACCEPT,
                 });
+                refresh++;
               }}
               color="green"
             />
@@ -92,6 +95,7 @@ const Invitation = ({ email, nick, rank, navigation }: Props) => {
                   friendNickname: nick,
                   responseType: FriendInvitationResponseType.DECLINE,
                 });
+                refresh++;
               }}
               color="red"
             />

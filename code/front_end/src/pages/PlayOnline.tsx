@@ -92,6 +92,112 @@ export default function PlayOnline({ navigation, route }: Props) {
     setOpponentOfferedDraw(false);
   };
 
+  const handleListenForDisconnect = async (gameId: string) => {
+    listenForDisconnections(gameId)
+      .then((response: MessageResponse | null) => {
+        if (response === null) return;
+        setOpponentDisconnected(true);
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
+
+  const unMount = () => {
+    if (!state.searchingGame) return;
+
+    cancelSearch().catch((err) => {
+      throw new Error(err);
+    });
+  };
+
+  const handleListnForFirstMove = async (
+    gameId: number,
+    myPlayer: Player,
+    opponent: Player
+  ) => {
+    try {
+      const res = await listenForFirstMove({ gameId });
+      dispatch({
+        type: "listenForFirstMove",
+        payload: { boardResponse: res, myPlayer, opponent },
+      });
+      return res;
+    } catch (err) {
+      if (typeof err === "string") throw new Error(err);
+      throw new Error("Unknown error");
+    }
+  };
+
+  const setCurrentPosition = (position: number) => {
+    dispatch({ type: "setCurrentPosition", payload: position });
+  };
+
+  const handleResponseFromDrawOffer = (board: BoardResponse | null) => {
+    if (!board) {
+      setOpponentOfferedDraw(false);
+      return listenForDrawOffer(String(state.gameId))
+        .then((msg: MessageResponse | null) => {
+          if (!msg) return;
+          setOpponentOfferedDraw(true);
+          listenForDrawOffer(String(state.gameId));
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    }
+    dispatch({
+      type: "setDataFromBoardResponse",
+      payload: { boardResponse: board },
+    });
+    setOpponentOfferedDraw(false);
+  };
+
+  const handleRespondToDrawOffer = (response: RespondToDrawOfferRequest) => {
+    respondToDrawOffer(response)
+      .then((board: BoardResponse | null) => {
+        handleResponseFromDrawOffer(board);
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
+
+  const handleOfferDraw = () => {
+    offerDraw(String(state.gameId))
+      .then((board: BoardResponse | null) => {
+        handleResponseFromDrawOffer(board);
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
+
+  const handlePing = async (gameId: string) => {
+    ping(gameId).then(() => (response: DisconnectionStatus | BoardResponse) => {
+      if (typeof response === "string") {
+        switch (response as DisconnectionStatus) {
+          case DisconnectionStatus.DISCONNECTED:
+            setOpponentDisconnected(true);
+            break;
+          case DisconnectionStatus.RECONNECTED:
+            setOpponentDisconnected(false);
+            break;
+          case DisconnectionStatus.FINE:
+          case DisconnectionStatus.NO_CHANGE:
+            return;
+        }
+      } else {
+        //opponent disconnected
+        setOpponentDisconnected(true);
+        dispatch({
+          type: "setDataFromBoardResponse",
+          payload: { boardResponse: response },
+        });
+      }
+    });
+  };
+
   useEffect(() => {
     searchNewGame();
 
@@ -134,64 +240,26 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleListenForResign = (gameId: string) => {
     listenForResignation(gameId)
-    .then((response : BoardResponse | null) => {
-      if (response === null) return;
-      dispatch({
-        type: "setDataFromBoardResponse",
-        payload: { boardResponse: response },
-      });
-    }).
-    catch((err) => {
-      throw new Error(err)
-    });
-  }
-
-  const handleResign = (gameId: string) => {
-    resign(gameId)
-    .then((response : BoardResponse | null) => {
-      if (response === null) return;
-      dispatch({
-        type: "setDataFromBoardResponse",
-        payload: { boardResponse: response },
-      });
-    }).
-    catch((err) => {
-      throw new Error(err)
-    });
-  }
-
-  const handlePing = async (gameId: string) => {
-    ping(gameId)
-    .then(()=>(response :DisconnectionStatus| BoardResponse) => {
-      if(typeof response === "string"){
-        switch(response as DisconnectionStatus){
-        case DisconnectionStatus.DISCONNECTED:
-          setOpponentDisconnected(true);
-          break;
-        case DisconnectionStatus.RECONNECTED:
-          setOpponentDisconnected(false);
-          break;
-        case DisconnectionStatus.FINE:
-        case DisconnectionStatus.NO_CHANGE:
-          return;
-      }
-    }
-      else{
-        //opponent disconnected
-        setOpponentDisconnected(true);
+      .then((response: BoardResponse | null) => {
+        if (response === null) return;
         dispatch({
           type: "setDataFromBoardResponse",
           payload: { boardResponse: response },
-        })
-      }
+        });
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
   };
 
-
-  const handleListenForDisconnect = async (gameId: string) => {
-    listenForDisconnections(gameId)
-      .then((response: MessageResponse | null) => {
+  const handleResign = (gameId: string) => {
+    resign(gameId)
+      .then((response: BoardResponse | null) => {
         if (response === null) return;
-        setOpponentDisconnected(true);
+        dispatch({
+          type: "setDataFromBoardResponse",
+          payload: { boardResponse: response },
+        });
       })
       .catch((err) => {
         throw new Error(err);
@@ -329,76 +397,6 @@ export default function PlayOnline({ navigation, route }: Props) {
           .catch((err) => {
             throw new Error(err);
           });
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
-  };
-
-  const unMount = () => {
-    if (!state.searchingGame) return;
-
-    cancelSearch().catch((err) => {
-      throw new Error(err);
-    });
-  };
-
-  const handleListnForFirstMove = async (
-    gameId: number,
-    myPlayer: Player,
-    opponent: Player
-  ) => {
-    try {
-      const res = await listenForFirstMove({ gameId });
-      dispatch({
-        type: "listenForFirstMove",
-        payload: { boardResponse: res, myPlayer, opponent },
-      });
-      return res;
-    } catch (err) {
-      if (typeof err === "string") throw new Error(err);
-      throw new Error("Unknown error");
-    }
-  };
-
-  const setCurrentPosition = (position: number) => {
-    dispatch({ type: "setCurrentPosition", payload: position });
-  };
-
-  const handleResponseFromDrawOffer = (board: BoardResponse | null) => {
-    if (!board) {
-      setOpponentOfferedDraw(false);
-      return listenForDrawOffer(String(state.gameId))
-        .then((msg: MessageResponse | null) => {
-          if (!msg) return;
-          setOpponentOfferedDraw(true);
-          listenForDrawOffer(String(state.gameId));
-        })
-        .catch((err) => {
-          throw new Error(err);
-        });
-    }
-    dispatch({
-      type: "setDataFromBoardResponse",
-      payload: { boardResponse: board },
-    });
-    setOpponentOfferedDraw(false);
-  };
-
-  const handleRespondToDrawOffer = (response: RespondToDrawOfferRequest) => {
-    respondToDrawOffer(response)
-      .then((board: BoardResponse | null) => {
-        handleResponseFromDrawOffer(board);
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
-  };
-
-  const handleOfferDraw = () => {
-    offerDraw(String(state.gameId))
-      .then((board: BoardResponse | null) => {
-        handleResponseFromDrawOffer(board);
       })
       .catch((err) => {
         throw new Error(err);

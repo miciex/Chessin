@@ -6,9 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/src/pages/LastGamePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/pages/LastGamePage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/src/pages/PlayWithFriendsMenuPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/pages/PlayWithFriendsMenuPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/src/services/userServices.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/services/userServices.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/features/socials/components/Invitation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/features/socials/components/Invitation.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/features/socials/components/InvitationToGame.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/features/socials/components/InvitationToGame.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/pages/PlayOnline.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/pages/PlayOnline.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,6 +109,7 @@
       <workItem from="1699179645657" duration="2078000" />
       <workItem from="1699196741901" duration="3451000" />
       <workItem from="1699208625322" duration="2071000" />
+      <workItem from="1699282699605" duration="1724000" />
     </task>
     <servers />
   </component>

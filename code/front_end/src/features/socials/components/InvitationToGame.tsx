@@ -39,6 +39,8 @@ const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
 
   const [user, setUser] = useState<User>();
 
+  let refresh = 0;
+
   useEffect(() => {
     getValueFor("user")
       .then((user) => {
@@ -48,7 +50,7 @@ const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
       .catch((err) => {
         throw new Error(err);
       });
-  });
+  }, [refresh]);
 
   const handleAnswerToGameInvitation = (request: HandleFriendInvitation) => {
     answerToGameInvitation(request)
@@ -99,6 +101,7 @@ const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
                   friendNickname: nick,
                   responseType: FriendInvitationResponseType.ACCEPT,
                 });
+                refresh++;
               }}
               color="green"
             />
@@ -111,6 +114,7 @@ const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
                   friendNickname: nick,
                   responseType: FriendInvitationResponseType.DECLINE,
                 });
+                refresh++;
               }}
               color="red"
             />
