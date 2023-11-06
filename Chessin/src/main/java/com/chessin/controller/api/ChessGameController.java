@@ -3,10 +3,7 @@ package com.chessin.controller.api;
 import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.*;
-import com.chessin.controller.responses.BoardResponse;
-import com.chessin.controller.responses.ChessGameResponse;
-import com.chessin.controller.responses.GameInvitationResponse;
-import com.chessin.controller.responses.MessageResponse;
+import com.chessin.controller.responses.*;
 import com.chessin.model.playing.*;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
 import com.chessin.model.playing.Glicko2.Repositories.BulletRatingRepository;
@@ -263,7 +260,10 @@ public class ChessGameController {
             disconnections.get(id).getListener().wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
-                return ResponseEntity.ok().body(DisconnectionStatus.DISCONNECTED);
+                return ResponseEntity.ok().body(DisconnectionResponse.builder()
+                        .disconnectionStatus(DisconnectionStatus.DISCONNECTED)
+                        .disconnectionTime(Constants.Application.DISCONNECTION_TIME)
+                        .build());
             else
                 return ResponseEntity.ok().body(DisconnectionStatus.FINE);
         }
