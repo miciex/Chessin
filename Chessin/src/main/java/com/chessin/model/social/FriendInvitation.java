@@ -23,5 +23,5 @@ public class FriendInvitation {
     private User user;
     @ManyToOne
     private User friend;
-    Instant date;
+    long date;
 }

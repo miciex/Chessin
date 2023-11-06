@@ -34,6 +34,7 @@ import {
   BoardResponse,
   BooleanMessageResponse,
   ChessGameResponse,
+  DisconnectionStatus,
   MessageResponse,
   RespondToDrawOfferRequest,
 } from "../utils/ServicesTypes";
@@ -72,6 +73,8 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [rotateBoard, setRotateBoard] = useState(false);
   const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
   const [opponentDisconnected, setOpponentDisconnected] = useState(false);
+  //TODO: show when opponent reconnects
+  //TODO: show timer when opponent disconnects
 
   const toggleSettings = () => {
     setShowSettings((prev) => !prev);
@@ -83,7 +86,6 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const opponentOfferedDrawTrue = () => {
     setOpponentOfferedDraw(true);
-    console.log("opponentOfferedDraw");
   };
 
   const opponentOfferedDrawFalse = () => {
@@ -132,57 +134,58 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const handleListenForResign = (gameId: string) => {
     listenForResignation(gameId)
-      .then((response: BoardResponse | null) => {
-        if (response === null) return;
-        dispatch({
-          type: "setDataFromBoardResponse",
-          payload: { boardResponse: response },
-        });
-      })
-      .catch((err) => {
-        throw new Error(err);
+    .then((response : BoardResponse | null) => {
+      if (response === null) return;
+      dispatch({
+        type: "setDataFromBoardResponse",
+        payload: { boardResponse: response },
       });
-  };
+    }).
+    catch((err) => {
+      throw new Error(err)
+    });
+  }
 
   const handleResign = (gameId: string) => {
     resign(gameId)
-      .then((response: BoardResponse | null) => {
-        if (response === null) return;
-        dispatch({
-          type: "setDataFromBoardResponse",
-          payload: { boardResponse: response },
-        });
-      })
-      .catch((err) => {
-        throw new Error(err);
+    .then((response : BoardResponse | null) => {
+      if (response === null) return;
+      dispatch({
+        type: "setDataFromBoardResponse",
+        payload: { boardResponse: response },
       });
-  };
+    }).
+    catch((err) => {
+      throw new Error(err)
+    });
+  }
 
   const handlePing = async (gameId: string) => {
     ping(gameId)
-      .then((response: MessageResponse | BoardResponse | null) => {
-        if (!response) {
-          //opponent reconnected
-          setOpponentDisconnected(false);
-          handleListenForDisconnect(gameId).catch((err) => {
-            throw new Error(err);
-          });
-        } else if ("message" in response) {
-          //opponent didn't disconnect
-          setOpponentDisconnected(false);
-        } else {
-          //opponent disconnected
+    .then(()=>(response :DisconnectionStatus| BoardResponse) => {
+      if(typeof response === "string"){
+        switch(response as DisconnectionStatus){
+        case DisconnectionStatus.DISCONNECTED:
           setOpponentDisconnected(true);
-          dispatch({
-            type: "setDataFromBoardResponse",
-            payload: { boardResponse: response },
-          });
-        }
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
+          break;
+        case DisconnectionStatus.RECONNECTED:
+          setOpponentDisconnected(false);
+          break;
+        case DisconnectionStatus.FINE:
+        case DisconnectionStatus.NO_CHANGE:
+          return;
+      }
+    }
+      else{
+        //opponent disconnected
+        setOpponentDisconnected(true);
+        dispatch({
+          type: "setDataFromBoardResponse",
+          payload: { boardResponse: response },
+        })
+      }
   };
+
 
   const handleListenForDisconnect = async (gameId: string) => {
     listenForDisconnections(gameId)

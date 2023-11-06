@@ -1,4 +1,4 @@
-export const baseLink = "http://192.168.10.136:8080/api/v1/";
+export const baseLink = "http://192.168.1.105:8080/api/v1/";
 export const authLink = `${baseLink}auth/`;
 export const registerLink = `${authLink}register`;
 export const authenticateLink = `${authLink}authenticate`;
@@ -20,8 +20,7 @@ export const chessGameLink = `${baseLink}game/`;
 export const searchNewGameLink = `${chessGameLink}searchNewGame`;
 export const cancelSearchLink = `${chessGameLink}cancelSearch`;
 export const submitMoveLink = `${chessGameLink}submitMove`;
-export const friendInvitation = `${userLink}respondToInvitation`;
-export const gameInvitation = `${userLink}respondToGameInvitation`;
+export const gameInvitation = `${chessGameLink}respondToGameInvitation`;
 export const addFriendLink = `${userLink}addFriend`;
 export const listenForFirstMoveLink = `${chessGameLink}listenForFirstMove/`;
 export const getGameByUsernameLink = `${chessGameLink}getGameByUsername/`;

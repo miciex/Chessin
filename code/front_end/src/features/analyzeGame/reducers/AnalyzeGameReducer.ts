@@ -13,7 +13,7 @@ import {
 } from "../../../utils/PlayerUtilities";
 import { Move, moveResponseToMove } from "../../../chess-logic/move";
 import { BoardResponse, ChessGameResponse } from "../../../utils/ServicesTypes";
-import { responseUser } from "../../../utils/PlayerUtilities";
+import { ResponseUser } from "../../../utils/PlayerUtilities";
 import { FenToIntArray, boardToMap } from "../../../chess-logic/helpMethods";
 
 export type AnalyzeGameState = {
@@ -40,7 +40,6 @@ export type AnalyzeGameState = {
 const chessGameResponseToAnalyzeGameState = (
   chessGameResponse: ChessGameResponse
 ): AnalyzeGameState => {
-  console.log(chessGameResponse.startBoard)
   return {
     id: chessGameResponse.id,
     whitePlayer: responseUserToPlayer(chessGameResponse.whiteUser, "white"),

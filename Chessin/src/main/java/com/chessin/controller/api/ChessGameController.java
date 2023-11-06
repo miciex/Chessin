@@ -3,10 +3,7 @@ package com.chessin.controller.api;
 import com.chessin.controller.playing.ChessGameService;
 import com.chessin.controller.register.UserService;
 import com.chessin.controller.requests.*;
-import com.chessin.controller.responses.BoardResponse;
-import com.chessin.controller.responses.ChessGameResponse;
-import com.chessin.controller.responses.GameInvitationResponse;
-import com.chessin.controller.responses.MessageResponse;
+import com.chessin.controller.responses.*;
 import com.chessin.model.playing.*;
 import com.chessin.model.playing.Glicko2.Repositories.BlitzRatingRepository;
 import com.chessin.model.playing.Glicko2.Repositories.BulletRatingRepository;
@@ -76,9 +73,6 @@ public class ChessGameController {
 
                 int whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
                 int blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
-
-//                whitePlayerIndex = 1;
-//                blackPlayerIndex = 0;
 
                 List<User> players = Arrays.asList(foundGame.getUser(), userRepository.findByEmail(email).get());
 
@@ -225,7 +219,7 @@ public class ChessGameController {
                     if(activeBoards.get(id).getMoves().size() < 2)
                         finishGame(id, Optional.of(GameResults.ABANDONED));
                     else
-                        finishGame(id, Optional.of(isWhite ? GameResults.BLACK_TIMEOUT : GameResults.WHITE_TIMEOUT));
+                        finishGame(id, Optional.of(isWhite ? GameResults.BLACK_DISCONNECTED : GameResults.WHITE_DISCONNECTED));
 
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                 }
@@ -265,7 +259,10 @@ public class ChessGameController {
             disconnections.get(id).getListener().wait(Constants.Application.WAIT_FOR_MOVE_TIME);
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
-                return ResponseEntity.ok().body(DisconnectionStatus.DISCONNECTED);
+                return ResponseEntity.ok().body(DisconnectionResponse.builder()
+                        .disconnectionStatus(DisconnectionStatus.DISCONNECTED)
+                        .disconnectionTime(Constants.Application.DISCONNECTION_TIME)
+                        .build());
             else
                 return ResponseEntity.ok().body(DisconnectionStatus.FINE);
         }
@@ -736,6 +733,9 @@ public class ChessGameController {
     public ResponseEntity<?> inviteFriend(@RequestBody GameInvitationRequest request, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
+        if(!userRepository.existsByNameInGame(request.getFriendNickname()))
+            return ResponseEntity.badRequest().body(MessageResponse.of("User not found."));
+
         String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
 
         if(activeGames.values().stream().anyMatch(game -> game.getWhiteUser().getEmail().equals(email) || game.getBlackUser().getEmail().equals(email)))
@@ -787,70 +787,73 @@ public class ChessGameController {
 
     @Transactional
     @PostMapping("/respondToGameInvitation")
-    public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet) throws InterruptedException {
+    public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(!userRepository.existsByNameInGame(request.getFriendNickname()))
+            return ResponseEntity.badRequest().body(MessageResponse.of("User not found."));
+
         String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
 
         if(!pendingInvitations.containsKey(friendEmail))
             return ResponseEntity.badRequest().body(MessageResponse.of("You have not been invited by this player."));
 
-        if(request.getResponseType() == ResponseType.ACCEPT)
+        synchronized(pendingInvitations.get(friendEmail))
         {
-            pendingInvitations.get(friendEmail).setFriend(userRepository.findByEmail(email).get());
+            if (request.getResponseType() == ResponseType.ACCEPT) {
+                pendingInvitations.get(friendEmail).setFriend(userRepository.findByEmail(email).get());
 
-            int whitePlayerIndex, blackPlayerIndex;
+                int whitePlayerIndex, blackPlayerIndex;
 
-            if(pendingInvitations.get(friendEmail).getPlayerColor() == PlayerColor.RANDOM)
-            {
-                whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
-                blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+                if (pendingInvitations.get(friendEmail).getPlayerColor() == PlayerColor.RANDOM) {
+                    whitePlayerIndex = ThreadLocalRandom.current().nextInt(2);
+                    blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+                } else {
+                    whitePlayerIndex = pendingInvitations.get(friendEmail).getPlayerColor() == PlayerColor.WHITE ? 0 : 1;
+                    blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
+                }
+
+                List<User> players = Arrays.asList(userRepository.findByEmail(friendEmail).get(), userRepository.findByEmail(email).get());
+
+                ChessGame game = ChessGame.builder()
+                        .startBoard(Constants.Boards.classicBoard)
+                        .whiteStarts(true)
+                        .whiteUser(players.get(whitePlayerIndex))
+                        .blackUser(players.get(blackPlayerIndex))
+                        .availableCastles(new int[]{0, 0, 0, 0})
+                        .timeControl(pendingInvitations.get(friendEmail).getTimeControl())
+                        .increment(pendingInvitations.get(friendEmail).getIncrement())
+                        .gameType(HelpMethods.getGameType(pendingInvitations.get(friendEmail).getTimeControl()))
+                        .startTime(Instant.now().toEpochMilli())
+                        .isRated(pendingInvitations.get(friendEmail).isRated())
+                        .gameResult(GameResults.NONE)
+                        .build();
+
+                chessGameRepository.save(game);
+
+                activeBoards.put(game.getId(), Board.fromGame(game));
+                activeGames.put(game.getId(), game);
+                disconnections.put(game.getId(), Disconnection.builder()
+                        .whiteDisconnected(false)
+                        .blackDisconnected(false)
+                        .realDisconnection(false)
+                        .ping(new Object())
+                        .listener(new Object())
+                        .build());
+
+                pendingInvitations.get(friendEmail).setId(game.getId());
+
+                pendingInvitations.get(friendEmail).notifyAll();
+
+                return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, userService));
             }
-            else
-            {
-                whitePlayerIndex = pendingInvitations.get(friendEmail).getPlayerColor() == PlayerColor.WHITE ? 0 : 1;
-                blackPlayerIndex = whitePlayerIndex == 0 ? 1 : 0;
-            }
-
-            List<User> players = Arrays.asList(userRepository.findByEmail(friendEmail).get(), userRepository.findByEmail(email).get());
-
-            ChessGame game = ChessGame.builder()
-                    .startBoard(Constants.Boards.classicBoard)
-                    .whiteStarts(true)
-                    .whiteUser(players.get(whitePlayerIndex))
-                    .blackUser(players.get(blackPlayerIndex))
-                    .availableCastles(new int[]{0, 0, 0, 0})
-                    .timeControl(pendingInvitations.get(friendEmail).getTimeControl())
-                    .increment(pendingInvitations.get(friendEmail).getIncrement())
-                    .gameType(HelpMethods.getGameType(pendingInvitations.get(friendEmail).getTimeControl()))
-                    .startTime(Instant.now().toEpochMilli())
-                    .isRated(pendingInvitations.get(friendEmail).isRated())
-                    .gameResult(GameResults.NONE)
-                    .build();
-
-            chessGameRepository.save(game);
-
-            activeBoards.put(game.getId(), Board.fromGame(game));
-            activeGames.put(game.getId(), game);
-            disconnections.put(game.getId(), Disconnection.builder()
-                    .whiteDisconnected(false)
-                    .blackDisconnected(false)
-                    .realDisconnection(false)
-                    .ping(new Object())
-                    .listener(new Object())
-                    .build());
-
-            pendingInvitations.get(friendEmail).setId(game.getId());
 
             pendingInvitations.get(friendEmail).notifyAll();
 
-            return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game, userService));
+            pendingInvitations.remove(friendEmail);
+
+            return ResponseEntity.ok().body(MessageResponse.of("Invitation responded."));
         }
-
-        pendingInvitations.get(friendEmail).notifyAll();
-
-        pendingInvitations.remove(friendEmail);
-
-        return ResponseEntity.ok().body(MessageResponse.of("Invitation responded."));
     }
 
     @Transactional

@@ -116,9 +116,6 @@ const styles = StyleSheet.create({
     flex: 8,
     alignItems: "center",
   },
-
-  endedGames: {},
-  endGame: {},
   buttonContainer: {
     margin: 12,
     height: 32,

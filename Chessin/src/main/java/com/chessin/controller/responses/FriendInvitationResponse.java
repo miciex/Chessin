@@ -1,5 +1,6 @@
 package com.chessin.controller.responses;
 
+import com.chessin.controller.register.UserService;
 import com.chessin.model.social.FriendInvitation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,14 +14,14 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FriendInvitationResponse {
-    private String nameInGame;
-    Date date;
+    private UserResponse user;
+    long date;
 
-    public static FriendInvitationResponse fromFriendInvitation(FriendInvitation friendInvitation, boolean isFriend){
+    public static FriendInvitationResponse fromFriendInvitation(FriendInvitation friendInvitation, UserService userService, boolean isFriend){
         return FriendInvitationResponse
                 .builder()
-                .nameInGame(isFriend ? friendInvitation.getUser().getNameInGame() : friendInvitation.getFriend().getNameInGame())
-                .date(Date.from(friendInvitation.getDate()))
+                .user(UserResponse.fromUser(isFriend ? friendInvitation.getUser() : friendInvitation.getFriend(), userService, false))
+                .date(friendInvitation.getDate())
                 .build();
     }
 }

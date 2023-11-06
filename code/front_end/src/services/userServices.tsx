@@ -1,8 +1,7 @@
 import AsynStorage from "@react-native-async-storage/async-storage";
-import { User, responseUser } from "../utils/PlayerUtilities";
+import { User, ResponseUser } from "../utils/PlayerUtilities";
 
 import {
-  friendInvitation,
   findUsersByNickname,
   getFriends,
   checkInvitationsLink,
@@ -11,10 +10,13 @@ import {
   checkSendedInvitationsLink,
   inviteToGameLink,
   checkInvitationsToGameLink,
+  respondtoInvitationLink,
 } from "../utils/ApiEndpoints";
 import {
   CodeVerificationRequest,
+  FriendInvitationResponse,
   FriendInvitationResponseType,
+  GameInvitationResponse,
   HandleFriendInvitation,
   HandleSearchBarSocials,
   InviteToGameRequest,
@@ -182,7 +184,6 @@ export const setUserDataFromResponse = async (
 
 export const addFriendFunc = async (request: FriendInvitationRequest) => {
   const accessToken = await getValueFor("accessToken");
-  console.log("s");
   const response = await fetch(addFriendLink, {
     method: "POST",
     headers: {
@@ -209,38 +210,18 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
 export const handleFriendInvitationFunc = async (
   request: HandleFriendInvitation
 ) => {
-  const accessToken = await getValueFor("accessToken");
-  const response = await fetch(friendInvitation, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(request),
-  })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error("Something went wrong on api server!");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-  return response;
+  return handlePost(respondtoInvitationLink, JSON.stringify(request)).catch(
+    (error) => {
+      throw new Error(error);
+    }
+  );
 };
 
-export const handleGameInvitation = async (
-  request: HandleFriendInvitation,
-  navigation: NativeStackNavigationProp<
-    RootStackParamList,
-    StackParamList,
-    undefined
-  >
+export const answerToGameInvitation = async (
+  request: HandleFriendInvitation
 ) => {
-  return handlePost(gameInvitation, JSON.stringify(request)).catch(() => {
-    throw new Error("failed linijka 246");
+  return handlePost(gameInvitation, JSON.stringify(request)).catch((error) => {
+    throw new Error(error);
   });
 };
 
@@ -260,7 +241,7 @@ export async function handleSearchBarSocials(request: HandleSearchBarSocials) {
       if (response.status === 200) {
         return response.json().catch((error) => {
           throw new Error(error);
-        }) as unknown as Array<responseUser>;
+        }) as unknown as Array<ResponseUser>;
       } else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {
@@ -270,7 +251,6 @@ export async function handleSearchBarSocials(request: HandleSearchBarSocials) {
       }
     })
     .catch((error) => {
-      console.log("eror");
       console.error(error);
     });
   return response;
@@ -290,7 +270,7 @@ export const checkInvitations = async () => {
       if (response.status === 200) {
         return response.json().catch((error) => {
           throw new Error(error);
-        }) as unknown as Array<responseUser>;
+        }) as unknown as Array<FriendInvitationResponse>;
       } else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {
@@ -344,7 +324,7 @@ export const getFriendsList = async (nick: string) => {
       if (response.status === 200) {
         return response.json().catch((error) => {
           throw new Error(error);
-        }) as unknown as Array<responseUser>;
+        }) as unknown as Array<ResponseUser>;
       } else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {
@@ -372,10 +352,9 @@ export const checkSendedInvitations = async () => {
   })
     .then((response) => {
       if (response.status === 200) {
-        console.log("shit");
         return response.json().catch((error) => {
           throw new Error(error);
-        }) as unknown as Array<responseUser>;
+        }) as unknown as Array<ResponseUser>;
       } else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {
@@ -392,17 +371,15 @@ export const checkSendedInvitations = async () => {
 };
 
 export const inviteToGame = async (request: InviteToGameRequest) => {
-  console.log(request);
   return handlePost(inviteToGameLink, JSON.stringify(request)).catch(
     (error) => {
-      console.error(error);
+      throw new Error(error);
     }
   );
 };
 
 export const checkInvitationsToGame = async () => {
   const accessToken = await getValueFor("accessToken");
-  console.log("jost");
   const response = await fetch(checkInvitationsToGameLink, {
     method: "POST",
     headers: {
@@ -414,7 +391,7 @@ export const checkInvitationsToGame = async () => {
       if (response.status === 200) {
         return response.json().catch((error) => {
           throw new Error(error);
-        }) as unknown as Array<responseUser>;
+        }) as unknown as Array<GameInvitationResponse>;
       } else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {
