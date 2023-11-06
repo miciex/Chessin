@@ -216,6 +216,6 @@ export type GameInvitationResponse = {
 };
 
 export type FriendInvitationResponse = {
-  nameInGame: string;
+  user: ResponseUser;
   date: number;
 };

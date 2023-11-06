@@ -90,7 +90,7 @@ type Props = {
 };
 
 export default function Notification({ route, navigation }: Props) {
-  const [invitations, setInvitations] = useState<Array<FriendInvitationResponse>>([]);
+  const [invitations, setInvitations] = useState<Array<User>>([]);
   const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([]);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function Notification({ route, navigation }: Props) {
       console.log("check invite data: ");
       console.log(data);
       if (!data) return;
-      setInvitations(data);
+      setInvitations(data.map((x) => responseUserToUser(x.user, "")));
     });
 
     checkInvitationsToGame().then((data) => {
