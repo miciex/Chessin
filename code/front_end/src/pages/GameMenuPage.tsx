@@ -49,7 +49,7 @@ export default function GameMenu({ navigation }: Props) {
   const [gameBotType, setGameBotType] = useState<botType>("ChessinBot");
   const [gameBotStrength, setGameBotStrength] = useState<strengthLevelType>(1);
   const [chosenColor, setChosenColor] =
-    useState<PlayColorsContextType>("random");
+    useState<PlayColorsContextType>("RANDOM");
   const [user, setUser] = useState<User | null>(null);
 
   const setGame = (gmType: playType) => {
@@ -68,32 +68,8 @@ export default function GameMenu({ navigation }: Props) {
             <View style={styles.appContainer}>
               <View style={styles.contentContainer}>
                 <View style={styles.chooseGameContainer}>
-                  {/* {gameType === "Play With Bot" ? (
-                    <>
-                      <View style={styles.gameOptionsContainer}>
-                        <BotGameOptions
-                          setBotType={setBotType}
-                          setGameBotStrength={setGameBotStrength}
-                          handleChooseBotType={setBotType}
-                          navigation={navigation}
-                        />
-                      </View>
-                      <View style={styles.pickColorContainer}>
-                        <View style={styles.pickColorInnerContainer}>
-                          <PickColor handleOnClick={setChosenColor} />
-                        </View>
-                      </View>
-                    </>
-                  ) : ( */}
                     <PlayOnlineOptions navigation={navigation} user={user} />
-                  {/* )} */}
                 </View>
-                {/* <View style={styles.bottomButtonsContainer}>
-                  <BottomButtons
-                    navigation={navigation}
-                    handleSetType={setGame}
-                  />
-                </View> */}
               </View>
               <Footer navigation={navigation} />
             </View>

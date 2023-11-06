@@ -23,6 +23,7 @@ import { GameType } from "../chess-logic/board";
 import { setPendingGameRequest } from "../features/playOnline/services/playOnlineService";
 import { inviteToGameLink } from "../utils/ApiEndpoints";
 import { inviteToGame } from "../services/userServices";
+import { ChessGameResponse } from "../utils/ServicesTypes";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -70,7 +71,6 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
 
   const handlePressRanked = () => {
     setIsEnabled(!isEnabled);
-    console.log(isEnabled, " cjik");
   };
   return (
     <View style={{ width: "100%", height: "100%" }}>
@@ -142,7 +142,6 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                   <BaseButton
                     handlePress={() => {
                       if (!user) return;
-                      console.log(isEnabled, " wartosc isRated");
                       let request = {
                         friendNickname: user2 ? user2.nameInGame : "",
                         timeControl: gameTempo.totalTime,
@@ -151,10 +150,10 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                         playerColor: chosenColor,
                       };
 
-                      console.log(typeof isEnabled, "typ zmiennej");
-
-                      inviteToGame(request);
+                      inviteToGame(request).then((response:null|ChessGameResponse) => {
+                        if(!response) return;
                       navigation.navigate("PlayOnline");
+                      });
                     }}
                     text="Graj"
                     fontSizeProps={30}

@@ -789,6 +789,10 @@ public class ChessGameController {
     @PostMapping("/respondToGameInvitation")
     public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
+
+        if(!userRepository.existsByNameInGame(request.getFriendNickname()))
+            return ResponseEntity.badRequest().body(MessageResponse.of("User not found."));
+
         String friendEmail = userRepository.findByNameInGame(request.getFriendNickname()).get().getEmail();
 
         if(!pendingInvitations.containsKey(friendEmail))

@@ -150,7 +150,6 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           }
           setUser2(user);
           checkSendedInvitations().then((data) =>{ 
-            console.log("data")
             if(data === undefined) return
             setSendedInvitations(data.map(x => responseUserToUser(x, "")))
           })
@@ -216,7 +215,6 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
       setFriends(data.map(x => responseUserToUser(x, "")))
     })
 
-    console.log("Shit")
     checkInvitations().then((data) =>{ 
       if(data === undefined) return
       setInvitations(data.map(x => responseUserToUser(x, "")))

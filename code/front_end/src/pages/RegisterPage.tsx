@@ -147,7 +147,6 @@ export default function Register({ navigation }: Props) {
   const onSubmit = () => {
     setInputsValid();
     if (!areInputsValid()) return;
-    console.log("registering");
     register({
       email,
       password,
@@ -157,7 +156,6 @@ export default function Register({ navigation }: Props) {
       country: country.Name,
     })
       .then((response) => {
-        console.log("response status: " + response.status);
         if (response.status === 200) {
           navigation.navigate("UserNotAuthenticated");
         } else if (response.status === 202) {

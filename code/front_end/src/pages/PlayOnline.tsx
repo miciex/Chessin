@@ -73,6 +73,8 @@ export default function PlayOnline({ navigation, route }: Props) {
   const [rotateBoard, setRotateBoard] = useState(false);
   const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
   const [opponentDisconnected, setOpponentDisconnected] = useState(false);
+  //TODO: show when opponent reconnects
+  //TODO: show timer when opponent disconnects
 
   const toggleSettings = () => {
     setShowSettings((prev) => !prev);
@@ -84,7 +86,6 @@ export default function PlayOnline({ navigation, route }: Props) {
 
   const opponentOfferedDrawTrue = () => {
     setOpponentOfferedDraw(true);
-    console.log("opponentOfferedDraw")
   };
 
   const opponentOfferedDrawFalse = () => {

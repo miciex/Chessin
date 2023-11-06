@@ -85,7 +85,6 @@ export default function RemindPasswordPage({
       email,
       newPassword,
     };
-    console.log("handling remind password request");
     remindPassword(request)
       .then((response) => {
         if (response.status === 202) {

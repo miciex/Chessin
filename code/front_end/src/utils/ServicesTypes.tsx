@@ -1,4 +1,4 @@
-import { responseUser } from "./PlayerUtilities";
+import { PlayColor, ResponseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
 import { GameResults, GameType } from "../chess-logic/board";
 import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColorContext";
@@ -50,8 +50,8 @@ export type PendingChessGameRequest = {
 
 export type ChessGameResponse = {
   id: number;
-  whiteUser: responseUser;
-  blackUser: responseUser;
+  whiteUser: ResponseUser;
+  blackUser: ResponseUser;
   moves: Array<MoveResponse>;
   availableCastles: Array<number>;
   timeControl: number;
@@ -195,8 +195,27 @@ export type MessageResponse = {
 
 export type BooleanMessageResponse = {
   message: "True" | "False";
-}
+};
 
 export const enum DisconnectionStatus {
-  FINE = "FINE", DISCONNECTED="DISCONNECTED", RECONNECTED="RECONNECTED", NO_CHANGE = "NO_CHANGE"
+  FINE = "FINE",
+  DISCONNECTED = "DISCONNECTED",
+  RECONNECTED = "RECONNECTED",
+  NO_CHANGE = "NO_CHANGE",
 }
+
+export type GameInvitationResponse = {
+  id: number;
+  user: ResponseUser;
+  friend: ResponseUser;
+  date: number;
+  timeControl: number;
+  increment: number;
+  isRated: boolean;
+  playerColor: PlayColor;
+};
+
+export type FriendInvitationResponse = {
+  nameInGame: string;
+  date: number;
+};

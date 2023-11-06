@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../../utils/Constants'
 import { ColorsPallet } from '../../../utils/Constants'
 import { getFriendsList } from '../../../services/userServices'
-import { User, responseUserToPlayer, responseUserToUser } from '../../../utils/PlayerUtilities'
+import { User, responseUserToUser } from '../../../utils/PlayerUtilities'
 
 
 

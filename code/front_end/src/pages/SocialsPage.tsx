@@ -11,7 +11,7 @@ import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
 import { handleSearchBarSocials, setUserDataFromResponse } from "../services/userServices";
 import { HandleSearchBarSocials } from "../utils/ServicesTypes";
-import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
+import { responseUserToUser } from "../utils/PlayerUtilities";
 import { User } from "../utils/PlayerUtilities";
 
 

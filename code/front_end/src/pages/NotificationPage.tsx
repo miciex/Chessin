@@ -15,6 +15,7 @@ import {
   checkInvitationsToGame,
 } from "../services/userServices";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
+import { FriendInvitationResponse } from "../utils/ServicesTypes";
 
 const ended_games = [
   {
@@ -89,26 +90,25 @@ type Props = {
 };
 
 export default function Notification({ route, navigation }: Props) {
-  const [invitations, setInvitations] = useState<Array<User>>([]);
+  const [invitations, setInvitations] = useState<Array<FriendInvitationResponse>>([]);
   const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([]);
 
   useEffect(() => {
-    console.log("fuck");
 
     checkInvitations().then((data) => {
       console.log("check invite data: ");
       console.log(data);
       if (!data) return;
-      setInvitations(data.map((x) => responseUserToUser(x, "")));
+      setInvitations(data);
     });
 
     checkInvitationsToGame().then((data) => {
-      console.log("check invite data: ");
+      console.log("invitations")
       console.log(data);
       if (!data) return;
-      setInvitationsToGame(data.map((x) => responseUserToUser(x, "")));
+      setInvitationsToGame(data.map((x) => responseUserToUser(x.user, "")));
     });
-  }, [invitations, invitationsToGame]);
+  }, []);
   return (
     <View style={styles.appContainer}>
       <ScrollView>
@@ -148,7 +148,4 @@ const styles = StyleSheet.create({
     flex: 8,
     alignItems: "center",
   },
-
-  endedGames: {},
-  endGame: {},
 });

@@ -211,7 +211,7 @@ export default function Piece({
         const endField =
           Math.round((position.x + gestureState.dx) / SIZE) +
           Math.round((position.y + gestureState.dy) / SIZE) * 8;
-        if (isPossibleMove(rotateBoard ? 63 - endField : endField) && isMyTurn) {
+        if (isPossibleMove(endField) && isMyTurn) {
           if (ableToMove){
           const move = moveFactory({
             pieces: state.board.position,

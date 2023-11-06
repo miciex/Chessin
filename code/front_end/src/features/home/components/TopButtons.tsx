@@ -13,7 +13,6 @@ type Props = {
 };
 
 export default function TopButtons({ navigation, user }: Props) {
-  console.log(user)
   return (
     <View style={styles.topButtonsContainer}>
       {user?
