@@ -21,7 +21,7 @@ export default function UserNotAuthenticatedPage({ navigation }: Props) {
         .then((value) => {
           if (value) {
             clearInterval(interval);
-            navigation.navigate("Home");
+            navigation.replace("Home");
           }
         })
         .catch((err) => {
@@ -32,7 +32,7 @@ export default function UserNotAuthenticatedPage({ navigation }: Props) {
         .then((value) => {
           if (value) {
             clearInterval(interval);
-            navigation.navigate("Home");
+            navigation.replace("Home");
           }
         })
         .catch((err) => {
