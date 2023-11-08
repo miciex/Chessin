@@ -59,6 +59,7 @@ export default function Login({ navigation }: Props) {
 
   const onSubmit = () => {
     if (!isDataValid()) return;
+    console.log("s");
     login({ email, password })
       .then((response) => {
         if (response.status === 200) {

@@ -24,6 +24,9 @@ import { FriendInvitationResponseType } from "../utils/ServicesTypes";
 import LogoutButton from "../components/LogoutButton";
 import { getGameHistory } from "../services/chessGameService";
 import { ChessGameResponse } from "../utils/ServicesTypes";
+import { BounceOutDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { AnimatedScrollView } from "react-native-reanimated/lib/typescript/reanimated2/component/ScrollView";
 const ended_games = [
   {
     date: "01.10.2022",
@@ -174,32 +177,49 @@ export default function ProfilePage({
     }
   }, [nameInGame, user, refresh]);
 
-  let component = userGames.slice(0, 5).map((game) => (
-    <View style={{ width: "90%" }}>
-      <EndedGame
-        nick={
-          game.whiteUser.nameInGame === user?.nameInGame
-            ? game.blackUser.nameInGame
-            : game.whiteUser.nameInGame
-        }
-        rank={
-          game.whiteUser.nameInGame === user?.nameInGame
-            ? game.blackRating
-            : game.whiteRating
-        }
-        result={game.gameResult}
-        navigation={navigation}
-        key={`${game.id}${user?.nameInGame}`}
-        date={new Date(game.startTime)}
-        gameId={game.id}
-        myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
-        whiteToMove={
-          (game.whiteStarts && game.moves.length % 2 === 0) ||
-          (game.moves.length % 2 === 1 && !game.whiteStarts)
-        }
-      />
-    </View>
-  ));
+  let component;
+
+  component =
+    userGames.length > 0 ? (
+      userGames.slice(0, 5).map((game) => (
+        <View style={{ width: "90%" }}>
+          <EndedGame
+            nick={
+              game.whiteUser.nameInGame === user?.nameInGame
+                ? game.blackUser.nameInGame
+                : game.whiteUser.nameInGame
+            }
+            rank={
+              game.whiteUser.nameInGame === user?.nameInGame
+                ? game.blackRating
+                : game.whiteRating
+            }
+            result={game.gameResult}
+            navigation={navigation}
+            key={`${game.id}${user?.nameInGame}`}
+            date={new Date(game.startTime)}
+            gameId={game.id}
+            myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
+            whiteToMove={
+              (game.whiteStarts && game.moves.length % 2 === 0) ||
+              (game.moves.length % 2 === 1 && !game.whiteStarts)
+            }
+          />
+        </View>
+      ))
+    ) : (
+      <View style={{ padding: 40 }}>
+        <Text
+          style={{
+            color: ColorsPallet.baseColor,
+            fontSize: 20,
+            textAlign: "center",
+          }}
+        >
+          No Old Games Yet
+        </Text>
+      </View>
+    );
 
   const playWithFriend = () => {
     let userArg: User;
@@ -257,8 +277,8 @@ export default function ProfilePage({
   }, [nameInGame, user?.nameInGame]);
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
+    <ScrollView style={{ backgroundColor: ColorsPallet.light }}>
+      <Animated.View style={styles.container}>
         <View style={styles.profile}>
           <Profile
             nick={user2 ? user2.nameInGame : user ? user.nameInGame : ""}
@@ -337,10 +357,7 @@ export default function ProfilePage({
           stringNavigation={toOldGames}
         />
         <View style={{ width: "85%" }}>{component}</View>
-        <View style={{ width: "85%" }}>{component}</View>
-        <View style={{ width: "85%" }}>{component}</View>
-        <View style={{ width: "85%" }}>{component}</View>
-      </View>
+      </Animated.View>
     </ScrollView>
   );
 }
