@@ -7,6 +7,7 @@ export const ColorsPallet = {
   gray: "#bbbbbb",
   green: "#00ff00",
   red: "#ff0000",
+  yellow: "#f4f72d"
 };
 
 export type StackParamList =
@@ -32,7 +33,7 @@ export const emailRegex: RegExp = new RegExp(
   /^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/
 );
 export const nameRegex: RegExp = new RegExp(
-  /^([ \u00c0-\u01ffa-zA-Z'\-]){3,}$/
+  /^([ \u00c0-\u01ffa-zA-Z'\-]){3,20}$/
 );
 export const passwordRegex: RegExp = new RegExp(
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{12,}$/

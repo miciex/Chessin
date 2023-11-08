@@ -93,6 +93,10 @@ public class ChessGameService {
         }
         else
         {
+            if(board.isWhiteTurn())
+                board.setWhiteTime(game.getTimeControl() + game.getIncrement());
+            else
+                board.setBlackTime(game.getTimeControl() + game.getIncrement());
             move.setRemainingTime(game.getTimeControl() + game.getIncrement());
         }
 

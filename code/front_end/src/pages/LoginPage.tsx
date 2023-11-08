@@ -102,7 +102,7 @@ export default function Login({ navigation }: Props) {
         .then((data) => {
           setUserDataFromResponse(data)
             .then(() => {
-              navigation.navigate("Home");
+              navigation.replace("Home");
             })
             .catch((err) => {
               throw new Error(err);
