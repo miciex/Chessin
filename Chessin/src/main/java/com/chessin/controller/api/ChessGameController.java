@@ -84,12 +84,12 @@ public class ChessGameController {
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(foundGame.getTimeControl())
                         .increment(foundGame.getIncrement())
-                        .gameType(HelpMethods.getGameType(foundGame.getTimeControl()))
+                        .gameType(HelpMethods.getGameType(foundGame.getTimeControl(), foundGame.getIncrement()))
                         .startTime(Instant.now().toEpochMilli())
                         .isRated(foundGame.isRated())
                         .gameResult(GameResults.NONE)
-                        .whiteRating(userService.getRating(players.get(whitePlayerIndex), HelpMethods.getGameType(foundGame.getTimeControl())))
-                        .blackRating(userService.getRating(players.get(blackPlayerIndex), HelpMethods.getGameType(foundGame.getTimeControl())))
+                        .whiteRating(userService.getRating(players.get(whitePlayerIndex), HelpMethods.getGameType(foundGame.getTimeControl(), foundGame.getIncrement())))
+                        .blackRating(userService.getRating(players.get(blackPlayerIndex), HelpMethods.getGameType(foundGame.getTimeControl(), foundGame.getIncrement())))
                         .build();
 
                 chessGameRepository.save(game);
@@ -210,7 +210,7 @@ public class ChessGameController {
                     disconnections.get(id).getListener().notifyAll();
                 }
 
-                disconnections.get(id).getPing().wait(Constants.Application.DISCONNECTION_TIME);
+                disconnections.get(id).getPing().wait(HelpMethods.getDisconnectionTime(activeGames.get(id).getGameType()));
 
                 if(!disconnections.containsKey(id))
                     return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
@@ -257,12 +257,12 @@ public class ChessGameController {
 
         synchronized(disconnections.get(id).getListener())
         {
-            disconnections.get(id).getListener().wait(Constants.Application.WAIT_FOR_MOVE_TIME);
+            disconnections.get(id).getListener().wait(Constants.Application.LISTEN_TIME);
 
             if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
                 return ResponseEntity.ok().body(DisconnectionResponse.builder()
                         .disconnectionStatus(DisconnectionStatus.DISCONNECTED)
-                        .disconnectionTime(Constants.Application.DISCONNECTION_TIME)
+                        .disconnectionTime(HelpMethods.getDisconnectionTime(activeGames.get(id).getGameType()))
                         .build());
             else
                 return ResponseEntity.ok().body(DisconnectionStatus.FINE);
@@ -280,7 +280,7 @@ public class ChessGameController {
 
         synchronized(activeGames.get(request.getGameId()))
         {
-            activeGames.get(request.getGameId()).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
+            activeGames.get(request.getGameId()).wait(Constants.Application.LISTEN_TIME);
 
             if(!activeBoards.containsKey(request.getGameId()))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
@@ -310,7 +310,7 @@ public class ChessGameController {
 
         synchronized(activeGames.get(id))
         {
-            activeGames.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
+            activeGames.get(id).wait(Constants.Application.LISTEN_TIME);
 
             if(activeBoards.containsKey(id))
             {
@@ -425,7 +425,7 @@ public class ChessGameController {
 
         synchronized(activeBoards.get(id))
         {
-            activeBoards.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
+            activeBoards.get(id).wait(Constants.Application.LISTEN_TIME);
 
             if(!activeBoards.containsKey(id))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
@@ -503,7 +503,7 @@ public class ChessGameController {
 
         synchronized(activeBoards.get(id))
         {
-            activeBoards.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
+            activeBoards.get(id).wait(Constants.Application.LISTEN_TIME);
 
             if(activeBoards.containsKey(id))
             {
@@ -551,7 +551,7 @@ public class ChessGameController {
                 activeBoards.get(id).setBlackOffersDraw(true);
 
             activeBoards.get(id).notifyAll();
-            activeBoards.get(id).wait(Constants.Application.WAIT_FOR_MOVE_TIME);
+            activeBoards.get(id).wait(Constants.Application.LISTEN_TIME);
 
             if(activeBoards.containsKey(id))
             {
@@ -825,7 +825,7 @@ public class ChessGameController {
                         .availableCastles(new int[]{0, 0, 0, 0})
                         .timeControl(pendingInvitations.get(friendEmail).getTimeControl())
                         .increment(pendingInvitations.get(friendEmail).getIncrement())
-                        .gameType(HelpMethods.getGameType(pendingInvitations.get(friendEmail).getTimeControl()))
+                        .gameType(HelpMethods.getGameType(pendingInvitations.get(friendEmail).getTimeControl(), pendingInvitations.get(friendEmail).getIncrement()))
                         .startTime(Instant.now().toEpochMilli())
                         .isRated(pendingInvitations.get(friendEmail).isRated())
                         .gameResult(GameResults.NONE)
