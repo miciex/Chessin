@@ -20,15 +20,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -778,6 +776,22 @@ public class ChessGameService {
                     return endBoard;
                 }
             }
+        }
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 5000)
+    public void handleGames()
+    {
+        List<Board> boards = activeBoards.values().stream().filter(x -> x.getMoves().size() <= 2).toList();
+
+        for(Board board : boards)
+        {
+           if(Instant.now().toEpochMilli() - board.getLastMoveTime() >= HelpMethods.getDisconnectionTime(board.getGameType()))
+           {
+               finishGame(board.getGameId(), Optional.of(GameResults.ABANDONED));
+               clearGame(board.getGameId());
+           }
         }
     }
 }

@@ -14,7 +14,6 @@ public class Constants {
     public static class Application
     {
         public static final int GAME_SEARCH_TIME = 1000 * 60 * 60;
-        public static final int WAIT_FOR_MOVE_TIME = 1000 * 60 * 60;
         public static final int WAIT_FOR_PING_TIME = 1000 * 10;
         public static final int LISTEN_TIME = 1000 * 60 * 60 * 24;
         public static final int TIMEOUT = 100;

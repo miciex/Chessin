@@ -21,25 +21,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
-
-import static java.util.stream.Collectors.toList;
-
 @RestController
 @RequestMapping("/api/v1/game")
 @RequiredArgsConstructor
 public class ChessGameController {
-    private final ChessGameRepository chessGameRepository;
     private final ChessGameService service;
-    private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final UserService userService;
 
     @Transactional
     @PostMapping("/searchNewGame")
