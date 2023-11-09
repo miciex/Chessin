@@ -171,7 +171,7 @@ export default function Register({ navigation }: Props) {
 
   const handleVerifyCodeResponse = async (response: Response) => {
     if (response.status === 200) {
-      navigation.navigate("Home");
+      navigation.replace("Home");
     } else if (response.status === 400) {
       response
         .text()

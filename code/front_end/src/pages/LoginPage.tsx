@@ -63,7 +63,7 @@ export default function Login({ navigation }: Props) {
     login({ email, password })
       .then((response) => {
         if (response.status === 200) {
-          navigation.navigate("Home");
+          navigation.replace("Home");
           return response.json();
         } else if (response.status === 202) {
           setShowAuthCode(true);

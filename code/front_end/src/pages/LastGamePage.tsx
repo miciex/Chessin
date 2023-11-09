@@ -36,7 +36,9 @@ export default function LastGame({ navigation }: Props) {
         setGamesPage((prev) => prev + 1);
         setUserGames((prev) => [...prev, ...data]);
       }
-    );
+    ).catch((error) => {
+      throw new Error(error);
+    });
   };
 
   const handleGetMoreGames = () => {
@@ -61,8 +63,9 @@ export default function LastGame({ navigation }: Props) {
 
   return (
     <View style={styles.appContainer}>
-      <ScrollView>
-        <View style={styles.contentContainer}>
+      <View style={styles.contentContainer}>
+      <ScrollView contentContainerStyle={{width:"100%", justifyContent: "center", alignItems: "center"}}>
+        
           <Heading text={"Old Games"} />
           {userGames.map((game, index) => (
             <View style={{ width: "90%" }}>
@@ -98,8 +101,9 @@ export default function LastGame({ navigation }: Props) {
               color="transparent"
             />
           </View>
-        </View>
+        
       </ScrollView>
+      </View>
       <Footer navigation={navigation} />
     </View>
   );
@@ -107,14 +111,13 @@ export default function LastGame({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   appContainer: {
-    flex: 1,
-    alignContent: "stretch",
+    flex: 7,
+    // alignContent: "stretch",
     backgroundColor: ColorsPallet.light,
   },
   contentContainer: {
     marginTop: 12,
     flex: 8,
-    alignItems: "center",
   },
   buttonContainer: {
     margin: 12,

@@ -129,7 +129,7 @@ export default function ResetPasswordPage({
         .text()
         .then(() => {
           logoutUser();
-          navigation.navigate("Home");
+          navigation.replace("Home");
         })
         .catch((err: any) => {
           throw new Error(err);
