@@ -11,6 +11,7 @@ import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
 
 public class HelpMethods {
+
     public static int[] getPositionFromHashmap(HashMap<Integer, Integer> pieces)
     {
         int[] position = new int[64];
@@ -78,15 +79,25 @@ public class HelpMethods {
         return -1;
     }
 
-    public static GameType getGameType(long timeControl)
+    public static GameType getGameType(long timeControl, long increment)
     {
-        if(timeControl >= 3600000)
+        if(timeControl + (25 * increment) >= 3600000)
             return GameType.CLASSICAL;
-        else if(timeControl > 600000)
+        else if(timeControl + (25 * increment) > 600000)
             return GameType.RAPID;
-        else if(timeControl >= 180000)
+        else if(timeControl + (25 * increment) >= 180000)
             return GameType.BLITZ;
         else
             return GameType.BULLET;
+    }
+
+    public static int getDisconnectionTime(GameType gameType)
+    {
+        return switch (gameType) {
+                    case CLASSICAL -> 120000;
+                    case RAPID -> 60000;
+                    case BLITZ -> 30000;
+                    case BULLET -> 20000;
+                };
     }
 }

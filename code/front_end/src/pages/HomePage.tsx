@@ -103,7 +103,7 @@ const HomePage = ({ navigation }: Props) => {
         isUserPlaying(parsedUser.nameInGame)
           .then((data: BooleanMessageResponse) => {
             if (!data) return;
-            if (data.message === "True") navigation.navigate("PlayOnline");
+            if (data.message === "True") navigation.replace("PlayOnline");
           })
           .catch((err) => {
             throw new Error(err);

@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class SubmitMoveRequest {
     private long gameId;
     private int movedPiece;

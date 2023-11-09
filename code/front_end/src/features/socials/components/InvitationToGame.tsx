@@ -56,7 +56,7 @@ const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
     answerToGameInvitation(request)
       .then((response: null | ChessGameResponse) => {
         if (!response) return;
-        navigation.navigate("PlayOnline");
+        navigation.replace("PlayOnline");
       })
       .catch((err) => {
         throw new Error(err);
