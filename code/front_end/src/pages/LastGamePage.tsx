@@ -1,5 +1,5 @@
 import { View, StyleSheet, ScrollView } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import EndedGame from "../features/home/components/EndedGame";
 import { ColorsPallet } from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -7,6 +7,7 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Footer from "../components/Footer";
 import Heading from "../components/Heading";
+
 import { User } from "../utils/PlayerUtilities";
 import { ChessGameResponse } from "../utils/ServicesTypes";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
@@ -28,17 +29,18 @@ export default function LastGame({ navigation }: Props) {
   const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
   const [gamesPage, setGamesPage] = useState<number>(0);
 
-
-  const updateGamesPage = (nameInGame:string) => {
-    getPagedGames(nameInGame, gamesPage).then((data:ChessGameResponse[]|null) => {
-      if(!data) return;
-      setGamesPage((prev) => prev + 1);
-      setUserGames(prev => [...prev, ...data]);
-    });
+  const updateGamesPage = (nameInGame: string) => {
+    getPagedGames(nameInGame, gamesPage).then(
+      (data: ChessGameResponse[] | null) => {
+        if (!data) return;
+        setGamesPage((prev) => prev + 1);
+        setUserGames((prev) => [...prev, ...data]);
+      }
+    );
   };
 
   const handleGetMoreGames = () => {
-    if(!user) return;
+    if (!user) return;
     updateGamesPage(user.nameInGame);
   };
 
@@ -61,19 +63,30 @@ export default function LastGame({ navigation }: Props) {
     <View style={styles.appContainer}>
       <ScrollView>
         <View style={styles.contentContainer}>
-          <Heading text={"Game History"} />
-          {userGames.map((game) => (
+          <Heading text={"Old Games"} />
+          {userGames.map((game, index) => (
             <View style={{ width: "90%" }}>
               <EndedGame
-                nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
-                rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
+                nick={
+                  game.whiteUser.nameInGame === user?.nameInGame
+                    ? game.blackUser.nameInGame
+                    : game.whiteUser.nameInGame
+                }
+                rank={
+                  game.whiteUser.nameInGame === user?.nameInGame
+                    ? game.blackRating
+                    : game.whiteRating
+                }
                 result={game.gameResult}
                 navigation={navigation}
                 key={`${game.id}${user?.nameInGame}`}
                 date={new Date(game.startTime)}
                 gameId={game.id}
                 myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
-                whiteToMove={game.whiteStarts&&game.moves.length%2===0 || game.moves.length%2===1 && !game.whiteStarts}
+                whiteToMove={
+                  (game.whiteStarts && game.moves.length % 2 === 0) ||
+                  (game.moves.length % 2 === 1 && !game.whiteStarts)
+                }
               />
             </View>
           ))}
@@ -103,9 +116,9 @@ const styles = StyleSheet.create({
     flex: 8,
     alignItems: "center",
   },
-  buttonContainer:{
+  buttonContainer: {
     margin: 12,
     height: 32,
-    width: '50%'
+    width: "50%",
   },
 });

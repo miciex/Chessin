@@ -15,19 +15,18 @@ type Props = {
 export default function TopButtons({ navigation, user }: Props) {
   return (
     <View style={styles.topButtonsContainer}>
-      {user?
-      ""
-    :
-    <View style={styles.authenticationButtonsContainer}>
-      <View style={styles.authButtonContainer}>
-        <AuthenticateButton navigation={navigation} text="Register" />
-      </View>
-      <View style={styles.authButtonContainer}>
-        <AuthenticateButton navigation={navigation} text="Login" />
-      </View>
-    </View>
-    }
-      
+      {user ? (
+        ""
+      ) : (
+        <View style={styles.authenticationButtonsContainer}>
+          <View style={styles.authButtonContainer}>
+            <AuthenticateButton navigation={navigation} text="Register" />
+          </View>
+          <View style={styles.authButtonContainer}>
+            <AuthenticateButton navigation={navigation} text="Login" />
+          </View>
+        </View>
+      )}
 
       <View style={styles.playButtonsContainer}>
         <View style={styles.playButtonContainer}>

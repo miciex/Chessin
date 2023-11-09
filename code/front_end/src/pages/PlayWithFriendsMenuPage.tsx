@@ -1,4 +1,4 @@
-import { View, StyleSheet, Switch } from "react-native";
+import { View, StyleSheet, Switch, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 <FontAwesome5 name="medal" size={24} color="black" />;
@@ -73,7 +73,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
     setIsEnabled(!isEnabled);
   };
   return (
-    <View style={{ width: "100%", height: "100%" }}>
+    <ScrollView style={{ width: "100%", height: "100%" }}>
       <PlayColorsContext.Provider value={chosenColor}>
         <View style={styles.appContainer}>
           {timerModalOpen ? (
@@ -150,10 +150,12 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                         playerColor: chosenColor,
                       };
 
-                      inviteToGame(request).then((response:null|ChessGameResponse) => {
-                        if(!response) return;
-                      navigation.navigate("PlayOnline");
-                      });
+                      inviteToGame(request).then(
+                        (response: null | ChessGameResponse) => {
+                          if (!response) return;
+                          navigation.navigate("PlayOnline");
+                        }
+                      );
                     }}
                     text="Graj"
                     fontSizeProps={30}
@@ -166,7 +168,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
           <Footer navigation={navigation} />
         </View>
       </PlayColorsContext.Provider>
-    </View>
+    </ScrollView>
   );
 }
 

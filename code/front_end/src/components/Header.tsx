@@ -32,7 +32,6 @@ export default function Header({ navigation }: Props) {
             color="black"
             style={styles.headerImage}
           />
-           
         </Pressable>
         <Pressable
           onPress={() => {
@@ -45,7 +44,6 @@ export default function Header({ navigation }: Props) {
             color="black"
             style={styles.headerImage}
           />
-           
         </Pressable>
       </View>
     </View>

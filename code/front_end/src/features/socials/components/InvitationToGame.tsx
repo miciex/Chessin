@@ -13,7 +13,10 @@ import {
   fetchUser,
   handleFriendInvitationFunc,
 } from "../../../services/userServices";
-import { ChessGameResponse, FriendInvitationResponseType } from "../../../utils/ServicesTypes";
+import {
+  ChessGameResponse,
+  FriendInvitationResponseType,
+} from "../../../utils/ServicesTypes";
 import { User } from "../../../utils/PlayerUtilities";
 import { getValueFor } from "../../../utils/AsyncStoreFunctions";
 import { HandleFriendInvitation } from "../../../utils/ServicesTypes";
@@ -29,32 +32,36 @@ type Props = {
   >;
 };
 
-const InvitationToGame = ({ email, nick, rank, navigation }: Props) => { 
+const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
   const goToFriendsProfile = () => {
     navigation.navigate("ProfilePage", { nameInGame: nick });
   };
 
   const [user, setUser] = useState<User>();
 
+  let refresh = 0;
+
   useEffect(() => {
-    getValueFor("user").then((user) => {
-      if(!user ) return;
-      setUser(JSON.parse(user));
-    })
-    .catch((err) => {
-      throw new Error(err)});
-  });
+    getValueFor("user")
+      .then((user) => {
+        if (!user) return;
+        setUser(JSON.parse(user));
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  }, [refresh]);
 
   const handleAnswerToGameInvitation = (request: HandleFriendInvitation) => {
     answerToGameInvitation(request)
-      .then((response:null|ChessGameResponse) => {
-        if(!response) return;
+      .then((response: null | ChessGameResponse) => {
+        if (!response) return;
         navigation.navigate("PlayOnline");
       })
       .catch((err) => {
         throw new Error(err);
       });
-  }
+  };
 
   return (
     <View style={styles.record}>
@@ -90,12 +97,11 @@ const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
             <BaseButton
               text="Accept"
               handlePress={() => {
-                handleAnswerToGameInvitation(
-                  {
-                    friendNickname: nick,
-                    responseType: FriendInvitationResponseType.ACCEPT,
-                  }
-                );
+                handleAnswerToGameInvitation({
+                  friendNickname: nick,
+                  responseType: FriendInvitationResponseType.ACCEPT,
+                });
+                refresh++;
               }}
               color="green"
             />
@@ -104,12 +110,11 @@ const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
             <BaseButton
               text="Reject"
               handlePress={() => {
-                handleAnswerToGameInvitation(
-                  {
-                    friendNickname: nick,
-                    responseType: FriendInvitationResponseType.DECLINE,
-                  }
-                );
+                handleAnswerToGameInvitation({
+                  friendNickname: nick,
+                  responseType: FriendInvitationResponseType.DECLINE,
+                });
+                refresh++;
               }}
               color="red"
             />

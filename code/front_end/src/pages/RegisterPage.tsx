@@ -270,20 +270,19 @@ export default function Register({ navigation }: Props) {
           </View>
         ) : null}
         {activeInput === "" ? (
-        <View style={styles.chooseCountryContainer}>
-          <ChooseCountry
-            isVisible={isCountryScollViewVisible}
-            setIsVisible={setIsCountryScollViewVisible}
-            setCountry={setCountry}
-            country={country}
-            setCountryValid={setCountryValid}
-          />
-        </View>
-        ):null
-}
+          <View style={styles.chooseCountryContainer}>
+            <ChooseCountry
+              isVisible={isCountryScollViewVisible}
+              setIsVisible={setIsCountryScollViewVisible}
+              setCountry={setCountry}
+              country={country}
+              setCountryValid={setCountryValid}
+            />
+          </View>
+        ) : null}
         {!isCountryScollViewVisible && activeInput === "" ? (
-        <Submit onSubmit={onSubmit} />)
-        :null}
+          <Submit onSubmit={onSubmit} />
+        ) : null}
       </View>
     </View>
   );

@@ -89,7 +89,7 @@ export default function RemindPasswordPage({
       .then((response) => {
         if (response.status === 202) {
           setLoggedIn(true);
-        }  else if (response.status === 400) {
+        } else if (response.status === 400) {
           response
             .text()
             .then((data) => {
@@ -215,10 +215,10 @@ export default function RemindPasswordPage({
           ></AuthInput>
         </>
         {activeInput === "" ? (
-        <View style={styles.submitButton}>
-          <BaseButton text="Submit" handlePress={handleSubmit} />
-        </View>)
-        :null}
+          <View style={styles.submitButton}>
+            <BaseButton text="Submit" handlePress={handleSubmit} />
+          </View>
+        ) : null}
       </View>
     </View>
   );

@@ -210,17 +210,17 @@ export const addFriendFunc = async (request: FriendInvitationRequest) => {
 export const handleFriendInvitationFunc = async (
   request: HandleFriendInvitation
 ) => {
-  return handlePost(respondtoInvitationLink,JSON.stringify(request))
-  .catch((error) => {
-    throw new Error(error);
-  });
+  return handlePost(respondtoInvitationLink, JSON.stringify(request)).catch(
+    (error) => {
+      throw new Error(error);
+    }
+  );
 };
 
 export const answerToGameInvitation = async (
   request: HandleFriendInvitation
 ) => {
-  return handlePost(gameInvitation,JSON.stringify(request))
-  .catch((error) => {
+  return handlePost(gameInvitation, JSON.stringify(request)).catch((error) => {
     throw new Error(error);
   });
 };
@@ -371,10 +371,11 @@ export const checkSendedInvitations = async () => {
 };
 
 export const inviteToGame = async (request: InviteToGameRequest) => {
-  return handlePost(inviteToGameLink,JSON.stringify(request))
-  .catch((error) => {
-    throw new Error(error);
-  });
+  return handlePost(inviteToGameLink, JSON.stringify(request)).catch(
+    (error) => {
+      throw new Error(error);
+    }
+  );
 };
 
 export const checkInvitationsToGame = async () => {
