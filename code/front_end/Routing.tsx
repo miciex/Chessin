@@ -41,9 +41,11 @@ export type RootStackParamList = {
   LastGame: undefined;
   Login: undefined;
   PlayBot: undefined;
-  PlayOnline: {
-    request: PendingChessGameRequest;
-  } | undefined;
+  PlayOnline:
+    | {
+        request: PendingChessGameRequest;
+      }
+    | undefined;
   PlayWithFriendsMenu: {
     userArg: User;
   };
@@ -89,12 +91,13 @@ const Routing = () => {
   useEffect(() => {
     resetAccessToken()
       .then(() => {
-        fetchandStoreUser().then(()=>{
+        fetchandStoreUser().then(() => {
           setUserAuthenticated();
         });
       })
       .catch((err) => {
         save("user", "");
+        console.log("coscos");
         setUserNotAuthenticated();
         throw new Error(err);
       });
@@ -134,12 +137,15 @@ const Routing = () => {
             children={(
               props: NativeStackScreenProps<RootStackParamList, "Home">
             ) => (
-              <HomePage {...props} setUserAuthenticated={setUserAuthenticated} />
+              <HomePage
+                {...props}
+                setUserAuthenticated={setUserAuthenticated}
+              />
             )}
             options={({ navigation }) => ({
               headerStyle: styles.header,
               headerTitle: () => getHeader(navigation),
-              headerBackVisible: false
+              headerBackVisible: false,
             })}
           />
           <Stack.Screen
@@ -294,7 +300,7 @@ const Routing = () => {
               headerStyle: styles.header,
               headerTitle: () => <NotAuthenticatedHeader />,
               headerBackVisible: false,
-              headerLeft: ()=> null
+              headerLeft: () => null,
             })}
           />
         </Stack.Navigator>
