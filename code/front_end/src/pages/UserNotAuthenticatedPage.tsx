@@ -24,7 +24,7 @@ export default function UserNotAuthenticatedPage({ navigation }: Props) {
             navigation.replace("Home");
           }
         })
-        .catch((err) => {
+        .catch(() => {
           throw new Error("User not authenticated");
         });
     const interval = setInterval(() => {
@@ -35,10 +35,10 @@ export default function UserNotAuthenticatedPage({ navigation }: Props) {
             navigation.replace("Home");
           }
         })
-        .catch((err) => {
+        .catch(() => {
           throw new Error("User not authenticated");
         });
-    }, 10000);
+    },2000);
     return () => clearInterval(interval);
   }, []);
 
