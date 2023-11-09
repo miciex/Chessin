@@ -55,7 +55,6 @@ export default function PlayerTimer({ state, isMyPlayer, dispatch }: Props) {
     ) {
       
       timeout = setTimeout(setDisconnectionTimer, 1000);
-      console.log("disconnection timer: " + state.disconnectionTimer.getTime());
       dispatch({
         type: "updateDisconnectionTimerByMillis",
         payload: -1000,

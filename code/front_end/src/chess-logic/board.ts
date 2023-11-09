@@ -710,9 +710,9 @@ export const unMovePiece = (
     move.movedPiece % 8 === Pieces.KING &&
     Math.abs(move.startField - move.endField) === 2
   ) {
-    newPosition[(move.startField / 8) * 8 + ((move.endField % 8) / 4) * 7] =
-      position[move.startField + (move.endField - move.startField) / 2];
-    delete newPosition[move.startField + (move.endField - move.startField) / 2];
+    newPosition[Math.floor(move.startField / 8) * 8 + Math.floor((move.endField % 8) / 4) * 7] =
+      position[move.startField + Math.floor((move.endField - move.startField) / 2)];
+    delete newPosition[move.startField + Math.floor((move.endField - move.startField) / 2)];
   }
   newPosition[move.startField] = move.movedPiece;
   delete newPosition[move.endField];
@@ -791,9 +791,11 @@ export const unMakeMove = (move: Move, board: Board): Board => {
 export const playMove = (move: Move, board: Board): Board => {
   board = makeMove(move, board);
   board.visualBoard = mapToBoard(board.position);
+  
   board.movesTo50MoveRule = draw50MoveRuleCheck(board);
   board.result = checkGameResult(board);
   board.whiteToMove = !board.whiteToMove;
+  console.log(board.visualBoard);
   return board;
 };
 

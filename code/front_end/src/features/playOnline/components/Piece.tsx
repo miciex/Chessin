@@ -149,6 +149,7 @@ export default function Piece({
       type: "playMove",
       payload: move,
     });
+    // dispatch({type:"updateMyClockByMilliseconds", paylo})
     if(state.board.moves.length === 0)
       dispatch({ type: "setCurrentPosition", payload: 0});
     submitMove(submitMoveRequest)
