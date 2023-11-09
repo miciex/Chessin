@@ -29,6 +29,7 @@ export type PlayOnlineState = {
   opponentDisconnected: boolean;
   opponentReconnected: boolean;
   disconnectionTimer: Date;
+  increment: number;
 };
 
 export type PlayOnlineAction =
@@ -162,6 +163,7 @@ export const getInitialState = (
     opponentDisconnected: false,
     opponentReconnected: false,
     disconnectionTimer: new Date(0),
+    increment: 0
   };
 };
 
@@ -276,6 +278,7 @@ export function reducer(
           ...responseUserToPlayer(chessGameResponse[`${myColor}User`], myColor),
           timeLeft: new Date(chessGameResponse.timeControl),
         },
+        increment: action.payload.chessGameResponse.increment
       };
     case "listenForFirstMove":
       return {
