@@ -25,10 +25,8 @@ import { FriendInvitationResponseType } from "../utils/ServicesTypes";
 import LogoutButton from "../components/LogoutButton";
 import { getGameHistory } from "../services/chessGameService";
 import { ChessGameResponse } from "../utils/ServicesTypes";
-import { BounceOutDown } from "react-native-reanimated";
+import { BounceInUp, BounceOutDown } from "react-native-reanimated";
 import Animated from "react-native-reanimated";
-import { AnimatedScrollView } from "react-native-reanimated/lib/typescript/reanimated2/component/ScrollView";
-
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -99,12 +97,14 @@ export default function ProfilePage({
             return;
           }
           setUser2(user);
-          checkSendedInvitations().then((data) => {
-            if (data === undefined) return;
-            setSendedInvitations(data.map((x) => responseUserToUser(x, "")));
-          }).catch((err) => {
-            throw new Error(err);
-          });
+          checkSendedInvitations()
+            .then((data) => {
+              if (data === undefined) return;
+              setSendedInvitations(data.map((x) => responseUserToUser(x, "")));
+            })
+            .catch((err) => {
+              throw new Error(err);
+            });
         })
         .catch((err) => {
           console.error("failed to fetch user");
@@ -119,28 +119,28 @@ export default function ProfilePage({
     userGames.length > 0 ? (
       userGames.slice(0, 5).map((game) => (
         // <View style={{ width: "90%" }}>
-          <EndedGame
-            nick={
-              game.whiteUser.nameInGame === user?.nameInGame
-                ? game.blackUser.nameInGame
-                : game.whiteUser.nameInGame
-            }
-            rank={
-              game.whiteUser.nameInGame === user?.nameInGame
-                ? game.blackRating
-                : game.whiteRating
-            }
-            result={game.gameResult}
-            navigation={navigation}
-            key={`${game.id}${user?.nameInGame}`}
-            date={new Date(game.startTime)}
-            gameId={game.id}
-            myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
-            whiteToMove={
-              (game.whiteStarts && game.moves.length % 2 === 0) ||
-              (game.moves.length % 2 === 1 && !game.whiteStarts)
-            }
-          />
+        <EndedGame
+          nick={
+            game.whiteUser.nameInGame === user?.nameInGame
+              ? game.blackUser.nameInGame
+              : game.whiteUser.nameInGame
+          }
+          rank={
+            game.whiteUser.nameInGame === user?.nameInGame
+              ? game.blackRating
+              : game.whiteRating
+          }
+          result={game.gameResult}
+          navigation={navigation}
+          key={`${game.id}${user?.nameInGame}`}
+          date={new Date(game.startTime)}
+          gameId={game.id}
+          myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
+          whiteToMove={
+            (game.whiteStarts && game.moves.length % 2 === 0) ||
+            (game.moves.length % 2 === 1 && !game.whiteStarts)
+          }
+        />
         // </View>
       ))
     ) : (
@@ -172,10 +172,11 @@ export default function ProfilePage({
   };
 
   const handleAddFriend = () => {
-    addFriendFunc({ friendNickname: user2 ? user2.nameInGame : "" })
-      .catch((err) => {
+    addFriendFunc({ friendNickname: user2 ? user2.nameInGame : "" }).catch(
+      (err) => {
         throw new Error(err);
-      });
+      }
+    );
     setRefresh(!refresh);
   };
 
@@ -192,36 +193,44 @@ export default function ProfilePage({
 
   useEffect(() => {
     if (nameInGame)
-      getFriendsList(nameInGame).then((data) => {
-        if (data === undefined) return;
-        setFriends(data.map((x) => responseUserToUser(x, "")));
-      }).catch((err) => {
-        throw new Error(err);
-      });
+      getFriendsList(nameInGame)
+        .then((data) => {
+          if (data === undefined) return;
+          setFriends(data.map((x) => responseUserToUser(x, "")));
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
 
-    checkInvitations().then((data) =>{ 
-      if(data === undefined) return
-      setInvitations(data.map(x => responseUserToUser(x.user, "")))
-    }).catch(err => {
-      throw new Error(err)
-    })
-     
-  }, [nameInGame, user?.nameInGame])
-
-  useEffect(() => {
-    if (nameInGame)
-      getFriendsList(nameInGame).then((data) => {
+    checkInvitations()
+      .then((data) => {
         if (data === undefined) return;
-        setFriends(data.map((x) => responseUserToUser(x, "")));
-      }).catch((err) => {
+        setInvitations(data.map((x) => responseUserToUser(x.user, "")));
+      })
+      .catch((err) => {
         throw new Error(err);
       });
   }, [nameInGame, user?.nameInGame]);
 
+  useEffect(() => {
+    if (nameInGame)
+      getFriendsList(nameInGame)
+        .then((data) => {
+          if (data === undefined) return;
+          setFriends(data.map((x) => responseUserToUser(x, "")));
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+  }, [nameInGame, user?.nameInGame]);
+
   return (
-    <ScrollView style={{ backgroundColor: ColorsPallet.light }}>
+    <Animated.ScrollView
+      style={{ backgroundColor: ColorsPallet.light }}
+      entering={BounceInUp}
+    >
       <View style={styles.container}>
-      {/* <Animated.View style={styles.container}> */}
+        {/* <Animated.View style={styles.container}> */}
         <View style={styles.profile}>
           <Profile
             nick={user2 ? user2.nameInGame : user ? user.nameInGame : ""}
@@ -300,9 +309,9 @@ export default function ProfilePage({
           stringNavigation={toOldGames}
         />
         <View style={{ width: "85%" }}>{component}</View>
-      {/* </Animated.View> */}
+        {/* </Animated.View> */}
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 

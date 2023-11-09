@@ -6,9 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/babel.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/babel.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,7 +107,8 @@
       <workItem from="1699196741901" duration="3451000" />
       <workItem from="1699208625322" duration="2071000" />
       <workItem from="1699282699605" duration="1724000" />
-      <workItem from="1699556356855" duration="615000" />
+      <workItem from="1699556356855" duration="1348000" />
+      <workItem from="1699557765445" duration="1342000" />
     </task>
     <servers />
   </component>
@@ -127,13 +125,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java</url>
-          <line>750</line>
+          <line>271</line>
           <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java</url>
-          <line>760</line>
-          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

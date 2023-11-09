@@ -16,69 +16,7 @@ import {
 } from "../services/userServices";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
 import { FriendInvitationResponse } from "../utils/ServicesTypes";
-
-const ended_games = [
-  {
-    date: "01.10.2022",
-    playerNick: "Pusznik",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "MaciekNieBij",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Slaweczuk",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Strzała",
-    rank: 1500,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Bestia",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Sharku",
-    rank: 1000,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-];
+import Animated, { BounceInDown, BounceInUp } from "react-native-reanimated";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -94,7 +32,6 @@ export default function Notification({ route, navigation }: Props) {
   const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([]);
 
   useEffect(() => {
-
     checkInvitations().then((data) => {
       console.log("check invite data: ");
       console.log(data);
@@ -103,14 +40,14 @@ export default function Notification({ route, navigation }: Props) {
     });
 
     checkInvitationsToGame().then((data) => {
-      console.log("invitations")
+      console.log("invitations");
       console.log(data);
       if (!data) return;
       setInvitationsToGame(data.map((x) => responseUserToUser(x.user, "")));
     });
   }, []);
   return (
-    <View style={styles.appContainer}>
+    <Animated.View style={styles.appContainer} entering={BounceInUp}>
       <ScrollView>
         <View style={styles.contentContainer}>
           <Heading text={"Notifications"} />
@@ -133,7 +70,7 @@ export default function Notification({ route, navigation }: Props) {
           <Notify text="Gratulacje osiagnales 1000 elo" />
         </View>
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
 

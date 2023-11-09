@@ -100,7 +100,7 @@ export default function LastGame({ navigation }: Props) {
           </View>
         </View>
       </ScrollView>
-      <Footer navigation={navigation} />
+      {/* <Footer navigation={navigation} /> */}
     </View>
   );
 }

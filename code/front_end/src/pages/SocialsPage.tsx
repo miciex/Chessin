@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
 import { ColorsPallet } from "../utils/Constants";
 import InputField from "../components/InputField";
@@ -9,11 +9,18 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
-import { handleSearchBarSocials, setUserDataFromResponse } from "../services/userServices";
+import {
+  handleSearchBarSocials,
+  setUserDataFromResponse,
+} from "../services/userServices";
 import { HandleSearchBarSocials } from "../utils/ServicesTypes";
 import { responseUserToUser } from "../utils/PlayerUtilities";
 import { User } from "../utils/PlayerUtilities";
-
+import Animated, {
+  BounceInUp,
+  RollInLeft,
+  SlideInLeft,
+} from "react-native-reanimated";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -24,43 +31,40 @@ type Props = {
   route: RouteProp<RootStackParamList, "Socials">;
 };
 
-
-
 export default function Socials({ route, navigation }: Props) {
+  const [users, setUsers] = useState<Array<User>>([]);
+  const [searchValue, setSearchValue] = useState<HandleSearchBarSocials>({
+    searchNickname: "a",
+  });
 
-  const [users, setUsers] = useState<Array<User>>([])
-  const [searchValue, setSearchValue] = useState<HandleSearchBarSocials>({searchNickname: "a"})
-  
-  useEffect(()=>{
-    if(searchValue.searchNickname)handleSearchBarSocials(searchValue).then((data) =>{ 
-      if(data === undefined) return
-      setUsers(data.map(x => responseUserToUser(x, "")))
-    })
-  }, [searchValue])
+  useEffect(() => {
+    if (searchValue.searchNickname)
+      handleSearchBarSocials(searchValue).then((data) => {
+        if (data === undefined) return;
+        setUsers(data.map((x) => responseUserToUser(x, "")));
+      });
+  }, [searchValue]);
 
-  
   return (
-    
-    <View style={styles.appContainer}>
+    <Animated.View style={styles.appContainer} entering={BounceInUp}>
       <View style={styles.formContainer}>
-       
-        <InputField placeholder="Search" onChange={e=>{setSearchValue({searchNickname: e})}} />
+        <InputField
+          placeholder="Search"
+          onChange={(e) => {
+            setSearchValue({ searchNickname: e });
+          }}
+        />
         <ScrollView>
           <View style={styles.scrollView}>
             {users.map((gracz) => (
-              
-              <Friend
-                  user={gracz}
-                  navigation={navigation}
-              />
-              
+              <Friend user={gracz} navigation={navigation} />
             ))}
           </View>
         </ScrollView>
       </View>
 
       <Footer navigation={navigation} />
-    </View>
+    </Animated.View>
   );
 }
 
