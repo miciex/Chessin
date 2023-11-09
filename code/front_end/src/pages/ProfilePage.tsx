@@ -13,6 +13,7 @@ import {
   checkInvitations,
   checkSendedInvitations,
   getFriendsList,
+  getPagedGames,
   getUser,
   handleFriendInvitationFunc,
 } from "../services/userServices";
@@ -27,68 +28,7 @@ import { ChessGameResponse } from "../utils/ServicesTypes";
 import { BounceOutDown } from "react-native-reanimated";
 import Animated from "react-native-reanimated";
 import { AnimatedScrollView } from "react-native-reanimated/lib/typescript/reanimated2/component/ScrollView";
-const ended_games = [
-  {
-    date: "01.10.2022",
-    playerNick: "Pusznik",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "MaciekNieBij",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Slaweczuk",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Strzała",
-    rank: 1500,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Bestia",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Sharku",
-    rank: 1000,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-];
+
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -130,20 +70,14 @@ export default function ProfilePage({
         let parsedUser: User = JSON.parse(user);
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
         setUser(parsedUser);
-        getGameHistory(user2 ? user2.nameInGame : parsedUser.nameInGame).then(
-          (response) => {
-            if (response.status === 200) {
-              response
-                .json()
-                .then((data: ChessGameResponse[]) => {
-                  setUserGames(data);
-                })
-                .catch(() => {
-                  throw new Error("Couldn't load game history");
-                });
-            } else throw new Error("Couldn't load game history");
-          }
-        );
+        getPagedGames(parsedUser.nameInGame, 0)
+          .then((data: ChessGameResponse[] | null) => {
+            if (!data) return;
+            setUserGames(data);
+          })
+          .catch((err) => {
+            throw err;
+          });
       })
       .catch((error) => {
         navigation.navigate("UserNotAuthenticated");
@@ -168,6 +102,8 @@ export default function ProfilePage({
           checkSendedInvitations().then((data) => {
             if (data === undefined) return;
             setSendedInvitations(data.map((x) => responseUserToUser(x, "")));
+          }).catch((err) => {
+            throw new Error(err);
           });
         })
         .catch((err) => {
@@ -182,7 +118,7 @@ export default function ProfilePage({
   component =
     userGames.length > 0 ? (
       userGames.slice(0, 5).map((game) => (
-        <View style={{ width: "90%" }}>
+        // <View style={{ width: "90%" }}>
           <EndedGame
             nick={
               game.whiteUser.nameInGame === user?.nameInGame
@@ -205,7 +141,7 @@ export default function ProfilePage({
               (game.moves.length % 2 === 1 && !game.whiteStarts)
             }
           />
-        </View>
+        // </View>
       ))
     ) : (
       <View style={{ padding: 40 }}>
@@ -237,7 +173,6 @@ export default function ProfilePage({
 
   const handleAddFriend = () => {
     addFriendFunc({ friendNickname: user2 ? user2.nameInGame : "" })
-      .then((data) => {})
       .catch((err) => {
         throw new Error(err);
       });
@@ -278,12 +213,15 @@ export default function ProfilePage({
       getFriendsList(nameInGame).then((data) => {
         if (data === undefined) return;
         setFriends(data.map((x) => responseUserToUser(x, "")));
+      }).catch((err) => {
+        throw new Error(err);
       });
   }, [nameInGame, user?.nameInGame]);
 
   return (
     <ScrollView style={{ backgroundColor: ColorsPallet.light }}>
-      <Animated.View style={styles.container}>
+      <View style={styles.container}>
+      {/* <Animated.View style={styles.container}> */}
         <View style={styles.profile}>
           <Profile
             nick={user2 ? user2.nameInGame : user ? user.nameInGame : ""}
@@ -362,7 +300,8 @@ export default function ProfilePage({
           stringNavigation={toOldGames}
         />
         <View style={{ width: "85%" }}>{component}</View>
-      </Animated.View>
+      {/* </Animated.View> */}
+      </View>
     </ScrollView>
   );
 }

@@ -114,7 +114,7 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
 
   const handlePlayOnline = () => {
     if (!user) return;
-    navigation.navigate("PlayOnline", {
+    navigation.replace("PlayOnline", {
       request: setPendingGameRequest(
         gameTempo.totalTime,
         gameTempo.increment,

@@ -1,7 +1,7 @@
 import { View, StyleSheet, Switch, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
-<FontAwesome5 name="medal" size={24} color="black" />;
+{/* <FontAwesome5 name="medal" size={24} color="black" />; */}
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -17,11 +17,9 @@ import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButt
 import { GameLengthTypeContext } from "../features/gameMenuPage/context/GameLengthContext";
 import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
 import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
-import { User, getRanking } from "../utils/PlayerUtilities";
+import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { GameType } from "../chess-logic/board";
-import { setPendingGameRequest } from "../features/playOnline/services/playOnlineService";
-import { inviteToGameLink } from "../utils/ApiEndpoints";
 import { inviteToGame } from "../services/userServices";
 import { ChessGameResponse } from "../utils/ServicesTypes";
 
@@ -38,11 +36,12 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
 
   const user2 = route.params.userArg;
-
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (user === null) return;
       setUser(JSON.parse(user));
+    }).catch((error) => {
+      throw new Error(error);
     });
   }, []);
 
@@ -73,7 +72,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
     setIsEnabled(!isEnabled);
   };
   return (
-    <ScrollView style={{ width: "100%", height: "100%" }}>
+    
       <PlayColorsContext.Provider value={chosenColor}>
         <View style={styles.appContainer}>
           {timerModalOpen ? (
@@ -82,7 +81,9 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
               handleGameTempoChange={handleGameTempoChange}
             />
           ) : (
+            
             <View style={styles.contentContainer}>
+              <ScrollView contentContainerStyle={{alignItems:"center", width:"90%"}}>
               <View style={styles.profileBox}>
                 <Profile
                   nick={user2 ? user2.nameInGame : ""}
@@ -96,7 +97,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                           CLASSICAL: 0,
                         }
                   }
-                  country={user2 ? user2.country : "POland"}
+                  country={user2 ? user2.country : "Poland"}
                 />
                 <View style={{ width: 400, height: 130 }}>
                   <ChooseTimeButton
@@ -153,7 +154,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                       inviteToGame(request).then(
                         (response: null | ChessGameResponse) => {
                           if (!response) return;
-                          navigation.navigate("PlayOnline");
+                          navigation.replace("PlayOnline");
                         }
                       );
                     }}
@@ -162,25 +163,27 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                   />
                 </View>
               </View>
+              </ScrollView>
             </View>
           )}
 
           <Footer navigation={navigation} />
         </View>
       </PlayColorsContext.Provider>
-    </ScrollView>
+    
   );
 }
 
 const styles = StyleSheet.create({
   appContainer: {
-    flex: 1,
-    alignContent: "stretch",
     backgroundColor: ColorsPallet.light,
+    alignContent: 'center',
+    alignItems: "center",
+    flex: 1,
   },
   contentContainer: {
     marginTop: 22,
-    flex: 8,
+    flex: 7,
     alignItems: "center",
   },
   text: {
@@ -205,9 +208,10 @@ const styles = StyleSheet.create({
   },
   profileBox: {
     width: "90%",
-    height: 200,
+    // height: 200,
     alignItems: "center",
     marginBottom: 20,
+    flex: 7
   },
   medalButton: {
     width: 60,
