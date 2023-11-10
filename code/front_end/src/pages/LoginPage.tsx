@@ -40,7 +40,8 @@ export default function Login({ navigation }: Props) {
   };
 
   const validatePassword = (): boolean => {
-    return containsNumbersRegex.test(password) && containsSpecialCharactersRegex.test(password) && password.toLowerCase() !== password && password.toUpperCase() !== password && password.length >= 12;
+    //return containsNumbersRegex.test(password) && containsSpecialCharactersRegex.test(password) && password.toLowerCase() !== password && password.toUpperCase() !== password && password.length >= 12;
+    return true;
   };
 
   const setPasswordValid = (): void => {

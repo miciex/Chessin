@@ -1,4 +1,4 @@
-export const baseLink = "http://192.168.117.70:8080/api/v1/";
+export const baseLink = "http://192.168.0.227:8080/api/v1/";
 export const authLink = `${baseLink}auth/`;
 export const registerLink = `${authLink}register`;
 export const authenticateLink = `${authLink}authenticate`;

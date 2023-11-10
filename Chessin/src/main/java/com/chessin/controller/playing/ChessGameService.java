@@ -86,6 +86,7 @@ public class ChessGameService {
                         .build();
 
                 chessGameRepository.save(game);
+                chessGameRepository.save(game);
 
                 pendingGames.get(foundGame.getUser().getEmail()).setId(game.getId());
 
@@ -252,7 +253,7 @@ public class ChessGameService {
             activeGames.get(request.getGameId()).wait(Constants.Application.LISTEN_TIME);
 
             if(!activeBoards.containsKey(request.getGameId()))
-                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
             if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
                 return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
@@ -345,7 +346,7 @@ public class ChessGameService {
             if(!activeBoards.containsKey(request.getGameId()))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
 
-            if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.BLACK_RESIGN, GameResults.WHITE_RESIGN, GameResults.ABANDONED).contains(activeBoards.get(request.getGameId()).getGameResult()))
+            if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.BLACK_RESIGN, GameResults.WHITE_RESIGN, GameResults.ABANDONED, GameResults.BLACK_TIMEOUT, GameResults.WHITE_TIMEOUT, GameResults.WHITE_ABANDONED, GameResults.BLACK_ABANDONED).contains(activeBoards.get(request.getGameId()).getGameResult()))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
 
             if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
@@ -371,7 +372,7 @@ public class ChessGameService {
 
             if(activeBoards.get(id).getGameResult() != GameResults.NONE)
             {
-                if((activeBoards.get(id).getGameResult() == GameResults.WHITE_RESIGN && activeBoards.get(id).getWhiteEmail().equals(email)) || (activeBoards.get(id).getGameResult() == GameResults.BLACK_RESIGN && activeBoards.get(id).getBlackEmail().equals(email)))
+                if((Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_ABANDONED).contains(activeBoards.get(id).getGameResult()) && activeBoards.get(id).getWhiteEmail().equals(email)) || (Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_ABANDONED).contains(activeBoards.get(id).getGameResult()) && activeBoards.get(id).getBlackEmail().equals(email)))
                     return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
                 else
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
@@ -393,7 +394,11 @@ public class ChessGameService {
         {
             if(activeBoards.get(id).getMoves().size() < 2)
             {
-                activeBoards.get(id).setGameResult(GameResults.ABANDONED);
+                if(activeBoards.get(id).getWhiteEmail().equals(email))
+                    activeBoards.get(id).setGameResult(GameResults.WHITE_ABANDONED);
+                else
+                    activeBoards.get(id).setGameResult(GameResults.BLACK_ABANDONED);
+
                 return ResponseEntity.ok().body(BoardResponse.fromBoard(finishGame(id, Optional.empty())));
             }
 
@@ -741,9 +746,9 @@ public class ChessGameService {
             {
                 synchronized(disconnections.get(gameId))
                 {
-                    if(gameResult.orElse(GameResults.NONE) == GameResults.ABANDONED)
+                    if(Arrays.asList(GameResults.ABANDONED, GameResults.WHITE_ABANDONED, GameResults.BLACK_ABANDONED).contains(gameResult.orElse(GameResults.NONE)))
                     {
-                        activeBoards.get(gameId).setGameResult(GameResults.ABANDONED);
+                        activeBoards.get(gameId).setGameResult(gameResult.get());
                         chessGameRepository.deleteById(gameId);
                         activeGames.get(gameId).notifyAll();
                         activeBoards.get(gameId).notifyAll();
