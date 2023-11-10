@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="c3612a33-4a58-4564-9cc5-b1aa433d58c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/GameInvitationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/requests/GameInvitationRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/src/features/gameMenuPage/components/PickColor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/features/gameMenuPage/components/PickColor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/src/features/gameMenuPage/context/PlayColorContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/features/gameMenuPage/context/PlayColorContext.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/src/pages/PlayWithFriendsMenuPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/pages/PlayWithFriendsMenuPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/src/services/userServices.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/services/userServices.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../code/front_end/src/utils/ServicesTypes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/utils/ServicesTypes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../code/front_end/src/utils/ApiEndpoints.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../code/front_end/src/utils/ApiEndpoints.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,6 +16,19 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="849e3684-50e3-4f7a-b0d9-c39554e82990" />
+        <option name="url" value="https://github.com/miciex/Chessin.git" />
+      </UrlAndAccount>
+    </option>
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="szf7tmya" />
@@ -40,27 +49,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/wojte/Desktop/Chessin_BE/Chessin",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.0",
-    "spring.configuration.checksum": "ba07b2238b8243fe17c60bfbc41b78e3",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/wojte/Desktop/Chessin_BE/Chessin&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;ba07b2238b8243fe17c60bfbc41b78e3&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="ChessinApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="Chessin" />
@@ -117,11 +127,24 @@
       <workItem from="1699130619515" duration="91000" />
       <workItem from="1699179645657" duration="2078000" />
       <workItem from="1699196741901" duration="3451000" />
+      <workItem from="1699606618217" duration="97000" />
+      <workItem from="1699606842468" duration="8866000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -155,6 +178,31 @@
           <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/api/ChessGameController.java</url>
           <line>279</line>
           <option name="timeStamp" value="263" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
+          <line>380</line>
+          <option name="timeStamp" value="313" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
+          <line>362</line>
+          <option name="timeStamp" value="315" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
+          <line>369</line>
+          <option name="timeStamp" value="316" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
+          <line>374</line>
+          <option name="timeStamp" value="317" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/chessin/controller/playing/ChessGameService.java</url>
+          <line>376</line>
+          <option name="timeStamp" value="318" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

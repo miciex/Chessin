@@ -17,6 +17,7 @@ import {
 } from "../../../utils/ServicesTypes";
 import { searchRatingRange } from "../../../utils/Constants";
 import { GameType } from "../../../chess-logic/board";
+import { handlePost } from "../../../lib/fetch";
 
 export const listenForMove = async (request: ListenForMoveRequest) => {
   const accessToken = await getValueFor("accessToken");
@@ -88,35 +89,9 @@ export const getGameByUsername = async (username: string) => {
 export const listenForFirstMove = async (
   request: ListenForFirstMoveRequest
 ) => {
-  const accessToken = await getValueFor("accessToken");
-
-  const response = await fetch(`${listenForFirstMoveLink}${request.gameId}`, {
-    method: "Post",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      } else if (response.status === 400) {
-        response
-          .text()
-          .then((data) => {
-            throw new Error(data);
-          })
-          .catch((error) => {
-            throw new Error(error);
-          });
-      } else {
-        throw new Error("Something went wrong in listen for first move");
-      }
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
-  return response;
+  return  handlePost(`${listenForFirstMoveLink}${request.gameId}`).catch((error) => {
+    throw new Error(error);
+  });
 };
 
 export const cancelSearch = async () => {

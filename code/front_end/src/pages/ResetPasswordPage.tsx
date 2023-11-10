@@ -7,11 +7,13 @@ import {
 import { TwoFactorAuthenticationResponse } from "../utils/ServicesTypes";
 import {
   notValidEmailMessage,
-  notValidPasswordMessage,
+  getPasswordErrorMessage,
   notValidPasswordRepeatMessage,
   emailRegex,
   passwordRegex,
   ColorsPallet,
+  containsNumbersRegex,
+  containsSpecialCharactersRegex,
 } from "../utils/Constants";
 import AuthInput from "../features/authentication/components/AuthInput";
 import BaseButton from "../components/BaseButton";
@@ -146,7 +148,7 @@ export default function ResetPasswordPage({
   };
 
   const validatePassword = (): boolean => {
-    return passwordRegex.test(password);
+    return containsNumbersRegex.test(password) && containsSpecialCharactersRegex.test(password) && password.toLowerCase() !== password && password.toUpperCase() !== password && password.length >= 12;
   };
 
   const setIsPasswordValid = (): void => {
@@ -155,7 +157,7 @@ export default function ResetPasswordPage({
   };
 
   const validateNewPassword = (): boolean => {
-    return passwordRegex.test(newPassword);
+    return containsNumbersRegex.test(newPassword) && containsSpecialCharactersRegex.test(newPassword) && newPassword.toLowerCase() !== newPassword && newPassword.toUpperCase() !== newPassword && newPassword.length >= 12;
   };
 
   const setIsNewPasswordValid = (): void => {
@@ -198,7 +200,7 @@ export default function ResetPasswordPage({
             value={password}
             onChange={setPassword}
             isValid={passwordValid}
-            notValidText={notValidPasswordMessage}
+            notValidText={getPasswordErrorMessage(password)}
             onSubmitEditing={setIsPasswordValid}
             onFocus={() => setActiveInput("oldPassword")}
             activeInput={activeInput}
@@ -208,7 +210,7 @@ export default function ResetPasswordPage({
             value={newPassword}
             onChange={setNewPassword}
             isValid={newPasswordValid}
-            notValidText={notValidPasswordMessage}
+            notValidText={getPasswordErrorMessage(newPassword)}
             onSubmitEditing={setIsNewPasswordValid}
             onFocus={() => setActiveInput("Password")}
             activeInput={activeInput}

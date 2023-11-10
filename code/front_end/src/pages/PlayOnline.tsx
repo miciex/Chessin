@@ -341,17 +341,15 @@ export default function PlayOnline({ navigation, route }: Props) {
     myPlayer: Player,
     opponent: Player
   ) => {
-    try {
-      const res = await listenForFirstMove({ gameId });
+      listenForFirstMove({ gameId }).then((res:BoardResponse | null) => {
+        if(!res) return;
       dispatch({
         type: "listenForFirstMove",
         payload: { boardResponse: res, myPlayer, opponent },
       });
-      return res;
-    } catch (err) {
-      if (typeof err === "string") throw new Error(err);
-      throw new Error("Unknown error");
-    }
+    }).catch((err) => {
+      throw new Error(err);
+    });
   };
 
   const setCurrentPosition = (position: number) => {

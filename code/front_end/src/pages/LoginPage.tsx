@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
-import { ColorsPallet } from "../utils/Constants";
+import { ColorsPallet, containsNumbersRegex, containsSpecialCharactersRegex } from "../utils/Constants";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import {
   AuthenticationResponse,
@@ -16,7 +16,7 @@ import { emailRegex, passwordRegex } from "../utils/Constants";
 import AuthInput from "../features/authentication/components/AuthInput";
 import {
   notValidEmailMessage,
-  notValidPasswordMessage,
+  getPasswordErrorMessage
 } from "../utils/Constants";
 import { setUserDataFromResponse } from "../services/userServices";
 import { login } from "../services/AuthenticationServices";
@@ -40,7 +40,7 @@ export default function Login({ navigation }: Props) {
   };
 
   const validatePassword = (): boolean => {
-    return passwordRegex.test(password);
+    return containsNumbersRegex.test(password) && containsSpecialCharactersRegex.test(password) && password.toLowerCase() !== password && password.toUpperCase() !== password && password.length >= 12;
   };
 
   const setPasswordValid = (): void => {
@@ -159,7 +159,7 @@ export default function Login({ navigation }: Props) {
             onChange={setPassword}
             securityTextEntry={true}
             isValid={isPasswordValid}
-            notValidText={notValidPasswordMessage}
+            notValidText={getPasswordErrorMessage(password)}
             onSubmitEditing={setPasswordValid}
             onFocus={() => setActiveInput("Password")}
             activeInput={activeInput}
