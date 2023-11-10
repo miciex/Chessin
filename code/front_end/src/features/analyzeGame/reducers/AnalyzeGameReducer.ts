@@ -1,5 +1,6 @@
 import {
   BoardResponseToOnlineBoard,
+  GameResults,
   GameType,
   OnlineBoardType,
   playMove,
@@ -12,7 +13,8 @@ import {
 } from "../../../utils/PlayerUtilities";
 import { Move, moveResponseToMove } from "../../../chess-logic/move";
 import { BoardResponse, ChessGameResponse } from "../../../utils/ServicesTypes";
-import { responseUser } from "../../../utils/PlayerUtilities";
+import { ResponseUser } from "../../../utils/PlayerUtilities";
+import { FenToIntArray, boardToMap } from "../../../chess-logic/helpMethods";
 
 export type AnalyzeGameState = {
   id: number;
@@ -32,6 +34,7 @@ export type AnalyzeGameState = {
   blackRatingChange: number;
   isRated: boolean;
   currentPosition: number;
+  gameResult: GameResults
 };
 
 const chessGameResponseToAnalyzeGameState = (
@@ -43,7 +46,7 @@ const chessGameResponseToAnalyzeGameState = (
     blackPlayer: responseUserToPlayer(chessGameResponse.blackUser, "black"),
     moves: chessGameResponse.moves.map((move) => moveResponseToMove(move)),
     availableCastles: chessGameResponse.availableCastles,
-    positions: chessGameResponse.moves.map((move) => move.position),
+    positions: [boardToMap(FenToIntArray(chessGameResponse.startBoard, 64)),...chessGameResponse.moves.map((move) => move.position)],
     timeControl: chessGameResponse.timeControl,
     increment: chessGameResponse.increment,
     startBoard: chessGameResponse.startBoard,
@@ -55,6 +58,7 @@ const chessGameResponseToAnalyzeGameState = (
     blackRatingChange: chessGameResponse.blackRatingChange,
     isRated: chessGameResponse.isRated,
     currentPosition: 0,
+    gameResult: chessGameResponse.gameResult
   };
 };
 
@@ -89,6 +93,10 @@ export type AnalyzeGameAction =
   | {
       type: "setUpGame";
       payload: { chessGameResponse: ChessGameResponse; nameInGame: string };
+    }|{
+      type: "setNextPosition";
+    }|{
+      type: "setPreviousPosition";
     };
 
 export const getInitialState = (
@@ -113,6 +121,7 @@ export const getInitialState = (
     blackRatingChange: 0,
     isRated,
     currentPosition: 0,
+    gameResult: GameResults.NONE
   };
 };
 
@@ -144,6 +153,14 @@ export function reducer(
           action.payload
         ),
       };
+    case "setNextPosition":
+      if (state.currentPosition < state.moves.length - 1) {
+        return { ...state, currentPosition: state.currentPosition + 1 };
+      }
+    case "setPreviousPosition":
+      if (state.currentPosition > 0) {
+        return { ...state, currentPosition: state.currentPosition - 1 };
+      }
     default:
       return state;
   }

@@ -14,7 +14,7 @@ export type User = {
     playing?:boolean;
 };
 
-export type responseUser = {
+export type ResponseUser = {
   id: number;
   firstname: string;
   lastname: string;
@@ -37,11 +37,11 @@ export type Player = {
   ranking: Rankings;
   highestRanking: number;
   online?: boolean;
-  color: playColor;
+  color: PlayColor;
   timeLeft: Date | null;
 };
 
-export type playColor = "white" | "black" | "spectator" | null;
+export type PlayColor = "white" | "black" | "spectator" | null;
 
 export type Rankings = { [k in GameType]: number };
 
@@ -65,7 +65,7 @@ export const getBasePlayer = (): Player => {
 };
 
 export const responseUserToUser = (
-  responseUser: responseUser,
+  responseUser: ResponseUser,
   email: string
 ): User => {
   const rankings: Rankings = {
@@ -106,8 +106,8 @@ export const loggedUserToUser = (loggedUser: loggedUserResponse): User => {
 };
 
 export const responseUserToPlayer = (
-  responseUser: responseUser,
-  color: playColor,
+  responseUser: ResponseUser,
+  color: PlayColor,
   email?: string
 ): Player => {
   const rankings: Rankings = {
@@ -129,7 +129,7 @@ export const responseUserToPlayer = (
   };
 };
 
-export const userToPlayer = (user: User, color: playColor): Player => {
+export const userToPlayer = (user: User, color: PlayColor): Player => {
   return {
     firstname: user.firstname,
     lastname: user.lastname,

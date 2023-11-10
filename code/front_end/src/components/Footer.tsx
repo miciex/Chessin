@@ -20,7 +20,7 @@ export default function Footer({ navigation }: Props) {
   };
 
   const handlePressHome = () => {
-    navigation.navigate("Home");
+    navigation.replace("Home");
   };
 
   const handleAnalyze = () => {

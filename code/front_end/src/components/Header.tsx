@@ -21,7 +21,9 @@ export default function Header({ navigation }: Props) {
         <Text style={styles.headerText}>Chessin</Text>
         <Pressable
           onPress={() => {
-            navigation.navigate("ProfilePage");
+            navigation.navigate("ProfilePage", {
+              nameInGame: "user",
+            });
           }}
         >
           <FontAwesome
@@ -30,7 +32,6 @@ export default function Header({ navigation }: Props) {
             color="black"
             style={styles.headerImage}
           />
-           
         </Pressable>
         <Pressable
           onPress={() => {
@@ -43,7 +44,6 @@ export default function Header({ navigation }: Props) {
             color="black"
             style={styles.headerImage}
           />
-           
         </Pressable>
       </View>
     </View>

@@ -1,5 +1,5 @@
 import { View, StyleSheet, ScrollView } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import EndedGame from "../features/home/components/EndedGame";
 import { ColorsPallet } from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -7,11 +7,13 @@ import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Footer from "../components/Footer";
 import Heading from "../components/Heading";
+
 import { User } from "../utils/PlayerUtilities";
 import { ChessGameResponse } from "../utils/ServicesTypes";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { getGameHistory } from "../services/chessGameService";
 import BaseButton from "../components/BaseButton";
+import { getPagedGames } from "../services/userServices";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -27,12 +29,21 @@ export default function LastGame({ navigation }: Props) {
   const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
   const [gamesPage, setGamesPage] = useState<number>(0);
 
-  const updateGamesPage = () => {
-    setGamesPage((prev) => prev + 1);
+  const updateGamesPage = (nameInGame: string) => {
+    getPagedGames(nameInGame, gamesPage).then(
+      (data: ChessGameResponse[] | null) => {
+        if (!data) return;
+        setGamesPage((prev) => prev + 1);
+        setUserGames((prev) => [...prev, ...data]);
+      }
+    ).catch((error) => {
+      throw new Error(error);
+    });
   };
 
   const handleGetMoreGames = () => {
-    //...Try to load more old games. If the code succeeded call udpateGamesPage
+    if (!user) return;
+    updateGamesPage(user.nameInGame);
   };
 
   useEffect(() => {
@@ -42,21 +53,7 @@ export default function LastGame({ navigation }: Props) {
         let parsedUser: User = JSON.parse(user);
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
         setUser(parsedUser);
-        getGameHistory(parsedUser.nameInGame).then((response) => {
-          console.log("Got response");
-          console.log(response.status);
-          if (response.status === 200) {
-            response
-              .json()
-              .then((data: ChessGameResponse[]) => {
-                setUserGames(data);
-              })
-              .catch((error) => {
-                console.error(error);
-                throw new Error("Couldn't load game history");
-              });
-          } else throw new Error("Couldn't load game history");
-        });
+        updateGamesPage(parsedUser.nameInGame);
       })
       .catch((error) => {
         navigation.navigate("UserNotAuthenticated");
@@ -66,10 +63,11 @@ export default function LastGame({ navigation }: Props) {
 
   return (
     <View style={styles.appContainer}>
-      <ScrollView>
-        <View style={styles.contentContainer}>
-          <Heading text={"Game History"} />
-          {userGames.map((game) => (
+      <View style={styles.contentContainer}>
+      <ScrollView contentContainerStyle={{width:"100%", justifyContent: "center", alignItems: "center"}}>
+        
+          <Heading text={"Old Games"} />
+          {userGames.map((game, index) => (
             <View style={{ width: "90%" }}>
               <EndedGame
                 nick={
@@ -82,24 +80,30 @@ export default function LastGame({ navigation }: Props) {
                     ? game.blackRating
                     : game.whiteRating
                 }
-                result={"win"}
+                result={game.gameResult}
                 navigation={navigation}
                 key={`${game.id}${user?.nameInGame}`}
-                date={"2023.10.27"}
+                date={new Date(game.startTime)}
                 gameId={game.id}
+                myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
+                whiteToMove={
+                  (game.whiteStarts && game.moves.length % 2 === 0) ||
+                  (game.moves.length % 2 === 1 && !game.whiteStarts)
+                }
               />
             </View>
           ))}
           <View style={styles.buttonContainer}>
             <BaseButton
               text="Load more games"
-              handlePress={() => {}}
+              handlePress={handleGetMoreGames}
               fontColor="black"
               color="transparent"
             />
           </View>
-        </View>
+        
       </ScrollView>
+      </View>
       <Footer navigation={navigation} />
     </View>
   );
@@ -107,21 +111,17 @@ export default function LastGame({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   appContainer: {
-    flex: 1,
-    alignContent: "stretch",
+    flex: 7,
+    // alignContent: "stretch",
     backgroundColor: ColorsPallet.light,
   },
   contentContainer: {
     marginTop: 12,
     flex: 8,
-    alignItems: "center",
   },
-  buttonContainer:{
+  buttonContainer: {
     margin: 12,
     height: 32,
-    width: '50%'
+    width: "50%",
   },
-
-  endedGames: {},
-  endGame: {},
 });

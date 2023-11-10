@@ -23,6 +23,13 @@ export type PlayOnlineState = {
   searchingGame: boolean;
   gameId: number;
   currentPosition: number;
+  showSettings: boolean;
+  rotateBoard: boolean;
+  opponentOfferedDraw: boolean;
+  opponentDisconnected: boolean;
+  opponentReconnected: boolean;
+  disconnectionTimer: Date;
+  increment: number;
 };
 
 export type PlayOnlineAction =
@@ -110,14 +117,39 @@ export type PlayOnlineAction =
         myPlayer: Player;
         opponent: Player;
       };
+    }|{
+      type: "setShowSettings";
+      payload: boolean;
+    }|{
+      type: "setRotateBoard";
+      payload: boolean;
+    }|{
+      type: "setOpponentOfferedDraw";
+      payload: boolean;
+    }|{
+      type: "setOpponentDisconnected";
+      payload: boolean;
+    }|{
+      type: "setDisconnectionTimer";
+      payload: Date;
+    }|{
+      type: "toggleSettings";
+    }|{
+      type: "toggleRotateBoard";
+    }|{
+      type: "setOpponentReconnected";
+      payload: boolean;
+    }|{
+      type: "updateDisconnectionTimerByMillis";
+      payload: number;
     };
 
 export const getInitialState = (
-  isRated: boolean,
-  gameType: GameType
+  isRated?: boolean,
+  gameType?: GameType
 ): PlayOnlineState => {
   return {
-    board: getInitialOnlineBoard(isRated, gameType),
+    board: getInitialOnlineBoard(isRated!==undefined ? isRated : true, gameType!==undefined ? gameType : GameType.BLITZ),
     myPlayer: getBasePlayer(),
     opponent: getBasePlayer(),
     gameFinished: false,
@@ -125,6 +157,13 @@ export const getInitialState = (
     searchingGame: false,
     gameId: -1,
     currentPosition: 0,
+    showSettings: false,
+    rotateBoard: false,
+    opponentOfferedDraw: false,
+    opponentDisconnected: false,
+    opponentReconnected: false,
+    disconnectionTimer: new Date(0),
+    increment: 0
   };
 };
 
@@ -239,6 +278,7 @@ export function reducer(
           ...responseUserToPlayer(chessGameResponse[`${myColor}User`], myColor),
           timeLeft: new Date(chessGameResponse.timeControl),
         },
+        increment: action.payload.chessGameResponse.increment
       };
     case "listenForFirstMove":
       return {
@@ -260,6 +300,53 @@ export function reducer(
               : action.payload.boardResponse.blackTime
           ),
         },
+      };
+    case "setDisconnectionTimer":
+      return {
+        ...state,
+        disconnectionTimer: action.payload,
+      };
+    case "setShowSettings":
+      return {
+        ...state,
+        showSettings: action.payload,
+      };
+    case "setOpponentDisconnected":
+      return {
+        ...state,
+        opponentDisconnected: action.payload,
+      };
+    case "setOpponentOfferedDraw":
+      return {
+        ...state,
+        opponentOfferedDraw: action.payload,
+      };
+    case "toggleSettings":
+      return {
+        ...state,
+        showSettings: !state.showSettings,
+      };
+    case "setRotateBoard":
+      return {
+        ...state,
+        rotateBoard: action.payload,
+      };
+    case "toggleRotateBoard":
+      return {
+        ...state,
+        rotateBoard: !state.rotateBoard,
+      };
+    case "setOpponentReconnected":
+      return {
+        ...state,
+        opponentReconnected: action.payload,
+      };
+    case "updateDisconnectionTimerByMillis":
+      return {
+        ...state,
+        disconnectionTimer: new Date(
+          state.disconnectionTimer!.getTime() + action.payload
+        ),
       };
     default:
       return state;

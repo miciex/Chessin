@@ -89,7 +89,7 @@ export default function Board({
   return activeValues.current.length > 0 ? (
     <View style={styles.container}>
       <View style={{ width: SIZE * 8, height: SIZE * 8 }}>
-        <Background rotateBoard={rotateBoard} />
+        <Background rotateBoard={rotateBoard} move={state.currentPosition >=0 ? state.board.moves[state.currentPosition] : undefined}/>
         {pieces}
       </View>
     </View>

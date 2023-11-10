@@ -1,7 +1,7 @@
-import { View, StyleSheet, Switch } from "react-native";
+import { View, StyleSheet, Switch, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
-<FontAwesome5 name="medal" size={24} color="black" />;
+{/* <FontAwesome5 name="medal" size={24} color="black" />; */}
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -20,6 +20,8 @@ import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsMod
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { GameType } from "../chess-logic/board";
+import { inviteToGame } from "../services/userServices";
+import { ChessGameResponse } from "../utils/ServicesTypes";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -34,11 +36,12 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   const [user, setUser] = useState<User>();
 
   const user2 = route.params.userArg;
-
   useEffect(() => {
     getValueFor("user").then((user) => {
       if (user === null) return;
       setUser(JSON.parse(user));
+    }).catch((error) => {
+      throw new Error(error);
     });
   }, []);
 
@@ -47,14 +50,14 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
   };
 
   const [chosenColor, setChosenColor] =
-    useState<PlayColorsContextType>("random");
+    useState<PlayColorsContextType>("RANDOM");
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
 
   const [gameTempo, setGameTempo] = useState<LengthType>({
     gameType: GameType.BLITZ,
-    totalTime: 180,
+    totalTime: 5 * 1000 * 60,
     increment: 0,
   });
   const handleGameTempoChange = (tempo: LengthType) => {
@@ -65,8 +68,11 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
 
   const [isEnabled, setIsEnabled] = useState(true);
 
+  const handlePressRanked = () => {
+    setIsEnabled(!isEnabled);
+  };
   return (
-    <View style={{ width: "100%", height: "100%"}}>
+    
       <PlayColorsContext.Provider value={chosenColor}>
         <View style={styles.appContainer}>
           {timerModalOpen ? (
@@ -75,18 +81,23 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
               handleGameTempoChange={handleGameTempoChange}
             />
           ) : (
+            
             <View style={styles.contentContainer}>
+              <ScrollView contentContainerStyle={{alignItems:"center", width:"90%"}}>
               <View style={styles.profileBox}>
                 <Profile
                   nick={user2 ? user2.nameInGame : ""}
-                  
-                  rank={user2 ? user2.ranking : {
-                    BULLET: 0,
-                    BLITZ: 0,
-                    RAPID: 0,
-                    CLASSICAL: 0,
-                }}
-                country={user2? user2.country : "POland"}
+                  rank={
+                    user2
+                      ? user2.ranking
+                      : {
+                          BULLET: 0,
+                          BLITZ: 0,
+                          RAPID: 0,
+                          CLASSICAL: 0,
+                        }
+                  }
+                  country={user2 ? user2.country : "Poland"}
                 />
                 <View style={{ width: 400, height: 130 }}>
                   <ChooseTimeButton
@@ -102,7 +113,7 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                   <View style={styles.medalButton}>
                     <BaseCustomContentButton
                       handlePress={() => {
-                        () => setIsEnabled(!isEnabled);
+                        setIsEnabled(!isEnabled);
                       }}
                       content={
                         <FontAwesome5
@@ -122,36 +133,57 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                     thumbColor={"#f4f3f4"}
                     ios_backgroundColor={"grey"}
                     value={isEnabled}
-                    onTouchMove={() => setIsEnabled(!isEnabled)}
+                    onTouchMove={() => {
+                      handlePressRanked();
+                    }}
                   />
                 </View>
+
                 <View style={{ width: "80%", height: 80 }}>
                   <BaseButton
-                    handlePress={() => {}}
+                    handlePress={() => {
+                      if (!user) return;
+                      let request = {
+                        friendNickname: user2 ? user2.nameInGame : "",
+                        timeControl: gameTempo.totalTime,
+                        increment: gameTempo.increment,
+                        isRated: isEnabled,
+                        playerColor: chosenColor,
+                      };
+
+                      inviteToGame(request).then(
+                        (response: null | ChessGameResponse) => {
+                          if (!response) return;
+                          navigation.replace("PlayOnline");
+                        }
+                      );
+                    }}
                     text="Graj"
                     fontSizeProps={30}
                   />
                 </View>
               </View>
+              </ScrollView>
             </View>
           )}
 
           <Footer navigation={navigation} />
         </View>
       </PlayColorsContext.Provider>
-    </View>
+    
   );
 }
 
 const styles = StyleSheet.create({
   appContainer: {
-    flex: 1,
-    alignContent: "stretch",
     backgroundColor: ColorsPallet.light,
+    alignContent: 'center',
+    alignItems: "center",
+    flex: 1,
   },
   contentContainer: {
     marginTop: 22,
-    flex: 8,
+    flex: 7,
     alignItems: "center",
   },
   text: {
@@ -176,9 +208,10 @@ const styles = StyleSheet.create({
   },
   profileBox: {
     width: "90%",
-    height: 200,
+    // height: 200,
     alignItems: "center",
     marginBottom: 20,
+    flex: 7
   },
   medalButton: {
     width: 60,

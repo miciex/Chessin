@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   TextInputKeyPressEventData,
+  Text,
 } from "react-native";
 import React, { useState, useRef } from "react";
 import { ColorsPallet } from "../../../utils/Constants";
@@ -116,6 +117,7 @@ export default function AuthCodeModal({
           <Pressable onPress={hideModal}>
             <Entypo name="circle-with-cross" size={24} color="black" />
           </Pressable>
+          <Text style={styles.text}>Enter verification code which was sent to your email</Text>
           <View style={styles.contentContainer}>
             <View style={styles.inputsContainer}>{InputsView}</View>
             <View style={styles.submitButtonContainer}>
@@ -168,4 +170,10 @@ const styles = StyleSheet.create({
     width: "50%",
     height: 32,
   },
+  text:{
+    padding: 10,
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+  }
 });

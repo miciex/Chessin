@@ -32,8 +32,33 @@ export const enum GameResults {
   WHITE_TIMEOUT = "WHITE_TIMEOUT",
   BLACK_TIMEOUT = "BLACK_TIMEOUT",
   DRAW_AGREEMENT = "DRAW_AGREEMENT",
+  WHITE_DISCONNECTED="WHITE_DISCONNECTED",
+  BLACK_DISCONNECTED="BLACK_DISCONNECTED",
   ABANDONED = "ABANDONED",
 }
+
+export const getWinner = (result:GameResults, whiteToMove: boolean) => {
+  switch (result) {
+    case GameResults.BLACK_RESIGN:
+    case GameResults.BLACK_TIMEOUT:
+      return "white";
+    case GameResults.WHITE_RESIGN:
+    case GameResults.WHITE_TIMEOUT:
+      return "black";
+    case GameResults.ABANDONED:
+      return "abandoned";
+    case GameResults.DRAW_AGREEMENT:
+    case GameResults.INSUFFICIENT_MATERIAL:
+    case GameResults.STALEMATE:
+    case GameResults.THREE_FOLD:
+    case GameResults.DRAW_50_MOVE_RULE:
+      return "draw";
+    case GameResults.MATE:
+      return whiteToMove ? "black" : "white";
+    default:
+      return null;
+  }
+};
 
 export enum GameType {
   CLASSICAL = "CLASSICAL",
@@ -84,7 +109,7 @@ export const BoardResponseToOnlineBoard = (
   boardResponse: BoardResponse
 ): OnlineBoardType => {
   const moves = boardResponse.moves.map((move) => moveFactory(move));
-  
+
   return {
     fen: boardResponse.startBoard,
     visualBoard: boardResponse.visualBoard,
@@ -685,9 +710,9 @@ export const unMovePiece = (
     move.movedPiece % 8 === Pieces.KING &&
     Math.abs(move.startField - move.endField) === 2
   ) {
-    newPosition[(move.startField / 8) * 8 + ((move.endField % 8) / 4) * 7] =
-      position[move.startField + (move.endField - move.startField) / 2];
-    delete newPosition[move.startField + (move.endField - move.startField) / 2];
+    newPosition[Math.floor(move.startField / 8) * 8 + Math.floor((move.endField % 8) / 4) * 7] =
+      position[move.startField + Math.floor((move.endField - move.startField) / 2)];
+    delete newPosition[move.startField + Math.floor((move.endField - move.startField) / 2)];
   }
   newPosition[move.startField] = move.movedPiece;
   delete newPosition[move.endField];
@@ -766,9 +791,11 @@ export const unMakeMove = (move: Move, board: Board): Board => {
 export const playMove = (move: Move, board: Board): Board => {
   board = makeMove(move, board);
   board.visualBoard = mapToBoard(board.position);
+  
   board.movesTo50MoveRule = draw50MoveRuleCheck(board);
   board.result = checkGameResult(board);
   board.whiteToMove = !board.whiteToMove;
+  console.log(board.visualBoard);
   return board;
 };
 

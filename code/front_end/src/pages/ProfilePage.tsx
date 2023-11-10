@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
 import React, { useState, useEffect } from "react";
 import Profile from "../features/playWithFriend/components/Profile";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -10,78 +10,25 @@ import FriendsIconList from "../features/playWithFriend/components/FriendsIconLi
 import BaseButton from "../components/BaseButton";
 import {
   addFriendFunc,
+  checkInvitations,
+  checkSendedInvitations,
   getFriendsList,
+  getPagedGames,
+  getUser,
+  handleFriendInvitationFunc,
 } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { fetchUser } from "../services/userServices";
+import { FriendInvitationResponseType } from "../utils/ServicesTypes";
 import LogoutButton from "../components/LogoutButton";
 import { getGameHistory } from "../services/chessGameService";
 import { ChessGameResponse } from "../utils/ServicesTypes";
+import { BounceOutDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { AnimatedScrollView } from "react-native-reanimated/lib/typescript/reanimated2/component/ScrollView";
 
-const ended_games = [
-  {
-    date: "01.10.2022",
-    playerNick: "Pusznik",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "MaciekNieBij",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Slaweczuk",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Strzała",
-    rank: 1500,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Bestia",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Sharku",
-    rank: 1000,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-];
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -91,19 +38,28 @@ type Props = {
   >;
 
   route: RouteProp<RootStackParamList, "ProfilePage">;
-  setUserNotAuthenticated: ()=>void;
+  setUserNotAuthenticated: () => void;
 };
 
-export default function ProfilePage({ navigation, route, setUserNotAuthenticated }: Props) {
+export default function ProfilePage({
+  navigation,
+  route,
+  setUserNotAuthenticated,
+}: Props) {
   const [user, setUser] = useState<User>();
   const [userGames, setUserGames] = useState<ChessGameResponse[]>([]);
   const [user2, setUser2] = useState<User>();
   const [ifMyAccount, setIfMyAccount] = useState<boolean>();
+  const [refresh, setRefresh] = useState<boolean>(true);
 
   const nameInGame = route?.params?.nameInGame;
   const goToFriendsMenu = () => {
     navigation.navigate("Friends", {
-      nameInGame: user2?.nameInGame ? user2?.nameInGame : user ? user?.nameInGame : "",
+      nameInGame: user2?.nameInGame
+        ? user2?.nameInGame
+        : user
+        ? user?.nameInGame
+        : "",
     });
   };
 
@@ -114,19 +70,14 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
         let parsedUser: User = JSON.parse(user);
         if (!parsedUser) return navigation.navigate("UserNotAuthenticated");
         setUser(parsedUser);
-        getGameHistory(user2 ? user2.nameInGame : parsedUser.nameInGame).then((response) => {
-          if (response.status === 200) {
-            response
-              .json()
-              .then((data: ChessGameResponse[]) => {
-                setUserGames(data);
-              })
-              .catch((error) => {
-                console.error(error);
-                throw new Error("Couldn't load game history");
-              });
-          } else throw new Error("Couldn't load game history");
-        });
+        getPagedGames(parsedUser.nameInGame, 0)
+          .then((data: ChessGameResponse[] | null) => {
+            if (!data) return;
+            setUserGames(data);
+          })
+          .catch((err) => {
+            throw err;
+          });
       })
       .catch((error) => {
         navigation.navigate("UserNotAuthenticated");
@@ -135,49 +86,81 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
   }, []);
 
   useEffect(() => {
-    if (user &&(user.nameInGame == nameInGame) || nameInGame === undefined) {
+    if (user && (user.nameInGame == nameInGame || nameInGame == "user")) {
       setIfMyAccount(true);
       setUser2(undefined);
     } else {
       setIfMyAccount(false);
     }
-    if (
-      !(user&&(user.nameInGame == nameInGame) || nameInGame === undefined) &&
-      nameInGame
-    ) {
+    if (nameInGame != "user" && nameInGame) {
       fetchUser(nameInGame)
         .then((user) => {
           if (user === null) {
             return;
           }
-          console.log("changing the value of user: " + user);
           setUser2(user);
+          checkSendedInvitations().then((data) => {
+            if (data === undefined) return;
+            setSendedInvitations(data.map((x) => responseUserToUser(x, "")));
+          }).catch((err) => {
+            throw new Error(err);
+          });
         })
         .catch((err) => {
-          console.log("failed to fetch user");
+          console.error("failed to fetch user");
           throw new Error(err);
         });
     }
-  }, [nameInGame, user]);
+  }, [nameInGame, user, refresh]);
 
-  let component = userGames.slice(0, 5).map((game) => (
-    <View style={{ width: "90%" }}>
-      <EndedGame
-        nick={game.whiteUser.nameInGame === user?.nameInGame ? game.blackUser.nameInGame : game.whiteUser.nameInGame}
-        rank={game.whiteUser.nameInGame === user?.nameInGame ? game.blackRating : game.whiteRating}
-        result={"win"}
-        navigation={navigation}
-        key={`${game.id}${user?.nameInGame}`}
-        date={"2023.10.27"}
-        gameId={game.id}
-      />
-    </View>
-  ))
+  let component;
+
+  component =
+    userGames.length > 0 ? (
+      userGames.slice(0, 5).map((game) => (
+        // <View style={{ width: "90%" }}>
+          <EndedGame
+            nick={
+              game.whiteUser.nameInGame === user?.nameInGame
+                ? game.blackUser.nameInGame
+                : game.whiteUser.nameInGame
+            }
+            rank={
+              game.whiteUser.nameInGame === user?.nameInGame
+                ? game.blackRating
+                : game.whiteRating
+            }
+            result={game.gameResult}
+            navigation={navigation}
+            key={`${game.id}${user?.nameInGame}`}
+            date={new Date(game.startTime)}
+            gameId={game.id}
+            myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}
+            whiteToMove={
+              (game.whiteStarts && game.moves.length % 2 === 0) ||
+              (game.moves.length % 2 === 1 && !game.whiteStarts)
+            }
+          />
+        // </View>
+      ))
+    ) : (
+      <View style={{ padding: 40 }}>
+        <Text
+          style={{
+            color: ColorsPallet.baseColor,
+            fontSize: 20,
+            textAlign: "center",
+          }}
+        >
+          No Old Games Yet
+        </Text>
+      </View>
+    );
 
   const playWithFriend = () => {
     let userArg: User;
-    if(user2) userArg = user2
-    else if(user) userArg = user
+    if (user2) userArg = user2;
+    else if (user) userArg = user;
     else return;
     navigation.navigate("PlayWithFriendsMenu", {
       userArg: userArg,
@@ -190,13 +173,15 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
 
   const handleAddFriend = () => {
     addFriendFunc({ friendNickname: user2 ? user2.nameInGame : "" })
-      .then((data) => {})
       .catch((err) => {
         throw new Error(err);
       });
+    setRefresh(!refresh);
   };
 
   const [friends, setFriends] = useState<Array<User>>([]);
+  const [sendedInvitations, setSendedInvitations] = useState<Array<User>>([]);
+  const [invitations, setInvitations] = useState<Array<User>>([]);
 
   const checkNicknameInObjects = (
     mainObject: Array<User>,
@@ -210,19 +195,40 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
       getFriendsList(nameInGame).then((data) => {
         if (data === undefined) return;
         setFriends(data.map((x) => responseUserToUser(x, "")));
+      }).catch((err) => {
+        throw new Error(err);
+      });
+
+    checkInvitations().then((data) =>{ 
+      if(data === undefined) return
+      setInvitations(data.map(x => responseUserToUser(x.user, "")))
+    }).catch(err => {
+      throw new Error(err)
+    })
+     
+  }, [nameInGame, user?.nameInGame])
+
+  useEffect(() => {
+    if (nameInGame)
+      getFriendsList(nameInGame).then((data) => {
+        if (data === undefined) return;
+        setFriends(data.map((x) => responseUserToUser(x, "")));
+      }).catch((err) => {
+        throw new Error(err);
       });
   }, [nameInGame, user?.nameInGame]);
 
   return (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor: ColorsPallet.light }}>
       <View style={styles.container}>
+      {/* <Animated.View style={styles.container}> */}
         <View style={styles.profile}>
           <Profile
-            nick={user2 ? user2.nameInGame : user ?user.nameInGame : ""}
-            rank={user2 ? user2.ranking : (user  ? user.ranking: undefined )}
+            nick={user2 ? user2.nameInGame : user ? user.nameInGame : ""}
+            rank={user2 ? user2.ranking : user ? user.ranking : undefined}
             active={user2 ? user2.online : user ? user.online : false}
             playing={user2 ? user2.playing : user ? user.playing : false}
-            country={user2 ? user2.country : user ? user.country :""}
+            country={user2 ? user2.country : user ? user.country : ""}
           />
         </View>
 
@@ -231,20 +237,44 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           friends,
           user?.nameInGame ? user?.nameInGame : ""
         ) ? (
-          <LogoutButton navigation={navigation} setUserNotAuthenticated={setUserNotAuthenticated}/>
+          ""
+        ) : checkNicknameInObjects(
+            sendedInvitations,
+            user2?.nameInGame ? user2?.nameInGame : ""
+          ) ? (
+          <View style={styles.invite}>
+            <View style={styles.sent}>
+              <Text style={{ fontSize: 16 }}>Invitation Sent</Text>
+            </View>
+          </View>
+        ) : user2 && checkNicknameInObjects(invitations, user2.nameInGame) ? (
+          <View style={styles.invite}>
+            <BaseButton
+              handlePress={() => {
+                handleFriendInvitationFunc({
+                  friendNickname: user2.nameInGame,
+                  responseType: FriendInvitationResponseType.ACCEPT,
+                });
+              }}
+              text={"Accept Invitation"}
+            />
+          </View>
         ) : (
           <View style={styles.invite}>
             <BaseButton
               handlePress={() => {
-                handleAddFriend;
+                handleAddFriend();
               }}
-              text="Send Invitation"
+              text="Send invitation"
             />
           </View>
         )}
 
         {ifMyAccount ? (
-          ""
+          <LogoutButton
+            navigation={navigation}
+            setUserNotAuthenticated={setUserNotAuthenticated}
+          />
         ) : (
           <View style={styles.invite}>
             <BaseButton
@@ -262,7 +292,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
         />
         <FriendsIconList
           navigation={navigation}
-          nameInGame={user2 ? user2.nameInGame : user ? user.nameInGame: ""}
+          nameInGame={user2 ? user2.nameInGame : user ? user.nameInGame : ""}
         />
         <Heading
           text={"Old Games"}
@@ -270,6 +300,7 @@ export default function ProfilePage({ navigation, route, setUserNotAuthenticated
           stringNavigation={toOldGames}
         />
         <View style={{ width: "85%" }}>{component}</View>
+      {/* </Animated.View> */}
       </View>
     </ScrollView>
   );
@@ -289,5 +320,13 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 55,
     margin: 3,
+  },
+  sent: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: ColorsPallet.dark,
   },
 });

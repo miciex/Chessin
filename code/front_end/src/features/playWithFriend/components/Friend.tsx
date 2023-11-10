@@ -5,7 +5,7 @@ import { Fontisto } from "@expo/vector-icons";
 import { ColorsPallet, StackParamList } from "../../../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
-import {User } from "../../../utils/PlayerUtilities";
+import { User } from "../../../utils/PlayerUtilities";
 
 type Props = {
   user: User;
@@ -16,7 +16,6 @@ type Props = {
   >;
 };
 const Friend = ({ navigation, user }: Props) => {
-  
   const PlayingEye = () => {
     if (!user.playing) {
       return null;
@@ -31,29 +30,33 @@ const Friend = ({ navigation, user }: Props) => {
   };
 
   const goToFriendsMenu = () => {
-    navigation.navigate("PlayWithFriendsMenu", {userArg:user});
+    navigation.navigate("PlayWithFriendsMenu", { userArg: user });
   };
   const goToFriendsProfile = () => {
-    navigation.navigate("ProfilePage", {nameInGame:user.nameInGame});
+    navigation.navigate("ProfilePage", { nameInGame: user.nameInGame });
   };
   return (
     <View style={styles.record}>
-   
-   <View style={styles.cornerPressable}>
-      <Pressable style={styles.left} onPress={goToFriendsProfile}  android_ripple={{
-                  color: ColorsPallet.darker,
-                  borderless: false,
-                }}>
-      <Image
-        style={styles.tinyLogo}
-        source={{
-          uri: "https://play-lh.googleusercontent.com/aTTVA77bs4tVS1UvnsmD_T0w-rdZef7UmjpIsg-8RVDOVl_EVEHjmkn6qN7C0teRS3o",
-        }}
-      />             
-      <Text >
-        <Online /> {user.nameInGame} {user.ranking.CLASSICAL? user.ranking.CLASSICAL.toString():""}
-      </Text>
-      </Pressable>
+      <View style={styles.cornerPressable}>
+        <Pressable
+          style={styles.left}
+          onPress={goToFriendsProfile}
+          android_ripple={{
+            color: ColorsPallet.darker,
+            borderless: false,
+          }}
+        >
+          <Image
+            style={styles.tinyLogo}
+            source={{
+              uri: "https://play-lh.googleusercontent.com/aTTVA77bs4tVS1UvnsmD_T0w-rdZef7UmjpIsg-8RVDOVl_EVEHjmkn6qN7C0teRS3o",
+            }}
+          />
+          <Text>
+            <Online /> {user.nameInGame}{" "}
+            {user.ranking.CLASSICAL ? user.ranking.CLASSICAL.toString() : ""}
+          </Text>
+        </Pressable>
       </View>
       <View style={styles.right}>
         <Text style={{ textAlign: "right", width: "100%" }}>
@@ -86,7 +89,6 @@ const styles = StyleSheet.create({
     marginTop: 7,
     display: "flex",
     alignItems: "center",
-
   },
   left: {
     width: "100%",
@@ -104,13 +106,13 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     borderRadius: 50,
-    marginRight: 10
+    marginRight: 10,
   },
-  cornerPressable:{
+  cornerPressable: {
     width: "70%",
     height: "100%",
     overflow: "hidden",
     borderRadius: 12,
     flexDirection: "row",
-  }
+  },
 });

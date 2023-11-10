@@ -44,7 +44,7 @@ export default function ChooseYourLevelModal({toggleGear,setLevel}: Props) {
             </View>
           </View>
           <View style={styles.contentContainer}>
-            {levels.map((level) => (
+            {levels.map((level, index) => (
               <View style={styles.record}>
                 <Pressable
                   android_ripple={{
@@ -52,6 +52,7 @@ export default function ChooseYourLevelModal({toggleGear,setLevel}: Props) {
                     borderless: false,
                   }}
                   onPress={() => {
+                    setLevel(levelsNum[index])
                     toggleGear();
                   }}
                   style={{
@@ -63,7 +64,7 @@ export default function ChooseYourLevelModal({toggleGear,setLevel}: Props) {
                   }}
                 >
                   <Text style={{ textAlign: "center", fontSize: 18 }}>
-                    {level}
+                    {level} {levelsNum[index]}
                   </Text>
                 </Pressable>
               </View>

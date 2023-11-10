@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 import { remindPassword } from "../services/AuthenticationServices";
 import { PasswordRemindRequest } from "../utils/ServicesTypes";
 import {
-  notValidPasswordMessage,
+  getPasswordErrorMessage,
   notValidPasswordRepeatMessage,
   emailRegex,
   passwordRegex,
   ColorsPallet,
+  containsNumbersRegex,
+  containsSpecialCharactersRegex,
 } from "../utils/Constants";
 import AuthInput from "../features/authentication/components/AuthInput";
 import BaseButton from "../components/BaseButton";
@@ -64,6 +66,7 @@ export default function RemindPasswordPage({
     useState<boolean>(true);
 
   const [showCodeModal, setShowCodeModal] = useState<boolean>(false);
+  const [activeInput, setActiveInput] = useState<string>("");
 
   const validateEmail = (): boolean => {
     return emailRegex.test(email);
@@ -71,6 +74,7 @@ export default function RemindPasswordPage({
 
   const setIsEmailValid = (): void => {
     setEmailValid(validateEmail());
+    setActiveInput("");
   };
 
   const isInputValid = () => {
@@ -83,12 +87,11 @@ export default function RemindPasswordPage({
       email,
       newPassword,
     };
-    console.log("handling remind password request");
     remindPassword(request)
       .then((response) => {
         if (response.status === 202) {
           setLoggedIn(true);
-        }  else if (response.status === 400) {
+        } else if (response.status === 400) {
           response
             .text()
             .then((data) => {
@@ -123,11 +126,12 @@ export default function RemindPasswordPage({
   };
 
   const validateNewPassword = (): boolean => {
-    return passwordRegex.test(newPassword);
+    return containsNumbersRegex.test(newPassword) && containsSpecialCharactersRegex.test(newPassword) && newPassword.toLowerCase() !== newPassword && newPassword.toUpperCase() !== newPassword && newPassword.length >= 12;
   };
 
   const setIsNewPasswordValid = (): void => {
     setNewPasswordValid(validateNewPassword());
+    setActiveInput("");
   };
 
   const validateRepeatPassword = (): boolean => {
@@ -136,6 +140,7 @@ export default function RemindPasswordPage({
 
   const setIsRepeatNewPasswordValid = (): void => {
     setRepeatNewPasswordValid(validateRepeatPassword());
+    setActiveInput("");
   };
 
   const hideModal = (): void => {
@@ -174,7 +179,6 @@ export default function RemindPasswordPage({
   };
 
   const modal = getModal();
-  console.log(loggedIn);
   return modal !== null ? (
     modal
   ) : (
@@ -187,6 +191,8 @@ export default function RemindPasswordPage({
           isValid={emailValid}
           notValidText="Email is not valid"
           onSubmitEditing={setIsEmailValid}
+          onFocus={() => setActiveInput("Email")}
+          activeInput={activeInput}
         />
         <>
           <AuthInput
@@ -194,24 +200,28 @@ export default function RemindPasswordPage({
             value={newPassword}
             onChange={setNewPassword}
             isValid={newPasswordValid}
-            notValidText={notValidPasswordMessage}
+            notValidText={notValidPasswordRepeatMessage}
             onSubmitEditing={setIsNewPasswordValid}
+            onFocus={() => setActiveInput("Password")}
+            activeInput={activeInput}
           ></AuthInput>
           <AuthInput
             placeholder="Repeat password"
             value={repeatNewPassword}
             onChange={setRepeatNewPassword}
             isValid={repeatNewPasswordValid}
-            notValidText={notValidPasswordRepeatMessage}
+            notValidText={getPasswordErrorMessage(repeatNewPassword)}
             onSubmitEditing={setIsRepeatNewPasswordValid}
+            onFocus={() => setActiveInput("Repeat password")}
+            activeInput={activeInput}
           ></AuthInput>
         </>
-        <View style={styles.submitButton}>
-          <BaseButton text="Submit" handlePress={handleSubmit} />
-        </View>
+        {activeInput === "" ? (
+          <View style={styles.submitButton}>
+            <BaseButton text="Submit" handlePress={handleSubmit} />
+          </View>
+        ) : null}
       </View>
-
-      <Footer navigation={navigation} />
     </View>
   );
 }

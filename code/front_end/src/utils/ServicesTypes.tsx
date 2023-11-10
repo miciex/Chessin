@@ -1,6 +1,7 @@
-import { responseUser } from "./PlayerUtilities";
+import { PlayColor, ResponseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
 import { GameResults, GameType } from "../chess-logic/board";
+import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColorContext";
 
 export type RegisterRequest = {
   firstname: string;
@@ -49,8 +50,8 @@ export type PendingChessGameRequest = {
 
 export type ChessGameResponse = {
   id: number;
-  whiteUser: responseUser;
-  blackUser: responseUser;
+  whiteUser: ResponseUser;
+  blackUser: ResponseUser;
   moves: Array<MoveResponse>;
   availableCastles: Array<number>;
   timeControl: number;
@@ -63,6 +64,8 @@ export type ChessGameResponse = {
   whiteRatinChange: number;
   blackRatingChange: number;
   isRated: boolean;
+  startTime: number;
+  gameResult: GameResults;
 };
 
 export type SubmitMoveRequest = {
@@ -71,7 +74,6 @@ export type SubmitMoveRequest = {
   startField: number;
   endField: number;
   promotePiece: number;
-  doesResign: boolean;
 };
 
 export type BoardResponse = {
@@ -123,22 +125,30 @@ export type ListenForMoveRequest = {
 };
 
 export type HandleFriendInvitation = {
-  friendNick: string;
+  friendNickname: string;
   responseType: FriendInvitationResponseType;
+};
 
-}
+export type InviteToGameRequest = {
+  friendNickname: string;
+  timeControl: number;
+  increment: number;
+  isRated: boolean;
+  playerColor: string;
+};
 
 export type HandleSearchBarSocials = {
   searchNickname: string;
-}
+};
 
 export enum FriendInvitationResponseType {
-  ACCEPT="ACCEPT", DECLINE="DECLINE"
+  ACCEPT = "ACCEPT",
+  DECLINE = "DECLINE",
 }
 
 export type NameInGame = {
   nameInGame: string;
-}
+};
 export type PasswordChangeRequest = {
   email: string;
   oldPassword?: string;
@@ -174,7 +184,43 @@ export enum ResponseType {
   DECLINE = "DECLINE",
 }
 
-export type RespondToDrawOfferRequest ={
+export type RespondToDrawOfferRequest = {
   gameId: number;
   responseType: ResponseType;
+};
+
+export type MessageResponse = {
+  message: string;
+};
+
+export type BooleanMessageResponse = {
+  message: "True" | "False";
+};
+
+export const enum DisconnectionStatus {
+  FINE = "FINE",
+  DISCONNECTED = "DISCONNECTED",
+  RECONNECTED = "RECONNECTED",
+  NO_CHANGE = "NO_CHANGE",
+}
+
+export type GameInvitationResponse = {
+  id: number;
+  user: ResponseUser;
+  friend: ResponseUser;
+  date: number;
+  timeControl: number;
+  increment: number;
+  isRated: boolean;
+  playerColor: PlayColor;
+};
+
+export type FriendInvitationResponse = {
+  user: ResponseUser;
+  date: number;
+};
+
+export type DisconnectionResponse = {
+  disconnectionStatus: DisconnectionStatus;
+  disconnectionTime: number;
 }

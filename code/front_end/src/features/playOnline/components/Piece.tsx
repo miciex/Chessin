@@ -144,14 +144,14 @@ export default function Piece({
       startField: move.startField,
       endField: move.endField,
       promotePiece: move.promotePiece,
-      doesResign: false,
     };
-    console.log("submitMoveRequest");
-    console.log(submitMoveRequest);
     dispatch({
       type: "playMove",
       payload: move,
     });
+    dispatch({type:"updateMyClockByMilliseconds", payload: state.increment})
+    if(state.board.moves.length === 0)
+      dispatch({ type: "setCurrentPosition", payload: 0});
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
         if (!boardResponse) return;
@@ -212,7 +212,7 @@ export default function Piece({
         const endField =
           Math.round((position.x + gestureState.dx) / SIZE) +
           Math.round((position.y + gestureState.dy) / SIZE) * 8;
-        if (isPossibleMove(rotateBoard ? 63 - endField : endField) && isMyTurn) {
+        if (isPossibleMove(endField) && isMyTurn) {
           if (ableToMove){
           const move = moveFactory({
             pieces: state.board.position,

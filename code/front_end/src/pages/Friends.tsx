@@ -15,7 +15,7 @@ import {
   setUserDataFromResponse,
 } from "../services/userServices";
 import { HandleSearchBarSocials } from "../utils/ServicesTypes";
-import { responseUser, responseUserToUser } from "../utils/PlayerUtilities";
+import { ResponseUser, responseUserToUser } from "../utils/PlayerUtilities";
 import { User } from "../utils/PlayerUtilities";
 import Heading from "../components/Heading";
 

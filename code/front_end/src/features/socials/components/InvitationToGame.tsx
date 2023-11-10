@@ -9,11 +9,17 @@ import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
 import {
   addFriendFunc,
+  answerToGameInvitation,
   fetchUser,
   handleFriendInvitationFunc,
 } from "../../../services/userServices";
-import { FriendInvitationResponseType } from "../../../utils/ServicesTypes";
+import {
+  ChessGameResponse,
+  FriendInvitationResponseType,
+} from "../../../utils/ServicesTypes";
 import { User } from "../../../utils/PlayerUtilities";
+import { getValueFor } from "../../../utils/AsyncStoreFunctions";
+import { HandleFriendInvitation } from "../../../utils/ServicesTypes";
 
 type Props = {
   email: string;
@@ -26,23 +32,36 @@ type Props = {
   >;
 };
 
-const Invitation = ({ email, nick, rank, navigation }: Props) => {
+const InvitationToGame = ({ email, nick, rank, navigation }: Props) => {
   const goToFriendsProfile = () => {
     navigation.navigate("ProfilePage", { nameInGame: nick });
   };
 
-  let refresh = 0;
-
   const [user, setUser] = useState<User>();
 
+  let refresh = 0;
+
   useEffect(() => {
-    fetchUser("", nick).then((user) => {
-      if (user === null) {
-        return;
-      }
-      setUser(user);
-    });
+    getValueFor("user")
+      .then((user) => {
+        if (!user) return;
+        setUser(JSON.parse(user));
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
   }, [refresh]);
+
+  const handleAnswerToGameInvitation = (request: HandleFriendInvitation) => {
+    answerToGameInvitation(request)
+      .then((response: null | ChessGameResponse) => {
+        if (!response) return;
+        navigation.replace("PlayOnline");
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
 
   return (
     <View style={styles.record}>
@@ -63,7 +82,7 @@ const Invitation = ({ email, nick, rank, navigation }: Props) => {
           />
           <View>
             <Text style={{ fontSize: 20, width: 300 }}>
-              {nick} zaprasza do znajomych
+              {nick} zaprasza do gry
             </Text>
             <Text style={{ color: "rgb(212, 209, 207)" }}>
               {user?.highestRanking.toString()}
@@ -78,7 +97,7 @@ const Invitation = ({ email, nick, rank, navigation }: Props) => {
             <BaseButton
               text="Accept"
               handlePress={() => {
-                handleFriendInvitationFunc({
+                handleAnswerToGameInvitation({
                   friendNickname: nick,
                   responseType: FriendInvitationResponseType.ACCEPT,
                 });
@@ -91,7 +110,7 @@ const Invitation = ({ email, nick, rank, navigation }: Props) => {
             <BaseButton
               text="Reject"
               handlePress={() => {
-                handleFriendInvitationFunc({
+                handleAnswerToGameInvitation({
                   friendNickname: nick,
                   responseType: FriendInvitationResponseType.DECLINE,
                 });
@@ -105,7 +124,7 @@ const Invitation = ({ email, nick, rank, navigation }: Props) => {
     </View>
   );
 };
-export default Invitation;
+export default InvitationToGame;
 
 const styles = StyleSheet.create({
   record: {

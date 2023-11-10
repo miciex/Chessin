@@ -2,7 +2,7 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import Submit from "../features/login/components/Submit";
 import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
-import { ColorsPallet } from "../utils/Constants";
+import { ColorsPallet, containsNumbersRegex, containsSpecialCharactersRegex, getPasswordErrorMessage, letterPasswordCaseError, numberPasswordError, specialCharacterPasswordError, toFewCharacterPasswordErrorMessage } from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import AuthInput from "../features/authentication/components/AuthInput";
@@ -10,7 +10,6 @@ import Footer from "../components/Footer";
 import { emailRegex, passwordRegex, nameRegex } from "../utils/Constants";
 import {
   notValidEmailMessage,
-  notValidPasswordMessage,
   notValidNameMessage,
   notValidNickMessage,
   notValidPasswordRepeatMessage,
@@ -51,6 +50,7 @@ export default function Register({ navigation }: Props) {
     useState<boolean>(false);
   const [isCountryValid, setIsCountryValid] = useState<boolean | null>(null);
   const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
+  const [activeInput, setActiveInput] = useState<string>("");
 
   const hideAuthCodeModal = (): void => {
     setShowAuthCode(false);
@@ -62,6 +62,7 @@ export default function Register({ navigation }: Props) {
 
   const setFirstNameValid = (): void => {
     setIsFirstNameValid(validateFirstName());
+    setActiveInput("");
   };
 
   const validateLastName = (): boolean => {
@@ -70,6 +71,7 @@ export default function Register({ navigation }: Props) {
 
   const setLastNameValid = (): void => {
     setIsLastNameValid(validateLastName());
+    setActiveInput("");
   };
 
   const validateNick = (): boolean => {
@@ -78,6 +80,7 @@ export default function Register({ navigation }: Props) {
 
   const setNickValid = (): void => {
     setIsNickValid(validateNick());
+    setActiveInput("");
   };
 
   const validataEmail = (): boolean => {
@@ -86,14 +89,16 @@ export default function Register({ navigation }: Props) {
 
   const setPasswordValid = (): void => {
     setIsPasswordValid(validatePassword());
+    setActiveInput("");
   };
 
   const validatePassword = (): boolean => {
-    return passwordRegex.test(password);
+    return containsNumbersRegex.test(password) && containsSpecialCharactersRegex.test(password) && password.toLowerCase() !== password && password.toUpperCase() !== password && password.length >= 12;
   };
 
   const setEmailValid = (): void => {
     setIsEmailValid(validataEmail());
+    setActiveInput("");
   };
 
   const validateRepeatPassword = (): boolean => {
@@ -102,6 +107,7 @@ export default function Register({ navigation }: Props) {
 
   const setRepeatPasswordValid = (): void => {
     setIsRepeatPasswordValid(validateRepeatPassword());
+    setActiveInput("");
   };
 
   const validateCountry = (newCountry?: countryIsoCodesType): boolean => {
@@ -112,6 +118,7 @@ export default function Register({ navigation }: Props) {
   const setCountryValid = (newCountry?: countryIsoCodesType): void => {
     const valid = newCountry ? validateCountry(newCountry) : validateCountry();
     setIsCountryValid(valid);
+    setActiveInput("");
   };
 
   const areInputsValid = (): boolean => {
@@ -139,7 +146,6 @@ export default function Register({ navigation }: Props) {
   const onSubmit = () => {
     setInputsValid();
     if (!areInputsValid()) return;
-    console.log("registering")
     register({
       email,
       password,
@@ -149,7 +155,6 @@ export default function Register({ navigation }: Props) {
       country: country.Name,
     })
       .then((response) => {
-        console.log("response status: "+response.status);
         if (response.status === 200) {
           navigation.navigate("UserNotAuthenticated");
         } else if (response.status === 202) {
@@ -165,7 +170,7 @@ export default function Register({ navigation }: Props) {
 
   const handleVerifyCodeResponse = async (response: Response) => {
     if (response.status === 200) {
-          navigation.navigate("Home")
+      navigation.replace("Home");
     } else if (response.status === 400) {
       response
         .text()
@@ -177,6 +182,8 @@ export default function Register({ navigation }: Props) {
         });
     }
   };
+
+  
 
   return showAuthCode ? (
     <AuthCodeModal
@@ -197,13 +204,7 @@ export default function Register({ navigation }: Props) {
   ) : (
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
-        <ScrollView
-          style={styles.ScrollView}
-          contentContainerStyle={{
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        {!isCountryScollViewVisible ? (
           <View style={styles.formContainer}>
             <AuthInput
               placeholder="Your Firstname"
@@ -212,6 +213,8 @@ export default function Register({ navigation }: Props) {
               isValid={isFirstNameValid}
               onSubmitEditing={setFirstNameValid}
               notValidText={notValidNameMessage}
+              onFocus={() => setActiveInput("Your Firstname")}
+              activeInput={activeInput}
             />
             <AuthInput
               placeholder="Your LastName"
@@ -220,6 +223,8 @@ export default function Register({ navigation }: Props) {
               isValid={isLastNameValid}
               onSubmitEditing={setLastNameValid}
               notValidText={notValidSurnameMessage}
+              onFocus={() => setActiveInput("Your LastName")}
+              activeInput={activeInput}
             />
             <AuthInput
               placeholder="Your Nick"
@@ -228,6 +233,8 @@ export default function Register({ navigation }: Props) {
               isValid={isNickValid}
               onSubmitEditing={setNickValid}
               notValidText={notValidNickMessage}
+              onFocus={() => setActiveInput("Your Nick")}
+              activeInput={activeInput}
             />
             <AuthInput
               placeholder="Email"
@@ -236,6 +243,8 @@ export default function Register({ navigation }: Props) {
               isValid={isEmailValid}
               onSubmitEditing={setEmailValid}
               notValidText={notValidEmailMessage}
+              onFocus={() => setActiveInput("Email")}
+              activeInput={activeInput}
             />
             <AuthInput
               placeholder="Password"
@@ -244,7 +253,9 @@ export default function Register({ navigation }: Props) {
               securityTextEntry={true}
               isValid={isPasswordValid}
               onSubmitEditing={setPasswordValid}
-              notValidText={notValidPasswordMessage}
+              notValidText={getPasswordErrorMessage(password)}
+              onFocus={() => setActiveInput("Password")}
+              activeInput={activeInput}
             />
             <AuthInput
               placeholder="Repeat Password"
@@ -254,8 +265,12 @@ export default function Register({ navigation }: Props) {
               isValid={isRepeatPasswordValid}
               onSubmitEditing={setRepeatPasswordValid}
               notValidText={notValidPasswordRepeatMessage}
+              onFocus={() => setActiveInput("Repeat Password")}
+              activeInput={activeInput}
             />
           </View>
+        ) : null}
+        {activeInput === "" ? (
           <View style={styles.chooseCountryContainer}>
             <ChooseCountry
               isVisible={isCountryScollViewVisible}
@@ -265,10 +280,11 @@ export default function Register({ navigation }: Props) {
               setCountryValid={setCountryValid}
             />
           </View>
-        </ScrollView>
-        <Submit onSubmit={onSubmit} />
+        ) : null}
+        {!isCountryScollViewVisible && activeInput === "" ? (
+          <Submit onSubmit={onSubmit} />
+        ) : null}
       </View>
-      {/* <Footer navigation={navigation} /> */}
     </View>
   );
 }
@@ -291,6 +307,7 @@ const styles = StyleSheet.create({
     alignContent: "stretch",
     alignItems: "center",
     paddingTop: 20,
+    paddingBottom: 20,
   },
   contentContainer: {
     flex: 8,

@@ -129,8 +129,7 @@ public class ChessGameController {
 
     @Transactional
     @PostMapping("/resign/{gameId}")
-    public ResponseEntity<?> resign(@PathVariable String gameId, HttpServletRequest servlet)
-    {
+    public ResponseEntity<?> resign(@PathVariable String gameId, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
 
         long id;

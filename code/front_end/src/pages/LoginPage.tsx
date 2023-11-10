@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
 import Submit from "../features/login/components/Submit";
-import { ColorsPallet } from "../utils/Constants";
+import { ColorsPallet, containsNumbersRegex, containsSpecialCharactersRegex } from "../utils/Constants";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import {
   AuthenticationResponse,
@@ -16,7 +16,7 @@ import { emailRegex, passwordRegex } from "../utils/Constants";
 import AuthInput from "../features/authentication/components/AuthInput";
 import {
   notValidEmailMessage,
-  notValidPasswordMessage,
+  getPasswordErrorMessage
 } from "../utils/Constants";
 import { setUserDataFromResponse } from "../services/userServices";
 import { login } from "../services/AuthenticationServices";
@@ -33,21 +33,24 @@ export default function Login({ navigation }: Props) {
   const [password, setPassword] = useState<string>("");
   const [isPasswordValid, setIsPasswordValid] = useState<boolean | null>(null);
   const [showAuthCode, setShowAuthCode] = useState<boolean>(false);
+  const [activeInput, setActiveInput] = useState<string>("");
 
   const validataEmail = (): boolean => {
     return emailRegex.test(email);
   };
 
   const validatePassword = (): boolean => {
-    return passwordRegex.test(password);
+    return containsNumbersRegex.test(password) && containsSpecialCharactersRegex.test(password) && password.toLowerCase() !== password && password.toUpperCase() !== password && password.length >= 12;
   };
 
   const setPasswordValid = (): void => {
     setIsPasswordValid(validatePassword());
+    setActiveInput("");
   };
 
   const setEmailValid = (): void => {
     setIsEmailValid(validataEmail());
+    setActiveInput("");
   };
 
   const isDataValid = (): boolean => {
@@ -56,10 +59,11 @@ export default function Login({ navigation }: Props) {
 
   const onSubmit = () => {
     if (!isDataValid()) return;
+    console.log("s");
     login({ email, password })
       .then((response) => {
         if (response.status === 200) {
-          navigation.navigate("Home");
+          navigation.replace("Home");
           return response.json();
         } else if (response.status === 202) {
           setShowAuthCode(true);
@@ -97,9 +101,13 @@ export default function Login({ navigation }: Props) {
       response
         .json()
         .then((data) => {
-          setUserDataFromResponse(data);
-        }).then(()=>{
-          navigation.navigate("Home");
+          setUserDataFromResponse(data)
+            .then(() => {
+              navigation.replace("Home");
+            })
+            .catch((err) => {
+              throw new Error(err);
+            });
         })
         .catch((err) => {
           throw new Error(err);
@@ -142,6 +150,8 @@ export default function Login({ navigation }: Props) {
             isValid={isEmailValid}
             notValidText={notValidEmailMessage}
             onSubmitEditing={setEmailValid}
+            onFocus={() => setActiveInput("Email")}
+            activeInput={activeInput}
           />
           <AuthInput
             placeholder="Password"
@@ -149,42 +159,44 @@ export default function Login({ navigation }: Props) {
             onChange={setPassword}
             securityTextEntry={true}
             isValid={isPasswordValid}
-            notValidText={notValidPasswordMessage}
+            notValidText={getPasswordErrorMessage(password)}
             onSubmitEditing={setPasswordValid}
+            onFocus={() => setActiveInput("Password")}
+            activeInput={activeInput}
           />
-
-          <Submit onSubmit={onSubmit} />
+          {activeInput === "" ? <Submit onSubmit={onSubmit} /> : null}
         </View>
-        <View style={styles.authLinksContainer}>
-          <View style={styles.authLinkButton}>
-            <BaseButton
-              text="Reset your password"
-              handlePress={() => {
-                navigation.navigate("ResetPassword");
-              }}
-              color={ColorsPallet.light}
-            />
-            
-          </View>
-          <View style={styles.authLinkButton}>
-          <BaseButton
-              text="Remind password"
-              handlePress={() => {
-                navigation.navigate("RemindPassword");
-              }}
-              color={ColorsPallet.light}
-            />
+        {activeInput === "" ? (
+          <View style={styles.authLinksContainer}>
+            <View style={styles.authLinkButton}>
+              <BaseButton
+                text="Reset your password"
+                handlePress={() => {
+                  navigation.navigate("ResetPassword");
+                }}
+                color={ColorsPallet.light}
+              />
             </View>
-          <View style={styles.authLinkButton}>
-            <BaseButton
-              text="Register"
-              handlePress={() => {
-                navigation.navigate("Register");
-              }}
-              color={ColorsPallet.light}
-            />
+            <View style={styles.authLinkButton}>
+              <BaseButton
+                text="Remind password"
+                handlePress={() => {
+                  navigation.navigate("RemindPassword");
+                }}
+                color={ColorsPallet.light}
+              />
+            </View>
+            <View style={styles.authLinkButton}>
+              <BaseButton
+                text="Register"
+                handlePress={() => {
+                  navigation.navigate("Register");
+                }}
+                color={ColorsPallet.light}
+              />
+            </View>
           </View>
-        </View>
+        ) : null}
       </View>
       {/* <Footer navigation={navigation} /> */}
     </View>
