@@ -344,8 +344,8 @@ public class ChessGameService {
 
             if(!activeBoards.containsKey(request.getGameId()))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
-
-            if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.BLACK_RESIGN, GameResults.WHITE_RESIGN, GameResults.ABANDONED).contains(activeBoards.get(request.getGameId()).getGameResult()))
+          
+            if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.BLACK_RESIGN, GameResults.WHITE_RESIGN, GameResults.ABANDONED, GameResults.BLACK_TIMEOUT, GameResults.WHITE_TIMEOUT).contains(activeBoards.get(request.getGameId()).getGameResult()))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
 
             if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
