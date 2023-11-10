@@ -56,6 +56,8 @@ export default function GameFinishedOverlay({
         return "Black disconnected";
       case GameResults.WHITE_DISCONNECTED:
         return "White disconnected";
+      case GameResults.BLACK_ABANDONED: return "Black abandoned game";
+      case GameResults.WHITE_ABANDONED: return "White abandoned game";
       default:
         return "Unknown result";
     }
