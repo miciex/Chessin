@@ -783,7 +783,7 @@ public class ChessGameService {
     @Scheduled(fixedRate = 5000)
     public void handleGames()
     {
-        List<Board> boards = activeBoards.values().stream().filter(x -> x.getMoves().size() <= 2).toList();
+        List<Board> boards = activeBoards.values().stream().filter(x -> x.getMoves().size() < 2).toList();
 
         for(Board board : boards)
         {
