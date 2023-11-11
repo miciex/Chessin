@@ -1,9 +1,9 @@
-import * as SecureStore from "expo-secure-store";
 import { findUserbyTokenLink } from "../../../utils/ApiEndpoints";
 import { User, loggedUserToUser } from "../../../utils/PlayerUtilities";
 import { save } from "../../../utils/AsyncStoreFunctions";
 import { loggedUserResponse } from "../../../utils/ServicesTypes";
 import { getValueFor } from "../../../utils/AsyncStoreFunctions";
+
 export const fetchandStoreUser = async () => {
   return fetchLoggedUser()
     .then((data) => {
@@ -27,12 +27,11 @@ export const fetchLoggedUser = async () => {
     }),
   })
     .then((response) => {
-      if (response.status === 200){
-        return response.json().catch(err=>{
-          throw new Error(err)
+      if (response.status === 200) {
+        return response.json().catch((err) => {
+          throw new Error(err);
         }) as unknown as loggedUserResponse;
-      }
-      else if (response.status === 400) {
+      } else if (response.status === 400) {
         throw new Error("Bad request");
       } else if (response.status === 401) {
         throw new Error("Unauthorized");

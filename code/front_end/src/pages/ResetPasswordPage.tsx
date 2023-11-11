@@ -10,7 +10,6 @@ import {
   getPasswordErrorMessage,
   notValidPasswordRepeatMessage,
   emailRegex,
-  passwordRegex,
   ColorsPallet,
   containsNumbersRegex,
   containsSpecialCharactersRegex,
@@ -20,7 +19,6 @@ import BaseButton from "../components/BaseButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
-import Footer from "../components/Footer";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import { VerificationType } from "../utils/ServicesTypes";
 import { logoutUser } from "../services/userServices";
@@ -148,7 +146,13 @@ export default function ResetPasswordPage({
   };
 
   const validatePassword = (): boolean => {
-    return containsNumbersRegex.test(password) && containsSpecialCharactersRegex.test(password) && password.toLowerCase() !== password && password.toUpperCase() !== password && password.length >= 12;
+    return (
+      containsNumbersRegex.test(password) &&
+      containsSpecialCharactersRegex.test(password) &&
+      password.toLowerCase() !== password &&
+      password.toUpperCase() !== password &&
+      password.length >= 12
+    );
   };
 
   const setIsPasswordValid = (): void => {
@@ -157,7 +161,13 @@ export default function ResetPasswordPage({
   };
 
   const validateNewPassword = (): boolean => {
-    return containsNumbersRegex.test(newPassword) && containsSpecialCharactersRegex.test(newPassword) && newPassword.toLowerCase() !== newPassword && newPassword.toUpperCase() !== newPassword && newPassword.length >= 12;
+    return (
+      containsNumbersRegex.test(newPassword) &&
+      containsSpecialCharactersRegex.test(newPassword) &&
+      newPassword.toLowerCase() !== newPassword &&
+      newPassword.toUpperCase() !== newPassword &&
+      newPassword.length >= 12
+    );
   };
 
   const setIsNewPasswordValid = (): void => {

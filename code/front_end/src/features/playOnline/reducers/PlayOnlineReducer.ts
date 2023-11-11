@@ -6,7 +6,6 @@ import {
 } from "../../../chess-logic/board";
 import {
   Player,
-  User,
   getBasePlayer,
   responseUserToPlayer,
 } from "../../../utils/PlayerUtilities";

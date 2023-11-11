@@ -1,4 +1,4 @@
-import { handleFetch, handlePost } from "../lib/fetch";
+import { handlePost } from "../lib/fetch";
 import {
   getGameByIdLink,
   getGameHistoryLink,
@@ -12,8 +12,6 @@ import {
   resignLink,
   respondToDrawOfferLink,
 } from "../utils/ApiEndpoints";
-import { getValueFor } from "../utils/AsyncStoreFunctions";
-import { User } from "../utils/PlayerUtilities";
 import { RespondToDrawOfferRequest } from "../utils/ServicesTypes";
 
 export const getGameHistory = async (nick: string) => {

@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView, Text } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { User } from "../utils/PlayerUtilities";
 import { RootStackParamList } from "../../Routing";
@@ -10,77 +10,12 @@ import TopButtons from "../features/home/components/TopButtons";
 import { ColorsPallet } from "../utils/Constants";
 import BaseButton from "../components/BaseButton";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
-import ChooseYourLevelModal from "../features/home/components/ChooseYourLevelModal";
 import {
   BooleanMessageResponse,
   ChessGameResponse,
 } from "../utils/ServicesTypes";
-import { getGameHistory, isUserPlaying } from "../services/chessGameService";
+import { isUserPlaying } from "../services/chessGameService";
 import { getPagedGames } from "../services/userServices";
-
-//przykladowe stary gry
-const ended_games = [
-  {
-    date: "01.10.2022",
-    playerNick: "Pusznik",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "MaciekNieBij",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Slaweczuk",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Strzała",
-    rank: 1500,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Bestia",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Sharku",
-    rank: 1000,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-];
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home", undefined>;
@@ -133,25 +68,7 @@ const HomePage = ({ navigation }: Props) => {
     <View style={styles.appContainer}>
       <View style={styles.contentContainer}>
         <ScrollView>
-          {/* {levelModal ? (
-            <>
-              <ChooseYourLevelModal
-                toggleGear={toggleLevel}
-                setLevel={setLevel}
-              />
-              {}
-            </>
-          ) : null} */}
           <View style={{ width: "100%", alignItems: "center" }}>
-            {/* <Text>Your ELO Level: {levelOfPlayer}</Text>
-            <View style={styles.oldGamesButton}>
-              <BaseButton
-                handlePress={() => {
-                  setLevelModal(!levelModal);
-                }}
-                text="Choose Your Level"
-              />
-            </View> */}
             <TopButtons navigation={navigation} user={user} />
             <View style={styles.oldGamesButton}>
               <BaseButton

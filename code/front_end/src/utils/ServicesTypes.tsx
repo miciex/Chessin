@@ -1,7 +1,6 @@
 import { PlayColor, ResponseUser } from "./PlayerUtilities";
 import { MoveResponse } from "../chess-logic/move";
 import { GameResults, GameType } from "../chess-logic/board";
-import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColorContext";
 
 export type RegisterRequest = {
   firstname: string;
@@ -223,4 +222,4 @@ export type FriendInvitationResponse = {
 export type DisconnectionResponse = {
   disconnectionStatus: DisconnectionStatus;
   disconnectionTime: number;
-}
+};

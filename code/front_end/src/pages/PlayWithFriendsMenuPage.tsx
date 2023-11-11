@@ -1,7 +1,9 @@
 import { View, StyleSheet, Switch, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
-{/* <FontAwesome5 name="medal" size={24} color="black" />; */}
+{
+  /* <FontAwesome5 name="medal" size={24} color="black" />; */
+}
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -14,7 +16,6 @@ import { PlayColorsContextType } from "../features/gameMenuPage/context/PlayColo
 import BaseCustomContentButton from "../components/BaseCustomContentButton";
 import { PlayColorsContext } from "../features/gameMenuPage/context/PlayColorContext";
 import ChooseTimeButton from "../features/gameMenuPage/components/ChooseTimeButton";
-import { GameLengthTypeContext } from "../features/gameMenuPage/context/GameLengthContext";
 import { LengthType } from "../features/gameMenuPage/context/GameLengthContext";
 import TimeOptionsModal from "../features/gameMenuPage/components/TimeOptionsModal";
 import { User } from "../utils/PlayerUtilities";
@@ -37,12 +38,14 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
 
   const user2 = route.params.userArg;
   useEffect(() => {
-    getValueFor("user").then((user) => {
-      if (user === null) return;
-      setUser(JSON.parse(user));
-    }).catch((error) => {
-      throw new Error(error);
-    });
+    getValueFor("user")
+      .then((user) => {
+        if (user === null) return;
+        setUser(JSON.parse(user));
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
   }, []);
 
   const handleCloseModal = () => {
@@ -72,18 +75,18 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
     setIsEnabled(!isEnabled);
   };
   return (
-    
-      <PlayColorsContext.Provider value={chosenColor}>
-        <View style={styles.appContainer}>
-          {timerModalOpen ? (
-            <TimeOptionsModal
-              handleCloseModal={handleCloseModal}
-              handleGameTempoChange={handleGameTempoChange}
-            />
-          ) : (
-            
-            <View style={styles.contentContainer}>
-              <ScrollView contentContainerStyle={{alignItems:"center", width:"90%"}}>
+    <PlayColorsContext.Provider value={chosenColor}>
+      <View style={styles.appContainer}>
+        {timerModalOpen ? (
+          <TimeOptionsModal
+            handleCloseModal={handleCloseModal}
+            handleGameTempoChange={handleGameTempoChange}
+          />
+        ) : (
+          <View style={styles.contentContainer}>
+            <ScrollView
+              contentContainerStyle={{ alignItems: "center", width: "90%" }}
+            >
               <View style={styles.profileBox}>
                 <Profile
                   nick={user2 ? user2.nameInGame : ""}
@@ -163,21 +166,20 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
                   />
                 </View>
               </View>
-              </ScrollView>
-            </View>
-          )}
+            </ScrollView>
+          </View>
+        )}
 
-          <Footer navigation={navigation} />
-        </View>
-      </PlayColorsContext.Provider>
-    
+        <Footer navigation={navigation} />
+      </View>
+    </PlayColorsContext.Provider>
   );
 }
 
 const styles = StyleSheet.create({
   appContainer: {
     backgroundColor: ColorsPallet.light,
-    alignContent: 'center',
+    alignContent: "center",
     alignItems: "center",
     flex: 1,
   },
@@ -211,7 +213,7 @@ const styles = StyleSheet.create({
     // height: 200,
     alignItems: "center",
     marginBottom: 20,
-    flex: 7
+    flex: 7,
   },
   medalButton: {
     width: 60,

@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import CountryFlag from "react-native-country-flag";
 import { ColorsPallet } from "../../../utils/Constants";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { BotPlayer } from "../../playOnline";

@@ -4,7 +4,6 @@ import AuthenticateButton from "./AuthenticateButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import PlayButton from "./PlayButton";
-import BaseButton from "../../../components/BaseButton";
 import { User } from "../../../utils/PlayerUtilities";
 
 type Props = {
@@ -31,16 +30,6 @@ export default function TopButtons({ navigation, user }: Props) {
       <View style={styles.playButtonsContainer}>
         <View style={styles.playButtonContainer}>
           <PlayButton navigation={navigation} />
-        </View>
-      </View>
-      <View style={styles.playButtonsContainer}>
-        <View style={styles.playButtonContainer}>
-          <BaseButton
-            handlePress={() => {
-              navigation.navigate("FreeBoard");
-            }}
-            text="Free Board"
-          />
         </View>
       </View>
     </View>

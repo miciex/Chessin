@@ -1,20 +1,12 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
-
 import { ColorsPallet } from "../utils/Constants";
-import InputField from "../components/InputField";
 import Friend from "../features/playWithFriend/components/Friend";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
-import Submit from "../features/login/components/Submit";
-import {
-  getFriendsList,
-  handleSearchBarSocials,
-  setUserDataFromResponse,
-} from "../services/userServices";
-import { HandleSearchBarSocials } from "../utils/ServicesTypes";
+import { getFriendsList } from "../services/userServices";
 import { ResponseUser, responseUserToUser } from "../utils/PlayerUtilities";
 import { User } from "../utils/PlayerUtilities";
 import Heading from "../components/Heading";
@@ -35,8 +27,8 @@ export default function Friends({ route, navigation }: Props) {
 
   useEffect(() => {
     if (nameInGame)
-      getFriendsList(nameInGame).then((data) => {
-        if (data === undefined) return;
+      getFriendsList(nameInGame).then((data: null | ResponseUser[]) => {
+        if (!data) return;
         setFriends(data.map((x) => responseUserToUser(x, "")));
       });
   }, [nameInGame]);

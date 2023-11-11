@@ -13,9 +13,7 @@ import {
   respondtoInvitationLink,
 } from "../utils/ApiEndpoints";
 import {
-  CodeVerificationRequest,
   FriendInvitationResponse,
-  FriendInvitationResponseType,
   GameInvitationResponse,
   HandleFriendInvitation,
   HandleSearchBarSocials,
@@ -38,11 +36,7 @@ import {
   FriendInvitationRequest,
 } from "../utils/ServicesTypes";
 import * as SecureStore from "expo-secure-store";
-import { Rankings } from "../utils/PlayerUtilities";
 import { GameType } from "../chess-logic/board";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../Routing";
-import { StackParamList } from "../utils/Constants";
 import { handleFetch, handlePost } from "../lib/fetch";
 
 export const storeUser = async (value: User) => {
@@ -311,33 +305,9 @@ export const updateUserRating = async (rating: number, gameType: GameType) => {
 };
 
 export const getFriendsList = async (nick: string) => {
-  const accessToken = await getValueFor("accessToken");
-
-  const response = await fetch(`${getFriends}${nick}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json().catch((error) => {
-          throw new Error(error);
-        }) as unknown as Array<ResponseUser>;
-      } else if (response.status === 400) {
-        throw new Error("Bad request");
-      } else if (response.status === 401) {
-        throw new Error("Unauthorized");
-      } else {
-        throw new Error("Something went wrong");
-      }
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
-
-  return response;
+  return handlePost(`${getFriends}${nick}`).catch((error) => {
+    throw new Error(error);
+  });
 };
 
 export const checkSendedInvitations = async () => {

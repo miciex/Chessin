@@ -372,10 +372,10 @@ public class ChessGameService {
 
             if(activeBoards.get(id).getGameResult() != GameResults.NONE)
             {
-                if((Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_ABANDONED).contains(activeBoards.get(id).getGameResult()) && activeBoards.get(id).getWhiteEmail().equals(email)) || (Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_ABANDONED).contains(activeBoards.get(id).getGameResult()) && activeBoards.get(id).getBlackEmail().equals(email)))
-                    return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
-                else
+                if((Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_ABANDONED).contains(activeBoards.get(id).getGameResult()) && activeBoards.get(id).getBlackEmail().equals(email)) || (Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_ABANDONED).contains(activeBoards.get(id).getGameResult()) && activeBoards.get(id).getWhiteEmail().equals(email)))
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
+                else
+                    return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
             }
             else
             {
@@ -463,6 +463,7 @@ public class ChessGameService {
 
             if(activeBoards.containsKey(id))
             {
+                //Probably should be changed to check if the result is Draw
                 if (activeBoards.get(id).getGameResult() != GameResults.NONE) {
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                 } else
@@ -787,19 +788,19 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
-    @Scheduled(fixedRate = 5000)
-    public void handleGames()
-    {
-        List<Board> boards = activeBoards.values().stream().filter(x -> x.getMoves().size() < 2).toList();
-
-        for(Board board : boards)
-        {
-           if(Instant.now().toEpochMilli() - board.getLastMoveTime() >= HelpMethods.getDisconnectionTime(board.getGameType()))
-           {
-               finishGame(board.getGameId(), Optional.of(GameResults.ABANDONED));
-               clearGame(board.getGameId());
-           }
-        }
-    }
+//    @Transactional
+//    @Scheduled(fixedRate = 5000)
+//    public void handleGames()
+//    {
+//        List<Board> boards = activeBoards.values().stream().filter(x -> x.getMoves().size() < 2).toList();
+//
+//        for(Board board : boards)
+//        {
+//           if(Instant.now().toEpochMilli() - board.getLastMoveTime() >= HelpMethods.getDisconnectionTime(board.getGameType()))
+//           {
+//               finishGame(board.getGameId(), Optional.of(GameResults.ABANDONED));
+//               clearGame(board.getGameId());
+//           }
+//        }
+//    }
 }
