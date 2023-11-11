@@ -240,8 +240,8 @@ export default function PlayOnline({ navigation, route }: Props) {
                         gameId: data.id,
                         moves: boardResponse.moves,
                       })
-                        .then((board: BoardResponse | undefined) => {
-                          if (board === undefined) return;
+                        .then((board: BoardResponse | null) => {
+                          if (!board) return;
                           dispatch({
                             type: "setDataFromBoardResponse",
                             payload: {
@@ -260,62 +260,47 @@ export default function PlayOnline({ navigation, route }: Props) {
                 });
             } else if (request) {
               searchForGame(request)
-                .then((response) => {
-                  if (response.status === 200) {
-                    response
-                      .json()
-                      .then((data: ChessGameResponse) => {
-                        if (!data) return;
-                        handleListenForDrawOffer(String(data.id));
-                        handleListenForResign(String(data.id));
-                        dispatch({
-                          type: "setUpGame",
-                          payload: {
-                            chessGameResponse: data,
-                            nameInGame: request.nameInGame,
-                          },
-                        });
-                        const isMyPlayerWhite =
-                          data.whiteUser.nameInGame === user.nameInGame;
-                        const myColor = isMyPlayerWhite ? "white" : "black";
-                        const opponentColor = isMyPlayerWhite
-                          ? "black"
-                          : "white";
-                        setRotateBoardAfterFoundGame(isMyPlayerWhite);
-                        getBoardByGameId(data.id).then(
-                          (boardResponse: BoardResponse) => {
-                            dispatch({
-                              type: "setDataFromBoardResponse",
-                              payload: { boardResponse },
-                            });
+                .then((data: ChessGameResponse | null) => {
+                  if (!data) return;
+                  handleListenForDrawOffer(String(data.id));
+                  handleListenForResign(String(data.id));
+                  dispatch({
+                    type: "setUpGame",
+                    payload: {
+                      chessGameResponse: data,
+                      nameInGame: request.nameInGame,
+                    },
+                  });
+                  const isMyPlayerWhite =
+                    data.whiteUser.nameInGame === user.nameInGame;
+                  const myColor = isMyPlayerWhite ? "white" : "black";
+                  const opponentColor = isMyPlayerWhite ? "black" : "white";
+                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
+                  getBoardByGameId(data.id).then(
+                    (boardResponse: BoardResponse | null) => {
+                      if (!boardResponse) return;
+                      dispatch({
+                        type: "setDataFromBoardResponse",
+                        payload: { boardResponse },
+                      });
 
-                            if (boardResponse.gameResult !== GameResults.NONE)
-                              return;
-                            handleListnForFirstMove(
-                              data.id,
-                              {
-                                ...user,
-                                color: myColor,
-                                timeLeft: new Date(request.timeControl),
-                              },
-                              responseUserToPlayer(
-                                data[`${opponentColor}User`],
-                                opponentColor
-                              )
-                            ).catch((err) => {
-                              throw new Error(err);
-                            });
-                          }
-                        );
-                      })
-                      .catch((err) => {
+                      if (boardResponse.gameResult !== GameResults.NONE) return;
+                      handleListnForFirstMove(
+                        data.id,
+                        {
+                          ...user,
+                          color: myColor,
+                          timeLeft: new Date(request.timeControl),
+                        },
+                        responseUserToPlayer(
+                          data[`${opponentColor}User`],
+                          opponentColor
+                        )
+                      ).catch((err) => {
                         throw new Error(err);
                       });
-                  } else {
-                    throw new Error(
-                      "Something went wrong while searching for game"
-                    );
-                  }
+                    }
+                  );
                 })
                 .catch((err) => {
                   throw new Error(err);
@@ -327,9 +312,6 @@ export default function PlayOnline({ navigation, route }: Props) {
           .catch((err) => {
             throw new Error(err);
           });
-      })
-      .catch((err) => {
-        throw new Error(err);
       });
   };
 

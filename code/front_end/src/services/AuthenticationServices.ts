@@ -19,13 +19,13 @@ import { handlePost } from "../lib/fetch";
 export const verifyCode = async (
   codeVerificationRequest: CodeVerificationRequest
 ) => {
-  handlePost(verifyCodeLink, JSON.stringify(codeVerificationRequest)).catch((error) => {
+  return handlePost(verifyCodeLink, JSON.stringify(codeVerificationRequest)).catch((error) => {
     throw new Error(error);
   });
 };
 
 export const register = async (registerRequest: RegisterRequest) => {
-  handlePost(registerLink, JSON.stringify(registerRequest)).catch((error) => {
+  return handlePost(registerLink, JSON.stringify(registerRequest)).catch((error) => {
     throw new Error(error);
   });
 };

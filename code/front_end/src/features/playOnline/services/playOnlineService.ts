@@ -20,70 +20,15 @@ import { GameType } from "../../../chess-logic/board";
 import { handlePost } from "../../../lib/fetch";
 
 export const listenForMove = async (request: ListenForMoveRequest) => {
-  const accessToken = await getValueFor("accessToken");
-
-  const response = await fetch(`${listenForMoveLink}`, {
-    method: "Post",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(request),
+  return handlePost(listenForMoveLink, JSON.stringify(request)).catch((error) => {
+    throw new Error(error);
   })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      } else if (response.status === 400) {
-        response
-          .text()
-          .then((data) => {
-            throw new Error(data);
-          })
-          .catch((error) => {
-            throw new Error(error);
-          });
-      } else {
-        throw new Error("Something went wrong in listen for move");
-      }
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
-  return response;
 };
 
 export const getGameByUsername = async (username: string) => {
-  const accessToken = await getValueFor("accessToken");
-  const response = await fetch(`${getGameByUsernameLink}${username}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json() as Promise<ChessGameResponse>;
-      } else if (response.status === 400) {
-        response
-          .text()
-          .then((data) => {
-            throw new Error(data);
-          })
-          .catch((error) => {
-            throw new Error(error);
-          });
-      } else {
-        console.error("don't know what happened");
-        console.error(response);
-        throw new Error("Something went wrong in get game by username");
-      }
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
-
-  return response;
+  return handlePost(`${getGameByUsernameLink}${username}`).catch((error) => {
+    throw new Error(error);
+  });
 };
 
 export const listenForFirstMove = async (
@@ -95,50 +40,15 @@ export const listenForFirstMove = async (
 };
 
 export const cancelSearch = async () => {
-  const accessToken = await getValueFor("accessToken");
-
-  fetch(cancelSearchLink, {
-    method: "Post",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      } else if (response.status === 400) {
-        response
-          .text()
-          .then((data) => {
-            throw new Error(data);
-          })
-          .catch((error) => {
-            throw new Error(error);
-          });
-      } else {
-        throw new Error("Something went wrong in cancel search");
-      }
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
+  return handlePost(cancelSearchLink).catch((error) => {
+    throw new Error(error);
+  });
 };
 
 export const searchForGame = async (request: PendingChessGameRequest) => {
-  const accessToken = await getValueFor("accessToken");
-
-  const response = await fetch(searchNewGameLink, {
-    method: "Post",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(request),
-  }).catch((error) => {
+  return handlePost(searchNewGameLink, JSON.stringify(request)).catch((error) => {
     throw new Error(error);
   });
-  return response;
 };
 
 export const setPendingGameRequest = (
@@ -161,53 +71,13 @@ export const setPendingGameRequest = (
 };
 
 export const submitMove = async (request: SubmitMoveRequest) => {
-  const accessToken = await getValueFor("accessToken");
-  return await fetch(submitMoveLink, {
-    method: "Post",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(request),
-  })
-    .then((response) => {
-      if(response.status===100){
-        return null;
-      }
-      if (response.status === 200) {
-        return response.json();
-      } else if (response.status === 400) {
-        response
-          .text()
-          .then((data) => {
-            throw new Error(`submit move error: ${data}`);
-          })
-          .catch((error) => {
-            throw new Error(error);
-          });
-      } else {
-        throw new Error("Something went wrong in submit move");
-      }
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
+  return handlePost(submitMoveLink, JSON.stringify(request)).catch((error) => {
+    throw new Error(error);
+  });
 };
 
 export const getBoardByGameId = async (gameId: number) => {
-
-  const accessToken = await getValueFor("accessToken");
-  try {
-    const response = await fetch(`${getBoardbyGameIdLink}${gameId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.json();
-  } catch (err) {
-    console.error(err);
-    throw new Error("Something went wrong in getting board by game id!");
-  }
+  return handlePost(`${getBoardbyGameIdLink}${gameId}`).catch((error) => {
+    throw new Error(error);
+  });
 };
