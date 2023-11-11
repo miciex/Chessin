@@ -37,6 +37,7 @@ import {
   DisconnectionResponse,
   DisconnectionStatus,
   MessageResponse,
+  PendingChessGameRequest,
   RespondToDrawOfferRequest,
 } from "../utils/ServicesTypes";
 import GameRecord from "../features/playOnline/components/GameRecord";
@@ -196,6 +197,103 @@ export default function PlayOnline({ navigation, route }: Props) {
       });
   };
 
+  const handleJoinToExistingGame = async (user: User) => {
+    getGameByUsername(user.nameInGame)
+      .then((data: ChessGameResponse | undefined) => {
+        if (!data) return;
+        const isMyPlayerWhite = data.whiteUser.nameInGame === user.nameInGame;
+        const myColor = isMyPlayerWhite ? "white" : "black";
+        handleListenForDrawOffer(String(data.id));
+        handleListenForResign(String(data.id));
+        setRotateBoardAfterFoundGame(isMyPlayerWhite);
+        dispatch({
+          type: "setUpGame",
+          payload: {
+            chessGameResponse: data,
+            nameInGame: user.nameInGame,
+          },
+        });
+        getBoardByGameId(data.id).then((boardResponse: BoardResponse) => {
+          dispatch({
+            type: "setDataFromBoardResponse",
+            payload: { boardResponse },
+          });
+          if (
+            boardResponse.gameResult !== GameResults.NONE ||
+            boardResponse.whiteTurn === (myColor === "white")
+          )
+            return;
+          listenForMove({
+            gameId: data.id,
+            moves: boardResponse.moves,
+          })
+            .then((board: BoardResponse | null) => {
+              if (!board) return;
+              dispatch({
+                type: "setDataFromBoardResponse",
+                payload: {
+                  boardResponse: board,
+                },
+              });
+            })
+            .catch((err) => {
+              throw new Error(err);
+            });
+        });
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
+
+  const handleSearchForGame = async (
+    user: User,
+    request: PendingChessGameRequest
+  ) => {
+    searchForGame(request)
+      .then((data: ChessGameResponse | null) => {
+        if (!data) return;
+        handleListenForDrawOffer(String(data.id));
+        handleListenForResign(String(data.id));
+        dispatch({
+          type: "setUpGame",
+          payload: {
+            chessGameResponse: data,
+            nameInGame: request.nameInGame,
+          },
+        });
+        const isMyPlayerWhite = data.whiteUser.nameInGame === user.nameInGame;
+        const myColor = isMyPlayerWhite ? "white" : "black";
+        const opponentColor = isMyPlayerWhite ? "black" : "white";
+        setRotateBoardAfterFoundGame(isMyPlayerWhite);
+        getBoardByGameId(data.id).then(
+          (boardResponse: BoardResponse | null) => {
+            if (!boardResponse) return;
+            dispatch({
+              type: "setDataFromBoardResponse",
+              payload: { boardResponse },
+            });
+
+            if (boardResponse.gameResult !== GameResults.NONE) return;
+            handleListnForFirstMove(
+              data.id,
+              {
+                ...user,
+                color: myColor,
+                timeLeft: new Date(request.timeControl),
+              },
+              responseUserToPlayer(data[`${opponentColor}User`], opponentColor)
+            ).catch((err) => {
+              throw new Error(err);
+            });
+          }
+        );
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  };
+
   const searchNewGame = () => {
     dispatch({ type: "setSearchingGame", payload: true });
     getValueFor("user")
@@ -209,102 +307,13 @@ export default function PlayOnline({ navigation, route }: Props) {
         isUserPlaying(user.nameInGame)
           .then((response: BooleanMessageResponse) => {
             if (response.message === "True") {
-              getGameByUsername(user.nameInGame)
-                .then((data: ChessGameResponse | undefined) => {
-                  if (!data) return;
-                  const isMyPlayerWhite =
-                    data.whiteUser.nameInGame === user.nameInGame;
-                  const myColor = isMyPlayerWhite ? "white" : "black";
-                  handleListenForDrawOffer(String(data.id));
-                  handleListenForResign(String(data.id));
-                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
-                  dispatch({
-                    type: "setUpGame",
-                    payload: {
-                      chessGameResponse: data,
-                      nameInGame: user.nameInGame,
-                    },
-                  });
-                  getBoardByGameId(data.id).then(
-                    (boardResponse: BoardResponse) => {
-                      dispatch({
-                        type: "setDataFromBoardResponse",
-                        payload: { boardResponse },
-                      });
-                      if (
-                        boardResponse.gameResult !== GameResults.NONE ||
-                        boardResponse.whiteTurn === (myColor === "white")
-                      )
-                        return;
-                      listenForMove({
-                        gameId: data.id,
-                        moves: boardResponse.moves,
-                      })
-                        .then((board: BoardResponse | null) => {
-                          if (!board) return;
-                          dispatch({
-                            type: "setDataFromBoardResponse",
-                            payload: {
-                              boardResponse: board,
-                            },
-                          });
-                        })
-                        .catch((err) => {
-                          throw new Error(err);
-                        });
-                    }
-                  );
-                })
-                .catch((err) => {
-                  throw new Error(err);
-                });
+              handleJoinToExistingGame(user).catch((err) => {
+                throw new Error(err);
+              });
             } else if (request) {
-              searchForGame(request)
-                .then((data: ChessGameResponse | null) => {
-                  if (!data) return;
-                  handleListenForDrawOffer(String(data.id));
-                  handleListenForResign(String(data.id));
-                  dispatch({
-                    type: "setUpGame",
-                    payload: {
-                      chessGameResponse: data,
-                      nameInGame: request.nameInGame,
-                    },
-                  });
-                  const isMyPlayerWhite =
-                    data.whiteUser.nameInGame === user.nameInGame;
-                  const myColor = isMyPlayerWhite ? "white" : "black";
-                  const opponentColor = isMyPlayerWhite ? "black" : "white";
-                  setRotateBoardAfterFoundGame(isMyPlayerWhite);
-                  getBoardByGameId(data.id).then(
-                    (boardResponse: BoardResponse | null) => {
-                      if (!boardResponse) return;
-                      dispatch({
-                        type: "setDataFromBoardResponse",
-                        payload: { boardResponse },
-                      });
-
-                      if (boardResponse.gameResult !== GameResults.NONE) return;
-                      handleListnForFirstMove(
-                        data.id,
-                        {
-                          ...user,
-                          color: myColor,
-                          timeLeft: new Date(request.timeControl),
-                        },
-                        responseUserToPlayer(
-                          data[`${opponentColor}User`],
-                          opponentColor
-                        )
-                      ).catch((err) => {
-                        throw new Error(err);
-                      });
-                    }
-                  );
-                })
-                .catch((err) => {
-                  throw new Error(err);
-                });
+              handleSearchForGame(user, request).catch((err) => {
+                throw new Error(err);
+              });
             } else {
               navigation.navigate("GameMenu");
             }
