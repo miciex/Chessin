@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Transactional
 public interface ChessGameRepository extends JpaRepository<ChessGame, Long> {
     @Modifying
     @Query(value = "UPDATE ChessGame cg SET cg.gameResult = :gameResult WHERE cg.id = :id")

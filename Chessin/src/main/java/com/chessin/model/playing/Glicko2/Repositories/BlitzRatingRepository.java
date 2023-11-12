@@ -3,6 +3,7 @@ package com.chessin.model.playing.Glicko2.Repositories;
 import com.chessin.model.playing.Glicko2.Entities.BlitzRating;
 import com.chessin.model.playing.Glicko2.Entities.RapidRating;
 import com.chessin.model.register.user.User;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+@Transactional
 public interface BlitzRatingRepository extends JpaRepository<BlitzRating, Long> {
     Optional<BlitzRating> findByUser(User user);
 }

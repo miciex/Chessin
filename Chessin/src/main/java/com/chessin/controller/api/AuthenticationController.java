@@ -9,11 +9,13 @@ import com.chessin.controller.register.AuthenticationService;
 import com.chessin.controller.responses.TokenRefreshResponse;
 import com.chessin.model.register.configuration.JwtService;
 import com.chessin.model.register.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
+@Transactional
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController {
