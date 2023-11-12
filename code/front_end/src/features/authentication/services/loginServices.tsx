@@ -6,9 +6,14 @@ import { handlePost } from "../../../lib/fetch";
 
 export const fetchandStoreUser = async () => {
   return fetchLoggedUser()
-    .then((data) => {
-      let user: User = loggedUserToUser(data);
-      save("user", JSON.stringify(user))
+    .then((data: loggedUserResponse | null) => {
+      if (!data) {
+        throw new Error("Couldn't fetch user");
+      }
+      return loggedUserToUser(data);
+    })
+    .then(async (user) => {
+      return save("user", JSON.stringify(user))
         .then(() => {
           return user;
         })
