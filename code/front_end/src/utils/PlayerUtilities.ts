@@ -1,5 +1,4 @@
 import { GameType } from "../chess-logic/board";
-import { GameLengthTypeContext } from "../features/gameMenuPage/context/GameLengthContext";
 import { loggedUserResponse } from "./ServicesTypes";
 
 export type User = {

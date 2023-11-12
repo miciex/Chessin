@@ -1,14 +1,6 @@
 import { countryIsoCodes, countryIsoCodesType } from "../playOnline";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  SafeAreaView,
-  FlatList,
-} from "react-native";
-import React, { useState } from "react";
+import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
+import React from "react";
 import CountryFlag from "react-native-country-flag";
 import { ColorsPallet } from "../../utils/Constants";
 import { Entypo } from "@expo/vector-icons";

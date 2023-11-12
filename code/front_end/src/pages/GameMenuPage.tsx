@@ -5,7 +5,6 @@ import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
 import Footer from "../components/Footer";
 import { ColorsPallet } from "../utils/Constants";
-import BottomButtons from "../features/gameMenuPage/components/BottomButtons";
 import {
   TypeContext,
   playType,
@@ -18,12 +17,10 @@ import {
   strengthLevelType,
   botStrengthLevelContextType,
 } from "../features/gameMenuPage/context/BotStrengthContext";
-import BotGameOptions from "../features/gameMenuPage/components/BotGameOptions";
 import {
   PlayColorsContextType,
   PlayColorsContext,
 } from "../features/gameMenuPage/context/PlayColorContext";
-import PickColor from "../features/gameMenuPage/components/PickColor";
 import PlayOnlineOptions from "../features/gameMenuPage/components/PlayOnlineOptions";
 import { User } from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
@@ -68,7 +65,7 @@ export default function GameMenu({ navigation }: Props) {
             <View style={styles.appContainer}>
               <View style={styles.contentContainer}>
                 <View style={styles.chooseGameContainer}>
-                    <PlayOnlineOptions navigation={navigation} user={user} />
+                  <PlayOnlineOptions navigation={navigation} user={user} />
                 </View>
               </View>
               <Footer navigation={navigation} />

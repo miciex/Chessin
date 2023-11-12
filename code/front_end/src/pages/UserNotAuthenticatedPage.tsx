@@ -1,10 +1,9 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import BaseButton from "../components/BaseButton";
 import { ColorsPallet } from "../utils/Constants";
-import { UserLoggedInContext } from "../features/context/userloggedInContext";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 
 type Props = {
@@ -18,15 +17,15 @@ type Props = {
 export default function UserNotAuthenticatedPage({ navigation }: Props) {
   useEffect(() => {
     getValueFor("user")
-        .then((value) => {
-          if (value) {
-            clearInterval(interval);
-            navigation.replace("Home");
-          }
-        })
-        .catch(() => {
-          throw new Error("User not authenticated");
-        });
+      .then((value) => {
+        if (value) {
+          clearInterval(interval);
+          navigation.replace("Home");
+        }
+      })
+      .catch(() => {
+        throw new Error("User not authenticated");
+      });
     const interval = setInterval(() => {
       getValueFor("user")
         .then((value) => {
@@ -38,7 +37,7 @@ export default function UserNotAuthenticatedPage({ navigation }: Props) {
         .catch(() => {
           throw new Error("User not authenticated");
         });
-    },2000);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 

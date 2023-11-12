@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 
-import EndedGame from "../features/home/components/EndedGame";
 import { ColorsPallet } from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -15,70 +14,6 @@ import {
   checkInvitationsToGame,
 } from "../services/userServices";
 import { User, responseUserToUser } from "../utils/PlayerUtilities";
-import { FriendInvitationResponse } from "../utils/ServicesTypes";
-
-const ended_games = [
-  {
-    date: "01.10.2022",
-    playerNick: "Pusznik",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "MaciekNieBij",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Slaweczuk",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Strzała",
-    rank: 1500,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Bestia",
-    rank: 1500,
-    lastGameResult: "win",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Sharku",
-    rank: 1000,
-    lastGameResult: "lose",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-  {
-    date: "01.10.2022",
-    playerNick: "Zocho",
-    rank: 1300,
-    lastGameResult: "draw",
-  },
-];
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -94,7 +29,6 @@ export default function Notification({ route, navigation }: Props) {
   const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([]);
 
   useEffect(() => {
-
     checkInvitations().then((data) => {
       console.log("check invite data: ");
       console.log(data);
@@ -103,7 +37,7 @@ export default function Notification({ route, navigation }: Props) {
     });
 
     checkInvitationsToGame().then((data) => {
-      console.log("invitations")
+      console.log("invitations");
       console.log(data);
       if (!data) return;
       setInvitationsToGame(data.map((x) => responseUserToUser(x.user, "")));

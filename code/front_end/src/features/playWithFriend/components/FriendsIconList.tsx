@@ -13,8 +13,8 @@ import { StackParamList } from "../../../utils/Constants";
 import { ColorsPallet } from "../../../utils/Constants";
 import { getFriendsList } from "../../../services/userServices";
 import {
+  ResponseUser,
   User,
-  responseUserToPlayer,
   responseUserToUser,
 } from "../../../utils/PlayerUtilities";
 
@@ -32,8 +32,8 @@ export default function FriendsIconList({ navigation, nameInGame }: Props) {
 
   useEffect(() => {
     if (nameInGame)
-      getFriendsList(nameInGame).then((data) => {
-        if (data === undefined) return;
+      getFriendsList(nameInGame).then((data: null | ResponseUser[]) => {
+        if (!data) return;
         setFriends(data.map((x) => responseUserToUser(x, "")));
       });
   }, [nameInGame]);

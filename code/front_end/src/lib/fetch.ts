@@ -7,7 +7,9 @@ export const handleFetch = async (url: string, options: RequestInit = {}) => {
       return null;
     }
     if(response.status === 200) {
-        return response.json()
+        return response.json().catch(() => {
+          throw new Error("Couldn't parse response");
+        });
     }
     else if(response.status === 400){
         throw new Error('Bad Request')
@@ -33,5 +35,7 @@ export const handlePost = async (url: string, body?: string) => {
       Authorization: `Bearer ${accessToken}`,
     },
     body: body,
+  }).catch((error) => {
+    throw new Error(error);
   });
 }

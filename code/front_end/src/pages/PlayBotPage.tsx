@@ -1,18 +1,10 @@
 import { View, StyleSheet } from "react-native";
-import React, { useReducer } from "react";
+import React from "react";
 import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import PlayerBar from "../features/playOnline/components/PlayerBar";
-import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import BotBar from "../features/play-with-bot/components/BotBar";
-import {
-  reducer,
-  initialState,
-} from "../features/play-with-bot/reducer/PlayWithBotReducer";
-import OnlineBoard from "../features/playOnline/components/Board";
 type Props = {
   navigation: NativeStackNavigationProp<
     RootStackParamList,

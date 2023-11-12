@@ -5,14 +5,10 @@ import {
   PlayOnlineAction,
   PlayOnlineState,
 } from "../reducers/PlayOnlineReducer";
-import {
-  GameResults,
-  possibleMovesAfterCheck,
-} from "../../../chess-logic/board";
+import { possibleMovesAfterCheck } from "../../../chess-logic/board";
 import { Move, moveFactory } from "../../../chess-logic/move";
 import { BoardResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { listenForMove, submitMove } from "../services/playOnlineService";
-import { updateUserRating } from "../../../services/userServices";
 
 const yellow = "rgba(255, 255, 0, 0.5)";
 type pos = { x: number; y: number };
@@ -149,9 +145,9 @@ export default function Piece({
       type: "playMove",
       payload: move,
     });
-    dispatch({type:"updateMyClockByMilliseconds", payload: state.increment})
-    if(state.board.moves.length === 0)
-      dispatch({ type: "setCurrentPosition", payload: 0});
+    dispatch({ type: "updateMyClockByMilliseconds", payload: state.increment });
+    if (state.board.moves.length === 0)
+      dispatch({ type: "setCurrentPosition", payload: 0 });
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
         if (!boardResponse) return;
@@ -179,14 +175,14 @@ export default function Piece({
       onPanResponderStart() {
         const activeField = findActiveValue();
         if (isPossibleMove(positionNumber) && isMyTurn) {
-          if (ableToMove){
-          const move = moveFactory({
-            pieces: state.board.position,
-            startField: rotateBoard ? 63 - activeField: activeField,
-            endField: rotateBoard ? 63 - positionNumber : positionNumber,
-          });
-           handleMove(move);
-        }
+          if (ableToMove) {
+            const move = moveFactory({
+              pieces: state.board.position,
+              startField: rotateBoard ? 63 - activeField : activeField,
+              endField: rotateBoard ? 63 - positionNumber : positionNumber,
+            });
+            handleMove(move);
+          }
 
           resetActiveValues();
           resetPossibleMoves();
@@ -196,7 +192,9 @@ export default function Piece({
           const possibleMoves = possibleMovesAfterCheck(
             rotateBoard ? 63 - positionNumber : positionNumber,
             state.board
-          ).map(possibleMove => rotateBoard ? 63 - possibleMove : possibleMove);
+          ).map((possibleMove) =>
+            rotateBoard ? 63 - possibleMove : possibleMove
+          );
           setValueActive(positionNumber);
           setPossibleMoves(possibleMoves);
         }
@@ -213,19 +211,17 @@ export default function Piece({
           Math.round((position.x + gestureState.dx) / SIZE) +
           Math.round((position.y + gestureState.dy) / SIZE) * 8;
         if (isPossibleMove(endField) && isMyTurn) {
-          if (ableToMove){
-          const move = moveFactory({
-            pieces: state.board.position,
-            startField: rotateBoard ? 63 - positionNumber: positionNumber,
-            endField: rotateBoard ? 63 - endField : endField,
-          });
+          if (ableToMove) {
+            const move = moveFactory({
+              pieces: state.board.position,
+              startField: rotateBoard ? 63 - positionNumber : positionNumber,
+              endField: rotateBoard ? 63 - endField : endField,
+            });
 
-          handleMove(move);
-          resetPossibleMoves();
-          setValueActive(endField);
-        }else 
-
-          resetPossibleMoves();
+            handleMove(move);
+            resetPossibleMoves();
+            setValueActive(endField);
+          } else resetPossibleMoves();
         }
 
         Animated.spring(pan, {

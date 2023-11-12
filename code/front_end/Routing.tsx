@@ -41,9 +41,11 @@ export type RootStackParamList = {
   LastGame: undefined;
   Login: undefined;
   PlayBot: undefined;
-  PlayOnline: {
-    request: PendingChessGameRequest;
-  } | undefined;
+  PlayOnline:
+    | {
+        request: PendingChessGameRequest;
+      }
+    | undefined;
   PlayWithFriendsMenu: {
     userArg: User;
   };
@@ -87,9 +89,10 @@ const Routing = () => {
   }, [netInfo.isConnected]);
 
   useEffect(() => {
+    let resetToken: NodeJS.Timeout;
     resetAccessToken()
       .then(() => {
-        fetchandStoreUser().then(()=>{
+        fetchandStoreUser().then(() => {
           setUserAuthenticated();
         });
       })
@@ -97,12 +100,14 @@ const Routing = () => {
         save("user", "");
         setUserNotAuthenticated();
         throw new Error(err);
+      })
+      .finally(() => {
+        resetToken = setInterval(() => {
+          resetAccessToken().catch((err) => {
+            throw new Error(err);
+          });
+        }, refreshTokenInterval);
       });
-    const resetToken = setInterval(() => {
-      resetAccessToken().catch((err) => {
-        throw new Error(err);
-      });
-    }, refreshTokenInterval);
     return () => {
       clearInterval(resetToken);
       save("user", "");
@@ -134,12 +139,15 @@ const Routing = () => {
             children={(
               props: NativeStackScreenProps<RootStackParamList, "Home">
             ) => (
-              <HomePage {...props} setUserAuthenticated={setUserAuthenticated} />
+              <HomePage
+                {...props}
+                setUserAuthenticated={setUserAuthenticated}
+              />
             )}
             options={({ navigation }) => ({
               headerStyle: styles.header,
               headerTitle: () => getHeader(navigation),
-              headerBackVisible: false
+              headerBackVisible: false,
             })}
           />
           <Stack.Screen
@@ -294,7 +302,7 @@ const Routing = () => {
               headerStyle: styles.header,
               headerTitle: () => <NotAuthenticatedHeader />,
               headerBackVisible: false,
-              headerLeft: ()=> null
+              headerLeft: () => null,
             })}
           />
         </Stack.Navigator>

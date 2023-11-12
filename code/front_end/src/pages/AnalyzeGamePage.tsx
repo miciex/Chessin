@@ -4,17 +4,12 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Routing";
-import PlayOnlineBoard from "../features/playOnline/components/Board";
 import GameRecord from "../features/playOnline/components/GameRecord";
 import { ColorsPallet } from "../utils/Constants";
-import { sampleMoves } from "../chess-logic/ChessConstants";
-import { StringMoveToText } from "../utils/ChessConvertionFunctions";
 import {
   reducer,
   initialState,
 } from "../features/analyzeGame/reducers/AnalyzeGameReducer";
-import GameRecordMove from "../features/playOnline/components/GameRecordMove";
-import { moveToChessNotation } from "../chess-logic/convertion";
 import Board from "../features/analyzeGame/components/Board";
 import { getGameById } from "../services/chessGameService";
 import { ChessGameResponse } from "../utils/ServicesTypes";
@@ -83,7 +78,7 @@ export default function AnalyzeGame({ navigation, route }: Props) {
               <GameRecord
                 moves={state.moves}
                 positions={state.positions}
-                currentPosition={state.currentPosition-1}
+                currentPosition={state.currentPosition - 1}
                 setCurrentPosition={changeCurrentPosition}
                 analyzeGame={true}
               />
@@ -157,7 +152,7 @@ const styles = StyleSheet.create({
   bottomPartContainer: {
     width: "100%",
     backgroundColor: ColorsPallet.darker,
-    flex:1
+    flex: 1,
   },
   arrowButtonsContainer: {
     width: "100%",
@@ -166,7 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: "row",
     justifyContent: "space-evenly",
-    padding: 8
+    padding: 8,
   },
   arrowButtonContainer: {
     width: 64,
@@ -174,5 +169,5 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     width: "100%",
-  }
+  },
 });

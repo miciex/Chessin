@@ -14,41 +14,24 @@ import {
   twofaEnabledLink,
   verifyCodeLink,
 } from "../utils/ApiEndpoints";
+import { handlePost } from "../lib/fetch";
 
 export const verifyCode = async (
   codeVerificationRequest: CodeVerificationRequest
 ) => {
-  return await fetch(verifyCodeLink, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(codeVerificationRequest),
-  }).catch((error) => {
-    throw new Error(error.message);
+  return handlePost(verifyCodeLink, JSON.stringify(codeVerificationRequest)).catch((error) => {
+    throw new Error(error);
   });
 };
 
 export const register = async (registerRequest: RegisterRequest) => {
-  return await fetch(registerLink, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(registerRequest),
-  }).catch((error) => {
-    throw new Error(error.message);
+  return handlePost(registerLink, JSON.stringify(registerRequest)).catch((error) => {
+    throw new Error(error);
   });
 };
 
 export const login = async (loginRequest: LoginRequest) => {
-  return await fetch(authenticateLink, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(loginRequest),
-  }).catch((error) => {
+  return handlePost(authenticateLink, JSON.stringify(loginRequest)).catch((error) => {
     throw new Error(error);
   });
 };
@@ -56,39 +39,23 @@ export const login = async (loginRequest: LoginRequest) => {
 export const changePassword = async (
   changePasswordRequest: PasswordChangeRequest
 ) => {
-  return await fetch(changePasswordLink, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(changePasswordRequest),
-  }).catch((err) => {
-    throw new Error(err);
+  return handlePost(changePasswordLink, JSON.stringify(changePasswordRequest)).catch((error) => {
+    throw new Error(error);
   });
 };
 
 export const remindPassword = async (
   remindPasswordRequest: PasswordRemindRequest
 ) => {
-  return fetch(remindPasswordLink, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(remindPasswordRequest),
-  })
+  return handlePost(remindPasswordLink, JSON.stringify(remindPasswordRequest)).catch((error) => {
+    throw new Error(error);
+  });
 };
 
 export const twoFaEnabled = async (
   twoFaEnabledRequest: TwoFactorAuthenticationEnabledRequest
 ) => {
-  return await fetch(twofaEnabledLink, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(twoFaEnabledRequest),
-  }).catch((err) => {
-    throw new Error(err);
+  return handlePost(twofaEnabledLink, JSON.stringify(twoFaEnabledRequest)).catch((error) => {
+    throw new Error(error);
   });
 };

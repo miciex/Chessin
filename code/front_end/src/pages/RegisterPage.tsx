@@ -1,13 +1,16 @@
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import Submit from "../features/login/components/Submit";
-import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
-import { ColorsPallet, containsNumbersRegex, containsSpecialCharactersRegex, getPasswordErrorMessage, letterPasswordCaseError, numberPasswordError, specialCharacterPasswordError, toFewCharacterPasswordErrorMessage } from "../utils/Constants";
+import {
+  ColorsPallet,
+  containsNumbersRegex,
+  containsSpecialCharactersRegex,
+  getPasswordErrorMessage,
+} from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import AuthInput from "../features/authentication/components/AuthInput";
-import Footer from "../components/Footer";
-import { emailRegex, passwordRegex, nameRegex } from "../utils/Constants";
+import { emailRegex, nameRegex } from "../utils/Constants";
 import {
   notValidEmailMessage,
   notValidNameMessage,
@@ -93,7 +96,13 @@ export default function Register({ navigation }: Props) {
   };
 
   const validatePassword = (): boolean => {
-    return containsNumbersRegex.test(password) && containsSpecialCharactersRegex.test(password) && password.toLowerCase() !== password && password.toUpperCase() !== password && password.length >= 12;
+    return (
+      containsNumbersRegex.test(password) &&
+      containsSpecialCharactersRegex.test(password) &&
+      password.toLowerCase() !== password &&
+      password.toUpperCase() !== password &&
+      password.length >= 12
+    );
   };
 
   const setEmailValid = (): void => {
@@ -182,8 +191,6 @@ export default function Register({ navigation }: Props) {
         });
     }
   };
-
-  
 
   return showAuthCode ? (
     <AuthCodeModal
