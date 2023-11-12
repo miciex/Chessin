@@ -783,11 +783,12 @@ public class ChessGameService {
         {
            if(Instant.now().toEpochMilli() - board.getLastMoveTime() >= HelpMethods.getDisconnectionTime(board.getGameType()))
            {
-               finishGame(board.getGameId(), Optional.of(GameResults.ABANDONED));
-               clearGame(board.getGameId());
+//               finishGame(board.getGameId(), Optional.of(GameResults.ABANDONED));
+//               clearGame(board.getGameId());
+                 synchronized(disconnections.get(board.getGameId())) {
+                     disconnections.get(board.getGameId()).notifyAll();
+                 }
            }
         }
     }
-
-
 }
