@@ -446,7 +446,7 @@ export default function PlayOnline({ navigation, route }: Props) {
           state={state}
           dispatch={dispatch}
           navigation={navigation}
-          searchGame={searchNewGame}
+          searchGame={handleSearchForGame}
         />
       </View>
       <Footer navigation={navigation} />

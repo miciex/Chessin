@@ -10,6 +10,8 @@ import {
   PlayOnlineState,
   PlayOnlineAction,
 } from "../reducers/PlayOnlineReducer";
+import { PendingChessGameRequest } from "../../../utils/ServicesTypes";
+import { User } from "../../../utils/PlayerUtilities";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -19,7 +21,7 @@ type Props = {
   >;
   state: PlayOnlineState;
   dispatch: React.Dispatch<PlayOnlineAction>;
-  searchGame: () => void;
+  searchGame: (user: User, request: PendingChessGameRequest) => void;
 };
 export default function GameFinishedOverlay({
   state,
@@ -52,12 +54,14 @@ export default function GameFinishedOverlay({
           : "White won by mate";
       case GameResults.ABANDONED:
         return "Game abandoned";
-      case GameResults.BLACK_DISCONNECTED: 
+      case GameResults.BLACK_DISCONNECTED:
         return "Black disconnected";
       case GameResults.WHITE_DISCONNECTED:
         return "White disconnected";
-      case GameResults.BLACK_ABANDONED: return "Black abandoned game";
-      case GameResults.WHITE_ABANDONED: return "White abandoned game";
+      case GameResults.BLACK_ABANDONED:
+        return "Black abandoned game";
+      case GameResults.WHITE_ABANDONED:
+        return "White abandoned game";
       default:
         return "Unknown result";
     }
@@ -68,6 +72,27 @@ export default function GameFinishedOverlay({
 
   const winnerText = getText();
 
+  const handlePlayAgain = () => {
+    if (!state.myPlayer?.color) return;
+    const userRating =
+      state.myPlayer.ranking[state.board.gameType] + state.myPlayer.color ===
+      "white"
+        ? state.board.whiteRatingChange
+        : state.board.blackRatingChange;
+    const request: PendingChessGameRequest = {
+      timeControl: state.timeControl,
+      increment: state.increment,
+      bottomRating: userRating - 200,
+      topRating: userRating + 200,
+      userRating,
+      isRated: state.board.isRated,
+      gameType: state.board.gameType,
+      nameInGame: state.myPlayer.nameInGame,
+    };
+
+    searchGame(state.myPlayer, request);
+  };
+
   return showOverlay ? (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
@@ -77,7 +102,7 @@ export default function GameFinishedOverlay({
         </View>
         <View style={styles.contentContainer}>
           <View style={styles.buttonContainer}>
-            <BaseButton text="Play again" handlePress={searchGame} />
+            <BaseButton text="Play again" handlePress={handlePlayAgain} />
             <BaseButton
               text="Go to Menu"
               handlePress={() => {

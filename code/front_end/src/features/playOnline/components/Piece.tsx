@@ -155,12 +155,6 @@ export default function Piece({
           type: "setDataFromBoardResponse",
           payload: { boardResponse },
         });
-        listenForMove({
-          gameId: state.gameId,
-          moves: boardResponse.moves,
-        }).catch((err) => {
-          throw new Error(err);
-        });
       })
       .catch((err) => {
         throw new Error(err);

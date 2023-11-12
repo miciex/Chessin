@@ -33,6 +33,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "./src/utils/Constants";
 import NotAuthenticatedHeader from "./src/components/NotAuthenticatedHeader";
 import { getValueFor, save } from "./src/utils/AsyncStoreFunctions";
+import TermsOfServicePage from "./src/pages/TermsOfServicePage";
+import LoadingScreen from "./src/pages/LoadingScreen";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -64,6 +66,8 @@ export type RootStackParamList = {
   ResetPassword: undefined;
   RemindPassword: undefined;
   UserNotAuthenticated: undefined;
+  TermsOfService: undefined;
+  LoadingScreen: undefined;
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
@@ -89,25 +93,11 @@ const Routing = () => {
   }, [netInfo.isConnected]);
 
   useEffect(() => {
-    let resetToken: NodeJS.Timeout;
-    resetAccessToken()
-      .then(() => {
-        fetchandStoreUser().then(() => {
-          setUserAuthenticated();
-        });
-      })
-      .catch((err) => {
-        save("user", "");
-        setUserNotAuthenticated();
+    let resetToken = setInterval(() => {
+      resetAccessToken().catch((err) => {
         throw new Error(err);
-      })
-      .finally(() => {
-        resetToken = setInterval(() => {
-          resetAccessToken().catch((err) => {
-            throw new Error(err);
-          });
-        }, refreshTokenInterval);
       });
+    }, refreshTokenInterval);
     return () => {
       clearInterval(resetToken);
       save("user", "");
@@ -131,9 +121,7 @@ const Routing = () => {
   return (
     <UserLoggedInContext.Provider value={authenticated}>
       <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName={authenticated ? "Home" : "UserNotAuthenticated"}
-        >
+        <Stack.Navigator initialRouteName={"LoadingScreen"}>
           <Stack.Screen
             name="Home"
             children={(
@@ -304,6 +292,28 @@ const Routing = () => {
               headerBackVisible: false,
               headerLeft: () => null,
             })}
+          />
+          <Stack.Screen
+            name="TermsOfService"
+            component={TermsOfServicePage}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => <NotAuthenticatedHeader />,
+              headerBackVisible: false,
+              headerLeft: () => null,
+            })}
+          />
+          <Stack.Screen
+            name="LoadingScreen"
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "LoadingScreen">
+            ) => (
+              <LoadingScreen
+                {...props}
+                setUserNotAuthenticated={setUserNotAuthenticated}
+                setUserAuthenticated={setUserAuthenticated}
+              />
+            )}
           />
         </Stack.Navigator>
       </NavigationContainer>
