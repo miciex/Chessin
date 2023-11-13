@@ -31,15 +31,15 @@ export default function LoadingScreen({
   const spinValue = useRef(new Animated.Value(0)).current;
 
   const redirectUserToGame = async (user?: User) => {
-    if (user) {
-      return navigation.navigate("Home");
-    }
     const accepted = await getValueFor("termsOfServiceAccepted").catch(() => {
       navigation.navigate("TermsOfService");
       throw new Error("Error while getting terms of service");
     });
     if (!accepted) {
       return navigation.navigate("TermsOfService");
+    }
+    if (user) {
+      return navigation.navigate("Home");
     } else {
       return navigation.navigate("UserNotAuthenticated");
     }
@@ -122,12 +122,16 @@ export default function LoadingScreen({
   useEffect(() => {
     resetAccessToken()
       .then(() => {
-        fetchandStoreUser().then((user) => {
-          setUserAuthenticated();
-          redirectUserToGame(user).catch(() => {
-            throw new Error("Error while redirecting user to game");
+        fetchandStoreUser()
+          .then((user) => {
+            setUserAuthenticated();
+            redirectUserToGame(user).catch(() => {
+              throw new Error("Error while redirecting user to game");
+            });
+          })
+          .catch(() => {
+            throw new Error("Error while fetching and storing user");
           });
-        });
       })
       .catch((err) => {
         save("user", "").catch(() => {
