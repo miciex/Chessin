@@ -9,54 +9,12 @@ import { possibleMovesAfterCheck } from "../../../chess-logic/board";
 import { Move, moveFactory } from "../../../chess-logic/move";
 import { BoardResponse, SubmitMoveRequest } from "../../../utils/ServicesTypes";
 import { listenForMove, submitMove } from "../services/playOnlineService";
+import { NumberToPiece } from "./NumberToPiece";
 
 const yellow = "rgba(255, 255, 0, 0.5)";
 type pos = { x: number; y: number };
 const SIZE = Dimensions.get("window").width / 8;
 const PIECE_SIZE = SIZE * 0.5;
-
-const convertToIcon = (piece: Number) => {
-  switch (piece) {
-    case 17:
-      return <FontAwesome5 name="chess-king" size={PIECE_SIZE} color="black" />;
-    case 22:
-      return (
-        <FontAwesome5 name="chess-queen" size={PIECE_SIZE} color="black" />
-      );
-    case 19:
-      return <FontAwesome5 name="chess-rook" size={PIECE_SIZE} color="black" />;
-    case 21:
-      return (
-        <FontAwesome5 name="chess-bishop" size={PIECE_SIZE} color="black" />
-      );
-    case 20:
-      return (
-        <FontAwesome5 name="chess-knight" size={PIECE_SIZE} color="black" />
-      );
-    case 18:
-      return <FontAwesome5 name="chess-pawn" size={PIECE_SIZE} color="black" />;
-    case 9:
-      return <FontAwesome5 name="chess-king" size={PIECE_SIZE} color="white" />;
-    case 14:
-      return (
-        <FontAwesome5 name="chess-queen" size={PIECE_SIZE} color="white" />
-      );
-    case 11:
-      return <FontAwesome5 name="chess-rook" size={PIECE_SIZE} color="white" />;
-    case 13:
-      return (
-        <FontAwesome5 name="chess-bishop" size={PIECE_SIZE} color="white" />
-      );
-    case 12:
-      return (
-        <FontAwesome5 name="chess-knight" size={PIECE_SIZE} color="white" />
-      );
-    case 10:
-      return <FontAwesome5 name="chess-pawn" size={PIECE_SIZE} color="white" />;
-    default:
-      return null;
-  }
-};
 
 type Props = {
   id: number;
@@ -141,13 +99,6 @@ export default function Piece({
       endField: move.endField,
       promotePiece: move.promotePiece,
     };
-    dispatch({
-      type: "playMove",
-      payload: move,
-    });
-    dispatch({ type: "updateMyClockByMilliseconds", payload: state.increment });
-    if (state.board.moves.length === 0)
-      dispatch({ type: "setCurrentPosition", payload: 0 });
     submitMove(submitMoveRequest)
       .then((boardResponse: BoardResponse) => {
         if (!boardResponse) return;
@@ -159,6 +110,13 @@ export default function Piece({
       .catch((err) => {
         throw new Error(err);
       });
+    dispatch({
+      type: "playMove",
+      payload: move,
+    });
+    dispatch({ type: "updateMyClockByMilliseconds", payload: state.increment });
+    if (state.board.moves.length === 0)
+      dispatch({ type: "setCurrentPosition", payload: 0 });
   };
 
   const panResponder = useRef(
@@ -320,7 +278,7 @@ export default function Piece({
             opacity: possibleMoves.current[positionNumber],
           }}
         />
-        {id !== 0 ? convertToIcon(id) : null}
+        {id !== 0 ? <NumberToPiece piece={id} pieceSize={PIECE_SIZE} /> : null}
       </Animated.View>
     </>
   );

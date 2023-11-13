@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -27,9 +27,24 @@ export default function TermsOfServicePage({ navigation, route }: Props) {
   };
 
   return (
-    <View>
+    <View style={styles.appContainer}>
       <Text>TermsOfServicePage</Text>
-      <BaseButton text="accept" handlePress={handleAccept} />
+      <View style={styles.buttonContainer}>
+        <BaseButton text="accept" handlePress={handleAccept} />
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    width: "50%",
+    height: 32,
+  },
+  appContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 16,
+  },
+});
