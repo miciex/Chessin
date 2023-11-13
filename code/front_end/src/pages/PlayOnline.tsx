@@ -269,8 +269,8 @@ export default function PlayOnline({ navigation, route }: Props) {
             const myColor = isMyPlayerWhite ? "white" : "black";
             const opponentColor = isMyPlayerWhite ? "black" : "white";
             setRotateBoardAfterFoundGame(isMyPlayerWhite);
-            getBoardByGameId(data.id).then(
-              (boardResponse: BoardResponse | null) => {
+            getBoardByGameId(data.id)
+              .then((boardResponse: BoardResponse | null) => {
                 if (!boardResponse) return;
                 dispatch({
                   type: "setDataFromBoardResponse",
@@ -292,8 +292,10 @@ export default function PlayOnline({ navigation, route }: Props) {
                 ).catch((err) => {
                   throw new Error(err);
                 });
-              }
-            );
+              })
+              .catch((err) => {
+                throw new Error(err);
+              });
           })
           .catch((err) => {
             throw new Error(err);
@@ -331,6 +333,9 @@ export default function PlayOnline({ navigation, route }: Props) {
           .catch((err) => {
             throw new Error(err);
           });
+      })
+      .catch((err) => {
+        throw new Error(err);
       });
   };
 
