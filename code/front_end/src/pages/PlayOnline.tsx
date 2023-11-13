@@ -250,44 +250,54 @@ export default function PlayOnline({ navigation, route }: Props) {
     user: User,
     request: PendingChessGameRequest
   ) => {
-    searchForGame(request)
-      .then((data: ChessGameResponse | null) => {
-        if (!data) return;
-        handleListenForDrawOffer(String(data.id));
-        handleListenForResign(String(data.id));
-        dispatch({
-          type: "setUpGame",
-          payload: {
-            chessGameResponse: data,
-            nameInGame: request.nameInGame,
-          },
-        });
-        const isMyPlayerWhite = data.whiteUser.nameInGame === user.nameInGame;
-        const myColor = isMyPlayerWhite ? "white" : "black";
-        const opponentColor = isMyPlayerWhite ? "black" : "white";
-        setRotateBoardAfterFoundGame(isMyPlayerWhite);
-        getBoardByGameId(data.id).then(
-          (boardResponse: BoardResponse | null) => {
-            if (!boardResponse) return;
+    cancelSearch()
+      .then(() => {
+        searchForGame(request)
+          .then((data: ChessGameResponse | null) => {
+            if (!data) return;
+            handleListenForDrawOffer(String(data.id));
+            handleListenForResign(String(data.id));
             dispatch({
-              type: "setDataFromBoardResponse",
-              payload: { boardResponse },
-            });
-
-            if (boardResponse.gameResult !== GameResults.NONE) return;
-            handleListnForFirstMove(
-              data.id,
-              {
-                ...user,
-                color: myColor,
-                timeLeft: new Date(request.timeControl),
+              type: "setUpGame",
+              payload: {
+                chessGameResponse: data,
+                nameInGame: request.nameInGame,
               },
-              responseUserToPlayer(data[`${opponentColor}User`], opponentColor)
-            ).catch((err) => {
-              throw new Error(err);
             });
-          }
-        );
+            const isMyPlayerWhite =
+              data.whiteUser.nameInGame === user.nameInGame;
+            const myColor = isMyPlayerWhite ? "white" : "black";
+            const opponentColor = isMyPlayerWhite ? "black" : "white";
+            setRotateBoardAfterFoundGame(isMyPlayerWhite);
+            getBoardByGameId(data.id).then(
+              (boardResponse: BoardResponse | null) => {
+                if (!boardResponse) return;
+                dispatch({
+                  type: "setDataFromBoardResponse",
+                  payload: { boardResponse },
+                });
+
+                if (boardResponse.gameResult !== GameResults.NONE) return;
+                handleListnForFirstMove(
+                  data.id,
+                  {
+                    ...user,
+                    color: myColor,
+                    timeLeft: new Date(request.timeControl),
+                  },
+                  responseUserToPlayer(
+                    data[`${opponentColor}User`],
+                    opponentColor
+                  )
+                ).catch((err) => {
+                  throw new Error(err);
+                });
+              }
+            );
+          })
+          .catch((err) => {
+            throw new Error(err);
+          });
       })
       .catch((err) => {
         throw new Error(err);

@@ -286,7 +286,7 @@ const Routing = () => {
           <Stack.Screen
             name="UserNotAuthenticated"
             component={UserNotAuthenticatedPage}
-            options={({ navigation }) => ({
+            options={() => ({
               headerStyle: styles.header,
               headerTitle: () => <NotAuthenticatedHeader />,
               headerBackVisible: false,
@@ -296,7 +296,7 @@ const Routing = () => {
           <Stack.Screen
             name="TermsOfService"
             component={TermsOfServicePage}
-            options={({ navigation }) => ({
+            options={() => ({
               headerStyle: styles.header,
               headerTitle: () => <NotAuthenticatedHeader />,
               headerBackVisible: false,
@@ -314,6 +314,14 @@ const Routing = () => {
                 setUserAuthenticated={setUserAuthenticated}
               />
             )}
+            options={() => ({
+              headerStyle: styles.header,
+              headerTitle: () => <NotAuthenticatedHeader />,
+              headerBackVisible: false,
+              headerBackButtonMenuEnabled: false,
+              headerLeft: () => null,
+              // headerTitleStyle:
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>
