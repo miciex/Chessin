@@ -228,6 +228,11 @@ public class ChessGameService {
             if(!disconnections.containsKey(id))
                 return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
+            if(activeBoards.get(id).getGameResult() != GameResults.NONE)
+            {
+                return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
+            }
+
             if(((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected())) && activeBoards.containsKey(id))
                 return ResponseEntity.ok().body(DisconnectionResponse.builder()
                         .disconnectionStatus(DisconnectionStatus.DISCONNECTED)
