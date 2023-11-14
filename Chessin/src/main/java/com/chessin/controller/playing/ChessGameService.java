@@ -436,7 +436,7 @@ public class ChessGameService {
                     return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not requested draw."));
             }
             else
-                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
         }
     }
 
@@ -457,15 +457,16 @@ public class ChessGameService {
             activeBoards.get(id).notifyAll();
             activeBoards.get(id).wait(Constants.Application.LISTEN_TIME);
 
-            if(activeBoards.containsKey(id))
-            {
-                if (activeBoards.get(id).getGameResult() != GameResults.NONE) {
-                    return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
-                } else
-                    return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not accepted draw."));
-            }
-            else
+            if(!activeBoards.containsKey(id))
                 return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
+
+            if(activeBoards.get(id).getGameResult() != GameResults.NONE)
+                return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
+
+            if (activeBoards.get(id).getGameResult() != GameResults.DRAW_AGREEMENT)
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
+            else
+                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not accepted draw."));
         }
     }
 
