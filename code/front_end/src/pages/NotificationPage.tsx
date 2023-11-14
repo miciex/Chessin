@@ -29,19 +29,27 @@ export default function Notification({ route, navigation }: Props) {
   const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([]);
 
   useEffect(() => {
-    checkInvitations().then((data) => {
-      console.log("check invite data: ");
-      console.log(data);
-      if (!data) return;
-      setInvitations(data.map((x) => responseUserToUser(x.user, "")));
-    });
+    checkInvitations()
+      .then((data) => {
+        console.log("check invite data: ");
+        console.log(data);
+        if (!data) return;
+        setInvitations(data.map((x) => responseUserToUser(x.user, "")));
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
 
-    checkInvitationsToGame().then((data) => {
-      console.log("invitations");
-      console.log(data);
-      if (!data) return;
-      setInvitationsToGame(data.map((x) => responseUserToUser(x.user, "")));
-    });
+    checkInvitationsToGame()
+      .then((data) => {
+        console.log("invitations");
+        console.log(data);
+        if (!data) return;
+        setInvitationsToGame(data.map((x) => responseUserToUser(x.user, "")));
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
   }, []);
   return (
     <View style={styles.appContainer}>

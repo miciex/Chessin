@@ -16,7 +16,10 @@ import BaseButton from "../../../components/BaseButton";
 import { setPendingGameRequest } from "../../playOnline/services/playOnlineService";
 import { getRanking } from "../../../utils/PlayerUtilities";
 import { GameType } from "../../../chess-logic/board";
-import { getFriendsList } from "../../../services/userServices";
+import {
+  getFriendsList,
+  getPagedFriends,
+} from "../../../services/userServices";
 import { getValueFor } from "../../../utils/AsyncStoreFunctions";
 
 type Props = {
@@ -55,12 +58,12 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
 
   useEffect(() => {
     if (!myUser) return;
-    getFriendsList(myUser.nameInGame)
+    getPagedFriends(myUser.nameInGame, 0)
       .then((data: null | ResponseUser[]) => {
         if (!data) return;
         setFriends(data.map((x) => responseUserToUser(x, "")));
       })
-      .catch((err) => {
+      .catch(() => {
         throw new Error("Error while getting friends");
       });
   }, [myUser]);
@@ -85,15 +88,18 @@ export default function PlayOnlineOptions({ navigation, user }: Props) {
 
   const handlePlayOnline = () => {
     if (!myUser) return;
-    navigation.navigate("PlayOnline", {
-      request: setPendingGameRequest(
-        gameTempo.totalTime,
-        gameTempo.increment,
-        getRanking(gameTempo.gameType, myUser),
-        myUser.nameInGame,
-        gameTempo.gameType
-      ),
-    });
+    if (chosenFriend === null) {
+      return navigation.navigate("PlayOnline", {
+        request: setPendingGameRequest(
+          gameTempo.totalTime,
+          gameTempo.increment,
+          getRanking(gameTempo.gameType, myUser),
+          myUser.nameInGame,
+          gameTempo.gameType
+        ),
+      });
+    }
+    navigation.navigate("PlayWithFriendsMenu", { userArg: chosenFriend });
   };
 
   return (

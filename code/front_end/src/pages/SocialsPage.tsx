@@ -8,9 +8,8 @@ import Footer from "../components/Footer";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
-import { handleSearchBarSocials } from "../services/userServices";
-import { HandleSearchBarSocials } from "../utils/ServicesTypes";
-import { responseUserToUser } from "../utils/PlayerUtilities";
+import { getPagedUsers } from "../services/userServices";
+import { ResponseUser, responseUserToUser } from "../utils/PlayerUtilities";
 import { User } from "../utils/PlayerUtilities";
 
 type Props = {
@@ -24,16 +23,18 @@ type Props = {
 
 export default function Socials({ route, navigation }: Props) {
   const [users, setUsers] = useState<Array<User>>([]);
-  const [searchValue, setSearchValue] = useState<HandleSearchBarSocials>({
-    searchNickname: "a",
-  });
+  const [searchValue, setSearchValue] = useState<string>("");
 
   useEffect(() => {
-    if (searchValue.searchNickname)
-      handleSearchBarSocials(searchValue).then((data) => {
-        if (data === undefined) return;
-        setUsers(data.map((x) => responseUserToUser(x, "")));
-      });
+    if (searchValue)
+      getPagedUsers(searchValue, 0)
+        .then((data: null | ResponseUser[]) => {
+          if (!data) return;
+          setUsers(data.map((x) => responseUserToUser(x, "")));
+        })
+        .catch((error) => {
+          throw new Error(error);
+        });
   }, [searchValue]);
 
   return (
@@ -42,7 +43,7 @@ export default function Socials({ route, navigation }: Props) {
         <InputField
           placeholder="Search"
           onChange={(e) => {
-            setSearchValue({ searchNickname: e });
+            setSearchValue(e);
           }}
         />
         <ScrollView>

@@ -43,3 +43,4 @@ export const isUserPlayingLink = `${chessGameLink}isUserPlaying/`;
 export const isUserPlayingTimeControlLink = `${chessGameLink}isUserPlayingTimeControl/`;
 export const pingLink = `${chessGameLink}ping/`;
 export const listenForDisconnectionLink = `${chessGameLink}listenForDisconnection/`;
+export const getUsersLink = `${userLink}getUsers/`;

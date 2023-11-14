@@ -208,6 +208,7 @@ export default function PlayOnline({ navigation, route }: Props) {
   };
 
   const handleJoinToExistingGame = async (user: User) => {
+    dispatch({ type: "setSearchingGame", payload: true });
     getGameByUsername(user.nameInGame)
       .then((data: ChessGameResponse | undefined) => {
         if (!data) return;
@@ -260,6 +261,7 @@ export default function PlayOnline({ navigation, route }: Props) {
     user: User,
     request: PendingChessGameRequest
   ) => {
+    dispatch({ type: "setSearchingGame", payload: true });
     cancelSearch()
       .then(() => {
         searchForGame(request)

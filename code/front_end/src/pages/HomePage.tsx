@@ -94,7 +94,7 @@ const HomePage = ({ navigation }: Props) => {
                   }
                   result={game.gameResult}
                   navigation={navigation}
-                  key={`${game.id}${user?.nameInGame}`}
+                  key={game.id}
                   date={new Date(game.startTime)}
                   gameId={game.id}
                   myPlayerWhite={game.whiteUser.nameInGame === user?.nameInGame}

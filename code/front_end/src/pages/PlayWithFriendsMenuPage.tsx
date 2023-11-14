@@ -23,6 +23,7 @@ import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { GameType } from "../chess-logic/board";
 import { inviteToGame } from "../services/userServices";
 import { ChessGameResponse } from "../utils/ServicesTypes";
+import { withDecay } from "react-native-reanimated";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -84,24 +85,26 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
           />
         ) : (
           <View style={styles.contentContainer}>
-            <ScrollView
-              contentContainerStyle={{ alignItems: "center", width: "90%" }}
-            >
-              <View style={styles.profileBox}>
-                <Profile
-                  nick={user2 ? user2.nameInGame : ""}
-                  rank={
-                    user2
-                      ? user2.ranking
-                      : {
-                          BULLET: 0,
-                          BLITZ: 0,
-                          RAPID: 0,
-                          CLASSICAL: 0,
-                        }
-                  }
-                  country={user2 ? user2.country : "Poland"}
-                />
+            <ScrollView style={{ width: "100%" }}>
+              <View style={styles.inScrollViewContainer}>
+                <View style={styles.profileOuterContainer}>
+                  <View style={styles.profileBox}>
+                    <Profile
+                      nick={user2 ? user2.nameInGame : ""}
+                      rank={
+                        user2
+                          ? user2.ranking
+                          : {
+                              BULLET: 0,
+                              BLITZ: 0,
+                              RAPID: 0,
+                              CLASSICAL: 0,
+                            }
+                      }
+                      country={user2 ? user2.country : "Poland"}
+                    />
+                  </View>
+                </View>
                 <View style={{ width: 400, height: 130 }}>
                   <ChooseTimeButton
                     handleOpenModal={handleOpenModal}
@@ -177,16 +180,30 @@ export default function PlayWithFriendsMenuPage({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
+  profileOuterContainer: {
+    width: "100%",
+    height: 200,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
   appContainer: {
     backgroundColor: ColorsPallet.light,
     alignContent: "center",
     alignItems: "center",
     flex: 1,
+    width: "100%",
   },
   contentContainer: {
-    marginTop: 22,
     flex: 7,
     alignItems: "center",
+    width: "100%",
+  },
+  inScrollViewContainer: {
+    marginTop: 20,
+    flex: 7,
+    alignItems: "center",
+    width: "100%",
+    paddingBottom: 20,
   },
   text: {
     textAlign: "center",
@@ -210,10 +227,9 @@ const styles = StyleSheet.create({
   },
   profileBox: {
     width: "90%",
-    // height: 200,
-    alignItems: "center",
+    height: 200,
     marginBottom: 20,
-    flex: 7,
+    // flex: 7,
   },
   medalButton: {
     width: 60,

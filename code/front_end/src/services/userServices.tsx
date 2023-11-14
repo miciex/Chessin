@@ -11,6 +11,7 @@ import {
   inviteToGameLink,
   checkInvitationsToGameLink,
   respondtoInvitationLink,
+  getUsersLink,
 } from "../utils/ApiEndpoints";
 import {
   FriendInvitationResponse,
@@ -195,13 +196,17 @@ export const logoutUser = async () => {
 };
 
 export const updateUserRating = async (rating: number, gameType: GameType) => {
-  const userJSON = await getValueFor("user");
+  const userJSON = await getValueFor("user").catch((error) => {
+    throw new Error(error);
+  });
   if (!userJSON)
     throw new Error("Couldn't update user rating, because user isn't stored");
   let user: User = await JSON.parse(userJSON);
   user.ranking[gameType] = rating;
   user.highestRanking = getHighestRanking(user.ranking);
-  save("user", JSON.stringify(user));
+  save("user", JSON.stringify(user)).catch((error) => {
+    throw new Error(error);
+  });
 };
 
 export const getFriendsList = async (nick: string) => {
@@ -236,4 +241,16 @@ export const getPagedGames = async (nameInGame: string, page: number) => {
       throw new Error(error);
     }
   );
+};
+
+export const getPagedFriends = async (nameInGame: string, page: number) => {
+  return handlePost(`${getFriends}${nameInGame}/${page}`).catch((error) => {
+    throw new Error(error);
+  });
+};
+
+export const getPagedUsers = async (nickname: string, page: number) => {
+  return handlePost(`${getUsersLink}${nickname}/${page}`).catch((error) => {
+    throw new Error(error);
+  });
 };
