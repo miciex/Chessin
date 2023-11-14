@@ -1,6 +1,6 @@
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 
-export const handleFetch = async (url: string, options: RequestInit = {}) => {
+export const handleFetch = async (url: string, options: RequestInit = {}, controller?:AbortController) => {
   return fetch(url, options)
   .then(response => {
     if(response.status === 202){
@@ -22,7 +22,7 @@ export const handleFetch = async (url: string, options: RequestInit = {}) => {
   });
 }
 
-export const handlePost = async (url: string, body?: string) => {
+export const handlePost = async (url: string, body?: string, controller?: AbortController) => {
   const accessToken = await getValueFor("accessToken").catch(() => {
     throw new Error(
       "Couldn't get board, because accessToken isn't stored"
@@ -35,7 +35,8 @@ export const handlePost = async (url: string, body?: string) => {
       Authorization: `Bearer ${accessToken}`,
     },
     body: body,
-  }).catch((error) => {
+    signal: controller?.signal
+  }, controller).catch((error) => {
     throw new Error(error);
   });
 }

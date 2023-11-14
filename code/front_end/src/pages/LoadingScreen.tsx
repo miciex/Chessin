@@ -35,6 +35,7 @@ export default function LoadingScreen({
       navigation.navigate("TermsOfService");
       throw new Error("Error while getting terms of service");
     });
+
     if (!accepted) {
       return navigation.navigate("TermsOfService");
     }

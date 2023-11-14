@@ -82,8 +82,8 @@ export const ping = async (gameId: string) => {
   });
 }
 
-export const listenForDisconnections = async (gameId: string) => {
-  return handlePost(`${listenForDisconnectionLink}${gameId}`).catch((error) => {
+export const listenForDisconnections = async (gameId: string, controller:AbortController) => {
+  return handlePost(`${listenForDisconnectionLink}${gameId}`,undefined, controller).catch((error) => {
     throw new Error(error);
   });
 }

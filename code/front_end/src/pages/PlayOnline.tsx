@@ -82,17 +82,23 @@ export default function PlayOnline({ navigation, route }: Props) {
   useEffect(() => {
     if (state.gameId < 0) return;
     if (state.myPlayer.color == undefined) return;
-    console.log("game result: " + JSON.stringify(state.board.result));
     if (state.board.result !== GameResults.NONE) return;
+    const handleListenForDisconnectController = new AbortController();
     const interval = setInterval(() => {
       handlePing(String(state.gameId)).catch(() => {
         throw new Error("Error while pinging");
       });
-    }, 10000);
-    handleListenForDisconnect(String(state.gameId)).catch(() => {
+    }, 5000);
+    handleListenForDisconnect(
+      String(state.gameId),
+      handleListenForDisconnectController
+    ).catch(() => {
       throw new Error("Error while listening for disconnect");
     });
-    return () => clearInterval(interval);
+    return () => {
+      // handleListenForDisconnectController.abort();
+      clearInterval(interval);
+    };
   }, [state.gameId, state.board.result]);
 
   const setRotateBoardAfterFoundGame = (isMyPlayerWhite: boolean) => {
@@ -170,9 +176,13 @@ export default function PlayOnline({ navigation, route }: Props) {
       });
   };
 
-  const handleListenForDisconnect = async (gameId: string) => {
-    listenForDisconnections(gameId)
+  const handleListenForDisconnect = async (
+    gameId: string,
+    controller: AbortController
+  ) => {
+    listenForDisconnections(gameId, controller)
       .then((response: DisconnectionResponse | null) => {
+        console.log("listenForDisconnections response", response);
         if (response === null) return;
         if (DisconnectionStatus.DISCONNECTED === response.disconnectionStatus) {
           dispatch({ type: "setOpponentDisconnected", payload: true });
@@ -255,8 +265,7 @@ export default function PlayOnline({ navigation, route }: Props) {
         searchForGame(request)
           .then((data: ChessGameResponse | null) => {
             if (!data) return;
-            handleListenForDrawOffer(String(data.id));
-            handleListenForResign(String(data.id));
+
             dispatch({
               type: "setUpGame",
               payload: {
