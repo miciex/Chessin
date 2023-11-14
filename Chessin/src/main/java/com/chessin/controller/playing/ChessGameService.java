@@ -459,7 +459,7 @@ public class ChessGameService {
 
             if(activeBoards.containsKey(id))
             {
-                if (activeBoards.get(id).getGameResult() != GameResults.NONE) {
+                if (activeBoards.get(id).getGameResult() == GameResults.DRAW_AGREEMENT) {
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                 } else
                     return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not accepted draw."));

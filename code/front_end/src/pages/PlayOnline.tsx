@@ -96,7 +96,7 @@ export default function PlayOnline({ navigation, route }: Props) {
       throw new Error("Error while listening for disconnect");
     });
     return () => {
-      // handleListenForDisconnectController.abort();
+      handleListenForDisconnectController.abort();
       clearInterval(interval);
     };
   }, [state.gameId, state.board.result]);
@@ -277,6 +277,8 @@ export default function PlayOnline({ navigation, route }: Props) {
               data.whiteUser.nameInGame === user.nameInGame;
             const myColor = isMyPlayerWhite ? "white" : "black";
             const opponentColor = isMyPlayerWhite ? "black" : "white";
+            handleListenForDrawOffer(String(data.id));
+            handleListenForResign(String(data.id));
             setRotateBoardAfterFoundGame(isMyPlayerWhite);
             getBoardByGameId(data.id)
               .then((boardResponse: BoardResponse | null) => {
