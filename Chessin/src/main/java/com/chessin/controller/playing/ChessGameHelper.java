@@ -2,6 +2,8 @@ package com.chessin.controller.playing;
 
 import com.chessin.controller.requests.PendingChessGameRequest;
 import com.chessin.controller.requests.SubmitMoveRequest;
+import com.chessin.controller.responses.ChessGameResponse;
+import com.chessin.controller.responses.MessageResponse;
 import com.chessin.controller.responses.MoveResponse;
 import com.chessin.model.playing.*;
 import com.chessin.model.playing.Glicko2.Entities.*;
@@ -14,15 +16,18 @@ import com.chessin.model.playing.Glicko2.Result;
 import com.chessin.model.utils.Convert;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ChessGameHelper {
     private final ChessGameRepository chessGameRepository;
     private final MoveRepository moveRepository;
@@ -109,8 +114,7 @@ public class ChessGameHelper {
     }
 
     @Transactional
-    public Board updateRatings(ChessGame game, Board board)
-    {
+    public Board updateRatings(ChessGame game, Board board) {
         Rating whiteRating, blackRating;
 
         switch (game.getGameType()) {
@@ -135,23 +139,16 @@ public class ChessGameHelper {
 
         double whiteRatingBefore = whiteRating.getRating(), blackRatingBefore = blackRating.getRating();
 
-        if(board.getGameResult() == GameResults.MATE)
-        {
-            if(board.isWhiteTurn())
+        if (board.getGameResult() == GameResults.MATE) {
+            if (board.isWhiteTurn())
                 ratingCalculator.updateRatings(new Result(blackRating, whiteRating));
             else
                 ratingCalculator.updateRatings(new Result(whiteRating, blackRating));
-        }
-        else if(Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_TIMEOUT, GameResults.BLACK_DISCONNECTED).contains(board.getGameResult()))
-        {
+        } else if (Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_TIMEOUT, GameResults.BLACK_DISCONNECTED).contains(board.getGameResult())) {
             ratingCalculator.updateRatings(new Result(whiteRating, blackRating));
-        }
-        else if(Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_TIMEOUT, GameResults.WHITE_DISCONNECTED).contains(board.getGameResult()))
-        {
+        } else if (Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_TIMEOUT, GameResults.WHITE_DISCONNECTED).contains(board.getGameResult())) {
             ratingCalculator.updateRatings(new Result(blackRating, whiteRating));
-        }
-        else if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.DRAW_50_MOVE_RULE, GameResults.INSUFFICIENT_MATERIAL, GameResults.STALEMATE).contains(board.getGameResult()))
-        {
+        } else if (Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.DRAW_50_MOVE_RULE, GameResults.INSUFFICIENT_MATERIAL, GameResults.STALEMATE).contains(board.getGameResult())) {
             ratingCalculator.updateRatings(new Result(whiteRating, blackRating, true));
         }
 
