@@ -88,7 +88,6 @@ public class ChessGameService {
                         .build();
 
                 chessGameRepository.save(game);
-                chessGameRepository.save(game);
 
                 pendingGames.get(foundGame.getUser().getEmail()).setId(game.getId());
 
@@ -153,7 +152,7 @@ public class ChessGameService {
         if(pendingGames.containsKey(email))
             pendingGames.remove(email);
         else
-            return ResponseEntity.badRequest().body(MessageResponse.of("No search found"));
+            return ResponseEntity.accepted().body(MessageResponse.of("No search found"));
 
         return ResponseEntity.ok().body(MessageResponse.of("Search cancelled"));
     }
