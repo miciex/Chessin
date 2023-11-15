@@ -149,9 +149,10 @@ export function reducer(
         ),
       };
     case "setNextPosition":
-      if (state.currentPosition < state.moves.length - 1) {
+      if (state.currentPosition < state.moves.length ) {
         return { ...state, currentPosition: state.currentPosition + 1 };
       }
+      else return state;
     case "setPreviousPosition":
       if (state.currentPosition > 0) {
         return { ...state, currentPosition: state.currentPosition - 1 };

@@ -64,11 +64,11 @@ const EndedGame = ({
             borderless: false,
           }}
         >
-          <Image
+          <FontAwesome
+            name="user-circle"
+            size={25}
+            color="black"
             style={styles.tinyLogo}
-            source={{
-              uri: "https://play-lh.googleusercontent.com/aTTVA77bs4tVS1UvnsmD_T0w-rdZef7UmjpIsg-8RVDOVl_EVEHjmkn6qN7C0teRS3o",
-            }}
           />
           <Text>
             {nick} {Math.floor(rank)}

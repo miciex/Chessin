@@ -72,7 +72,6 @@ export default function Notification({ route, navigation }: Props) {
               email={player.email}
             />
           ))}
-          <Notify text="Gratulacje osiagnales 1000 elo" />
         </View>
       </ScrollView>
     </View>
