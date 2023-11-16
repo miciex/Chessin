@@ -255,7 +255,10 @@ const Routing = () => {
           <Stack.Screen
             name="Avatar"
             component={AvatarPage}
-            options={{ headerShown: false }}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => getHeader(navigation),
+            })}
           />
           <Stack.Screen
             name="ResetPassword"

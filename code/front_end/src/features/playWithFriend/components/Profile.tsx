@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import React from "react";
 import { ColorsPallet } from "../../../utils/Constants";
 import { Rankings } from "../../../utils/PlayerUtilities";
 import CountryFlag from "react-native-country-flag";
 import { countryToIsoCode } from "../../playOnline";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../../Routing";
 
 type Props = {
   nick: string;
@@ -12,6 +14,11 @@ type Props = {
   playing?: boolean;
   avatar?: string;
   country: string;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "ProfilePage",
+    undefined
+  >;
 };
 
 export default function Profile({
@@ -21,10 +28,22 @@ export default function Profile({
   playing,
   avatar,
   country,
+  navigation,
 }: Props) {
   return (
     <View style={styles.profile}>
       <View style={styles.left}>
+        <Pressable onPress={() => navigation.navigate("Avatar")}>
+          <Image
+            style={styles.tinyLogo}
+            source={{
+              uri: avatar
+                ? avatar
+                : "https://us-tuna-sounds-images.voicemod.net/6f0b01c1-bf29-4157-a1f7-800327ea9323-1658162982836.jpg",
+            }}
+          />
+        </Pressable>
+
         <CountryFlag isoCode={countryToIsoCode(country)} size={60} />
       </View>
       <View style={styles.right}>
@@ -84,9 +103,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   tinyLogo: {
-    width: 85,
-    height: 85,
+    width: 95,
+    height: 95,
     borderRadius: 50,
+    marginBottom: 10,
   },
 
   flag: {

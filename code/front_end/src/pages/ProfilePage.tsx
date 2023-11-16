@@ -252,6 +252,7 @@ export default function ProfilePage({
             active={user2 ? user2.online : user ? user.online : false}
             playing={user2 ? user2.playing : user ? user.playing : false}
             country={user2 ? user2.country : user ? user.country : ""}
+            navigation={navigation}
           />
         </View>
 
