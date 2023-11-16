@@ -33,6 +33,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "./src/utils/Constants";
 import NotAuthenticatedHeader from "./src/components/NotAuthenticatedHeader";
 import { getValueFor, save } from "./src/utils/AsyncStoreFunctions";
+import AvatarPage from "./src/pages/AvatarPage";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -64,6 +65,7 @@ export type RootStackParamList = {
   ResetPassword: undefined;
   RemindPassword: undefined;
   UserNotAuthenticated: undefined;
+  Avatar: undefined;
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
@@ -301,6 +303,14 @@ const Routing = () => {
               headerTitle: () => <NotAuthenticatedHeader />,
               headerBackVisible: false,
               headerLeft: () => null,
+            })}
+          />
+          <Stack.Screen
+            name="Avatar"
+            component={AvatarPage}
+            options={({ navigation }) => ({
+              headerStyle: styles.header,
+              headerTitle: () => getHeader(navigation),
             })}
           />
         </Stack.Navigator>
