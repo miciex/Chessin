@@ -11,7 +11,6 @@ import Heading from "../components/Heading";
 import { User } from "../utils/PlayerUtilities";
 import { ChessGameResponse } from "../utils/ServicesTypes";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
-import { getGameHistory } from "../services/chessGameService";
 import BaseButton from "../components/BaseButton";
 import { getPagedGames } from "../services/userServices";
 
@@ -30,13 +29,15 @@ export default function LastGame({ navigation }: Props) {
   const [gamesPage, setGamesPage] = useState<number>(0);
 
   const updateGamesPage = (nameInGame: string) => {
-    getPagedGames(nameInGame, gamesPage).then(
-      (data: ChessGameResponse[] | null) => {
+    getPagedGames(nameInGame, gamesPage)
+      .then((data: ChessGameResponse[] | null) => {
         if (!data) return;
         setGamesPage((prev) => prev + 1);
         setUserGames((prev) => [...prev, ...data]);
-      }
-    );
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
   };
 
   const handleGetMoreGames = () => {
@@ -61,8 +62,14 @@ export default function LastGame({ navigation }: Props) {
 
   return (
     <View style={styles.appContainer}>
-      <ScrollView>
-        <View style={styles.contentContainer}>
+      <View style={styles.contentContainer}>
+        <ScrollView
+          contentContainerStyle={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <Heading text={"Old Games"} />
           {userGames.map((game, index) => (
             <View style={{ width: "90%" }}>
@@ -98,23 +105,22 @@ export default function LastGame({ navigation }: Props) {
               color="transparent"
             />
           </View>
-        </View>
-      </ScrollView>
-      {/* <Footer navigation={navigation} /> */}
+        </ScrollView>
+      </View>
+      <Footer navigation={navigation} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   appContainer: {
-    flex: 1,
-    alignContent: "stretch",
+    flex: 7,
+    // alignContent: "stretch",
     backgroundColor: ColorsPallet.light,
   },
   contentContainer: {
     marginTop: 12,
     flex: 8,
-    alignItems: "center",
   },
   buttonContainer: {
     margin: 12,

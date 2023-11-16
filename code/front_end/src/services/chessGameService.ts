@@ -1,4 +1,4 @@
-import { handleFetch, handlePost } from "../lib/fetch";
+import { handlePost } from "../lib/fetch";
 import {
   getGameByIdLink,
   getGameHistoryLink,
@@ -12,8 +12,6 @@ import {
   resignLink,
   respondToDrawOfferLink,
 } from "../utils/ApiEndpoints";
-import { getValueFor } from "../utils/AsyncStoreFunctions";
-import { User } from "../utils/PlayerUtilities";
 import { RespondToDrawOfferRequest } from "../utils/ServicesTypes";
 
 export const getGameHistory = async (nick: string) => {
@@ -84,8 +82,8 @@ export const ping = async (gameId: string) => {
   });
 }
 
-export const listenForDisconnections = async (gameId: string) => {
-  return handlePost(`${listenForDisconnectionLink}${gameId}`).catch((error) => {
+export const listenForDisconnections = async (gameId: string, controller:AbortController) => {
+  return handlePost(`${listenForDisconnectionLink}${gameId}`,undefined, controller).catch((error) => {
     throw new Error(error);
   });
 }

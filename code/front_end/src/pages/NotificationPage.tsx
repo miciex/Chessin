@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 
-import EndedGame from "../features/home/components/EndedGame";
 import { ColorsPallet } from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
@@ -32,19 +31,27 @@ export default function Notification({ route, navigation }: Props) {
   const [invitationsToGame, setInvitationsToGame] = useState<Array<User>>([]);
 
   useEffect(() => {
-    checkInvitations().then((data) => {
-      console.log("check invite data: ");
-      console.log(data);
-      if (!data) return;
-      setInvitations(data.map((x) => responseUserToUser(x.user, "")));
-    });
+    checkInvitations()
+      .then((data) => {
+        console.log("check invite data: ");
+        console.log(data);
+        if (!data) return;
+        setInvitations(data.map((x) => responseUserToUser(x.user, "")));
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
 
-    checkInvitationsToGame().then((data) => {
-      console.log("invitations");
-      console.log(data);
-      if (!data) return;
-      setInvitationsToGame(data.map((x) => responseUserToUser(x.user, "")));
-    });
+    checkInvitationsToGame()
+      .then((data) => {
+        console.log("invitations");
+        console.log(data);
+        if (!data) return;
+        setInvitationsToGame(data.map((x) => responseUserToUser(x.user, "")));
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
   }, []);
   return (
     <Animated.View style={styles.appContainer} entering={BounceInUp}>
@@ -67,7 +74,6 @@ export default function Notification({ route, navigation }: Props) {
               email={player.email}
             />
           ))}
-          <Notify text="Gratulacje osiagnales 1000 elo" />
         </View>
       </ScrollView>
     </Animated.View>

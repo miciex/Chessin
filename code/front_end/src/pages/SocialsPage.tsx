@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 
 import { ColorsPallet } from "../utils/Constants";
@@ -14,13 +14,14 @@ import {
   setUserDataFromResponse,
 } from "../services/userServices";
 import { HandleSearchBarSocials } from "../utils/ServicesTypes";
-import { responseUserToUser } from "../utils/PlayerUtilities";
-import { User } from "../utils/PlayerUtilities";
 import Animated, {
   BounceInUp,
   RollInLeft,
   SlideInLeft,
 } from "react-native-reanimated";
+import { getPagedUsers } from "../services/userServices";
+import { ResponseUser, responseUserToUser } from "../utils/PlayerUtilities";
+import { User } from "../utils/PlayerUtilities";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -33,25 +34,27 @@ type Props = {
 
 export default function Socials({ route, navigation }: Props) {
   const [users, setUsers] = useState<Array<User>>([]);
-  const [searchValue, setSearchValue] = useState<HandleSearchBarSocials>({
-    searchNickname: "a",
-  });
+  const [searchValue, setSearchValue] = useState<string>("");
 
   useEffect(() => {
-    if (searchValue.searchNickname)
-      handleSearchBarSocials(searchValue).then((data) => {
-        if (data === undefined) return;
-        setUsers(data.map((x) => responseUserToUser(x, "")));
-      });
+    if (searchValue)
+      getPagedUsers(searchValue, 0)
+        .then((data: null | ResponseUser[]) => {
+          if (!data) return;
+          setUsers(data.map((x) => responseUserToUser(x, "")));
+        })
+        .catch((error) => {
+          throw new Error(error);
+        });
   }, [searchValue]);
 
   return (
-    <Animated.View style={styles.appContainer} entering={BounceInUp}>
+    <Animated.View style={styles.appContainer}>
       <View style={styles.formContainer}>
         <InputField
           placeholder="Search"
           onChange={(e) => {
-            setSearchValue({ searchNickname: e });
+            setSearchValue(e);
           }}
         />
         <ScrollView>

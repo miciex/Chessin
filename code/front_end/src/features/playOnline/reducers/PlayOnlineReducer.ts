@@ -6,7 +6,6 @@ import {
 } from "../../../chess-logic/board";
 import {
   Player,
-  User,
   getBasePlayer,
   responseUserToPlayer,
 } from "../../../utils/PlayerUtilities";
@@ -30,6 +29,7 @@ export type PlayOnlineState = {
   opponentReconnected: boolean;
   disconnectionTimer: Date;
   increment: number;
+  timeControl: number;
 };
 
 export type PlayOnlineAction =
@@ -163,7 +163,8 @@ export const getInitialState = (
     opponentDisconnected: false,
     opponentReconnected: false,
     disconnectionTimer: new Date(0),
-    increment: 0
+    increment: 0,
+    timeControl: 0,
   };
 };
 
@@ -278,7 +279,8 @@ export function reducer(
           ...responseUserToPlayer(chessGameResponse[`${myColor}User`], myColor),
           timeLeft: new Date(chessGameResponse.timeControl),
         },
-        increment: action.payload.chessGameResponse.increment
+        increment: action.payload.chessGameResponse.increment,
+        timeControl: action.payload.chessGameResponse.timeControl,
       };
     case "listenForFirstMove":
       return {

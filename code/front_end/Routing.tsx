@@ -34,6 +34,8 @@ import { StackParamList } from "./src/utils/Constants";
 import NotAuthenticatedHeader from "./src/components/NotAuthenticatedHeader";
 import { getValueFor, save } from "./src/utils/AsyncStoreFunctions";
 import AvatarPage from "./src/pages/AvatarPage";
+import TermsOfServicePage from "./src/pages/TermsOfServicePage";
+import LoadingScreen from "./src/pages/LoadingScreen";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -66,6 +68,8 @@ export type RootStackParamList = {
   RemindPassword: undefined;
   UserNotAuthenticated: undefined;
   Avatar: undefined;
+  TermsOfService: undefined;
+  LoadingScreen: undefined;
 };
 
 const refreshTokenInterval = 1000 * 60 * 14;
@@ -91,19 +95,7 @@ const Routing = () => {
   }, [netInfo.isConnected]);
 
   useEffect(() => {
-    resetAccessToken()
-      .then(() => {
-        fetchandStoreUser().then(() => {
-          setUserAuthenticated();
-        });
-      })
-      .catch((err) => {
-        save("user", "");
-        console.log("coscos");
-        setUserNotAuthenticated();
-        throw new Error(err);
-      });
-    const resetToken = setInterval(() => {
+    let resetToken = setInterval(() => {
       resetAccessToken().catch((err) => {
         throw new Error(err);
       });
@@ -131,9 +123,7 @@ const Routing = () => {
   return (
     <UserLoggedInContext.Provider value={authenticated}>
       <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName={authenticated ? "Home" : "UserNotAuthenticated"}
-        >
+        <Stack.Navigator initialRouteName={"LoadingScreen"}>
           <Stack.Screen
             name="Home"
             children={(
@@ -263,6 +253,11 @@ const Routing = () => {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="Avatar"
+            component={AvatarPage}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="ResetPassword"
             children={(
               props: NativeStackScreenProps<RootStackParamList, "ResetPassword">
@@ -298,7 +293,7 @@ const Routing = () => {
           <Stack.Screen
             name="UserNotAuthenticated"
             component={UserNotAuthenticatedPage}
-            options={({ navigation }) => ({
+            options={() => ({
               headerStyle: styles.header,
               headerTitle: () => <NotAuthenticatedHeader />,
               headerBackVisible: false,
@@ -306,11 +301,33 @@ const Routing = () => {
             })}
           />
           <Stack.Screen
-            name="Avatar"
-            component={AvatarPage}
-            options={({ navigation }) => ({
+            name="TermsOfService"
+            component={TermsOfServicePage}
+            options={() => ({
               headerStyle: styles.header,
-              headerTitle: () => getHeader(navigation),
+              headerTitle: () => <NotAuthenticatedHeader />,
+              headerBackVisible: false,
+              headerLeft: () => null,
+            })}
+          />
+          <Stack.Screen
+            name="LoadingScreen"
+            children={(
+              props: NativeStackScreenProps<RootStackParamList, "LoadingScreen">
+            ) => (
+              <LoadingScreen
+                {...props}
+                setUserNotAuthenticated={setUserNotAuthenticated}
+                setUserAuthenticated={setUserAuthenticated}
+              />
+            )}
+            options={() => ({
+              headerStyle: styles.header,
+              headerTitle: () => <NotAuthenticatedHeader />,
+              headerBackVisible: false,
+              headerBackButtonMenuEnabled: false,
+              headerLeft: () => null,
+              // headerTitleStyle:
             })}
           />
         </Stack.Navigator>

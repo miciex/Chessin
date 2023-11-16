@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { Modal } from "react-native";
 import BaseButton from "../../../components/BaseButton";
 import { ColorsPallet } from "../../../utils/Constants";
 
@@ -17,25 +16,29 @@ export default function OnlineBarModal({
   handleDecline,
   handleAccept,
 }: Props) {
-  return (
-    showModal ? (
-      <View style={styles.modal}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <Text>{modalTxt}</Text>
-          <View style={styles.buttonsContainer}>
-            <View style={styles.buttonContainer}>
-              <BaseButton text="Yes" handlePress={handleAccept} fontColor={ColorsPallet.green}/>
-            </View>
-            <View style={styles.buttonContainer}>
-              <BaseButton text="No" handlePress={handleDecline} fontColor={ColorsPallet.red}/>
-            </View>
+  return showModal ? (
+    <View style={styles.modal}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>{modalTxt}</Text>
+        <View style={styles.buttonsContainer}>
+          <View style={styles.buttonContainer}>
+            <BaseButton
+              text="Yes"
+              handlePress={handleAccept}
+              fontColor={ColorsPallet.green}
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <BaseButton
+              text="No"
+              handlePress={handleDecline}
+              fontColor={ColorsPallet.red}
+            />
           </View>
         </View>
       </View>
-    ) : null
-  );
+    </View>
+  ) : null;
 }
 
 const styles = StyleSheet.create({

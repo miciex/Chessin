@@ -3,18 +3,18 @@ import React, { useEffect, useState } from "react";
 import { remindPassword } from "../services/AuthenticationServices";
 import { PasswordRemindRequest } from "../utils/ServicesTypes";
 import {
-  notValidPasswordMessage,
+  getPasswordErrorMessage,
   notValidPasswordRepeatMessage,
   emailRegex,
-  passwordRegex,
   ColorsPallet,
+  containsNumbersRegex,
+  containsSpecialCharactersRegex,
 } from "../utils/Constants";
 import AuthInput from "../features/authentication/components/AuthInput";
 import BaseButton from "../components/BaseButton";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import { RouteProp } from "@react-navigation/native";
-import Footer from "../components/Footer";
 import AuthCodeModal from "../features/login/components/AuthCodeModal";
 import { VerificationType } from "../utils/ServicesTypes";
 import { logoutUser } from "../services/userServices";
@@ -124,7 +124,13 @@ export default function RemindPasswordPage({
   };
 
   const validateNewPassword = (): boolean => {
-    return passwordRegex.test(newPassword);
+    return (
+      containsNumbersRegex.test(newPassword) &&
+      containsSpecialCharactersRegex.test(newPassword) &&
+      newPassword.toLowerCase() !== newPassword &&
+      newPassword.toUpperCase() !== newPassword &&
+      newPassword.length >= 12
+    );
   };
 
   const setIsNewPasswordValid = (): void => {
@@ -198,7 +204,7 @@ export default function RemindPasswordPage({
             value={newPassword}
             onChange={setNewPassword}
             isValid={newPasswordValid}
-            notValidText={notValidPasswordMessage}
+            notValidText={notValidPasswordRepeatMessage}
             onSubmitEditing={setIsNewPasswordValid}
             onFocus={() => setActiveInput("Password")}
             activeInput={activeInput}
@@ -208,7 +214,7 @@ export default function RemindPasswordPage({
             value={repeatNewPassword}
             onChange={setRepeatNewPassword}
             isValid={repeatNewPasswordValid}
-            notValidText={notValidPasswordRepeatMessage}
+            notValidText={getPasswordErrorMessage(repeatNewPassword)}
             onSubmitEditing={setIsRepeatNewPasswordValid}
             onFocus={() => setActiveInput("Repeat password")}
             activeInput={activeInput}

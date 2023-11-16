@@ -1,19 +1,14 @@
 import {
-  BoardResponseToOnlineBoard,
   GameResults,
   GameType,
-  OnlineBoardType,
-  playMove,
 } from "../../../chess-logic/board";
 import {
   Player,
-  User,
   getBasePlayer,
   responseUserToPlayer,
 } from "../../../utils/PlayerUtilities";
 import { Move, moveResponseToMove } from "../../../chess-logic/move";
-import { BoardResponse, ChessGameResponse } from "../../../utils/ServicesTypes";
-import { ResponseUser } from "../../../utils/PlayerUtilities";
+import { ChessGameResponse } from "../../../utils/ServicesTypes";
 import { FenToIntArray, boardToMap } from "../../../chess-logic/helpMethods";
 
 export type AnalyzeGameState = {
@@ -154,9 +149,10 @@ export function reducer(
         ),
       };
     case "setNextPosition":
-      if (state.currentPosition < state.moves.length - 1) {
+      if (state.currentPosition < state.moves.length ) {
         return { ...state, currentPosition: state.currentPosition + 1 };
       }
+      else return state;
     case "setPreviousPosition":
       if (state.currentPosition > 0) {
         return { ...state, currentPosition: state.currentPosition - 1 };

@@ -7,6 +7,7 @@
 package com.chessin.model.playing.Glicko2;
 
 import com.chessin.model.playing.Glicko2.Entities.Rating;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.context.annotation.Bean;
 
@@ -20,6 +21,7 @@ import java.util.List;
  * @author Jeremy Gooch
  * 
  */
+@Transactional
 public class RatingCalculator {
 
 	private final static double DEFAULT_RATING =  1000.0;

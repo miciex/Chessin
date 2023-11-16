@@ -13,6 +13,7 @@ import com.chessin.model.playing.Glicko2.Repositories.RapidRatingRepository;
 import com.chessin.model.register.user.Provider;
 import com.chessin.model.register.user.User;
 import com.chessin.model.register.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final ClassicalRatingRepository classicalRatingRepository;

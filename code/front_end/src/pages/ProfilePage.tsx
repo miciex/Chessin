@@ -14,16 +14,18 @@ import {
   checkSendedInvitations,
   getFriendsList,
   getPagedGames,
-  getUser,
   handleFriendInvitationFunc,
 } from "../services/userServices";
 import { ColorsPallet } from "../utils/Constants";
-import { User, responseUserToUser } from "../utils/PlayerUtilities";
+import {
+  ResponseUser,
+  User,
+  responseUserToUser,
+} from "../utils/PlayerUtilities";
 import { getValueFor } from "../utils/AsyncStoreFunctions";
 import { fetchUser } from "../services/userServices";
 import { FriendInvitationResponseType } from "../utils/ServicesTypes";
 import LogoutButton from "../components/LogoutButton";
-import { getGameHistory } from "../services/chessGameService";
 import { ChessGameResponse } from "../utils/ServicesTypes";
 import { BounceInUp, BounceOutDown } from "react-native-reanimated";
 import Animated from "react-native-reanimated";
@@ -194,8 +196,8 @@ export default function ProfilePage({
   useEffect(() => {
     if (nameInGame)
       getFriendsList(nameInGame)
-        .then((data) => {
-          if (data === undefined) return;
+        .then((data: null | ResponseUser[]) => {
+          if (!data) return;
           setFriends(data.map((x) => responseUserToUser(x, "")));
         })
         .catch((err) => {
@@ -210,6 +212,18 @@ export default function ProfilePage({
       .catch((err) => {
         throw new Error(err);
       });
+  }, [nameInGame, user?.nameInGame]);
+
+  useEffect(() => {
+    if (nameInGame)
+      getFriendsList(nameInGame)
+        .then((data: null | ResponseUser[]) => {
+          if (!data) return;
+          setFriends(data.map((x) => responseUserToUser(x, "")));
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
   }, [nameInGame, user?.nameInGame]);
 
   useEffect(() => {

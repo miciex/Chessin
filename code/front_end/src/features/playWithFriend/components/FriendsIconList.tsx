@@ -13,10 +13,11 @@ import { StackParamList } from "../../../utils/Constants";
 import { ColorsPallet } from "../../../utils/Constants";
 import { getFriendsList } from "../../../services/userServices";
 import {
+  ResponseUser,
   User,
-  responseUserToPlayer,
   responseUserToUser,
 } from "../../../utils/PlayerUtilities";
+import { FontAwesome } from "@expo/vector-icons";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -32,8 +33,8 @@ export default function FriendsIconList({ navigation, nameInGame }: Props) {
 
   useEffect(() => {
     if (nameInGame)
-      getFriendsList(nameInGame).then((data) => {
-        if (data === undefined) return;
+      getFriendsList(nameInGame).then((data: null | ResponseUser[]) => {
+        if (!data) return;
         setFriends(data.map((x) => responseUserToUser(x, "")));
       });
   }, [nameInGame]);
@@ -60,13 +61,9 @@ export default function FriendsIconList({ navigation, nameInGame }: Props) {
                 }}
               >
                 <View style={styles.profile}>
-                  <Image
-                    style={styles.imageIcon}
-                    source={{
-                      uri: "https://images.squarespace-cdn.com/content/v1/5d025635e9e6f00001d604a6/1561427252699-2EMQCKUQ1J49MYTDGQ47/http-%253A%253Awww.comedycentral.com.au%253Asouth-park%253Avideos%253Athe-worst-of-eric-cartman-casa-bonita-clips.jpg?format=500w",
-                    }}
-                    alt={player.country}
-                  />
+                  <View>
+                    <FontAwesome name="user-circle" size={50} color="black" />
+                  </View>
                   <Text style={styles.text}>{player.nameInGame}</Text>
                 </View>
               </Pressable>
@@ -103,6 +100,7 @@ const styles = StyleSheet.create({
     height: 100,
   },
   profile: {
+    marginTop: 16,
     height: 50,
     marginLeft: 6,
   },

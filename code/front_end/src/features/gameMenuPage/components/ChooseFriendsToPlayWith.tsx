@@ -12,11 +12,11 @@ export default function ChooseFriendsToPlayWith({
   friends,
   handleChooseFriend,
 }: Props) {
-  const content = friends.map((friend, index) => (
+  const content = friends.map((friend) => (
     <FriendToPlayWith
       friend={friend}
       handleChooseFriend={handleChooseFriend}
-      key={index}
+      key={friend.nameInGame}
     />
   ));
 

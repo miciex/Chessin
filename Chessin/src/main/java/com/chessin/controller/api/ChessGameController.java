@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/game")
 @RequiredArgsConstructor
+@Transactional
 public class ChessGameController {
     private final ChessGameService service;
     private final JwtService jwtService;
 
-    @Transactional
     @PostMapping("/searchNewGame")
     public ResponseEntity<?> searchNewGame(@RequestBody PendingChessGameRequest request, HttpServletRequest servlet) throws InterruptedException {
 
@@ -37,7 +37,6 @@ public class ChessGameController {
         return service.searchNewGame(request, email);
     }
 
-    @Transactional
     @PostMapping("/cancelSearch")
     public ResponseEntity<?> cancelSearch(HttpServletRequest servlet)
     {
@@ -46,7 +45,6 @@ public class ChessGameController {
         return service.cancelSearch(email);
     }
 
-    @Transactional
     @PostMapping("/ping/{gameId}")
     public ResponseEntity<?> ping(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -63,7 +61,6 @@ public class ChessGameController {
         return service.ping(id, email);
     }
 
-    @Transactional
     @PostMapping("/listenForDisconnection/{gameId}")
     public ResponseEntity<?> listenForDisconnection(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -79,13 +76,11 @@ public class ChessGameController {
         return service.listenForDisconnection(id, email);
     }
 
-    @Transactional
     @PostMapping("/listenForMove")
     public ResponseEntity<?> listenForMove(@RequestBody ListenForMoveRequest request) throws InterruptedException {
         return service.listenForMove(request);
     }
 
-    @Transactional
     @PostMapping("/listenForFirstMove/{gameId}")
     public ResponseEntity<?> listenForFirstMove(@PathVariable String gameId) throws InterruptedException {
         long id;
@@ -101,7 +96,6 @@ public class ChessGameController {
         return service.listenForFirstMove(id);
     }
 
-    @Transactional
     @PostMapping("/submitMove")
     public ResponseEntity<?> submitMove(@RequestBody SubmitMoveRequest request, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -109,7 +103,6 @@ public class ChessGameController {
         return service.submitMove(request, email);
     }
 
-    @Transactional
     @PostMapping("/listenForResignation/{gameId}")
     public ResponseEntity<?> listenForResignation(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -127,7 +120,6 @@ public class ChessGameController {
         return service.listenForResignation(id, email);
     }
 
-    @Transactional
     @PostMapping("/resign/{gameId}")
     public ResponseEntity<?> resign(@PathVariable String gameId, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -145,7 +137,6 @@ public class ChessGameController {
         return service.resign(id, email);
     }
 
-    @Transactional
     @PostMapping("/listenForDrawOffer/{gameId}")
     public ResponseEntity<?> listenForDrawOffer(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -163,7 +154,6 @@ public class ChessGameController {
         return service.listenForDrawOffer(id, email);
     }
 
-    @Transactional
     @PostMapping("/offerDraw/{gameId}")
     public ResponseEntity<?> offerDraw(@PathVariable String gameId, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -181,7 +171,6 @@ public class ChessGameController {
         return service.offerDraw(id, email);
     }
 
-    @Transactional
     @PostMapping("/respondToDrawOffer")
     public ResponseEntity<?> respondToDrawOffer(@RequestBody RespondToDrawOfferRequest request, HttpServletRequest servlet)
     {
@@ -190,7 +179,6 @@ public class ChessGameController {
         return service.respondToDrawOffer(request, email);
     }
 
-    @Transactional
     @PostMapping("/cancelDrawOffer/{gameId}")
     public ResponseEntity<?> cancelDrawOffer(@PathVariable String gameId, HttpServletRequest servlet)
     {
@@ -263,7 +251,6 @@ public class ChessGameController {
         return service.isUserPlayingTimeControl(username, timeControl, increment);
     }
 
-    @Transactional
     @PostMapping("/inviteFriend")
     public ResponseEntity<?> inviteFriend(@RequestBody GameInvitationRequest request, HttpServletRequest servlet) throws InterruptedException {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -271,7 +258,6 @@ public class ChessGameController {
         return service.inviteFriend(request, email);
     }
 
-    @Transactional
     @PostMapping("/respondToGameInvitation")
     public ResponseEntity<?> respondToGameInvitation(@RequestBody GameInvitationResponseRequest request, HttpServletRequest servlet) {
         String email = jwtService.extractUsername(servlet.getHeader("Authorization").substring(7));
@@ -279,7 +265,6 @@ public class ChessGameController {
         return service.respondToGameInvitation(request, email);
     }
 
-    @Transactional
     @PostMapping("/checkGameInvitations")
     public ResponseEntity<?> checkGameInvitations(HttpServletRequest servlet)
     {

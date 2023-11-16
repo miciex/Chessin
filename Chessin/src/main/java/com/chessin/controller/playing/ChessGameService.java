@@ -24,6 +24,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -32,6 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ChessGameService {
     private final ChessGameRepository chessGameRepository;
     private final UserRepository userRepository;
@@ -44,8 +46,8 @@ public class ChessGameService {
     private final ConcurrentHashMap<Long, Disconnection> disconnections = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, GameInvitation> pendingInvitations = new ConcurrentHashMap<>();
 
-    @Transactional
     public ResponseEntity<?> searchNewGame(PendingChessGameRequest request, String email) throws InterruptedException {
+
         if(pendingGames.containsKey(email))
         {
             return ResponseEntity.badRequest().body(MessageResponse.of("User is already searching for a game."));
@@ -117,15 +119,15 @@ public class ChessGameService {
 
         pendingGames.put(email, pendingChessGame);
 
-        synchronized (pendingGames.get(pendingChessGame.getUser().getEmail()))
+        synchronized(pendingGames.get(email))
         {
-            pendingGames.get(pendingChessGame.getUser().getEmail()).wait(Constants.Application.GAME_SEARCH_TIME);
+            pendingGames.get(email).wait(Constants.Application.GAME_SEARCH_TIME);
 
-            if(!pendingGames.containsKey(pendingChessGame.getUser().getEmail()))
+            if(!pendingGames.containsKey(email))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
 
-            if (pendingGames.get(pendingChessGame.getUser().getEmail()).getOpponent() == null) {
-                pendingGames.remove(pendingChessGame.getUser().getEmail());
+            if (pendingGames.get(email).getOpponent() == null) {
+                pendingGames.remove(email);
                 return ResponseEntity.badRequest().body(MessageResponse.of("No opponent found"));
             }
             else
@@ -142,21 +144,19 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> cancelSearch(String email)
     {
         if(!userRepository.existsByEmail(email))
             return ResponseEntity.badRequest().body(MessageResponse.of("User not found"));
 
-        if(pendingGames.get(email) != null)
+        if(pendingGames.containsKey(email))
             pendingGames.remove(email);
         else
-            return ResponseEntity.badRequest().body(MessageResponse.of("No search found"));
+            return ResponseEntity.accepted().body(MessageResponse.of("No search found"));
 
         return ResponseEntity.ok().body(MessageResponse.of("Search cancelled"));
     }
 
-    @Transactional
     public ResponseEntity<?> ping(long id, String email) throws InterruptedException {
         if(!activeBoards.containsKey(id))
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
@@ -212,7 +212,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> listenForDisconnection(long id, String email) throws InterruptedException {
         if (!activeBoards.containsKey(id))
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
@@ -226,7 +225,15 @@ public class ChessGameService {
         {
             disconnections.get(id).getListener().wait(Constants.Application.LISTEN_TIME);
 
-            if((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected()))
+            if(!disconnections.containsKey(id))
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
+
+            if(activeBoards.get(id).getGameResult() != GameResults.NONE)
+            {
+                return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
+            }
+
+            if(((isWhite && disconnections.get(id).isBlackDisconnected()) || (!isWhite && disconnections.get(id).isWhiteDisconnected())) && activeBoards.containsKey(id))
                 return ResponseEntity.ok().body(DisconnectionResponse.builder()
                         .disconnectionStatus(DisconnectionStatus.DISCONNECTED)
                         .disconnectionTime(HelpMethods.getDisconnectionTime(activeGames.get(id).getGameType()))
@@ -236,7 +243,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> listenForMove(ListenForMoveRequest request) throws InterruptedException {
         if(!activeGames.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found"));
@@ -249,13 +255,15 @@ public class ChessGameService {
             activeGames.get(request.getGameId()).wait(Constants.Application.LISTEN_TIME);
 
             if(!activeBoards.containsKey(request.getGameId()))
-                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
-            return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
+            if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
+                return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
+            else
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(request.getGameId())));
         }
     }
 
-    @Transactional
     public ResponseEntity<?> listenForFirstMove(long id) throws InterruptedException {
         if(!activeBoards.containsKey(id))
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
@@ -267,23 +275,16 @@ public class ChessGameService {
         {
             activeGames.get(id).wait(Constants.Application.LISTEN_TIME);
 
-            if(activeBoards.containsKey(id))
-            {
-                if (activeBoards.get(id).getGameResult() == GameResults.NONE) {
-                    if (activeBoards.get(id).getMoves() == null || activeBoards.get(id).getMoves().isEmpty()) {
-                        finishGame(id, Optional.of(GameResults.ABANDONED));
-                        return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
-                    } else
-                        return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
-                } else
-                    return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
-            }
+            if(!activeBoards.containsKey(id))
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
+
+            if(activeBoards.get(id).getGameResult() != GameResults.NONE)
+                return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
             else
-                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(activeBoards.get(id)));
         }
     }
 
-    @Transactional
     public ResponseEntity<?> submitMove(SubmitMoveRequest request, String email) throws InterruptedException {
         if(!activeBoards.containsKey(request.getGameId()))
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
@@ -345,7 +346,7 @@ public class ChessGameService {
             if(!activeBoards.containsKey(request.getGameId()))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
 
-            if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.BLACK_RESIGN, GameResults.WHITE_RESIGN).contains(activeBoards.get(request.getGameId()).getGameResult()))
+            if(Arrays.asList(GameResults.DRAW_AGREEMENT, GameResults.BLACK_RESIGN, GameResults.WHITE_RESIGN, GameResults.ABANDONED, GameResults.BLACK_TIMEOUT, GameResults.WHITE_TIMEOUT, GameResults.WHITE_ABANDONED, GameResults.BLACK_ABANDONED).contains(activeBoards.get(request.getGameId()).getGameResult()))
                 return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
 
             if(activeBoards.get(request.getGameId()).getGameResult() != GameResults.NONE)
@@ -357,7 +358,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> listenForResignation(long id, String email) throws InterruptedException {
         if(!activeBoards.containsKey(id))
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
@@ -367,23 +367,22 @@ public class ChessGameService {
             activeBoards.get(id).wait(Constants.Application.LISTEN_TIME);
 
             if(!activeBoards.containsKey(id))
-                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
 
             if(activeBoards.get(id).getGameResult() != GameResults.NONE)
             {
-                if((activeBoards.get(id).getGameResult() == GameResults.WHITE_RESIGN && activeBoards.get(id).getWhiteEmail().equals(email)) || (activeBoards.get(id).getGameResult() == GameResults.BLACK_RESIGN && activeBoards.get(id).getBlackEmail().equals(email)))
+                if((Arrays.asList(GameResults.WHITE_RESIGN, GameResults.WHITE_ABANDONED).contains(activeBoards.get(id).getGameResult()) && activeBoards.get(id).getWhiteEmail().equals(email)) || (Arrays.asList(GameResults.BLACK_RESIGN, GameResults.BLACK_ABANDONED).contains(activeBoards.get(id).getGameResult()) && activeBoards.get(id).getBlackEmail().equals(email)))
                     return ResponseEntity.accepted().body(MessageResponse.of("Game has ended."));
                 else
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
             }
             else
             {
-                return ResponseEntity.status(HttpStatus.CONTINUE).body(MessageResponse.of("Opponent has not resigned."));
+                return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not resigned."));
             }
         }
     }
 
-    @Transactional
     public ResponseEntity<?> resign(long id, String email)
     {
         if(!activeBoards.containsKey(id))
@@ -392,7 +391,14 @@ public class ChessGameService {
         synchronized(activeBoards.get(id))
         {
             if(activeBoards.get(id).getMoves().size() < 2)
-                return ResponseEntity.ok().body(BoardResponse.fromBoard(finishGame(id, Optional.of(GameResults.ABANDONED))));
+            {
+                if(activeBoards.get(id).getWhiteEmail().equals(email))
+                    activeBoards.get(id).setGameResult(GameResults.WHITE_ABANDONED);
+                else
+                    activeBoards.get(id).setGameResult(GameResults.BLACK_ABANDONED);
+
+                return ResponseEntity.ok().body(BoardResponse.fromBoard(finishGame(id, Optional.empty())));
+            }
 
             if(activeBoards.get(id).getWhiteEmail().equals(email))
             {
@@ -409,7 +415,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> listenForDrawOffer(long id, String email) throws InterruptedException {
         if(!activeBoards.containsKey(id))
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
@@ -435,7 +440,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> offerDraw(long id, String email) throws InterruptedException {
         if(!activeBoards.get(id).getWhiteEmail().equals(email) && !activeBoards.get(id).getBlackEmail().equals(email))
             return ResponseEntity.badRequest().body(MessageResponse.of("You are not playing this game."));
@@ -455,17 +459,16 @@ public class ChessGameService {
 
             if(activeBoards.containsKey(id))
             {
-                if (activeBoards.get(id).getGameResult() != GameResults.NONE) {
+                if (activeBoards.get(id).getGameResult() == GameResults.DRAW_AGREEMENT) {
                     return ResponseEntity.ok().body(BoardResponse.fromBoard(clearGame(id)));
                 } else
                     return ResponseEntity.accepted().body(MessageResponse.of("Opponent has not accepted draw."));
             }
             else
-                return ResponseEntity.accepted().body(MessageResponse.of("Game not found."));
+                return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
         }
     }
 
-    @Transactional
     public ResponseEntity<?> respondToDrawOffer(RespondToDrawOfferRequest request, String email)
     {
         if(!activeBoards.get(request.getGameId()).getWhiteEmail().equals(email) && !activeBoards.get(request.getGameId()).getBlackEmail().equals(email))
@@ -495,7 +498,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> cancelDrawOffer(long id, String email)
     {
         if(!activeBoards.get(id).getWhiteEmail().equals(email) && !activeBoards.get(id).getBlackEmail().equals(email))
@@ -519,7 +521,6 @@ public class ChessGameService {
         return ResponseEntity.ok().body(MessageResponse.of("Draw offer cancelled."));
     }
 
-    @Transactional
     public ResponseEntity<?> getGame(long id)
     {
         if(!chessGameRepository.existsById(id))
@@ -531,10 +532,9 @@ public class ChessGameService {
         return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(chessGameRepository.findById(id).get(), userService));
     }
 
-    @Transactional
     public ResponseEntity<?> getGameByUsername(String username)
     {
-        Optional<ChessGame> game = activeGames.values().stream().filter(x -> x.getBlackUser().getNameInGame().equals(username) || x.getWhiteUser().getNameInGame().equals(username)).findFirst();
+        Optional<ChessGame> game = getGameByEmail(userRepository.findByNameInGame(username).get().getEmail());
 
         if(game.isPresent())
             return ResponseEntity.ok().body(ChessGameResponse.fromChessGame(game.get(), userService));
@@ -542,7 +542,6 @@ public class ChessGameService {
             return ResponseEntity.badRequest().body(MessageResponse.of("This player is not playing any game."));
     }
 
-    @Transactional
     public ResponseEntity<?> getBoardByUsername(String username)
     {
         Optional<Board> board = activeBoards.values().stream().filter(x -> userRepository.findByEmail(x.getBlackEmail()).get().getNameInGame().equals(username) || userRepository.findByEmail(x.getWhiteEmail()).get().getNameInGame().equals(username)).findFirst();
@@ -553,7 +552,6 @@ public class ChessGameService {
             return ResponseEntity.badRequest().body(MessageResponse.of("This player is not playing any game."));
     }
 
-    @Transactional
     public ResponseEntity<?> getBoardByGameId(long id)
     {
         if(activeBoards.containsKey(id))
@@ -562,7 +560,6 @@ public class ChessGameService {
             return ResponseEntity.badRequest().body(MessageResponse.of("Game not found."));
     }
 
-    @Transactional
     public ResponseEntity<?> isUserPlaying(String username)
     {
         String email = userRepository.findByNameInGame(username).get().getEmail();
@@ -571,7 +568,6 @@ public class ChessGameService {
         return isPlaying ? ResponseEntity.ok().body(MessageResponse.of("True")) : ResponseEntity.ok().body(MessageResponse.of("False"));
     }
 
-    @Transactional
     public ResponseEntity<?> isUserPlayingTimeControl(String username, long timeControl, long increment)
     {
         String email = userRepository.findByNameInGame(username).get().getEmail();
@@ -593,7 +589,6 @@ public class ChessGameService {
         return ResponseEntity.ok().body(MessageResponse.of("False"));
     }
 
-    @Transactional
     public ResponseEntity<?> inviteFriend(GameInvitationRequest request, String email) throws InterruptedException {
         if(!userRepository.existsByNameInGame(request.getFriendNickname()))
             return ResponseEntity.badRequest().body(MessageResponse.of("User not found."));
@@ -647,7 +642,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> respondToGameInvitation(GameInvitationResponseRequest request, String email)
     {
         if(!userRepository.existsByNameInGame(request.getFriendNickname()))
@@ -716,7 +710,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public ResponseEntity<?> checkGameInvitations(String email)
     {
         List<GameInvitation> invitations = pendingInvitations.values().stream().filter(x -> x.getFriend().getEmail().equals(email)).toList();
@@ -729,7 +722,6 @@ public class ChessGameService {
         return ResponseEntity.ok().body(responses);
     }
 
-    @Transactional
     public Board finishGame(long gameId, Optional<GameResults> gameResult)
     {
         synchronized(activeGames.get(gameId))
@@ -738,9 +730,9 @@ public class ChessGameService {
             {
                 synchronized(disconnections.get(gameId))
                 {
-                    if(gameResult.orElse(GameResults.NONE) == GameResults.ABANDONED)
+                    if(Arrays.asList(GameResults.ABANDONED, GameResults.WHITE_ABANDONED, GameResults.BLACK_ABANDONED).contains(gameResult.orElse(GameResults.NONE)))
                     {
-                        activeBoards.get(gameId).setGameResult(GameResults.ABANDONED);
+                        activeBoards.get(gameId).setGameResult(gameResult.get());
                         chessGameRepository.deleteById(gameId);
                         activeGames.get(gameId).notifyAll();
                         activeBoards.get(gameId).notifyAll();
@@ -760,7 +752,6 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
     public Board clearGame(long gameId)
     {
         synchronized(activeGames.get(gameId))
@@ -779,18 +770,28 @@ public class ChessGameService {
         }
     }
 
-    @Transactional
+    public Optional<ChessGame> getGameByEmail(String email)
+    {
+        String username = userRepository.findByEmail(email).get().getNameInGame();
+
+        return activeGames.values().stream().filter(x -> x.getBlackUser().getNameInGame().equals(username) || x.getWhiteUser().getNameInGame().equals(username)).findFirst();
+    }
+
+
     @Scheduled(fixedRate = 5000)
     public void handleGames()
     {
-        List<Board> boards = activeBoards.values().stream().filter(x -> x.getMoves().size() <= 2).toList();
+        List<Board> boards = activeBoards.values().stream().filter(x -> x.getMoves().size() < 2).toList();
 
         for(Board board : boards)
         {
            if(Instant.now().toEpochMilli() - board.getLastMoveTime() >= HelpMethods.getDisconnectionTime(board.getGameType()))
            {
-               finishGame(board.getGameId(), Optional.of(GameResults.ABANDONED));
-               clearGame(board.getGameId());
+//               finishGame(board.getGameId(), Optional.of(GameResults.ABANDONED));
+//               clearGame(board.getGameId());
+                 synchronized(disconnections.get(board.getGameId())) {
+                     disconnections.get(board.getGameId()).notifyAll();
+                 }
            }
         }
     }

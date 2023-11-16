@@ -1,18 +1,10 @@
 import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
-
-import { FontAwesome5 } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import { ColorsPallet, StackParamList } from "../../../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../Routing";
 import BaseButton from "../../../components/BaseButton";
-import {
-  addFriendFunc,
-  answerToGameInvitation,
-  fetchUser,
-  handleFriendInvitationFunc,
-} from "../../../services/userServices";
+import { answerToGameInvitation } from "../../../services/userServices";
 import {
   ChessGameResponse,
   FriendInvitationResponseType,

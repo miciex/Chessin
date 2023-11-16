@@ -1,16 +1,18 @@
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import Submit from "../features/login/components/Submit";
-import LogInWithOtherFirm from "../features/login/components/LogInWithOtherFirm";
-import { ColorsPallet } from "../utils/Constants";
+import {
+  ColorsPallet,
+  containsNumbersRegex,
+  containsSpecialCharactersRegex,
+  getPasswordErrorMessage,
+} from "../utils/Constants";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Routing";
 import AuthInput from "../features/authentication/components/AuthInput";
-import Footer from "../components/Footer";
-import { emailRegex, passwordRegex, nameRegex } from "../utils/Constants";
+import { emailRegex, nameRegex } from "../utils/Constants";
 import {
   notValidEmailMessage,
-  notValidPasswordMessage,
   notValidNameMessage,
   notValidNickMessage,
   notValidPasswordRepeatMessage,
@@ -94,7 +96,13 @@ export default function Register({ navigation }: Props) {
   };
 
   const validatePassword = (): boolean => {
-    return passwordRegex.test(password);
+    return (
+      containsNumbersRegex.test(password) &&
+      containsSpecialCharactersRegex.test(password) &&
+      password.toLowerCase() !== password &&
+      password.toUpperCase() !== password &&
+      password.length >= 12
+    );
   };
 
   const setEmailValid = (): void => {
@@ -171,7 +179,7 @@ export default function Register({ navigation }: Props) {
 
   const handleVerifyCodeResponse = async (response: Response) => {
     if (response.status === 200) {
-      navigation.navigate("Home");
+      navigation.replace("Home");
     } else if (response.status === 400) {
       response
         .text()
@@ -252,7 +260,7 @@ export default function Register({ navigation }: Props) {
               securityTextEntry={true}
               isValid={isPasswordValid}
               onSubmitEditing={setPasswordValid}
-              notValidText={notValidPasswordMessage}
+              notValidText={getPasswordErrorMessage(password)}
               onFocus={() => setActiveInput("Password")}
               activeInput={activeInput}
             />
