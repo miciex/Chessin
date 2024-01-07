@@ -31,6 +31,7 @@ export default function LoadingScreen({
   const spinValue = useRef(new Animated.Value(0)).current;
 
   const redirectUserToGame = async (user?: User) => {
+    console.log("user");
     const accepted = await getValueFor("termsOfServiceAccepted").catch(() => {
       navigation.navigate("TermsOfService");
       throw new Error("Error while getting terms of service");

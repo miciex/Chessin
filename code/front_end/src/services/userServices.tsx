@@ -112,6 +112,7 @@ export const resetAccessToken = async () => {
   await AsynStorage.removeItem("accessToken");
   const refreshToken = await getValueFor("refreshToken");
   if (refreshToken === null) return;
+
   handleFetch(refreshTokenLink, {
     body: JSON.stringify({
       refreshToken: refreshToken,
@@ -122,6 +123,7 @@ export const resetAccessToken = async () => {
     method: "POST",
   })
     .then(async (data) => {
+      console.log("1");
       await AsynStorage.setItem("accessToken", data.accessToken);
     })
     .catch(() => {

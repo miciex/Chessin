@@ -10,6 +10,7 @@ export const fetchandStoreUser = async () => {
       if (!data) {
         throw new Error("Couldn't fetch user");
       }
+
       return loggedUserToUser(data);
     })
     .then(async (user) => {
